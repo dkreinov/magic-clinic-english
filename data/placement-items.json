@@ -1,0 +1,282 @@
+{
+  "meta": {
+    "version": 1,
+    "generatedAt": "2026-07-24T10:39:27.544Z",
+    "generator": "scripts/build-item-bank.js",
+    "model": "gpt-4.1-mini",
+    "source": "data/band1.json",
+    "task1Count": 12,
+    "task2TextCount": 2,
+    "task2QuestionCount": 6
+  },
+  "task1": [
+    {
+      "id": "t1-01",
+      "direction": "audio-to-picture",
+      "lemma": "pet",
+      "he": "חיית מחמד",
+      "emoji": "🐕",
+      "options": [
+        "🐕",
+        "🎬",
+        "🐎",
+        "👩"
+      ],
+      "correctIndex": 0,
+      "section": "preBandI",
+      "audio": "audio/word-pet.mp3"
+    },
+    {
+      "id": "t1-02",
+      "direction": "audio-to-picture",
+      "lemma": "mom",
+      "he": "אמא",
+      "emoji": "👩",
+      "options": [
+        "🥩",
+        "👩",
+        "🌀",
+        "🏕️"
+      ],
+      "correctIndex": 1,
+      "section": "preBandI",
+      "audio": "audio/word-mom.mp3"
+    },
+    {
+      "id": "t1-03",
+      "direction": "audio-to-picture",
+      "lemma": "camp",
+      "he": "מחנה",
+      "emoji": "🏕️",
+      "options": [
+        "🏕️",
+        "👩",
+        "🐕",
+        "🐎"
+      ],
+      "correctIndex": 0,
+      "section": "preBandI",
+      "audio": "audio/word-camp.mp3"
+    },
+    {
+      "id": "t1-04",
+      "direction": "audio-to-picture",
+      "lemma": "fan",
+      "he": "מאוורר",
+      "emoji": "🌀",
+      "options": [
+        "🦁",
+        "👨",
+        "🎤",
+        "🌀"
+      ],
+      "correctIndex": 3,
+      "section": "preBandI",
+      "audio": "audio/word-fan.mp3"
+    },
+    {
+      "id": "t1-05",
+      "direction": "audio-to-picture",
+      "lemma": "dad",
+      "he": "אבא",
+      "emoji": "👨",
+      "options": [
+        "🧑‍💻",
+        "🎤",
+        "👨",
+        "🦁"
+      ],
+      "correctIndex": 2,
+      "section": "preBandI",
+      "audio": "audio/word-dad.mp3"
+    },
+    {
+      "id": "t1-06",
+      "direction": "audio-to-picture",
+      "lemma": "desk",
+      "he": "שולחן",
+      "emoji": "🧑‍💻",
+      "options": [
+        "🧑‍💻",
+        "🐎",
+        "🌀",
+        "🥩"
+      ],
+      "correctIndex": 0,
+      "section": "preBandI",
+      "audio": "audio/word-desk.mp3"
+    },
+    {
+      "id": "t1-07",
+      "direction": "picture-to-word",
+      "lemma": "singer",
+      "he": "זמר",
+      "emoji": "🎤",
+      "options": [
+        "dad",
+        "pet",
+        "singer",
+        "camp"
+      ],
+      "correctIndex": 2,
+      "section": "bandI"
+    },
+    {
+      "id": "t1-08",
+      "direction": "picture-to-word",
+      "lemma": "horse",
+      "he": "סוס",
+      "emoji": "🐎",
+      "options": [
+        "horse",
+        "pet",
+        "camp",
+        "mom"
+      ],
+      "correctIndex": 0,
+      "section": "bandI"
+    },
+    {
+      "id": "t1-09",
+      "direction": "picture-to-word",
+      "lemma": "zoo",
+      "he": "גן חיות",
+      "emoji": "🦁",
+      "options": [
+        "fan",
+        "mom",
+        "steak",
+        "zoo"
+      ],
+      "correctIndex": 3,
+      "section": "bandI"
+    },
+    {
+      "id": "t1-10",
+      "direction": "picture-to-word",
+      "lemma": "movie",
+      "he": "סרט",
+      "emoji": "🎬",
+      "options": [
+        "desk",
+        "steak",
+        "pet",
+        "movie"
+      ],
+      "correctIndex": 3,
+      "section": "bandI"
+    },
+    {
+      "id": "t1-11",
+      "direction": "picture-to-word",
+      "lemma": "monkey",
+      "he": "קוף",
+      "emoji": "🐒",
+      "options": [
+        "movie",
+        "steak",
+        "monkey",
+        "camp"
+      ],
+      "correctIndex": 2,
+      "section": "bandI"
+    },
+    {
+      "id": "t1-12",
+      "direction": "picture-to-word",
+      "lemma": "steak",
+      "he": "סטייק",
+      "emoji": "🥩",
+      "options": [
+        "camp",
+        "horse",
+        "steak",
+        "singer"
+      ],
+      "correctIndex": 2,
+      "section": "bandI"
+    }
+  ],
+  "task2": [
+    {
+      "id": "t2-t1",
+      "title": "בדיקת חיה בבית החולים",
+      "text": "The doctor is at the hospital. She looks at the dog. The dog is not well. The doctor gives advice to the owner. They will come again tomorrow.",
+      "questions": [
+        {
+          "id": "t2-t1-q1",
+          "prompt": "איפה נמצא הרופא?",
+          "options": [
+            "בבית החולים",
+            "בבית",
+            "בגן",
+            "בבית הספר"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "t2-t1-q2",
+          "prompt": "מה עושה הרופא לכלב?",
+          "options": [
+            "בודק אותו",
+            "משחק איתו",
+            "נותן לו אוכל",
+            "רואה סרט"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "t2-t1-q3",
+          "prompt": "מתי הם יחזרו?",
+          "options": [
+            "מחר",
+            "היום",
+            "אתמול",
+            "בשבוע הבא"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "id": "t2-t2",
+      "title": "חיות בגן החיות",
+      "text": "There is a big elephant at the zoo. The elephant is near a tree. A boy and a girl look at the elephant. They like the animal very much. The sun is bright and the day is warm.",
+      "questions": [
+        {
+          "id": "t2-t2-q1",
+          "prompt": "איזה חיה יש בגן החיות?",
+          "options": [
+            "פיל",
+            "כלב",
+            "חתול",
+            "ציפור"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "t2-t2-q2",
+          "prompt": "איפה הפיל נמצא?",
+          "options": [
+            "ליד עץ",
+            "על המים",
+            "בבית",
+            "במכונית"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "id": "t2-t2-q3",
+          "prompt": "איך הילדים מרגישים לגבי הפיל?",
+          "options": [
+            "הם אוהבים אותו",
+            "הם מפחדים ממנו",
+            "הם לא רואים אותו",
+            "הם עייפים"
+          ],
+          "correctIndex": 0
+        }
+      ]
+    }
+  ]
+}
