@@ -1,0 +1,52 @@
+import { sendJson, readJsonBody } from '../lib/http.js';
+import { loadProfile, saveProfile } from '../lib/store.js';
+import { defaultProfile } from '../lib/profile.js';
+import { generateChapter } from '../lib/story.js';
+import { chatJSON } from '../lib/openai.js';
+import band1 from '../data/band1.json' with { type: 'json' };
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    sendJson(res, 405, { ok: false, error: `Method ${req.method} not allowed` });
+    return;
+  }
+
+  let body;
+  try {
+    body = await readJsonBody(req);
+  } catch (err) {
+    sendJson(res, 400, { ok: false, error: 'invalid JSON body' });
+    return;
+  }
+
+  if (body.action !== 'generate') {
+    sendJson(res, 400, { ok: false, error: 'unknown action' });
+    return;
+  }
+
+  let p = await loadProfile();
+  if (p === null) p = defaultProfile();
+
+  if (p.placement.completed !== true) {
+    sendJson(res, 400, { ok: false, error: 'placement required' });
+    return;
+  }
+
+  if (!p.learner.heroineName || !p.learner.petName) {
+    sendJson(res, 400, { ok: false, error: 'learner required' });
+    return;
+  }
+
+  const r = await generateChapter({ profile: p, band1, chat: chatJSON });
+  if (!r.ok) {
+    sendJson(res, 502, { ok: false, error: 'chapter generation failed' });
+    return;
+  }
+
+  p.story.chapters.push(r.chapter);
+  p.story.summarySoFar = r.summarySoFar;
+  p.story.cliffhanger = r.chapter.cliffhanger;
+  await saveProfile(p);
+
+  sendJson(res, 200, { ok: true, data: { chapter: r.chapter } });
+}

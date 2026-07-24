@@ -172,6 +172,95 @@ test('word-tap POST without lemma returns 400', async () => {
   });
 });
 
+test('set-learner POST sets both names and persists via GET', async () => {
+  await withTempDataDir(async () => {
+    const req = createPostReq({ action: 'set-learner', heroineName: 'Noa', petName: 'Sparky' });
+    const res = createMockRes();
+    await profileHandler(req, res);
+    assert.strictEqual(res.statusCode, 200);
+    const parsed = JSON.parse(res.body);
+    assertEnvelope(parsed);
+    assert.strictEqual(parsed.ok, true);
+    assert.strictEqual(parsed.data.learner.heroineName, 'Noa');
+    assert.strictEqual(parsed.data.learner.petName, 'Sparky');
+
+    const getReq = createGetReq();
+    const getRes = createMockRes();
+    await profileHandler(getReq, getRes);
+    assert.strictEqual(getRes.statusCode, 200);
+    const getParsed = JSON.parse(getRes.body);
+    assert.strictEqual(getParsed.data.learner.heroineName, 'Noa');
+    assert.strictEqual(getParsed.data.learner.petName, 'Sparky');
+  });
+});
+
+test('set-learner POST with neither name returns 400 "name required"', async () => {
+  await withTempDataDir(async () => {
+    const req = createPostReq({ action: 'set-learner' });
+    const res = createMockRes();
+    await profileHandler(req, res);
+    assert.strictEqual(res.statusCode, 400);
+    const parsed = JSON.parse(res.body);
+    assertEnvelope(parsed);
+    assert.strictEqual(parsed.ok, false);
+    assert.strictEqual(parsed.error, 'name required');
+  });
+});
+
+test('set-learner POST with blank heroineName returns 400', async () => {
+  await withTempDataDir(async () => {
+    const req = createPostReq({ action: 'set-learner', heroineName: '   ' });
+    const res = createMockRes();
+    await profileHandler(req, res);
+    assert.strictEqual(res.statusCode, 400);
+    const parsed = JSON.parse(res.body);
+    assertEnvelope(parsed);
+    assert.strictEqual(parsed.ok, false);
+    assert.strictEqual(parsed.error, 'name required');
+  });
+});
+
+test('log-check POST appends an entry to story.checkLog and persists', async () => {
+  await withTempDataDir(async () => {
+    const req = createPostReq({
+      action: 'log-check',
+      chapter: 1,
+      questionId: 'ch1-q1',
+      chosenIndex: 0,
+      correctIndex: 0,
+    });
+    const res = createMockRes();
+    await profileHandler(req, res);
+    assert.strictEqual(res.statusCode, 200);
+    const parsed = JSON.parse(res.body);
+    assertEnvelope(parsed);
+    assert.strictEqual(parsed.ok, true);
+    assert.strictEqual(parsed.data.story.checkLog.length, 1);
+    assert.strictEqual(parsed.data.story.checkLog[0].questionId, 'ch1-q1');
+    assert.strictEqual(parsed.data.story.checkLog[0].correct, true);
+
+    const getReq = createGetReq();
+    const getRes = createMockRes();
+    await profileHandler(getReq, getRes);
+    assert.strictEqual(getRes.statusCode, 200);
+    const getParsed = JSON.parse(getRes.body);
+    assert.strictEqual(getParsed.data.story.checkLog.length, 1);
+  });
+});
+
+test('log-check POST missing questionId returns 400 "invalid check"', async () => {
+  await withTempDataDir(async () => {
+    const req = createPostReq({ action: 'log-check', chapter: 1, chosenIndex: 0, correctIndex: 0 });
+    const res = createMockRes();
+    await profileHandler(req, res);
+    assert.strictEqual(res.statusCode, 400);
+    const parsed = JSON.parse(res.body);
+    assertEnvelope(parsed);
+    assert.strictEqual(parsed.ok, false);
+    assert.strictEqual(parsed.error, 'invalid check');
+  });
+});
+
 test('PUT method returns 405', async () => {
   await withTempDataDir(async () => {
     const req = { method: 'PUT' };

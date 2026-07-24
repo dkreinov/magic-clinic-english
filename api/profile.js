@@ -1,6 +1,6 @@
 import { sendJson, readJsonBody } from '../lib/http.js';
 import { loadProfile, saveProfile } from '../lib/store.js';
-import { defaultProfile, applyWordTap, markWordKnown } from '../lib/profile.js';
+import { defaultProfile, applyWordTap, markWordKnown, setLearner, logCheck } from '../lib/profile.js';
 
 const WORD_SOURCES = ['placement', 'tap', 'band'];
 
@@ -57,6 +57,32 @@ export default async function handler(req, res) {
       sendJson(res, 400, { ok: false, error: err.message });
       return;
     }
+  } else if (body.action === 'set-learner') {
+    if (body.heroineName === undefined && body.petName === undefined) {
+      sendJson(res, 400, { ok: false, error: 'name required' });
+      return;
+    }
+    try {
+      setLearner(p, { heroineName: body.heroineName, petName: body.petName });
+    } catch (err) {
+      sendJson(res, 400, { ok: false, error: err.message });
+      return;
+    }
+  } else if (body.action === 'log-check') {
+    if (
+      typeof body.questionId !== 'string' ||
+      typeof body.chosenIndex !== 'number' ||
+      typeof body.correctIndex !== 'number'
+    ) {
+      sendJson(res, 400, { ok: false, error: 'invalid check' });
+      return;
+    }
+    logCheck(p, {
+      chapter: body.chapter,
+      questionId: body.questionId,
+      chosenIndex: body.chosenIndex,
+      correctIndex: body.correctIndex,
+    });
   } else {
     sendJson(res, 400, { ok: false, error: 'unknown action' });
     return;
