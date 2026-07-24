@@ -1,15 +1,20 @@
 :root {
-  --color-primary: #7c3aed;
-  --color-teal: #0d9488;
-  --color-accent: #f59e0b;
-  --color-bg: #faf7f2;
-  --color-ink: #1f2937;
+  --color-primary: #c39bf0;
+  --color-teal: #4ecec0;
+  --color-accent: #f5c563;
+  --color-bg: #241305;
+  --color-ink: #fdf1d8;
   --radius: 16px;
 
-  --color-primary-ink: #ffffff;
-  --color-muted: #6b7280;
-  --color-card: #ffffff;
-  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --color-primary-ink: #2a1606;
+  --color-muted: #d9bc92;
+  --color-card: #3a1d08;
+  --color-surface-2: #4d2a0e;
+  --color-border: #a35d22;
+  --color-nav: #2e1806;
+  --color-danger: #ef9a7d;
+  --color-glow: #fde3a2;
+  --shadow-soft: 0 0 0 1px rgba(253, 227, 162, 0.10), 0 4px 14px rgba(0, 0, 0, 0.45);
   --nav-height: 68px;
   --transition-fast: 150ms ease;
 }
@@ -26,7 +31,7 @@ body {
 
 body {
   font-family: "Rubik", system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: linear-gradient(180deg, #fdfbf7 0%, var(--color-bg) 240px);
+  background: linear-gradient(180deg, #3d2109 0%, var(--color-bg) 340px);
   background-color: var(--color-bg);
   background-attachment: fixed;
   color: var(--color-ink);
@@ -118,12 +123,12 @@ a {
   align-items: center;
   justify-content: center;
   margin-bottom: 12px;
-  background: color-mix(in srgb, var(--color-primary) 12%, white);
+  background: color-mix(in srgb, var(--color-primary) 18%, var(--color-card));
   color: var(--color-primary);
 }
 
 .card--locked .card-icon {
-  background: color-mix(in srgb, var(--color-muted) 15%, white);
+  background: color-mix(in srgb, var(--color-muted) 15%, var(--color-card));
   color: var(--color-muted);
 }
 
@@ -163,12 +168,12 @@ a {
 }
 
 .btn-primary:hover {
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.28);
+  box-shadow: 0 4px 16px rgba(195, 155, 240, 0.30);
 }
 
 .btn[disabled] {
-  background: #e5e7eb;
-  color: var(--color-muted);
+  background: var(--color-surface-2);
+  color: color-mix(in srgb, var(--color-muted) 70%, var(--color-surface-2));
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
@@ -201,7 +206,7 @@ a {
   height: 28px;
   border-radius: 50%;
   background: var(--color-accent);
-  color: white;
+  color: var(--color-primary-ink);
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -257,8 +262,8 @@ a {
   border-radius: 50%;
   background: linear-gradient(
     160deg,
-    color-mix(in srgb, var(--color-primary) 20%, white),
-    color-mix(in srgb, var(--color-accent) 25%, white)
+    color-mix(in srgb, var(--color-primary) 28%, var(--color-card)),
+    color-mix(in srgb, var(--color-accent) 32%, var(--color-card))
   );
   display: flex;
   align-items: center;
@@ -273,7 +278,7 @@ a {
   content: "";
   position: absolute;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
+  background: color-mix(in srgb, var(--color-glow) 18%, transparent);
 }
 
 .illustration::before {
@@ -288,7 +293,7 @@ a {
   height: 30px;
   bottom: 30px;
   right: 34px;
-  background: rgba(255, 255, 255, 0.35);
+  background: color-mix(in srgb, var(--color-glow) 12%, transparent);
 }
 
 .illustration svg {
@@ -305,8 +310,8 @@ a {
   bottom: 0;
   left: 0;
   right: 0;
-  background: white;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+  background: var(--color-nav);
+  box-shadow: 0 -1px 0 rgba(253, 227, 162, 0.10), 0 -2px 14px rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: space-around;
   align-items: stretch;
@@ -362,7 +367,9 @@ a {
   aspect-ratio: 3 / 2;
   object-fit: cover;
   border-radius: var(--radius);
-  box-shadow: var(--shadow-soft);
+  box-shadow: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 74%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 74%, transparent 100%);
 }
 
 .hero-banner { margin-bottom: 16px; }
@@ -375,8 +382,10 @@ a {
   height: 160px;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-soft);
+  border-radius: 50%;
+  box-shadow: none;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 60%, transparent 100%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 60%, transparent 100%);
   margin: 0 auto 16px;
 }
 
