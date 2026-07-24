@@ -133,8 +133,9 @@ static files and API routes.
   schema-v1 object (both meta timestamps = `nowIso`, default `new Date().toISOString()`);
   `validateProfile(p)` → `{ok: boolean, errors: string[]}` checking: `version === 1`, all six
   top-level keys present with correct types, all five skills present each with valid
-  `state/score/band` values, every `words` entry has valid `status/source` enums and numeric
-  `taps`. `lib/store.js` exports `loadProfile()` (returns `null` if nothing stored),
+  `state/score/band` values, every `words` entry has valid `status/source` enums, numeric
+  `taps`, `he` string-or-null, and `firstSeen`/`lastSeen` parseable ISO date strings (the
+  validator enforces the FULL GC-3 word-entry schema, not a subset). `lib/store.js` exports `loadProfile()` (returns `null` if nothing stored),
   `saveProfile(profile)` (stamps `meta.updatedAt`, writes; file backend creates `DATA_DIR`
   recursively). Blob backend: `put` from `@vercel/blob` with the GC-2 options; read via
   `head(pathname)` → fetch URL → JSON, returning `null` on not-found. Blob code paths are NOT
@@ -192,13 +193,18 @@ static files and API routes.
   "standalone", dir "rtl", lang "he", background_color "#faf7f2", theme_color "#7c3aed", icons:
   `icons/icon.svg` (sizes "any", purpose "any maskable"). `icon.svg`: simple flat mark — amber
   paw print over a purple rounded square (pure SVG shapes, no text). `sw.js`: `const CACHE =
-  "magic-vet-v1"`; precache the shell file list; fetch handler: `/api/` → network-first,
-  else cache-first with network fallback. `tests/shell.test.js`: reads files and asserts —
+  "magic-vet-v1"` and `const PRECACHE = [...]` where PRECACHE is a JSON-parseable array
+  literal, exactly: `["/", "/styles.css", "/app.js", "/api.js", "/views/home.js",
+  "/views/placement.js", "/views/reader.js", "/views/words.js", "/manifest.webmanifest",
+  "/icons/icon.svg"]`; install handler `cache.addAll(PRECACHE)`; fetch handler: `/api/` →
+  network-first, else cache-first with network fallback. `tests/shell.test.js`: reads files and asserts —
   index.html contains `dir="rtl"`, `lang="he"`, manifest link, app.js module script; manifest
   parses with required fields per this spec; every `public/**/*.js` passes `node --check`
-  (spawn); sw.js contains `magic-vet-v1`; styles.css defines `--color-primary` etc. (tokens
-  named `--color-primary`, `--color-teal`, `--color-accent`, `--color-bg`, `--color-ink`,
-  `--radius`).
+  (spawn); sw.js contains `magic-vet-v1`, and the test extracts the `PRECACHE = [...]` array
+  literal (regex between `[` and `]`), JSON-parses it, and asserts every entry resolves to an
+  existing file under `public/` (`"/"` maps to `index.html`); styles.css defines tokens named
+  `--color-primary`, `--color-teal`, `--color-accent`, `--color-bg`, `--color-ink`,
+  `--radius`.
 - **non-goals:** no placement logic, no reader logic, no API wiring from views, no push
   notifications, no PNG icons. Do not modify `api/` or `lib/`.
 - **tier:** WORKER (Sonnet). budgets: 2 retries.
@@ -219,7 +225,10 @@ static files and API routes.
   envelope; handler throw → 500 envelope. No directory traversal (resolve+prefix check).
   `tests/dev-server.test.js`: temp `DATA_DIR`; `startServer(0)`; fetch `/` → 200 + `text/html`
   + body contains `dir="rtl"`; `/styles.css` → 200; `/api/health` → `{ok:true}`;
-  `/api/nope` → 404; `/../package.json` does NOT leak (non-200 or index fallback); closes server.
+  `/api/nope` → 404; traversal check MUST bypass client normalization (fetch collapses `../`):
+  use `node:http` `http.request({port, path})` with raw paths `"/../package.json"` and
+  `"/..%2Fpackage.json"`, assert neither response body contains `"@vercel/blob"` (i.e. the
+  real package.json never leaks); closes server.
 - **non-goals:** no HTTPS, no live reload, no proxying, no changes under `public/` or `api/`.
 - **tier:** WORKER (Sonnet). budgets: 2 retries.
 
