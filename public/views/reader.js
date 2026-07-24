@@ -1,5 +1,7 @@
 import { getJson, postJson } from "../api.js";
 
+const CHAPTER_BANNERS = { 0: "chapter-night", 1: "chapter-clinic", 2: "chapter-forest" };
+
 const VIEW_STYLE = `
   .reader-card-title {
     font-size: 1.15rem;
@@ -183,6 +185,25 @@ const VIEW_STYLE = `
     font-weight: 700;
     margin-top: 10px;
   }
+
+  .reader-popup {
+    animation: reader-popup-in var(--transition-fast);
+  }
+
+  .reader-popup::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 4px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-muted) 40%, white);
+    margin: -6px auto 14px;
+  }
+
+  @keyframes reader-popup-in {
+    from { transform: translateY(12px); opacity: 0.6; }
+    to { transform: translateY(0); opacity: 1; }
+  }
 `;
 
 function header(subtitle, title) {
@@ -327,6 +348,7 @@ export async function render(container, ctx) {
     return `
       ${styleTag()}
       ${header("הסיפור", "מרפאת הקסמים")}
+      <img class="hero-banner" src="/assets/hero-clinic.webp" alt="" />
       <div class="card">
         <p class="card-subtitle" style="margin-bottom: 16px;">הכל מוכן! הגיע הזמן להתחיל את ההרפתקה.</p>
         <button class="btn btn-primary" type="button" data-action="generate">מתחילים את הסיפור</button>
@@ -421,8 +443,12 @@ export async function render(container, ctx) {
 
   function renderChapter() {
     const chapter = latestChapter();
+    const bannerName = CHAPTER_BANNERS[chapter.n % 3];
     const questionsHtml = chapter.questions.map((q) => renderQuestion(chapter, q)).join("");
     const doneAll = allQuestionsCorrect(chapter);
+    const celebrateHtml = doneAll
+      ? `<img class="celebrate-image" src="/assets/celebration.webp" alt="" />`
+      : "";
     const continueHtml = doneAll
       ? `<button class="btn btn-primary" type="button" data-action="continue-story">המשך הסיפור</button>`
       : "";
@@ -431,11 +457,13 @@ export async function render(container, ctx) {
       ${styleTag()}
       ${header("הסיפור", "מרפאת הקסמים")}
       <p class="reader-chapter-label">פרק ${chapter.n}</p>
+      <img class="chapter-banner" src="/assets/${bannerName}.webp" alt="" />
       <div class="card">
         <p class="reader-card-title">${escapeHtml(chapter.title)}</p>
         <div class="reader-text" dir="ltr">${renderWords(chapter.text)}</div>
       </div>
       ${questionsHtml}
+      ${celebrateHtml}
       ${continueHtml}
       ${renderPopup()}
     `;
