@@ -556,3 +556,11 @@ PHASE 4 CLOSED
 - Orchestrator review: APPROVED, no changes. Cloud steps orchestrator-executed. Icon upgrade
   dropped (owner-involved per design §7). Pristine-start blob clear added to my gate list.
 - Record-completeness test PASSED (fourth consecutive phase). Planner tokens: 88993.
+
+## 2026-07-24T15:33:03+03:00 — STEP 5.1 [ORCH] DONE
+- Linked project english-app (.vercel/ created, gitignored). CLI syntax drift vs plan:
+  create-store requires --access + --yes flags explicitly (recon example was right, my first
+  attempts wrong). Store english-app-blob (store_ynHcXdA7lDuet5Dn, iad1, PUBLIC) created +
+  connected; BLOB_READ_WRITE_TOKEN auto-injected. OPENAI_API_KEY piped from .env via stdin.
+  env ls shows exactly both names; no secret value printed anywhere. CLI also created
+  .env.local (OIDC + blob token; gitignored via CLI's own .gitignore edit — committed).
