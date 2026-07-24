@@ -425,9 +425,74 @@ may be edited. Phase 3 write set: `public/index.html`, `public/manifest.webmanif
   `tests/shell.test.js`. The PRECACHE list stays frozen. Without this bump returning devices
   serve the old shell from cache forever (field-guide lesson 9 — learned the hard way last run).
 
-## Phase 4 — deploy and live verification  (skeleton)
+### Step 3.1 amendment — INTERVENTION (orchestrator ruling, 2026-07-24)
 
-Deploy to the existing Vercel project, hard-reload the live URL, screenshot home / placement
-intro / words on a phone viewport, confirm the SW served the new shell (cache name `magic-vet-v3`),
-and confirm by READ-ONLY inspection that the learner profile is untouched (placement not started,
-word bank empty).
+The first dispatch of step 3.1 came back `stopped-with-question`, correctly. Its frozen
+validation contained `! grep -rqE '#faf7f2|#7c3aed' public/ tests/`, which sweeps the whole of
+`public/` — wider than the step's four-file write set — and it hit `public/icons/icon.svg`.
+The executor refused to touch a file outside its boundary and asked. That is the escalation rule
+working exactly as intended: a cheap model found a genuine gap in the orchestrator's spec instead
+of guessing its way around it.
+
+**The finding is real and in scope.** `public/icons/icon.svg` is the app's launcher/PWA icon and
+is built entirely from the four SUPERSEDED values: `#7c3aed` (plate), `#faf7f2` (paw pads),
+`#f59e0b` (centre pad), `#0d9488` (sparkle). It is the single most visible surface of the app —
+it sits on the phone's home screen — and leaving it cream-and-old-violet is exactly the
+"leftover cream surface" the brief forbids.
+
+**RULING: add `public/icons/icon.svg` to step 3.1's write set** and apply a strict one-old-token
+to one-new-token substitution. Shapes, geometry, `viewBox`, `rx`, element order and the
+`purpose: "any maskable"` contract are untouched — this is colors only, exactly like every other
+step in this run:
+
+| Element | Old | New | Why this mapping |
+|---|---|---|---|
+| rounded-square plate | `#7c3aed` | `#2e1806` | takes the app's chrome color, so the icon and the browser/OS bar are literally the same color |
+| paw pads | `#faf7f2` | `#fdf1d8` | cream → the new warm parchment ink; same role, and 13.8:1 against the new plate |
+| centre pad | `#f59e0b` | `#f5c563` | amber → the new gold accent |
+| sparkle | `#0d9488` | `#4ecec0` | teal → the new teal accent |
+
+No element changes which role it plays; each old token maps to the new token that replaced it.
+
+## Phase 4 — deploy and live verification
+
+Baseline commit: `bd9ccdb`. No executor steps — this phase is orchestrator-run operations and
+verification, so it is not dispatched to a worker. (Deviation from the usual fresh-next-phase-
+planner step, logged in the journal: there is no code to specify, only commands to run and
+evidence to gather, and the acceptance criteria below are written BEFORE any of it happens, which
+is the part of the discipline that actually matters here.)
+
+### How the learner's profile is protected during verification
+
+The brief's hard constraint is that her profile must never be touched during verification.
+`GET /api/profile` is NOT safe for this purpose: on a null profile it calls `defaultProfile()`
+and then `saveProfile()` — a read that writes. So verification issues **no API call at all**.
+Instead the claim is proved two ways that have zero side effects:
+
+1. `git diff 563dd41..HEAD -- api/ lib/ data/` is empty — no code that can read, write or migrate
+   the profile changed anywhere in this run.
+2. Live browsing is restricted to `#/home`, which `public/views/home.js` renders from static
+   markup and which makes no `fetch` at all. `#/reader` and `#/placement` DO call the API and are
+   therefore off-limits. The service worker's PRECACHE list is static shell files only, so
+   registration triggers no API traffic either.
+
+### Phase 4 acceptance criteria (frozen before any deploy)
+
+1. `vercel --prod` completes and returns a production URL.
+2. Live `/styles.css` (fetched with a cache-buster) contains `--color-bg: #241305` and contains
+   no occurrence of `white`, `#faf7f2`, `#7c3aed`, `#1f2937` or `#6b7280`.
+3. Live `/sw.js` contains `magic-vet-v3` and not `magic-vet-v2`.
+4. Live `/manifest.webmanifest` has `background_color` `#241305` and `theme_color` `#2e1806`.
+5. Live `/icons/icon.svg` contains `#2e1806` and not `#7c3aed`/`#faf7f2`.
+6. Live `/index.html` contains both `<meta name="theme-color" content="#2e1806" />` and
+   `<meta name="color-scheme" content="dark" />`.
+7. Live `/views/placement.js`, `/views/reader.js`, `/views/words.js` each contain no `white`,
+   no `black`, no `#dc2626`.
+8. In a real browser on the production URL, after unregistering any old service worker, clearing
+   caches and hard-reloading (field-guide lesson 13): the computed `--color-bg` reads `#241305`,
+   the rendered `body` background is `rgb(36, 19, 5)`, and the bottom nav is `rgb(46, 24, 6)`.
+9. Measured rendered contrast on the live home screen passes AA for every text element present.
+10. `git diff 563dd41..HEAD -- api/ lib/ data/` is empty (profile-safety proof 1), and no API call
+    was made during verification (profile-safety proof 2).
+11. `npm test` at the deployed commit reports 146 pass / 0 fail, and
+    `node scripts/check-contrast.mjs` exits 0.
