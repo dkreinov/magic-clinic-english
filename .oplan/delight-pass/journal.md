@@ -221,3 +221,10 @@ STEP 3.3 home.js hero + heroine
   surprises: none  deviations: none
   tokens: worker=34235, checker=0 (audit: orchestrator byte-exact diff vs contract)
   interventions: 0 · commit: (this commit) · accepted: 2026-07-24
+
+STEP 3.4 placement.js intro friend + celebration x2
+  tier: WORKER (Sonnet) · validation_first_try: yes (146/146) · retries: 0 · escalations: 0
+  did: 3 additive <img> lines at the specified anchors; nothing else in diff
+  surprises: none  deviations: none
+  tokens: worker=37579, checker=0 (audit: orchestrator byte-exact diff vs contract)
+  interventions: 0 · commit: (this commit) · accepted: 2026-07-24
