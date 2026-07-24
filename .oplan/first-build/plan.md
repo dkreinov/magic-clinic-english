@@ -413,19 +413,197 @@ must use section+reg or an external corpus (decide at Phase 3 planning); do NOT 
 frequency field exists. G2 no `source` enum value for learner-asserted "known" outside
 placement — D5 sidesteps; additive enum amendment only if a future phase needs it.
 
-## PHASE 3 — Placement test  (skeleton)
-- **goal:** the pre-built, owner-reviewable item bank + TTS audio + the two-task placement UI
-  that writes the initial skill estimates and word statuses into the profile.
-- **expected inputs:** `data/band1.json`, profile engine, app shell placement view.
-- **expected outputs:** `scripts/build-item-bank.js` (offline, OpenAI; NEVER runtime),
-  `data/placement-items.json`, `docs/item-bank-review.md` (owner checklist), `scripts/build-tts.js`
-  → `public/audio/*.mp3` (gpt-4o-mini-tts), working placement flow (Task 1 word↔picture w/
-  audio, Task 2 micro-texts + Hebrew-option MCQs), scoring → profile update endpoint.
-- **validation gate:** `npm test` incl. scoring unit tests; item bank passes a mechanical lint
-  (every item: valid word from band1, 1 correct + 3 distractors, audio file exists); owner
-  review flagged as REQUIRED-BEFORE-CHILD-USE in STATUS (human gate, not run-blocking).
-- **risks:** pictures for word↔picture items (likely emoji/SVG at launch — decide at planning);
-  TTS cost/quality; item quality needs owner eyes.
+## PHASE 3 — Placement test  (CURRENT — planned by fresh Opus planner, orchestrator-approved 2026-07-24 with Amendment A1)
+
+**GOAL:** a committed, owner-reviewable placement item bank (emoji "pictures" + committed TTS
+mp3s) built OFFLINE from data/band1.json, plus deterministic server-side scoring and the
+two-task placement UI. Completing it writes skills.receptiveVocab +
+skills.readingComprehension (state/score/band) and markWordKnown(source:"placement") for each
+correctly answered Task-1 word. Test items are NEVER generated at runtime.
+
+**ACCEPTANCE CRITERIA (frozen):**
+- AC1 clean `npm install --no-audit --no-fund && npm test` exits 0; suite adds
+  tests/placement-items.test.js, placement-audio.test.js, placement-scoring.test.js,
+  api-placement.test.js, placement-ui.test.js.
+- AC2 data/placement-items.json parses; task1 length ∈ [10,16]; every task1 item passes the
+  frozen item schema (direction enum; 4 distinct options; correctIndex in range;
+  options[correctIndex] === (audio-to-picture?emoji:lemma); audio-to-picture options all match
+  \p{Extended_Pictographic}; picture-to-word options all /^[a-z]+$/; he non-empty Hebrew);
+  task2 has exactly 2 texts × exactly 3 questions; every question = 4 distinct Hebrew options
+  + correctIndex 0..3; every task2 text passes the band1 vocab constraint (as AMENDED by A1)
+  via lib/vocab.js baseForms; task2 texts contain no apostrophes (A1).
+- AC3 every audio path referenced by an audio-to-picture item resolves to an existing
+  public/<path> file with bytes > 1000.
+- AC4 scoring units green: scoreTask1/scoreTask2/bandForScore hit frozen fixtures; clientView
+  output contains no "correctIndex" and no "lemma" key (string scan).
+- AC5 GET /api/placement returns stripped bank; POST submit scores + persists: after task1
+  submit, GET /api/profile shows receptiveVocab "estimated" + correct Task-1 lemmas
+  known/placement + placement.task1 set; after both tasks placement.completed === true.
+- AC6 one commit per step 3.1–3.5; porcelain clean at gate; docs/item-bank-review.md exists
+  with a REQUIRED-BEFORE-CHILD-USE banner.
+
+**DEPENDS ON:** band1.json (2.1); lib/vocab.js (2.2); lib/profile.js mutators (2.3);
+lib/store.js; lib/http.js (body THROWS — field guide 8/10); api pattern (2.4); public/api.js +
+placement stub + style tokens (1.4); dev-server .mp3 MIME (1.5); OpenAI TTS gpt-4o-mini-tts +
+chat gpt-4.1-mini (design §9, re-verified by planner this session).
+
+**SKELETON CHANGES:** (a) placement gets its OWN endpoint api/placement.js (GET stripped bank
++ POST submit) — answer keys stay server-side, api/profile.js untouched. (b) pure scoring in
+new lib/placement.js. (c) "pictures" = emoji committed in the bank JSON. (d) audio ONLY on
+audio-to-picture items (~6 mp3s) — playing the word on picture-to-word would leak the answer.
+
+**DECISIONS:**
+- D1 Fixed sets, no adaptivity: Task 1 = 12 items (6 audio-to-picture + 6 picture-to-word);
+  Task 2 = 2 texts × 3 MCQs.
+- D2 Pictures = one emoji per item; Task-1 candidates = band1 single===true AND pos matches
+  \bn\b; LLM assigns emoji+he and drops words without a clean emoji.
+- D3 Distractors drawn from the OTHER selected targets; seeded RNG (mulberry32, seed
+  20260724) for reproducible option order.
+- D4 Deterministic scoring; score = correct/total; bandForScore: s<0.5→preA1; 0.5≤s<0.8→A1;
+  s≥0.8→A2 (heuristic — no per-item difficulty data exists (G1); owner-recalibratable).
+- D5 Only correctly answered Task-1 lemmas get markWordKnown(source "placement", he from
+  item). Task 2 marks no individual words.
+- D6 TTS: gpt-4o-mini-tts, voice "nova", mp3, frozen instructions ("Speak slowly and clearly,
+  like a warm, friendly teacher pronouncing one English word for a young learner.").
+- D7 data/placement-items.json = FULL bank incl. answer keys (server-only, committed,
+  owner-reviewed); client gets clientView() stripped; api/placement.js loads the bank via
+  `import bank from '../data/placement-items.json' with {type:'json'}` (verified Node 22.14;
+  ensures Vercel bundling).
+- D8 (AMENDED by A1) Task-2 vocab constraint: every token's baseForms() must intersect
+  allowedTokens = all /[a-z]+/ substrings of every band1 lemma ∪ the frozen FUNCTION_FORMS
+  list (see A1 below). Texts contain no contractions (no apostrophes).
+- D9 Generator LLM: gpt-4.1-mini, temperature 0, JSON-only; two calls (emoji+he assignment;
+  task2 texts+questions given the allowed word list); generator SELF-VALIDATES (schema + D8 +
+  Hebrew checks + option distinctness), retries task2 ≤3×, exits non-zero on failure (no
+  partial output).
+
+### STEP 3.1 — Item-bank generator + committed bank + lint
+- **files (create):** scripts/build-item-bank.js, data/placement-items.json,
+  tests/placement-items.test.js
+- **commands:** `set -a; . ./.env; set +a; node scripts/build-item-bank.js` (one-time,
+  OpenAI + network; output committed like band1.json; tests pass WITHOUT re-running it).
+- **validation (frozen):** `npm test`
+- **contracts:** FULL item schema: task1 item = {id:"t1-NN", direction:"audio-to-picture"|
+  "picture-to-word", lemma:/^[a-z]+$/, he:<Hebrew>, emoji:<pictographic>, options:[4 distinct
+  strings], correctIndex:0..3, section:"preBandI"|"bandI", audio:"audio/word-<lemma>.mp3"
+  ONLY when direction==="audio-to-picture"}. Invariants: options[correctIndex] ===
+  (a2p?emoji:lemma); a2p ⇒ all options pictographic; p2w ⇒ all options /^[a-z]+$/.
+  task2 item = {id:"t2-tN", title:<he>, text:<English, no apostrophes>, questions:[{id:
+  "t2-tN-qM", prompt:<he>, options:[4 distinct he], correctIndex:0..3} ×3]}. top = {meta:
+  {version:1, generatedAt, generator, model:"gpt-4.1-mini", source:"data/band1.json",
+  task1Count, task2TextCount:2, task2QuestionCount:6}, task1, task2}.
+  Generator algorithm: candidatePool = single && /\bn\b/.test(pos); LLM(emoji+he) → keep
+  non-null distinct emoji; select 12 targets (6 preBandI + 6 bandI when available); first 6 →
+  audio-to-picture, next 6 → picture-to-word; 3 distractors per item from other targets
+  (emoji for a2p, lemma for p2w) via mulberry32(20260724); shuffle options; LLM(task2) with
+  allowed word list + theme "everyday life / animals / a vet's clinic, no story spoilers",
+  no contractions; SELF-VALIDATE per D8(A1) + Hebrew /[֐-׿]/ + distinctness; retry
+  ≤3; exit 1 on failure. JSON indent 2, ensure non-ASCII preserved, trailing newline.
+  tests/placement-items.test.js asserts AC2 in full, duplicating the A1 FUNCTION_FORMS list
+  verbatim and the no-apostrophe check.
+- **non-goals:** no runtime generation; no audio (3.2); no scoring/API (3.3); no UI; don't
+  touch lib/, api/, public/.
+- **tier:** WORKER (Sonnet). depends on: 2.1, 2.2.
+
+### STEP 3.2 — TTS audio generator + committed mp3s
+- **files (create):** scripts/build-tts.js, public/audio/word-*.mp3 (one per a2p lemma),
+  tests/placement-audio.test.js
+- **commands:** `set -a; . ./.env; set +a; node scripts/build-tts.js` (one-time; commits mp3s)
+- **validation (frozen):** `npm test`
+- **contracts:** read bank; for each task1 item WITH audio field: POST
+  https://api.openai.com/v1/audio/speech {model:"gpt-4o-mini-tts", voice:"nova",
+  input:<lemma>, response_format:"mp3", instructions:<D6 frozen string>} → write bytes to
+  public/<item.audio>; mkdir -p public/audio; idempotent. tests/placement-audio.test.js:
+  every a2p audio file exists with size > 1000 bytes; no audio field on p2w items; PRECACHE
+  in sw.js NOT modified (field guide 7).
+- **non-goals:** no PRECACHE edit; no scoring/API/UI; don't touch the bank JSON.
+- **tier:** WORKER (Sonnet). depends on: 3.1.
+
+### STEP 3.3 — Scoring lib + placement API endpoint
+- **files (create):** lib/placement.js, api/placement.js, tests/placement-scoring.test.js,
+  tests/api-placement.test.js
+- **commands:** none. **validation (frozen):** `npm test`
+- **contracts:** lib/placement.js (pure, zero imports): scoreTask1(bank, answers=[{id,choice}])
+  → {correct,total,score,knownLemmas:[{lemma,he}]} (match by id; total=matched; score=
+  total?correct/total:0); scoreTask2(bank, answers) → {correct,total,score} over flattened
+  task2 questions by qid; bandForScore(s) per D4; clientView(bank) → task1 a2p:{id,direction,
+  audio,options} / p2w:{id,direction,emoji,options}; task2:{id,title,text,questions:[{id,
+  prompt,options}]} — NO lemma/correctIndex/section anywhere, no emoji on a2p, no audio on p2w.
+  api/placement.js (GC-4): bank via import-with-type-json. GET → 200 clientView. POST:
+  readJsonBody try/catch → 400 "invalid JSON body"; action must be "submit" else 400 "unknown
+  action"; require task1 or task2 array else 400 "no answers"; p = loadProfile() ??
+  defaultProfile(); task1 present → r=scoreTask1; r.total===0 → 400 "no valid answers";
+  skills.receptiveVocab={state:"estimated",score,band}; markWordKnown for each knownLemma
+  (source "placement", he); placement.task1={correct,total,score,answeredAt}. task2 analogous
+  → readingComprehension + placement.task2. Both present in profile → completed=true +
+  completedAt. saveProfile; 200 {ok:true,data:p}. Non-GET/POST → 405.
+  tests/placement-scoring.test.js: inline fixture bank; bandForScore at 0,0.4,0.5,0.79,0.8,1
+  → preA1,preA1,A1,A1,A2,A2; clientView string scans (no "correctIndex", no "lemma" key; a2p
+  has no emoji key; p2w has no audio key). tests/api-placement.test.js: temp DATA_DIR, mock
+  res, Readable-of-Buffer req (field guide 10): GET stripped; POST task1 → 200 + estimated +
+  known lemma persisted (verify via GET /api/profile) + placement.task1; POST task2 →
+  readingComprehension + completed; malformed body 400; bad action 400; PUT 405; final
+  validateProfile ok.
+- **non-goals:** no UI; no live OpenAI; don't modify api/profile.js, lib/profile.js, data/*,
+  public/*.
+- **tier:** WORKER (Sonnet). depends on: 3.1, 2.3, 1.2/1.3.
+
+### STEP 3.4 — Placement UI flow
+- **files:** public/views/placement.js (rewrite), tests/placement-ui.test.js (create)
+- **commands:** none. **validation (frozen):** `npm test`
+- **contracts:** render(container) async: getJson("/api/placement") + getJson("/api/profile")
+  for resume (task1 done & task2 not → start at task2; both → done screen). State machine
+  intro→task1→task1done→task2→done (+error state). Task 1: a2p = play button (`new
+  Audio(item.audio)`) + 4-option grid; p2w = large emoji + 4 word options; record choice,
+  advance, NO right/wrong feedback. After 12 → postJson("/api/placement", {action:"submit",
+  task1:[{id,choice}]}) → task1done. Task 2: text rendered dir="ltr", then 3 questions × 4
+  Hebrew options; submit task2 → done. FROZEN Hebrew strings (must appear literally):
+  "מתחילים" · "הקשיבי ובחרי את התמונה הנכונה" · "▶ השמעה" · "הביטי בתמונה ובחרי את המילה" ·
+  "שאלה {X} מתוך {Y}" · "כל הכבוד! סיימת את המשימה הראשונה." · "אפשר לנוח רגע." ·
+  "ממשיכים למשימה 2" · "אמשיך אחר כך" (→ #/home) · "קראי את הטקסט ועני על השאלות" ·
+  "סיימת את המבחן!" · "עכשיו הסיפור יתאים בדיוק לך." · "לסיפור" (→ #/reader) ·
+  "משהו השתבש, נסי שוב.". Existing style classes only (btn/btn-primary/card); small inline
+  styles allowed for grids. tests/placement-ui.test.js: node --check; exports render; contains
+  each frozen string; references /api/placement, /api/profile, "submit". (DOM behavior
+  verified manually at the phase gate by the orchestrator.)
+- **non-goals:** no sw.js/PRECACHE changes, no other views, no new endpoints, no new CSS file.
+- **tier:** WORKER (Sonnet). depends on: 3.3, 1.4.
+
+### STEP 3.5 — Owner-review doc
+- **files (create):** docs/item-bank-review.md
+- **commands:** none. **validation (frozen):** `npm test`
+- **contracts:** begins with banner "STATUS: REQUIRED-BEFORE-CHILD-USE"; bilingual ok;
+  checklist per Task-1 item (emoji matches word; audio plays + pronounces clearly; distractors
+  unambiguous) and per Task-2 text (natural, level-appropriate, no story spoilers; each
+  question answerable from the text; marked-correct option right; Hebrew phrasing correct);
+  how to edit the bank safely (schema, re-run npm test, re-run build-tts.js only if an a2p
+  lemma changed). Human gate, NOT run-blocking.
+- **non-goals:** no code changes; don't touch the bank or audio.
+- **tier:** WORKER (Sonnet). depends on: 3.1, 3.2.
+
+**RISKS:** R1 task2 vocab constraint unsatisfiable in natural prose → A1 allowlist +
+generator retries ≤3 then exits 1 (worker stops, never weakens the constraint). R2 emoji/he
+mismatch or ambiguous distractors → owner review (3.5). R3 answer-key leakage → server-side
+scoring + clientView strip + AC4/AC5 scans. R4 Vercel bundling of bank JSON → import
+attributes (proof at Phase 5 deploy). R5 ≤12 measured known words seeded — by design. R6
+emoji rendering varies by device — single Android Chrome target, owner confirms. R7 one-time
+OpenAI spend trivial (~6 mp3s + 2 chat calls).
+
+**BLOCKERS:** none. **RECORD GAPS:** none new (G1 reaffirmed: no frequency data; D4
+thresholds heuristic and owner-recalibratable).
+
+### AMENDMENT A1 (orchestrator, at plan approval)
+allowedTokens for the Task-2 constraint = all /[a-z]+/ substrings of band1 lemmas ∪ frozen
+FUNCTION_FORMS list:
+["is","are","was","were","am","been","being","has","had","did","done","does","went","gone",
+ "said","saw","seen","got","made","came","come","took","taken","ran","ate","gave","given",
+ "found","knew","known","put","let","its","an","her","him","his","hers","them","they",
+ "their","theirs","us","our","ours","me","my","mine","your","yours"]
+The generator self-check AND tests/placement-items.test.js duplicate this list verbatim.
+Task-2 texts must contain no contractions — /'/.test(text) === false, asserted in the test
+and stated in the generator prompt. Rationale: irregular forms (is/was/went/saw...) are
+unreachable via baseForms from band1 base verbs; a frozen allowlist keeps the gate mechanical
+without weakening it.
 
 ## PHASE 4 — Story engine  (skeleton)
 - **goal:** the core loop live end-to-end locally: generate chapter 1..N constrained to known

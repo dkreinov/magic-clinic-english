@@ -279,3 +279,15 @@ PHASE 2 CLOSED
     false in code this phase (its one mismatch was the orchestrator's own summarization).
     Machinery still earning its keep; checker cost dropped to 0.65x worker (better than
     Phase 1's parity).
+
+## 2026-07-24T13:33:04+03:00 — PHASE 3 PLANNED (fresh Opus planner, files only)
+- Planner reconnaissance: OpenAI TTS (gpt-4o-mini-tts -> 200 mp3) and chat (gpt-4.1-mini ->
+  200) re-verified live; JSON import-attributes + \p{Extended_Pictographic} confirmed on
+  Node 22.14; band1 has 562 single nouns for Task 1 candidates.
+- BLOCKERS: none. RECORD GAPS: none new (G1 no-frequency reaffirmed; D4 band thresholds are
+  heuristic, owner-recalibratable).
+- Orchestrator review: APPROVED with Amendment A1 — frozen FUNCTION_FORMS allowlist for the
+  Task-2 vocab constraint (irregular forms unreachable via baseForms) + no-contractions rule.
+  Preempts the likeliest stopped-with-question round-trip. Decisions D1-D9 ratified.
+- Record-completeness test PASSED again (planner needed nothing outside the files).
+- Planner tokens: 89067.

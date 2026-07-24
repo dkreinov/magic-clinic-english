@@ -1,4 +1,4 @@
-CURRENT: phase 2 CLOSED; phase 3 "Placement test" being planned (next-phase planner running)
+CURRENT: phase 3 "Placement test", next step 3.1
 PLAN: .oplan/first-build/plan.md
 ACCEPTED: 1.1 7983095 · 1.2 2012689 · 1.3 12dce41 · 1.4 16c1866 · 1.5 699ff2c ·
 2.1 fc1f0a6 · 2.2 204213b · 2.3 251f76c · 2.4 e42a9e6
