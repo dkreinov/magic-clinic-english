@@ -564,3 +564,19 @@ PHASE 4 CLOSED
   connected; BLOB_READ_WRITE_TOKEN auto-injected. OPENAI_API_KEY piped from .env via stdin.
   env ls shows exactly both names; no secret value printed anywhere. CLI also created
   .env.local (OIDC + blob token; gitignored via CLI's own .gitignore edit — committed).
+
+## 2026-07-24T15:35:49+03:00 — STEPS 5.2 + 5.3 [ORCH] DONE
+- 5.2 Deploy:  clean build in 3s (only benign engines warnings —
+  D5 accepted; NO JSON-bundling errors: Phase-3 R4 proven). Production domain:
+  https://english-app-three-tan.vercel.app (deployment-specific URLs are Vercel-auth
+  protected by default; the canonical alias is public — recorded for the handoff doc).
+- 5.3 Production smoke — ALL PASS: /api/health envelope ✓; / RTL ✓; /api/placement stripped
+  (0 hits for correctIndex/lemma) ✓; manifest (name מרפאת הקסמים)/sw.js/icon.svg/audio all
+  200 ✓; FULL LOOP on prod: placement submit -> completed, band A2 ✓; set-learner
+  Luna/Sparkle ✓; LIVE chapter on prod in 16.9s, ratio 0.978, 89 words, 11 glossary, 3 Qs ✓;
+  translate glow -> זוהר ✓; profile persisted via REAL Blob (blob list showed
+  profile/profile.json — GC-2 blob path exercised in production for the first time) ✓.
+- R6 pristine reset: smoke profile deleted from the store (blob del); prod /api/profile now
+  serves a fresh default (completed=false, 0 words). She starts clean.
+- CLI quirk for the record: blob subcommands need either the rw token (source .env.local,
+  unset VERCEL_OIDC_TOKEN) or both OIDC+store-id; bare invocation errors.
