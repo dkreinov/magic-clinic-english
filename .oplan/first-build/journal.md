@@ -167,3 +167,26 @@ PHASE 1 CLOSED
   status==="known" only; mark-known requires explicit source).
 - Record-completeness test PASSED: the fresh planner planned the phase from files alone.
 - Planner tokens: 99579.
+
+STEP 2.1 Extract MoE Band list -> data/band1.json
+  tier: WORKER (Sonnet)
+  did: Downloaded MoE PDF (52 pages, 1,003,073 bytes) to data/raw/band1.pdf; wrote
+       deterministic scripts/build_band1.py per the frozen algorithm; generated
+       data/band1.json (1341 entries, 1137 single-word, sections preBandI:190/bandI:1151,
+       reg Prod:971/Rec:363/null:7, 453 with disambiguation meanings); tests/band1.test.js
+       (5 cases: meta ranges, full schema sweep, sample lemmas, phrase-with-pos).
+  surprises: none — structure and counts matched planning reconnaissance exactly (1341/1137)
+  deviations: none
+  validation_first_try: yes
+  retries: 0
+  escalations: 0
+  tokens: worker=34842, checker=41591, orchestrator_delta=unavailable
+  interventions: 0 code-affecting. Audit round 1 returned one finding that was a FALSE
+       POSITIVE caused by the orchestrator ABBREVIATING the spec in the auditor packet
+       ("ws-collapsed meaning" vs the authoritative plan.md text
+       're.sub(r"\s+"," ",meaning).strip() or None'). Work matches the authoritative spec
+       byte-for-byte; finding voided against plan.md; all other checks passed. LESSON:
+       auditor packets must quote spec text VERBATIM, never re-abbreviate.
+  extra orchestrator checks: rebuild byte-identical (md5); clean npm test 40/40.
+  commit: fc1f0a6
+  accepted: 2026-07-24T13:09:49+03:00
