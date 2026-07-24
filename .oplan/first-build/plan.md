@@ -380,7 +380,10 @@ band1.json is {meta, entries:[…]} (array — duplicate lemmas exist across PoS
 ### STEP 2.4 — Profile API POST actions
 - **goal:** api/profile.js gains GC-4 POST word-tap / mark-known using 2.3's mutators,
   persisted via store.
-- **files:** api/profile.js (modify), tests/api-profile-post.test.js (create)
+- **files:** api/profile.js (modify), tests/api-profile-post.test.js (create),
+  tests/api.test.js (modify — AMENDED during 2.4: ONLY the now-obsolete case
+  "profile POST returns 405" becomes "profile PUT returns 405" with the mock method "PUT";
+  the planner missed that adding POST semantics invalidates that Phase 1 assertion)
 - **commands:** none. **validation (frozen):** `npm test`
 - **contracts:** keep existing GET. POST: readJsonBody in try/catch → 400
   {ok:false,error:"invalid JSON body"} on throw. action==="word-tap": require non-blank string

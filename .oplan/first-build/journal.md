@@ -229,3 +229,53 @@ STEP 2.3 Profile word-mutation functions
   audit: match, confidence high (first round, clean)
   commit: 251f76c
   accepted: 2026-07-24T13:16:12+03:00
+
+## 2026-07-24T14:50+03:00 — STEP 2.4 INTERVENTION (unanswered-question / planner miss)
+- Executor stopped correctly before writing anything: Phase 1's tests/api.test.js case
+  "profile POST returns 405" contradicts 2.4's new POST semantics (non-iterable mock req ->
+  body-read TypeError -> spec-mandated 400, not 405). Planner missed that 2.4 invalidates a
+  Phase 1 assertion. Worker proved the failure with a direct repro before stopping.
+- DECISION: the obsolete test gives way — single case retargeted to "profile PUT returns 405"
+  (mock method PUT); tests/api.test.js added to 2.4's write set for exactly that change.
+  plan.md amended; worker resumed.
+
+STEP 2.4 Profile API POST actions
+  tier: WORKER (Sonnet)
+  did: api/profile.js — POST word-tap/mark-known (validation, mutators, persist, 400/405
+       discipline; GET unchanged). tests/api-profile-post.test.js — 10 cases with real
+       Readable-stream mocks. tests/api.test.js — single authorized change (obsolete POST-405
+       case retargeted to PUT).
+  surprises: Readable.from(string) chunks break readJsonBody's Buffer.concat — test mocks
+       must stream Buffer chunks. (Production unaffected: real HTTP gives Buffers.)
+  deviations: Buffer.from wrapping in test mocks (mechanical, accepted as amendment 2)
+  validation_first_try: no · retries: 1 · escalations: 0
+  tokens: worker=33497+44213, checker=33140, orchestrator_delta=unavailable
+  interventions: 1 (unanswered-question: planner missed that POST semantics invalidate
+       Phase 1's "profile POST returns 405" test; single-case retarget authorized)
+  audit: match, confidence high
+  commit: e42a9e6
+  accepted: 2026-07-24T13:22:16+03:00
+
+## 2026-07-24T13:22:17+03:00 — PHASE 2 GATE
+- AC1 clean-state install+test: exit 0, 61/61 — PASS. AC2 band1.json: verified at 2.1
+  (1341/1137, schema sweep, deterministic rebuild) — PASS. AC3 one commit per step 2.1–2.4
+  (fc1f0a6, 204213b, 251f76c, e42a9e6) — PASS. AC4 coverage fixtures green in suite — PASS.
+  AC5 live round-trip: POST word-tap -> GET persisted (taps 1) -> mark-known flips status
+  and preserves taps/source; malformed body -> 400 — PASS. Hebrew console mojibake is a Git
+  Bash display artifact; unit tests assert UTF-8 round-trip.
+
+PHASE 2 CLOSED
+  steps: 4, first-try passes: 2/4 (2.2 and 2.4 stopped-with-question on REAL planner defects
+    before writing; both resolved by orchestrator amendment, then passed first try)
+  escalations: 0 (steps: none)
+  interventions: 3 (2.2 planner algorithm/fixture contradiction; 2.4 obsolete Phase 1 test;
+    2.1 audit false-positive from orchestrator's abbreviated spec — process defect, mine)
+  cost: worker=205731 tokens, checker=133670 tokens, planner=99579 tokens (Opus),
+    total subagent=438980 tokens. Dollar figures: unavailable from harness.
+  orchestrator_context: unavailable from within the run; qualitative: healthy.
+  field_guide: about to add 2 lessons (see next entry).
+  honesty-clause note: 2 of 4 steps hit planner defects that the escalation rule converted
+    from silent divergence into cheap round-trips. The checker layer also caught nothing
+    false in code this phase (its one mismatch was the orchestrator's own summarization).
+    Machinery still earning its keep; checker cost dropped to 0.65x worker (better than
+    Phase 1's parity).

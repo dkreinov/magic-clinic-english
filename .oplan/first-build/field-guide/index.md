@@ -19,3 +19,7 @@
    never Vercel's `res.status().json()`; that is what lets the same handler run under the dev
    server. Empty/invalid JSON request bodies THROW — callers must send a valid JSON body.
 9. Windows paths in ESM: compare module URLs with `pathToFileURL(...)`.href, never raw paths.
+10. Test mocks feeding lib/http.js readJsonBody MUST stream Buffer chunks
+    (Readable.from([Buffer.from(json)])) — string chunks crash Buffer.concat.
+11. When a step adds a NEW METHOD to an existing endpoint, check existing tests for
+    now-obsolete method-guard assertions (Phase 1's POST-405 case broke Phase 2's 2.4).
