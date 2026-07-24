@@ -5,8 +5,8 @@
   "display": "standalone",
   "dir": "rtl",
   "lang": "he",
-  "background_color": "#faf7f2",
-  "theme_color": "#7c3aed",
+  "background_color": "#241305",
+  "theme_color": "#2e1806",
   "icons": [
     {
       "src": "/icons/icon.svg",

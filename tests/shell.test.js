@@ -25,8 +25,8 @@ test('manifest.webmanifest parses and has expected fields', () => {
   assert.strictEqual(manifest.display, 'standalone');
   assert.strictEqual(manifest.dir, 'rtl');
   assert.strictEqual(manifest.lang, 'he');
-  assert.strictEqual(manifest.background_color, '#faf7f2');
-  assert.strictEqual(manifest.theme_color, '#7c3aed');
+  assert.strictEqual(manifest.background_color, '#241305');
+  assert.strictEqual(manifest.theme_color, '#2e1806');
   assert.strictEqual(manifest.icons[0].src, '/icons/icon.svg');
 });
 
@@ -55,7 +55,7 @@ test('every .js file under public/ passes node --check', () => {
 
 test('sw.js has the expected cache name and precache list resolving to real files', () => {
   const sw = readFileSync(path.join(publicDir, 'sw.js'), 'utf8');
-  assert.ok(sw.includes('magic-vet-v2'));
+  assert.ok(sw.includes('magic-vet-v3'));
 
   const match = sw.match(/PRECACHE\s*=\s*(\[[\s\S]*?\])/);
   assert.ok(match, 'expected to find PRECACHE array literal in sw.js');
