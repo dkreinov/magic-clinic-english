@@ -86,6 +86,17 @@ them:
 | reader spinner track | `color-mix(in srgb, var(--color-primary) 25%, var(--color-card))` |
 | reader popup grabber bar (decorative) | `color-mix(in srgb, var(--color-muted) 45%, var(--color-card))` |
 | decorative glow blobs (`.illustration::before/::after`) | `color-mix(in srgb, var(--color-glow) 18%, transparent)` / `... 12%, transparent)` |
+| modal scrim (`.reader-overlay`) — NOT a tint, stays pure black | `rgba(0, 0, 0, 0.6)` (was `0.35`, which is nearly invisible over the new dark page) |
+
+### WDT-6 — interactive controls must declare an explicit foreground
+
+`<button>` does not inherit `color`: the UA stylesheet sets it to `buttontext`. Three rules —
+`.placement-option-btn`, `.placement-question-option`, `.reader-question-option` — declare no
+`color`, so today they render UA-black on white and after the re-theme would render UA-black on
+deep brown (~1.9:1), a silent WDT-2 failure that the token-level contrast gate cannot see.
+Phase 2 therefore ADDS `color: var(--color-ink);` to those three rules. (Corroboration that this
+is a real hazard and not theory: `public/styles.css` already carries `button { font-family:
+inherit; }` — someone hit the same non-inheritance with fonts and fixed only that one.)
 
 The "learning" badge's foreground, currently `color-mix(in srgb, var(--color-accent) 70%, black)`,
 becomes plain `var(--color-accent)` — darkening toward black is a light-theme idiom.
@@ -354,24 +365,65 @@ markup — it makes no API call).
 
 ---
 
-## Phase 2 — the three per-view stylesheets  (skeleton)
+## Phase 2 — the three per-view stylesheets
 
-Re-theme the `VIEW_STYLE` template literal in `public/views/placement.js`,
-`public/views/reader.js`, `public/views/words.js` — one step per file, per contract WDT-5:
-`color-mix(..., white)` → the WDT-5 mixes; `color: white` → `var(--color-primary-ink)`;
-`#dc2626` → `var(--color-danger)`; `color-mix(..., black)` on the learning badge →
-`var(--color-accent)`; `background: rgba(0, 0, 0, 0.35)` overlay deepened; `border: 2px solid
-transparent` resting borders given `var(--color-border)`; `.reader-question-option`'s
-`background: var(--color-bg)` → `var(--color-surface-2)` so options read as raised on a card.
-Same validation shape: `npm test` (146) + the contrast gate + a grep proving no `white`/`black`
-mix and no `#dc2626` remain in the three files.
+Planned by a fresh next-phase planner from the written record only, then reviewed by the
+orchestrator. Baseline commit: **`ee87ab8`**. The full step specs — rule tables quoting every
+current declaration verbatim, per-step validation commands, and the nine acceptance criteria —
+live in `phase-2-plan.md` beside this file; they run to several hundred lines of exact CSS blocks
+and are kept out of this document only for readability. `phase-2-plan.md` is part of the frozen
+plan and is what the executor packets are built from.
+
+Shape: one step per file — 2.1 `public/views/placement.js`, 2.2 `public/views/reader.js`,
+2.3 `public/views/words.js` — plus 2.4, an orchestrator-run static harness check (no dev server,
+no API call, no profile contact). Every tint uses the WDT-5 percentages verbatim; `#dc2626`
+becomes `var(--color-danger)`; the learning badge's `color-mix(..., black)` collapses to
+`var(--color-accent)`; resting `border: 2px solid transparent` becomes `var(--color-border)`;
+`.reader-question-option`'s fill moves from `var(--color-bg)` to `var(--color-surface-2)`; and
+WDT-6 adds the three missing `color:` declarations.
+
+### Orchestrator rulings on the planner's BLOCKER and RECORD GAPS
+
+- **BLOCKER 1 — `--color-border` (#a35d22) on `--color-surface-2` (#4d2a0e) is 2.51:1, under 3:1.
+  RULING: accept as planned (the planner's option A).** WCAG 1.4.11 asks that a control be
+  distinguishable from its *adjacent* background — here the card the option sits on — and the
+  border's outer edge clears that at 3.05:1. The 2.51:1 figure is the border against the
+  control's own fill, which is not the 1.4.11 test. It is also a strict improvement, not a
+  regression: in the light theme the same control had a cream `#faf7f2` fill on a white `#ffffff`
+  card — a boundary contrast of **1.04:1**. Raising `--color-border` until it cleared 3:1 against
+  the option fill as well would need a relative luminance near 0.20 (roughly `#b58a5a`), a
+  visibly light outline around every answer button — louder than the look the owner approved,
+  and it would reopen a token already recorded with its provenance in the frozen
+  `docs/visual-design.md`. Rejected as the worse trade. Logged so the choice is on the record
+  rather than silent.
+- **RECORD GAP 1 — scrim opacity was never frozen. RULING: adopt `rgba(0, 0, 0, 0.6)`** and
+  freeze it in WDT-5 above, so it is a contract rather than a planner's improvisation.
+- **RECORD GAP 2 — buttons do not inherit `color`. RULING: accept; promoted to contract WDT-6**
+  above. This is the most valuable thing the fresh planner produced: an accessibility failure the
+  token-level gate is structurally blind to, because the offending foreground is supplied by the
+  user agent and appears in no file at all.
+- **RECORD GAP 3 — `color-scheme: dark` on `public/index.html`. RULING: defer to Phase 3**, whose
+  write set already includes that file. Added to the Phase 3 skeleton below.
+- **RECORD GAP 4 — no per-phase baseline commit in the record. RULING: fixed** —
+  `phase-state.md` now carries a `BASELINE:` line for the current phase.
 
 ## Phase 3 — PWA chrome + service-worker cache  (skeleton)
 
-`public/index.html` `<meta name="theme-color">`; `public/manifest.webmanifest` and its two
-assertions in `tests/shell.test.js` (ONLY if the owner approved question 1); the `CACHE` version
-bump in `public/sw.js` (`magic-vet-v2` → `magic-vet-v3`) plus its assertion string in
-`tests/shell.test.js`. The PRECACHE list stays frozen.
+Owner approved both changes at the Phase 1 gate, so WDT-3 is closed and the two test assertions
+may be edited. Phase 3 write set: `public/index.html`, `public/manifest.webmanifest`,
+`public/sw.js`, `tests/shell.test.js`.
+
+- `public/manifest.webmanifest`: `background_color` `#faf7f2` → `#241305`,
+  `theme_color` `#7c3aed` → `#2e1806`.
+- `public/index.html`: `<meta name="theme-color" content="#7c3aed">` → `content="#2e1806"`.
+- `public/index.html`: ALSO add `<meta name="color-scheme" content="dark">` (Phase 2 planner's
+  RECORD GAP 3). Without it the user agent still renders scrollbars, text-input internals, the
+  caret and focus rings for a light page — the same class of defect as WDT-6, one level lower.
+- `tests/shell.test.js` lines 28–29: both assertions updated to the new values. This is the ONLY
+  authorised change to a test's color assertion in this run.
+- `public/sw.js`: `CACHE` `magic-vet-v2` → `magic-vet-v3`, plus its assertion string in
+  `tests/shell.test.js`. The PRECACHE list stays frozen. Without this bump returning devices
+  serve the old shell from cache forever (field-guide lesson 9 — learned the hard way last run).
 
 ## Phase 4 — deploy and live verification  (skeleton)
 

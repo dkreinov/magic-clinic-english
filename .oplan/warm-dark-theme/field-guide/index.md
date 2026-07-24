@@ -21,15 +21,20 @@ Inherited from first-build / delight-pass (still binding):
 New this run:
 10. `npm test 2>&1 | tail -N && ...` reports the exit code of `tail`, NOT of npm — a real test
     failure sails straight through the `&&` chain. Always prefix with `set -o pipefail`.
-11. `sharp` is a devDependency of THIS repo, so a script outside the repo cannot `import 'sharp'`.
-    Import it by absolute file URL:
-    `file:///C:/Users/dkreinov/claude/english-app/node_modules/sharp/dist/index.cjs`.
-12. On a dark ground, `color-mix(..., white)` and `..., black)` are both light-theme idioms.
+11. On a dark ground, `color-mix(..., white)` and `..., black)` are both light-theme idioms.
     Every tint in this app mixes into `var(--color-card)` — percentages frozen in plan WDT-5.
-13. The learner profile is LIVE data. Verification must never start placement or tap a word;
+12. The learner profile is LIVE data. Verification must never start placement or tap a word;
     the home view is static markup and makes no API call, so it is the safe preview screen.
-14. Verifying a style change in a browser: a plain reload LIES. A service worker from an earlier
+13. Verifying a style change in a browser: a plain reload LIES. A service worker from an earlier
     session serves the old shell, and unregistering it is NOT enough — the HTTP disk cache still
     holds the old styles.css. Always: unregister SW + `caches.delete(...)` + ctrl+shift+R, then
     confirm via `getComputedStyle(document.documentElement).getPropertyValue('--color-bg')`
     before believing any screenshot. Cost us two false "it didn't work" readings on 2026-07-24.
+14. Chrome reports a resolved `color-mix()` as `color(srgb 0.302667 0.182902 0.158745)`, NOT as
+    `rgb(...)`. Any script that reads computed backgrounds with an `rgb()` regex will silently
+    parse those as `rgb(0,0,0)` and FABRICATE passing contrast numbers for exactly the tinted
+    states you most need to check. Parse both forms, and be suspicious of identical `0,0,0` rows.
+15. `<button>` does not inherit `color` (the UA sets `buttontext`) — same trap as `font-family`,
+    which this repo already works around. Any control on a re-themed surface needs an EXPLICIT
+    `color:`; a token-level contrast gate cannot see this, because the bad foreground is supplied
+    by the browser and appears in no file.

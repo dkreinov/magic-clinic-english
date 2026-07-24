@@ -1,66 +1,64 @@
 # STATUS — warm-dark-theme
 
-*Rewritten in full at every update. Last update: Phase 1 finished — waiting at the owner gate.*
+*Rewritten in full at every update. Last update: Phase 2 closed, Phase 3 starting.*
 
 ## Where we are
 
-Phase 1 is done and passed its gate. The app's colors now come from the artwork, and the home
-screen is fully re-themed. **Nothing has been published** — this is all local, on your machine.
-The run is paused exactly where you asked it to pause.
+Every screen in the app is now on the artwork's colors. Phases 1 and 2 are done and both passed
+their gates. Still nothing published — this is all local.
 
 ```mermaid
 flowchart LR
-    P[Plan written + reviewed<br/>5 problems found and fixed] --> P1
-    P1[Phase 1 DONE<br/>new colors, home screen,<br/>automatic readability check] --> GATE{{YOU ARE HERE<br/>owner gate<br/>2 decisions needed}}
-    GATE --> P2[Phase 2<br/>the other three screens]
-    P2 --> P3[Phase 3<br/>launch-screen color +<br/>force old phones to update]
-    P3 --> P4[Phase 4<br/>publish + check it live]
-    style P fill:#cfe8cf
+    P1[Phase 1 DONE<br/>colors + home screen<br/>+ readability checker] --> GATE
+    GATE[Owner gate PASSED<br/>you approved the palette<br/>and the launch-screen change] --> P2
+    P2[Phase 2 DONE<br/>placement, reader, words] --> P3
+    P3[Phase 3 NOW<br/>launch-screen color +<br/>force old phones to update] --> P4
+    P4[Phase 4<br/>publish + check it live]
     style P1 fill:#cfe8cf
-    style GATE fill:#ffd27f
+    style GATE fill:#cfe8cf
+    style P2 fill:#cfe8cf
+    style P3 fill:#ffd27f
 ```
 
-## What changed, in three files
+## What Phase 2 changed
 
-| File | What happened |
-|---|---|
-| `public/styles.css` | The whole app shell moved to the new colors, and the pictures now fade into the page instead of sitting in boxes |
-| `scripts/check-contrast.mjs` | New. The automatic readability check — 28 text/background combinations, every time |
-| `docs/visual-design.md` | The frozen style doc now records the new palette, where each color was measured from, and the old cream values marked as superseded |
+The three remaining screens — placement, the story reader, and the word collection. Answer
+buttons, selected/correct/wrong states, the word popup, the badges, the loading spinner and the
+input field all moved onto the new palette. Six files total have changed in the whole run so far,
+and no test, no logic and no text among them.
 
-Everything else is byte-for-byte untouched: no view file, no test, no logic, no text.
+## The thing Phase 2 caught that nobody had noticed
 
-## Checks that passed
+We hand each phase to a fresh planner who only reads the written record, partly as a way to test
+that record. This time it found a genuine bug the rest of the machinery could not see.
 
-- **146 of 146 tests still green** — same as before we started, none rewritten.
-- **Readability: all 28 combinations pass WCAG AA.** Weakest is 4.86 against a 4.5 minimum;
-  ordinary page text sits at 16.0. We also deliberately broke a color to confirm the checker
-  actually fails — it did, then passed again once restored.
-- **No cream left** anywhere in the stylesheet.
-- **Colors only**: a mechanical check proves every changed line in the stylesheet is a color,
-  background, shadow, border or mask line. Nothing else moved.
+Buttons in a web page do not inherit the page's text color — the browser supplies its own, which
+is black. Three of the answer buttons never set a color of their own. On the old cream pages that
+looked fine. On the new dark pages they would have been **black text on dark brown** — roughly
+1.9 to 1, far below the readable minimum, on the buttons your daughter taps to answer questions.
+Our automatic checker could not have caught it, because the offending color exists in no file at
+all; it comes from the browser. Three lines were added to fix it.
 
-## What we need from you
+## Readability, measured for real
 
-**1. Do you like it?** The two screenshots show the home screen. The pictures now bleed into the
-page: the big banner fades out at its bottom edge, and the round character portrait has a soft
-faded edge instead of a hard square. If the palette or that blending isn't right, this is the
-cheap moment to change it — only one screen has been done.
+Rather than eyeball a screenshot, we rendered all 25 themed states in a throwaway test page and
+measured what the browser actually painted. **24 of 25 pass**, the weakest real one at 5.75
+against a 4.5 minimum. The single exception is the greyed-out *disabled* button at 4.26, which
+the accessibility standard explicitly exempts — it is meant to look unavailable.
 
-**2. The launch-screen color.** There's a test that pins the app's startup background to the old
-cream `#faf7f2` and the browser bar color to the old violet `#7c3aed`. That's what your phone
-paints for a moment while the app opens. Leaving it means a white flash before the dark app
-appears. Changing it means editing that test, which is a genuine contract change — so per your
-instruction we stopped rather than quietly rewriting it. Our recommendation is startup
-background → `#241305` and browser bar → `#2e1806`.
+That measurement caught a second problem, in itself: our first pass reported perfect scores for
+the six tinted states because Chrome reports blended colors in a format our reader mis-parsed as
+pure black. It was inventing passing numbers. Fixed, re-run, and written into the run's lessons.
 
-## One thing worth knowing (not a decision)
+## What's left
 
-The primary button "בואי נתחיל" shows a text underline, because it's a link styled as a button.
-That's how it was before this re-theme too — it isn't a color problem, so it's outside the
-"colors only" boundary you set. Say the word and we'll fix it; otherwise we leave it alone.
+- **Phase 3**: the launch-screen and browser-bar colors you approved, plus telling returning
+  phones to fetch the new version instead of serving the old one from their cache. That last part
+  is the mistake the previous run learned the hard way.
+- **Phase 4**: publish to Vercel and verify on the live site.
 
 ## Safety
 
-Your daughter's profile was never touched. The preview screen is the home screen, which is fixed
-text and pictures and never contacts the server. Nothing has been deployed.
+Your daughter's profile has not been touched and will not be. Every check so far has used either
+the static home screen or an offline test page — nothing has contacted the app's server, started
+placement, or added a word.

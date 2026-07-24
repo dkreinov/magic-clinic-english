@@ -163,3 +163,112 @@ PHASE 1 CLOSED
   before any code was written, two of which (the pipefail exit-code masking and the `color: white`
   regex hole) would have let a broken step report a false PASS. That is the machinery earning
   its keep, and it is the number to watch across the rest of the run.
+
+## OWNER GATE — PASSED (2026-07-24)
+
+Owner was shown the WDT-1 palette, the two home-screen screenshots, the contrast results, and
+both open questions.
+
+DECISION 1 — palette: **APPROVE AS SHOWN.** The WDT-1 values and the artwork-blend treatment
+(banner bottom-fade, spot art as a soft-edged circle) are approved. Phases 2–4 proceed.
+
+DECISION 2 — PWA chrome (resolves WDT-3 / OPEN QUESTION 1): **change both, update the test.**
+Owner explicitly authorised editing the two frozen assertions in tests/shell.test.js:
+  public/manifest.webmanifest  background_color #faf7f2 -> #241305
+                               theme_color      #7c3aed -> #2e1806
+  public/index.html            <meta name="theme-color"> #7c3aed -> #2e1806
+  tests/shell.test.js:28-29    both assertions updated to the new values
+This is the ONLY authorised change to a test's color assertion in this run. WDT-3 is now closed.
+
+FYI item (raised, not a question): the primary button renders with a text underline because it
+is an <a class="btn btn-primary">. Predates this run, not a color defect, left alone.
+
+Execution resumes in autonomous mode. Remaining pauses: none planned.
+
+## PHASE 2 — PLANNING (fresh next-phase planner, PLANNER tier, files only)
+
+The fresh planner read the record and the code and returned a full plan plus 1 BLOCKER and
+4 RECORD GAPS. Its most valuable output was RECORD GAP 2, which is a real defect nothing else in
+this run would have caught:
+
+**`<button>` does not inherit `color`.** `.placement-option-btn`, `.placement-question-option`
+and `.reader-question-option` declare no `color`, so the UA stylesheet supplies `buttontext`.
+In the cream theme that rendered black-on-white and looked fine. After the re-theme it would have
+rendered black on deep brown at roughly 1.9:1 — a hard WDT-2 failure. The token-level contrast
+gate is STRUCTURALLY BLIND to it, because the offending foreground exists in no file: it comes
+from the browser. Corroborated by the fact that `public/styles.css` already carries
+`button { font-family: inherit; }` — someone hit the identical non-inheritance with fonts and
+fixed only that one. Promoted to contract WDT-6; Phase 2 adds the three missing declarations.
+This is the single strongest argument in this run for the fresh-planner step: the orchestrator
+wrote the Phase 2 skeleton and did not see it.
+
+ORCHESTRATOR RULINGS (full text in plan.md):
+- BLOCKER 1 (`--color-border` 2.51:1 against `--color-surface-2`): accepted as planned. WCAG
+  1.4.11 tests the control against its ADJACENT background — the card — where the border clears
+  3.05:1. It is also a strict improvement: the same control in the cream theme had a boundary
+  contrast of 1.04:1 (cream fill on a white card). Raising the token far enough to clear 3:1
+  against the option's own fill too would need luminance ~0.20 (about `#b58a5a`), a loud outline
+  on every answer button, and would reopen an owner-approved, doc-frozen token.
+- RECORD GAP 1 (scrim opacity never frozen): adopted `rgba(0, 0, 0, 0.6)`, added to WDT-5.
+- RECORD GAP 3 (`color-scheme: dark`): deferred to Phase 3, whose write set includes index.html.
+- RECORD GAP 4 (no per-phase baseline commit): fixed, `phase-state.md` now carries `BASELINE:`.
+
+## PHASE 2 — EXECUTION
+
+STEP 2.1 re-theme public/views/placement.js
+  tier: WORKER (Sonnet) · did: 5 rule swaps — play-btn ink, two option borders + two added
+  `color: var(--color-ink)` (WDT-6), two selection tints 10%/white -> 14%/card.
+  surprises: none · deviations: none · validation_first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=33941, checker=24547 · interventions: 0 · audit: match/high
+  commit: 7363faf · accepted: 2026-07-24
+
+STEP 2.2 re-theme public/views/reader.js
+  tier: WORKER (Sonnet) · did: 9 rule swaps — tapped-word 28%, input border, spinner track 25%,
+  question-option border + surface-2 fill + added ink color, correct 16%, wrong (both #dc2626
+  -> --color-danger) 16%, feedback.bad -> --color-danger, scrim 0.35 -> 0.6, grabber 45%.
+  surprises: none · deviations: none · validation_first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=37783, checker=25581 · interventions: 0 · audit: match/high
+  commit: ac9110d · accepted: 2026-07-24
+
+STEP 2.3 re-theme public/views/words.js
+  tier: WORKER (Sonnet) · did: both badge backgrounds -> 18% into --color-card; learning badge
+  foreground `color-mix(--color-accent 70%, black)` collapsed to plain var(--color-accent).
+  surprises: none · deviations: none · validation_first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=27093, checker=22513 · interventions: 0 · audit: match/high
+  commit: 87331b3 · accepted: 2026-07-24
+
+STEP 2.4 orchestrator visual check (not dispatched)
+  Chrome's screenshot transport failed repeatedly this session (CDP `Page.captureScreenshot`
+  deserialize error), so instead of eyeballing, the harness was verified MECHANICALLY, which is
+  stronger evidence. A throwaway static harness (scratchpad only, no repo file, no API call, no
+  profile contact) inlines styles.css + all three VIEW_STYLE blocks and renders 25 themed states;
+  a script then walks each element, resolves its EFFECTIVE background through the ancestor chain
+  with alpha compositing, and computes the real rendered WCAG ratio.
+  RESULT: 24/25 pass, worst non-disabled = 5.75 ("known" word badge). The single sub-4.5 item is
+  `.btn[disabled]` at 4.26 — WCAG 1.4.3 explicitly exempts inactive components, and the muting is
+  deliberate so the control reads as unavailable. Accepted; logged as a known, exempt item.
+  TRAP FOUND IN THE MEASUREMENT ITSELF: Chrome returns `color-mix` results as
+  `color(srgb 0.30 0.18 0.15)` floats, not `rgb()`. The first measurement pass parsed those with
+  an `rgb()` regex and silently reported `rgb(0,0,0)` backgrounds — i.e. it FABRICATED passing
+  numbers for exactly the six tinted states most in need of checking. Caught by noticing six
+  identical `bg=rgb(0,0,0)` rows. Promoted to field-guide lesson 15.
+  CROSS-CHECK (unplanned, valuable): Chrome's own composited color-mix values match
+  scripts/check-contrast.mjs's arithmetic to 2 decimals — e.g. selected option renders
+  `color(srgb 0.302667 0.182902 0.158745)` where the script predicts (77.18, 46.64, 40.48)/255 =
+  (0.30266, 0.18290, 0.15874). The gate is faithful to what actually renders, not just
+  self-consistent.
+
+PHASE 2 CLOSED
+  steps: 3 (+1 orchestrator step), first-try passes: 3/3
+  escalations: 0 · interventions: 0 · audits: 3/3 match, all CONFIDENCE high
+  cost: planner=121483, worker=98817, checker=72641, phase total=292941 subagent tokens;
+        run-to-date total=556056; dollar cost unavailable (harness does not report it here)
+  orchestrator_context: unavailable
+  field_guide: 40/40 lines (within budget). Curation: added lessons 14 (Chrome returns color-mix as
+    `color(srgb ...)`) and 15 (buttons do not inherit `color`); EVICTED the `sharp`
+    absolute-import lesson, whose only use (palette derivation) is finished and will not recur.
+    That trade is exactly what the cap is for: the two new lessons each describe a defect that
+    silently fabricated or hid a failure, which is worth more than a one-off import path.
+  acceptance criteria: all 9 pass — 146/146 tests, contrast gate ALL PASS, zero light-theme
+    leftovers in any view, exactly 3 files changed, styling-only proof empty, nothing else moved,
+    WDT5-OK, INK-OK, and the harness measurement above.
