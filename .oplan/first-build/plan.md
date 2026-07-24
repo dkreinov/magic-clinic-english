@@ -605,19 +605,131 @@ and stated in the generator prompt. Rationale: irregular forms (is/was/went/saw.
 unreachable via baseForms from band1 base verbs; a frozen allowlist keeps the gate mechanical
 without weakening it.
 
-## PHASE 4 — Story engine  (skeleton)
-- **goal:** the core loop live end-to-end locally: generate chapter 1..N constrained to known
-  words, read with tap-to-translate, answer micro-checks, watch the word collection grow.
-- **expected inputs:** profile with placement estimates, `lib/vocab.js` coverage, app shell.
-- **expected outputs:** `lib/openai.js` (chat wrapper, server-only), `api/chapter.js`
-  (generate + coverage-check ≥95% known + question-answerability verification + Hebrew glossary;
-  regenerate on failed checks), `api/translate.js` (fallback), reader UI (tap word → glossary
-  popup → save to bank), micro-check UI (2–3 Hebrew-option MCQs inline), words view (real data),
-  onboarding (heroine + pet naming) feeding `learner.*`.
-- **validation gate:** `npm test` with mocked OpenAI; one live generation smoke-tested by the
-  orchestrator against the real key; coverage checker demonstrably rejects a too-hard text.
-- **risks:** coverage constraint may need multiple regeneration rounds (cost/latency); question
-  verification mechanics (decide: verbatim-anchor check vs. second LLM pass) — decide at planning.
+## PHASE 4 — Story engine  (CURRENT — planned by fresh Opus planner, orchestrator-approved 2026-07-24, no changes)
+
+GOAL: core loop live end-to-end locally — onboarding (name heroine + pet), server-side OpenAI
+chapter generation constrained to a mechanically-verified ≥95% known-word floor with Hebrew
+glossary + 2–3 answerable Hebrew MCQs, reader with tap-to-translate and inline micro-checks,
+live word collection. All tests OpenAI-mocked; ONE real generation smoke-tested by the
+orchestrator at the gate.
+
+ACCEPTANCE CRITERIA (frozen): AC1 clean install+test exit 0 with 8 new test files, zero
+network in tests (transport injection). AC2 story.test.js: buildAllowedSet(post-placement
+profile, band1) ≥250 lemmas; verifyChapter accepts frozen in-vocab fixture (ratio ≥0.95,
+glossary covers every unknown token, every question.evidence verbatim in text) and rejects
+too-hard fixture + bogus-evidence fixture. AC3 generateChapter retry-then-succeed on mocks;
+all-fail → {ok:false}; api/chapter.js 502 on that path, 200+persist on success. AC4 profile
+POST set-learner + log-check persist; validateProfile green. AC5 (ORCHESTRATOR-EXECUTED live
+smoke at gate): real-key POST /api/chapter → 200, stored coverageRatio ≥0.95, glossary covers
+unknowns; tap-to-translate + micro-check verified in real browser. AC6 one commit per step
+4.1–4.5; porcelain clean; sw.js PRECACHE unchanged.
+
+DECISIONS (approved):
+- D1 COLD-START: allowed set = knownLemmaSet(profile) ∪ preBandI lemmas ∪ CORE_FUNCTION_WORDS
+  ∪ STORY_LEXICON; coverage via new coverageAgainst(text, allowedSet); gate ratio ≥0.95.
+  Empirical: preBandI-only = 0.53 on a real gpt-4.1-mini chapter; + function words = 0.89;
+  prompt+retry closes to ≥0.95. Tightens as her bank grows (only knownLemmaSet grows). NOT the
+  §1 founding failure: floors = ~190 school-assumed + ~110 function + ~25 premise words, all
+  glossed on first appearance.
+- D0 Model: gpt-4.1-mini frozen (chapters temp 0.7, translation temp 0).
+- D2 Mock seam: lib/openai.js setTransport/resetTransport + generateChapter takes chat param.
+- D3 Question gate: deterministic verbatim-anchor — each MCQ carries `evidence` (verbatim
+  English substring of the text); gate = text.includes(evidence) && ≥3 word-tokens.
+- D4 Glossary gate: every coverageAgainst(...).unknown token must be glossary-covered
+  (baseForms match) — every new word translatable offline.
+- D5 Tap-to-translate: glossary first; miss → POST /api/translate fallback (gpt-4.1-mini,
+  temp 0); save via existing word-tap.
+- D6 summarySoFar written by the LLM each generation; api/chapter.js persists it +
+  cliffhanger; fed back on next call.
+- D7 Micro-check logging: story.checkLog[] via POST /api/profile "log-check" — GC-3
+  AMENDMENT A2 (additive: defaultProfile seeds checkLog:[]; validator requires array if
+  present).
+- D8 Onboarding: POST /api/profile "set-learner" (heroineName/petName, trim, 1–24 chars).
+- D9 Chapter: 80–140 English words, 2–3 MCQs, cliffhanger required, no contractions.
+- D10 Degrade: maxAttempts=3 with forbidden-token feedback; total failure → 502 envelope,
+  NEVER an unverified chapter; reader shows fixed friendly Hebrew retry message.
+
+STEP 4.1 — OpenAI wrapper + coverageAgainst
+  files: lib/openai.js (create), lib/vocab.js (modify — additive export coverageAgainst),
+    tests/openai.test.js, tests/vocab-coverage-against.test.js. validation: npm test.
+  contracts: lib/openai.js — CHAT_MODEL='gpt-4.1-mini'; CHAT_URL=chat/completions; module
+    _transport with setTransport/resetTransport; chatJSON({system,user,temperature=0.7}) →
+    _transport({model,temperature,response_format:{type:'json_object'},messages:[system?,user]});
+    defaultTransport: OPENAI_API_KEY at call time (throw 'OPENAI_API_KEY not set'), POST w/
+    Bearer, throw on !ok or missing content, JSON.parse(content). coverageAgainst(text,
+    allowedSet) → {total,known,unknown sorted-unique,ratio} via baseForms; existing exports
+    UNCHANGED. Tests: transport injection (payload shape), resetTransport, key-missing throw
+    (no network); coverageAgainst fixtures.
+  non-goals: no story logic/prompts/endpoints. tier WORKER. depends 2.2.
+
+STEP 4.2 — lib/story.js (allowed set + gates + generation loop)
+  files: lib/story.js, tests/story.test.js. validation: npm test.
+  contracts: exports STORY_MODEL; CORE_FUNCTION_WORDS = Phase-3 A1 FUNCTION_FORMS verbatim ∪
+    ["a","the","this","that","these","those","i","you","he","she","it","we","to","of","in",
+    "on","at","for","with","from","by","as","and","or","but","not","no","yes","what","who",
+    "where","when","why","how","here","there","now","then","so","if","up","down","out","all",
+    "one","two","three","very","too","also","because","about","into","over","again","new",
+    "some","many","more","most","little","big","good","bad"]; STORY_LEXICON=["vet","magical",
+    "magic","animal","creature","clinic","apprentice","dragon","unicorn","fairy","wizard",
+    "witch","spell","potion","wing","tail","scale","feather","paw","horn","pet","heal","cure",
+    "sick","forest","cave"]; buildAllowedSet(profile,band1); verifyChapter(chapter,allowedSet,
+    {minRatio=0.95}) → {ok,ratio,unknown,errors[]} (structural + coverage + glossary-covers-
+    unknowns + evidence gates); chapterSchema {n,title,text,cliffhanger,glossary:[{word,he}],
+    questions:[{id:`ch${n}-q${m}`,prompt,options[4],correctIndex,evidence}],coverageRatio,
+    generatedAt}; buildPrompt(...) (premise: heroine=learner.heroineName apprenticed to a vet
+    for magical creatures with pet learner.petName; 80–140 words; cliffhanger; ONLY allowed
+    words, inflections ok, no contractions; JSON output incl. summarySoFar);
+    generateChapter({profile,band1,chat,now,maxAttempts=3}) loop w/ forbidden-token feedback →
+    {ok:true,chapter,summarySoFar} | {ok:false,error,lastErrors}. Tests per AC2/AC3 with fake
+    chat; CORE lists duplicated in test for mechanical pin.
+  non-goals: no HTTP/store/live calls. tier WORKER. depends 4.1, 2.1.
+
+STEP 4.3 — setLearner/logCheck + GC-3 A2
+  files: lib/profile.js (modify additive), tests/profile-learner.test.js. validation: npm test.
+  contracts: defaultProfile story gains checkLog:[]; validator: story.checkLog must be array
+    if present; setLearner (trim, ''→throw 'name required', >24→'name too long', set only
+    provided); logCheck pushes {chapter,questionId,chosenIndex,correctIndex,correct,at}.
+  non-goals: no HTTP; existing mutators untouched. tier WORKER. depends 1.2/2.3.
+
+STEP 4.4 — api/chapter.js + api/translate.js + profile actions
+  files: api/chapter.js, api/translate.js, api/profile.js (modify — 2 new actions),
+    tests/api-chapter.test.js, tests/api-translate.test.js, tests/api-profile-post.test.js
+    (modify — add cases). validation: npm test.
+  contracts: chapter: GET→405; POST action 'generate': require placement.completed (400
+    'placement required') + heroineName&&petName (400 'learner required'); generateChapter
+    with chat=chatJSON; !ok → 502 'chapter generation failed'; ok → push chapter, set
+    summarySoFar+cliffhanger, saveProfile, 200 {chapter}; other action 400. translate: POST
+    {word} non-blank (400 'word required') → chatJSON translate-one-word system prompt temp 0
+    → 200 {word,he}; chat throw → 502 'translation failed'; GET→405. profile POST adds
+    'set-learner' (require a name; try/catch → 400 err.message) + 'log-check' (require string
+    questionId + numeric indexes else 400 'invalid check'). Tests via setTransport fakes +
+    withTempDataDir + Readable-of-Buffer; resetTransport in finally.
+  non-goals: no UI; no lib/data/sw changes; key never in public/. tier WORKER. depends 4.2/4.3/2.4.
+
+STEP 4.5 — Reader + Words views
+  files: public/views/reader.js (rewrite), public/views/words.js (rewrite),
+    tests/reader-ui.test.js, tests/words-ui.test.js. validation: npm test.
+  contracts: reader state machine — !placement.completed → prompt card ("קודם נעשה מבחן היכרות
+    קטן" → #/placement); no names → onboarding ("איך נקרא לגיבורה שלנו?" · "ואיך נקרא לחיה
+    הקסומה הראשונה?" · "יאללה, מתחילים!") → set-learner then generate; no chapters →
+    "מתחילים את הסיפור"; else latest chapter: LTR text with every word in tappable
+    <span data-word>; tap → popup (glossary first, else /api/translate) + "שמרי למילים שלי"
+    (word-tap); inline questions w/ feedback ("כל הכבוד!" / "לא נורא, ננסה שוב") + log-check;
+    all answered → "המשך הסיפור" → next chapter; any generate error → "רגע, הקסם מתעכב… ננסה
+    שוב עוד רגע." + retry. words view: empty state unchanged; else word list (LTR lemma + he,
+    badges "יודעת"/"לומדת", sort lastSeen desc). Static tests: node --check, exports, frozen
+    strings, endpoint/action references.
+  non-goals: no sw.js/PRECACHE, no other views, no new CSS file, no new endpoints. tier
+    WORKER. depends 4.4, 1.4.
+
+RISKS: R1 gate unsatisfiable w/ tiny known set → D1 floors + retries + 502 degrade. R2
+evidence gate grounds correct answer, not distractor impossibility — accepted, future 2nd-pass
+verifier possible. R3 STORY_LEXICON ~25 unmeasured premise words — bounded, glossed,
+owner-reviewable. R4 baseForms over-credit → makes texts easier, safe direction. R5 non-JSON
+LLM output → parse throw = failed attempt. R6 translate cost per tap — rare (glossary covers
+new words).
+
+BLOCKERS: none. RECORD GAPS: none.
 
 ## PHASE 5 — Integration, polish & deploy  (skeleton)
 - **goal:** deployed, installable, verified on production URL; owner handoff doc.

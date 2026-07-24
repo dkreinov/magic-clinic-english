@@ -411,3 +411,14 @@ PHASE 3 CLOSED
     skips; checker layer continues to earn its cost.
   OWNER GATE (not run-blocking): docs/item-bank-review.md must be reviewed and signed off
     BEFORE the child uses the placement test. Flagged in STATUS.
+
+## 2026-07-24T14:17:13+03:00 — PHASE 4 PLANNED (fresh Opus planner, files only)
+- Planner ran ONE sanctioned live probe: real gpt-4.1-mini chapter vs preBandI-only allowed
+  set = 0.53 coverage; same text vs preBandI+function-words = 0.89 — grounding cold-start
+  decision D1 empirically instead of by guess.
+- BLOCKERS: none. RECORD GAPS: none. GC-3 amendment A2 (story.checkLog, additive) logged.
+- Orchestrator review: APPROVED, no changes. D0-D10 ratified; the D1 allowed-set union
+  (known ∪ preBandI ∪ CORE_FUNCTION_WORDS ∪ STORY_LEXICON, gate ≥0.95 via new
+  coverageAgainst) is the phase's load-bearing decision and is mechanical.
+- Record-completeness test PASSED (third consecutive phase).
+- Planner tokens: 124466.

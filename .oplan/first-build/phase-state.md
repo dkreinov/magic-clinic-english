@@ -1,4 +1,4 @@
-CURRENT: phase 3 CLOSED; phase 4 "Story engine" being planned
+CURRENT: phase 4 "Story engine", next step 4.1
 PLAN: .oplan/first-build/plan.md
 ACCEPTED: 3.1 55be2d5 · 3.2 2dce91c · 3.3 c00ce8a · 3.4 c3a2455 · 3.5 06348cf · 1.1 7983095 · 1.2 2012689 · 1.3 12dce41 · 1.4 16c1866 · 1.5 699ff2c ·
 2.1 fc1f0a6 · 2.2 204213b · 2.3 251f76c · 2.4 e42a9e6
