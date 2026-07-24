@@ -86,3 +86,27 @@ STEP 1.2 Profile + storage libraries
   audit: match, confidence high (round 2)
   commit: 2012689
   accepted: 2026-07-24T12:34:21+03:00
+
+## 2026-07-24T12:55+03:00 — STEP 1.3 AUDIT ROUND 1: mismatch (1 contract finding)
+- Auditor: readJsonBody returns `undefined` for empty body; contract says invalid JSON throws
+  and empty IS invalid. Orchestrator ruling: empty body throws, no special cases — plan.md
+  step 1.3 contract amended; worker resumed to delete the special case. Re-audit will follow
+  (a second mismatch on this step stops the run per SKILL §7).
+
+STEP 1.3 API endpoints: health + profile
+  tier: WORKER (Sonnet)
+  did: lib/http.js (sendJson via writeHead/end, readJsonBody strict — empty body throws);
+       api/health.js (GET 200 envelope, else 405); api/profile.js (GET loads/creates+saves
+       default profile, else 405); tests/api.test.js (mock req/res, temp DATA_DIR, 5 tests).
+  surprises: none
+  deviations: none
+  validation_first_try: yes
+  retries: 0
+  escalations: 0
+  tokens: worker=34286+35897 (two turns), checker=27936+27749 (two audit rounds),
+       orchestrator_delta=unavailable
+  interventions: 1 (bad-spec/unauthorized-choice: worker special-cased empty body in
+       readJsonBody; ruling = empty throws; contract amended; audit round 2 match)
+  audit: match, confidence high (round 2)
+  commit: 12dce41
+  accepted: 2026-07-24T12:38:15+03:00

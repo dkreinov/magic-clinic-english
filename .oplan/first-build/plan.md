@@ -158,7 +158,8 @@ static files and API routes.
 - **validation (frozen):** `npm test` → exit 0
 - **contracts:** GC-4. `lib/http.js`: `sendJson(res, status, body)` uses only
   `res.writeHead(status, {"Content-Type":"application/json; charset=utf-8"})` + `res.end(JSON.stringify(body))`;
-  `readJsonBody(req)` collects the stream, parses JSON, throws on invalid. `api/health.js`:
+  `readJsonBody(req)` collects the stream, parses JSON, throws on invalid — an EMPTY body is
+  invalid JSON and throws too; no special cases (AMENDED during 1.3 audit). `api/health.js`:
   GET → 200 `{ok:true, data:{status:"up", version:1}}`; other methods → 405 envelope.
   `api/profile.js`: GET → `loadProfile()`; if null, create `defaultProfile()`, save it, return
   it; response `{ok:true, data:<profile>}`; other methods → 405 (mutations come in Phase 2).
