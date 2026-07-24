@@ -78,7 +78,7 @@ mechanically valid (PNG, right aspect, full-res) and on-brief.
 - **commands:** browser automation (claude-in-chrome MCP via ToolSearch) + Bash for file moves.
 - **validation (frozen):**
   ```
-  cd C:/Users/dkreinov/claude/english-app && node -e "const fs=require('fs');for(const f of ['hero-clinic','chapter-clinic','chapter-forest','chapter-night']){const p='assets/delight/'+f+'.png';const b=fs.readFileSync(p);if(b.toString('hex',0,8)!=='89504e470d0a1a0a')throw new Error(p+': not PNG');const w=b.readUInt32BE(16),h=b.readUInt32BE(20);if(w<1000)throw new Error(p+': width '+w+'<1000');if(w<=h)throw new Error(p+': not landscape '+w+'x'+h);if(b.length<100000)throw new Error(p+': suspiciously small');console.log(p,w+'x'+h,Math.round(b.length/1024)+'KB')}"
+  cd C:/Users/dkreinov/claude/english-app && node -e "const fs=require('fs'),c=require('crypto');const seen={[c.createHash('md5').update(fs.readFileSync('assets/design-tests/dragon-clinic-test.png')).digest('hex')]:'anchor'};for(const f of ['hero-clinic','chapter-clinic','chapter-forest','chapter-night']){const p='assets/delight/'+f+'.png';const b=fs.readFileSync(p);if(b.toString('hex',0,8)!=='89504e470d0a1a0a')throw new Error(p+': not PNG');const w=b.readUInt32BE(16),h=b.readUInt32BE(20);if(w<1000)throw new Error(p+': width '+w+'<1000');if(w<=h)throw new Error(p+': not landscape '+w+'x'+h);if(b.length<100000)throw new Error(p+': suspiciously small');const hash=c.createHash('md5').update(b).digest('hex');if(seen[hash])throw new Error(p+': DUPLICATE content of '+seen[hash]);seen[hash]=f;console.log(p,w+'x'+h,Math.round(b.length/1024)+'KB')}"
   ```
 - **contracts:** GC-D5 (names), GC-D6 + STYLE SUFFIX, GC-D7 (chat, downloads). Frozen prompts:
   - hero-clinic: "Wide landscape image (3:2): the exterior of a cozy crooked magical veterinary
@@ -108,9 +108,16 @@ Call tabs_context first; open a NEW tab; navigate to the GC-D7 chat URL. Per ima
 frozen prompt into the composer, send, poll (screenshot every ~15s, up to 3 min) until the image
 renders; open the image; use the share dialog's Download button. **Download handoff (race-safe):**
 BEFORE clicking Download, record the current newest `ChatGPT Image*.png` in
-`C:\Users\dkreinov\Downloads` (`ls -t`); after clicking, poll with Bash until a file NEWER than
-that recording exists, no `*.crdownload`/`*.tmp` sibling remains, and its byte size is identical
-across two reads 2 seconds apart — only then `mv` it to the target name. **Generation failure:**
+`C:\Users\dkreinov\Downloads` (`ls -t`); activate the Download control **exactly ONCE** — never
+re-click while waiting (a re-click makes Chrome save another full copy; an earlier run produced
+89 identical files this way). Then poll with Bash ONLY (no further browser clicks) until a file
+NEWER than that recording exists, no `*.crdownload`/`*.tmp` sibling remains, and its byte size is
+identical across two reads 2 seconds apart — only then `mv` it to the target name. If no new file
+appears within 30s, screenshot to verify the button state before at most ONE re-click. After the
+`mv`, verify the download landed uniquely: if additional new `ChatGPT Image*.png` files appeared
+since your pre-click recording, count them in SURPRISES and do NOT delete them. Before starting
+the next image, re-record the newest file so a stale duplicate can never be grabbed; the
+validation's hash-distinctness check is the backstop. **Generation failure:**
 if ChatGPT errors, refuses, or nothing renders within 3 minutes, resend the same prompt once;
 if that also fails, return `STATUS: failed` describing what the page showed — do not improvise
 an alternative pipeline. View
@@ -130,7 +137,7 @@ off-brief, keep the better attempt and report it in SURPRISES. Generate images O
 - **commands:** same browser procedure as 1.1 (same chat, same tab ok).
 - **validation (frozen):**
   ```
-  cd C:/Users/dkreinov/claude/english-app && node -e "const fs=require('fs');const spec={'heroine':'square','placement-friend':'square','words-treasure':'square','celebration':'landscape'};for(const f of Object.keys(spec)){const p='assets/delight/'+f+'.png';const b=fs.readFileSync(p);if(b.toString('hex',0,8)!=='89504e470d0a1a0a')throw new Error(p+': not PNG');const w=b.readUInt32BE(16),h=b.readUInt32BE(20);if(w<900)throw new Error(p+': width '+w+'<900');if(spec[f]==='square'&&w!==h)throw new Error(p+': not square '+w+'x'+h);if(spec[f]==='landscape'&&w<=h)throw new Error(p+': not landscape '+w+'x'+h);if(b.length<100000)throw new Error(p+': suspiciously small');console.log(p,w+'x'+h,Math.round(b.length/1024)+'KB')}"
+  cd C:/Users/dkreinov/claude/english-app && node -e "const fs=require('fs'),c=require('crypto');const seen={[c.createHash('md5').update(fs.readFileSync('assets/design-tests/dragon-clinic-test.png')).digest('hex')]:'anchor'};for(const f of ['hero-clinic','chapter-clinic','chapter-forest','chapter-night'])seen[c.createHash('md5').update(fs.readFileSync('assets/delight/'+f+'.png')).digest('hex')]=f;const spec={'heroine':'square','placement-friend':'square','words-treasure':'square','celebration':'landscape'};for(const f of Object.keys(spec)){const p='assets/delight/'+f+'.png';const b=fs.readFileSync(p);if(b.toString('hex',0,8)!=='89504e470d0a1a0a')throw new Error(p+': not PNG');const w=b.readUInt32BE(16),h=b.readUInt32BE(20);if(w<900)throw new Error(p+': width '+w+'<900');if(spec[f]==='square'&&w!==h)throw new Error(p+': not square '+w+'x'+h);if(spec[f]==='landscape'&&w<=h)throw new Error(p+': not landscape '+w+'x'+h);if(b.length<100000)throw new Error(p+': suspiciously small');const hash=c.createHash('md5').update(b).digest('hex');if(seen[hash])throw new Error(p+': DUPLICATE content of '+seen[hash]);seen[hash]=f;console.log(p,w+'x'+h,Math.round(b.length/1024)+'KB')}"
   ```
 - **contracts:** GC-D5/D6/D7 + STYLE SUFFIX. Frozen prompts:
   - heroine: "Square image (1:1): the same brown-haired girl vet apprentice from the earlier

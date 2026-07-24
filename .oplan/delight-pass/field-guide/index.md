@@ -20,3 +20,8 @@ New this run:
     be ambiguous otherwise).
 11. ALL image generation happens in the ONE dedicated chat (design.md §7 URL). Never a new chat.
     Generate one image at a time — ChatGPT serializes generations within a chat.
+12. Activate ChatGPT's Download control exactly ONCE and wait via Bash polling only. Re-clicking
+    while waiting made Chrome save 89 identical copies (2026-07-24 incident) — and once
+    Downloads is polluted with duplicates, the "newest file" heuristic grabs stale bytes.
+13. Any validation over generated assets must assert CONTENT distinctness (md5 across all
+    assets + anchor), not just per-file format/aspect — duplicate grabs pass per-file checks.
