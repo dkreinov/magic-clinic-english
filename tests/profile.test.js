@@ -18,7 +18,7 @@ test('defaultProfile produces the expected schema-v1 shape', () => {
     },
     words: {},
     placement: { completed: false, task1: null, task2: null, completedAt: null },
-    story: { chapters: [], summarySoFar: '', cliffhanger: '' },
+    story: { chapters: [], summarySoFar: '', cliffhanger: '', checkLog: [] },
     meta: { createdAt: NOW, updatedAt: NOW },
   });
 });
