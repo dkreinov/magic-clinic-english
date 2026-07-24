@@ -1,0 +1,114 @@
+# Owner Handoff — English Learning App
+
+מדריך למפעיל/ה (ההורה): איך להתקין את האפליקציה על הטלפון של הבת, מה חובה לבדוק
+לפני שהיא מתחילה, מה לצפות בשבועות הראשונים, איך להריץ הכל מקומית, כמה זה עולה,
+ומה מדיניות הפרטיות.
+
+Production URL (canonical, share this one — deployment-specific
+`*-dkreinovs-projects.vercel.app` URLs redirect to a Vercel login):
+
+**https://english-app-three-tan.vercel.app**
+
+---
+
+## 1. התקנה על הטלפון שלה / Install on her phone
+
+1. בטלפון האנדרואיד שלה, פתחי **Chrome** וגלשי אל:
+   `https://english-app-three-tan.vercel.app`
+2. פתחי את תפריט שלוש הנקודות (⋮) בפינה הימנית העליונה.
+3. בחרי **"Add to Home screen"** (או **"Install app"**, תלוי בגרסת Chrome).
+4. אשרי את ההתקנה.
+
+אייקון האפליקציה הוא כרגע טביעת כפה (paw-print) פשוטה — אייקון מאויר ויפה יותר
+הוא צעד עתידי שייעשה ביחד איתך. בפתיחה הראשונה האפליקציה תיפתח כמו אפליקציה
+רגילה, במסך מלא (ללא סרגל הכתובת של הדפדפן).
+
+## 2. לפני שהיא מתחילה — חובה / Before she starts — REQUIRED
+
+**חובה** לעבור על `docs/item-bank-review.md` (כ-30 דקות) **לפני** שהילדה עושה
+את מבחן המיון (placement test) בפעם הראשונה. המסמך מכיל את כל השאלות שהיא
+תראה — אימוג'ים, תרגומים, הסחות דעת (distractors), וטקסטי ההבנה.
+
+שימי לב במיוחד לשני פריטים חלשים שזוהו מראש:
+
+- **`t1-06` desk → 🧑‍💻** — האימוג'י הזה נקרא בעיקר כ"אדם מול מחשב", לא כ"שולחן"
+  באופן חד-משמעי, והתרגום "שולחן" עמום.
+- **`t1-04` fan → 🌀** — אימוג'י הציקלון הוא ייצוג חלש למילה "מאוורר". וודאי מול
+  הבת שלך שהיא אכן מזהה את זה נכון.
+
+הוראות תיקון מלאות (אם צריך) נמצאות בסעיף 5 של `docs/item-bank-review.md`.
+
+בנוסף: **לפני** שהיא מתחילה, בדקי בעצמך — בטלפון או בדפדפן שלך — שלחיצה על מילה
+בטקסט הסיפור פותחת חלונית תרגום (tap-to-translate). זהו הפער היחיד באוטומציה:
+המחווה של הלחיצה (tap gesture) על המכשיר נבדקה באמצעות code review ובדיקות API,
+לא על ידי אצבעות רובוטיות אמיתיות — לכן חשוב לוודא זאת ידנית פעם אחת בעצמך.
+
+## 3. מה לצפות בשבועות הראשונים / First weeks — what to watch
+
+מתוך `design.md` §1, שני קריטריוני ההצלחה (שניהם חייבים להתקיים):
+
+> Kill criteria (both must hold):
+> 1. She **wants** to use it (comes back voluntarily).
+> 2. The learning is **real** (level-calibrated, measurable).
+
+סימנים מעשיים לעקוב אחריהם:
+
+- **האם היא מבקשת את הפרק הבא?** זה האינדיקטור הכי ישיר לקריטריון #1 —
+  אם היא חוזרת מרצון, זה עובד.
+- **האם תשובות שגויות בבדיקות המיקרו (micro-checks) תכופות?** זה סימן כיול
+  (calibration signal) שהטקסט קשה מדי — האפליקציה רושמת זאת אוטומטית.
+- כל פרק שנוצר שומר `coverageRatio` (יחס כיסוי מילים ידועות). ערך של **0.95
+  ומעלה** אמור להרגיש נוח לקריאה — זו בדיקה כמותית לקריטריון #2.
+
+## 4. הרצה מקומית / Run locally
+
+הרצה מקומית משתמשת בפרופיל מקומי בתיקיית `.data/` ו**אינה נוגעת בפרודקשן**.
+
+```bash
+npm install --no-audit --no-fund
+npm test
+npm run dev
+```
+
+לאחר `npm run dev`, האפליקציה זמינה בכתובת http://localhost:3000
+(ניתן לשנות פורט עם משתנה הסביבה `PORT`). `npm test` מריץ 146 בדיקות.
+
+## 5. עלויות / Costs
+
+שני ספקים גובים כסף:
+
+- **OpenAI**: תשלום לפי שימוש — לכל פרק שנוצר, ולכל fallback של
+  tap-translate (שברי סנט לכל קריאה). בניית ה-item bank וקבצי ה-TTS
+  הראשונית כבר בוצעה כעלות חד-פעמית. מעקב ב-
+  [platform.openai.com/usage](https://platform.openai.com/usage).
+- **Vercel**: אחסון (hosting) + אחסון Blob לפרופיל שלה. מעקב בדשבורד
+  [vercel.com](https://vercel.com) שלך.
+
+עלות כוללת צפויה: **כ-$5–10 לחודש** (`design.md` §2).
+
+## 6. פרטיות / Privacy posture
+
+הפרופיל שלה (שמות שהיא בחרה לגיבורה ולחיית המחמד שלה, בנק המילים באנגלית
+שלה, וציונים) נשמר ב-Vercel Blob store בשם `english-app-blob`, בנתיב
+`profile/profile.json`. חשוב לדעת: זהו **public-access** store — כל מי שמנחש
+או מקבל את ה-URL האקראי והלא-ניתן-לניחוש של ה-store יכול לקרוא אותו. **אין
+בפרופיל שם אמיתי שלה** — רק שמות בדויים, מילים, וציונים — ולכן זה מקובל
+לנתונים האלה. שדרוג לאחסון פרטי אפשרי בעתיד, אך דורש שינוי בשכבת האחסון
+(storage layer).
+
+## 7. תזכורת המטרה / The goal, verbatim
+
+מתוך `design.md` §1:
+
+> - An app for **one child**: the owner's daughter, Hebrew speaker, finishing 5th grade / entering 6th grade (~11 years old).
+> - Goal: real English learning — reading, comprehension, vocabulary, later speaking confidence. **Not fluff.**
+> - No accounts, no multi-user, no productization.
+> - Kill criteria (both must hold):
+>   1. She **wants** to use it (comes back voluntarily).
+>   2. The learning is **real** (level-calibrated, measurable).
+
+והעיקרון המרכזי שהאפליקציה כולה בנויה סביבו: **95–98% מהמילים בכל טקסט
+חייבות להיות ידועות לה** כדי שהקריאה תהיה מובנת ומהנה במקום מתסכלת (זה בדיוק
+מה שהתסכל בניסיון הקודם — טקסט שנכתב בלי לדעת אילו מילים היא באמת מכירה).
+
+**אם האפליקציה מפסיקה לשרת אותה — לשנות אותה, או לסגור אותה.**
