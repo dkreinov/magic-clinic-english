@@ -130,3 +130,24 @@ PHASE 1 CLOSED
   review: accepted as-is; validations mechanical, write sets disjoint (2.1 docs/visual-design.md,
   2.2 design.md), every content decision cites a source file. Written into plan.md verbatim
   (condensed formatting only). Planner tokens: 61321.
+
+STEP 2.1 Write docs/visual-design.md from the record
+  tier: WORKER (Sonnet)
+  did: created docs/visual-design.md (8 H2 sections) transcribing/deriving from design.md §7,
+       plan.md GC-D1..D8 + step 1.1/1.2 prompts + STYLE SUFFIX, journal OWNER GATE entry,
+       field-guide 10-13, public/styles.css :root, public/index.html font link.
+  surprises: frozen validation command itself was broken — `grep -qF "--color-primary"` parses
+       the pattern as a long option on GNU grep. Executor proved content correct with `--`
+       separator added, changed nothing outside scope. INTERVENTION: orchestrator amended the
+       frozen command in plan.md (added `--` before all three grep patterns) — planner defect,
+       not worker defect.
+  deviations: none
+  validation_first_try: no (validation-command bug, not content bug; amended command passes
+       clean-state on first orchestrator run)
+  retries: 0
+  escalations: 0
+  tokens: worker=65390, checker=43654, orchestrator_delta=unavailable
+  interventions: 1 (bad-spec: validation command grep long-option bug)
+  audit: match, confidence high (byte-for-byte cross-check vs styles.css/index.html/plan.md)
+  commit: (this commit)
+  accepted: 2026-07-24
