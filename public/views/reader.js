@@ -1,26 +1,592 @@
-export function render(container) {
-  container.innerHTML = `
-    <header class="app-header">
-      <p class="greeting">הסיפור</p>
-      <h1 class="app-title">מרפאת הקסמים</h1>
-    </header>
+import { getJson, postJson } from "../api.js";
 
-    <div class="empty-state">
-      <div class="illustration" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M12 3.5c-.9 0-1.6.7-1.6 1.6 0 .5.2.9.5 1.2-1 .3-1.7 1.2-1.7 2.3 0 .3 0 .5.1.8-1.4.2-2.4 1.4-2.4 2.9 0 1.6 1.3 2.9 2.9 2.9h4.4c1.6 0 2.9-1.3 2.9-2.9 0-1.5-1-2.7-2.4-2.9.1-.3.1-.5.1-.8 0-1.1-.7-2-1.7-2.3.3-.3.5-.7.5-1.2 0-.9-.7-1.6-1.6-1.6Z"
-            fill="currentColor"
-            fill-opacity="0.55"
-          />
-          <ellipse cx="9" cy="17.5" rx="1.1" ry="1.5" fill="currentColor" fill-opacity="0.55" />
-          <ellipse cx="15" cy="17.5" rx="1.1" ry="1.5" fill="currentColor" fill-opacity="0.55" />
-          <ellipse cx="7.3" cy="20.3" rx="1" ry="1.3" fill="currentColor" fill-opacity="0.55" />
-          <ellipse cx="16.7" cy="20.3" rx="1" ry="1.3" fill="currentColor" fill-opacity="0.55" />
-        </svg>
-      </div>
-      <p class="empty-state-title">הסיפור עוד לא התחיל…</p>
-      <p class="empty-state-text">כשתסיימי את מבחן ההיכרות, הסיפור שלך יחכה כאן.</p>
-    </div>
+const VIEW_STYLE = `
+  .reader-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .reader-chapter-label {
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .reader-text {
+    font-size: 1.08rem;
+    line-height: 1.9;
+    text-align: left;
+  }
+
+  .reader-text .w {
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background var(--transition-fast);
+  }
+
+  .reader-text .w:active,
+  .reader-text .w.tapped {
+    background: color-mix(in srgb, var(--color-accent) 25%, white);
+  }
+
+  .reader-onboard-field {
+    margin-bottom: 18px;
+  }
+
+  .reader-onboard-label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .reader-onboard-input {
+    width: 100%;
+    min-height: 48px;
+    border-radius: var(--radius);
+    border: 2px solid transparent;
+    background: var(--color-card);
+    box-shadow: var(--shadow-soft);
+    padding: 0 16px;
+    font-size: 1.05rem;
+    font-family: inherit;
+    color: var(--color-ink);
+  }
+
+  .reader-onboard-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  .reader-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 40px 16px;
+    text-align: center;
+    color: var(--color-muted);
+    font-weight: 600;
+  }
+
+  .reader-spinner {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 4px solid color-mix(in srgb, var(--color-primary) 20%, white);
+    border-top-color: var(--color-primary);
+    animation: reader-spin 0.9s linear infinite;
+  }
+
+  @keyframes reader-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .reader-question-card {
+    margin-bottom: 16px;
+  }
+
+  .reader-question-prompt {
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .reader-question-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .reader-question-option {
+    min-height: 48px;
+    border-radius: var(--radius);
+    border: 2px solid transparent;
+    background: var(--color-bg);
+    box-shadow: var(--shadow-soft);
+    font-size: 0.98rem;
+    font-weight: 600;
+    padding: 10px 16px;
+    text-align: right;
+    cursor: pointer;
+    transition: transform var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+  }
+
+  .reader-question-option:active {
+    transform: scale(0.98);
+  }
+
+  .reader-question-option.correct {
+    border-color: var(--color-teal);
+    background: color-mix(in srgb, var(--color-teal) 12%, white);
+  }
+
+  .reader-question-option.wrong {
+    border-color: #dc2626;
+    background: color-mix(in srgb, #dc2626 10%, white);
+  }
+
+  .reader-question-option[disabled] {
+    cursor: default;
+  }
+
+  .reader-question-feedback {
+    margin-top: 10px;
+    font-weight: 700;
+  }
+
+  .reader-question-feedback.ok {
+    color: var(--color-teal);
+  }
+
+  .reader-question-feedback.bad {
+    color: #dc2626;
+  }
+
+  .reader-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 50;
+  }
+
+  .reader-popup {
+    width: 100%;
+    max-width: 480px;
+    background: var(--color-card);
+    border-radius: var(--radius) var(--radius) 0 0;
+    box-shadow: var(--shadow-soft);
+    padding: 22px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+    text-align: center;
+  }
+
+  .reader-popup-word {
+    font-size: 1.4rem;
+    font-weight: 700;
+    direction: ltr;
+    margin-bottom: 6px;
+  }
+
+  .reader-popup-he {
+    font-size: 1.2rem;
+    color: var(--color-muted);
+    margin-bottom: 18px;
+  }
+
+  .reader-popup-confirm {
+    color: var(--color-teal);
+    font-weight: 700;
+    margin-top: 10px;
+  }
+`;
+
+function header(subtitle, title) {
+  return `
+    <header class="app-header">
+      <p class="greeting">${subtitle}</p>
+      <h1 class="app-title">${title}</h1>
+    </header>
   `;
+}
+
+function styleTag() {
+  return `<style>${VIEW_STYLE}</style>`;
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function normalizeWord(raw) {
+  return raw.toLowerCase().replace(/[^a-z]/g, "");
+}
+
+function renderWords(text) {
+  const tokens = text.split(/(\s+)/);
+  return tokens
+    .map((tok) => {
+      if (/^\s+$/.test(tok) || tok === "") return tok;
+      const dataWord = normalizeWord(tok);
+      if (dataWord === "") return escapeHtml(tok);
+      return `<span class="w" data-word="${escapeHtml(dataWord)}">${escapeHtml(tok)}</span>`;
+    })
+    .join("");
+}
+
+function findInGlossary(chapter, dataWord) {
+  if (!chapter || !Array.isArray(chapter.glossary)) return null;
+  for (const g of chapter.glossary) {
+    if (!g || typeof g.word !== "string") continue;
+    const gw = g.word.toLowerCase();
+    if (gw === dataWord || dataWord.startsWith(gw)) {
+      return g.he;
+    }
+  }
+  return null;
+}
+
+export async function render(container, ctx) {
+  let profile = null;
+  let stage = "loading";
+  let generating = false;
+  let genError = false;
+  let activePopup = null; // { word, he, saved }
+
+  async function boot() {
+    draw();
+    try {
+      profile = await getJson("/api/profile");
+      decideStage();
+    } catch (err) {
+      stage = "error";
+    }
+    draw();
+  }
+
+  function decideStage() {
+    if (!profile.placement || !profile.placement.completed) {
+      stage = "needs-placement";
+      return;
+    }
+    if (!profile.learner.heroineName || !profile.learner.petName) {
+      stage = "onboarding";
+      return;
+    }
+    if (!profile.story.chapters || profile.story.chapters.length === 0) {
+      stage = "start-story";
+      return;
+    }
+    stage = "chapter";
+  }
+
+  function latestChapter() {
+    const chapters = profile.story.chapters;
+    return chapters[chapters.length - 1];
+  }
+
+  async function runGenerate() {
+    generating = true;
+    genError = false;
+    draw();
+    try {
+      const { chapter } = await postJson("/api/chapter", { action: "generate" });
+      profile.story.chapters.push(chapter);
+      generating = false;
+      stage = "chapter";
+      draw();
+    } catch (err) {
+      generating = false;
+      genError = true;
+      draw();
+    }
+  }
+
+  function renderLoading() {
+    return `${styleTag()}${header("הסיפור", "רגע...")}<p class="card-subtitle">טוען...</p>`;
+  }
+
+  function renderNeedsPlacement() {
+    return `
+      ${styleTag()}
+      ${header("הסיפור", "מרפאת הקסמים")}
+      <div class="card">
+        <p class="card-subtitle" style="margin-bottom: 16px;">קודם נעשה מבחן היכרות קטן</p>
+        <a class="btn btn-primary" href="#/placement" style="text-decoration:none;">למבחן ההיכרות</a>
+      </div>
+    `;
+  }
+
+  function renderOnboarding() {
+    return `
+      ${styleTag()}
+      ${header("הסיפור", "בואי נכיר")}
+      <div class="card">
+        <div class="reader-onboard-field">
+          <label class="reader-onboard-label" for="heroineName">איך נקרא לגיבורה שלנו?</label>
+          <input class="reader-onboard-input" id="heroineName" type="text" dir="ltr" autocomplete="off" autocorrect="off" spellcheck="false" />
+        </div>
+        <div class="reader-onboard-field">
+          <label class="reader-onboard-label" for="petName">ואיך נקרא לחיה הקסומה הראשונה?</label>
+          <input class="reader-onboard-input" id="petName" type="text" dir="ltr" autocomplete="off" autocorrect="off" spellcheck="false" />
+        </div>
+        <button class="btn btn-primary" type="button" data-action="onboard-submit">יאללה, מתחילים!</button>
+      </div>
+    `;
+  }
+
+  function renderStartStory() {
+    return `
+      ${styleTag()}
+      ${header("הסיפור", "מרפאת הקסמים")}
+      <div class="card">
+        <p class="card-subtitle" style="margin-bottom: 16px;">הכל מוכן! הגיע הזמן להתחיל את ההרפתקה.</p>
+        <button class="btn btn-primary" type="button" data-action="generate">מתחילים את הסיפור</button>
+      </div>
+    `;
+  }
+
+  function renderGenerating() {
+    return `
+      ${styleTag()}
+      ${header("הסיפור", "מרפאת הקסמים")}
+      <div class="reader-loading">
+        <div class="reader-spinner" aria-hidden="true"></div>
+        <p>הקסם קורה... רגע אחד</p>
+      </div>
+    `;
+  }
+
+  function renderGenError() {
+    return `
+      ${styleTag()}
+      ${header("הסיפור", "מרפאת הקסמים")}
+      <div class="card">
+        <p class="card-subtitle" style="margin-bottom: 16px;">רגע, הקסם מתעכב… ננסה שוב עוד רגע.</p>
+        <button class="btn btn-primary" type="button" data-action="generate">נסי שוב</button>
+      </div>
+    `;
+  }
+
+  const checkState = {};
+
+  function questionState(q) {
+    const key = q.id;
+    if (!checkState[key]) {
+      checkState[key] = { correct: false, chosen: null, logged: false, triedWrong: new Set() };
+    }
+    return checkState[key];
+  }
+
+  function allQuestionsCorrect(chapter) {
+    return chapter.questions.every((q) => questionState(q).correct);
+  }
+
+  function renderQuestion(chapter, q) {
+    const st = questionState(q);
+    const optionsHtml = q.options
+      .map((opt, i) => {
+        let cls = "reader-question-option";
+        let disabled = "";
+        if (st.correct) {
+          disabled = "disabled";
+          if (i === q.correctIndex) cls += " correct";
+        } else if (st.triedWrong.has(i)) {
+          disabled = "disabled";
+          cls += " wrong";
+        }
+        return `<button class="${cls}" type="button" data-action="q-answer" data-q="${q.id}" data-choice="${i}" ${disabled}>${escapeHtml(opt)}</button>`;
+      })
+      .join("");
+
+    let feedbackHtml = "";
+    if (st.correct) {
+      feedbackHtml = `<p class="reader-question-feedback ok">כל הכבוד!</p>`;
+    } else if (st.chosen !== null) {
+      feedbackHtml = `<p class="reader-question-feedback bad">לא נורא, ננסה שוב</p>`;
+    }
+
+    return `
+      <div class="card reader-question-card">
+        <p class="reader-question-prompt">${escapeHtml(q.prompt)}</p>
+        <div class="reader-question-options">${optionsHtml}</div>
+        ${feedbackHtml}
+      </div>
+    `;
+  }
+
+  function renderPopup() {
+    if (!activePopup) return "";
+    const savedHtml = activePopup.saved
+      ? `<p class="reader-popup-confirm">נשמר!</p>`
+      : `<button class="btn btn-primary" type="button" data-action="popup-save">שמרי למילים שלי</button>`;
+    return `
+      <div class="reader-overlay" data-action="popup-close">
+        <div class="reader-popup" data-action="popup-stop">
+          <p class="reader-popup-word">${escapeHtml(activePopup.word)}</p>
+          <p class="reader-popup-he">${escapeHtml(activePopup.he || "—")}</p>
+          ${savedHtml}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderChapter() {
+    const chapter = latestChapter();
+    const questionsHtml = chapter.questions.map((q) => renderQuestion(chapter, q)).join("");
+    const doneAll = allQuestionsCorrect(chapter);
+    const continueHtml = doneAll
+      ? `<button class="btn btn-primary" type="button" data-action="continue-story">המשך הסיפור</button>`
+      : "";
+
+    return `
+      ${styleTag()}
+      ${header("הסיפור", "מרפאת הקסמים")}
+      <p class="reader-chapter-label">פרק ${chapter.n}</p>
+      <div class="card">
+        <p class="reader-card-title">${escapeHtml(chapter.title)}</p>
+        <div class="reader-text" dir="ltr">${renderWords(chapter.text)}</div>
+      </div>
+      ${questionsHtml}
+      ${continueHtml}
+      ${renderPopup()}
+    `;
+  }
+
+  function draw() {
+    let html;
+    if (stage === "loading") html = renderLoading();
+    else if (stage === "needs-placement") html = renderNeedsPlacement();
+    else if (stage === "onboarding") html = renderOnboarding();
+    else if (stage === "start-story") html = renderStartStory();
+    else if (stage === "chapter") {
+      if (generating) html = renderGenerating();
+      else if (genError) html = renderGenError();
+      else html = renderChapter();
+    } else {
+      html = `${styleTag()}${header("הסיפור", "אופס")}<p class="card-subtitle">משהו השתבש.</p>`;
+    }
+
+    container.innerHTML = html;
+    bindEvents();
+  }
+
+  function bindEvents() {
+    const onboardBtn = container.querySelector('[data-action="onboard-submit"]');
+    if (onboardBtn) {
+      onboardBtn.addEventListener("click", async () => {
+        const heroineName = container.querySelector("#heroineName").value.trim();
+        const petName = container.querySelector("#petName").value.trim();
+        if (!heroineName || !petName) return;
+        try {
+          profile = await postJson("/api/profile", {
+            action: "set-learner",
+            heroineName,
+            petName,
+          });
+        } catch (err) {
+          return;
+        }
+        stage = "chapter";
+        await runGenerate();
+      });
+    }
+
+    const generateBtn = container.querySelector('[data-action="generate"]');
+    if (generateBtn) {
+      generateBtn.addEventListener("click", async () => {
+        stage = "chapter";
+        await runGenerate();
+      });
+    }
+
+    const continueBtn = container.querySelector('[data-action="continue-story"]');
+    if (continueBtn) {
+      continueBtn.addEventListener("click", async () => {
+        await runGenerate();
+      });
+    }
+
+    container.querySelectorAll('[data-action="q-answer"]').forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const chapter = latestChapter();
+        const qId = btn.getAttribute("data-q");
+        const q = chapter.questions.find((x) => x.id === qId);
+        const choice = Number(btn.getAttribute("data-choice"));
+        const st = questionState(q);
+        const isFirstAnswer = !st.logged;
+
+        st.chosen = choice;
+        st.correct = choice === q.correctIndex;
+        if (!st.correct) {
+          st.triedWrong.add(choice);
+        }
+
+        if (isFirstAnswer) {
+          st.logged = true;
+          try {
+            await postJson("/api/profile", {
+              action: "log-check",
+              chapter: chapter.n,
+              questionId: q.id,
+              chosenIndex: choice,
+              correctIndex: q.correctIndex,
+            });
+          } catch (err) {
+            // ignore network errors on logging
+          }
+        }
+
+        draw();
+      });
+    });
+
+    container.querySelectorAll(".reader-text .w").forEach((span) => {
+      span.addEventListener("click", async (ev) => {
+        ev.stopPropagation();
+        const dataWord = span.getAttribute("data-word");
+        if (!dataWord) return;
+        const chapter = latestChapter();
+        let he = findInGlossary(chapter, dataWord);
+        activePopup = { word: dataWord, he: he || "", saved: false };
+        draw();
+        if (he === null) {
+          try {
+            const r = await postJson("/api/translate", { word: dataWord });
+            if (activePopup && activePopup.word === dataWord) {
+              activePopup.he = r.he;
+              draw();
+            }
+          } catch (err) {
+            // leave popup with dash
+          }
+        }
+      });
+    });
+
+    const popupSaveBtn = container.querySelector('[data-action="popup-save"]');
+    if (popupSaveBtn) {
+      popupSaveBtn.addEventListener("click", async () => {
+        if (!activePopup) return;
+        try {
+          await postJson("/api/profile", {
+            action: "word-tap",
+            lemma: activePopup.word,
+            he: activePopup.he || null,
+          });
+        } catch (err) {
+          // ignore
+        }
+        if (activePopup) {
+          activePopup.saved = true;
+          draw();
+        }
+      });
+    }
+
+    const overlay = container.querySelector(".reader-overlay");
+    if (overlay) {
+      overlay.addEventListener("click", () => {
+        activePopup = null;
+        draw();
+      });
+    }
+
+    const popup = container.querySelector('[data-action="popup-stop"]');
+    if (popup) {
+      popup.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+      });
+    }
+  }
+
+  await boot();
 }
