@@ -422,3 +422,13 @@ PHASE 3 CLOSED
   coverageAgainst) is the phase's load-bearing decision and is mechanical.
 - Record-completeness test PASSED (third consecutive phase).
 - Planner tokens: 124466.
+
+STEP 4.1 OpenAI wrapper + coverageAgainst
+  tier: WORKER (Sonnet)
+  did: lib/openai.js (chatJSON, injectable transport, key at call time); lib/vocab.js +
+       coverageAgainst (additive); 2 test files (transport shape, key-missing throw, coverage
+       fixtures — zero network).
+  surprises: none · deviations: none · validation_first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=30461, checker=25536, orchestrator_delta=unavailable · interventions: 0
+  audit: match, confidence high (first round)
+  commit: 5975c4d · accepted: 2026-07-24T14:19:14+03:00
