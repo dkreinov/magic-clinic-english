@@ -272,3 +272,111 @@ PHASE 2 CLOSED
   acceptance criteria: all 9 pass — 146/146 tests, contrast gate ALL PASS, zero light-theme
     leftovers in any view, exactly 3 files changed, styling-only proof empty, nothing else moved,
     WDT5-OK, INK-OK, and the harness measurement above.
+
+## PHASE 3 — EXECUTION
+
+STEP 3.1 PWA chrome colors, app icon, color-scheme meta, sw cache bump
+  tier: WORKER (Sonnet) · dispatches: 3 (two stopped-with-question, third accepted)
+  INTERVENTION 1 — my spec bug, correctly caught. The frozen validation contained
+  `! grep -rqE '#faf7f2|#7c3aed' public/ tests/`, which sweeps ALL of public/ — wider than the
+  step's four-file write set — and hit `public/icons/icon.svg`. The executor refused to edit a
+  file outside its boundary and asked instead of guessing. The finding was REAL and in scope: the
+  launcher icon was still built entirely from the four superseded values (#7c3aed plate,
+  #faf7f2 pads, #f59e0b centre, #0d9488 sparkle) — the single most visible surface of the app,
+  sitting on the phone's home screen. RULING: added icon.svg to the write set with a strict
+  one-old-token-to-one-new-token substitution (plate -> #2e1806 so the icon matches the browser
+  bar exactly; pads -> #fdf1d8; centre -> #f5c563; sparkle -> #4ecec0), geometry untouched
+  because the icon is `purpose: "any maskable"` and the OS crops it. Plan amended, step files
+  reverted to 814473a, re-dispatched.
+  INTERVENTION 2 — my arithmetic bug, also correctly caught. The amended validation asserted
+  `grep -cE 'ellipse|rect|path' icon.svg` = 7; the file actually has 8 (1 rect + 6 ellipse +
+  1 path). The executor verified the count was 8 both BEFORE and AFTER its edit, refused to
+  change geometry to satisfy a bad constant, and asked. Constant corrected to 8.
+  Because the second stop was purely my erroneous constant and the executor's six edits were
+  already complete and correct, the orchestrator did NOT burn a third identical dispatch: it
+  corrected the constant, re-ran the full corrected validation itself in a clean state, and sent
+  the diff to a fresh auditor. Both halves of the gate (independent re-validation + fresh eyes)
+  stayed intact.
+  surprises: the app icon was carrying the entire old palette and nothing in the plan had
+    accounted for it · deviations: none by the executor
+  validation_first_try: no · retries: 0 · escalations: 0 · interventions: 2 (both bad-spec, mine)
+  tokens: worker=73634 (across both dispatches), checker=25273
+  audit: match / CONFIDENCE high — explicitly confirmed icon.svg is colour-only (viewBox, all
+    cx/cy/rx/ry, path `d`, element count and order untouched) and that tests/shell.test.js has
+    EXACTLY the three authorised assertion changes with PRECACHE deepStrictEqual intact.
+  commit: bd9ccdb · accepted: 2026-07-24
+
+PHASE 3 CLOSED
+  steps: 1 · first-try passes: 0/1 (both failures were orchestrator spec defects, not worker error)
+  escalations: 0 · interventions: 2 · audits: 1/1 match
+  cost: worker=73634, checker=25273, phase total=98907 subagent tokens
+  gate: 146/146 tests, contrast ALL PASS, sw.js diff is exactly one line (CACHE), shell.test.js
+    diff is exactly the three authorised assertions, and a full-repo sweep for every superseded
+    value (#faf7f2 #7c3aed #f59e0b #0d9488 #1f2937 #6b7280 #dc2626 #e5e7eb #fdfbf7) across
+    public/ tests/ scripts/ returns NOTHING.
+
+## PHASE 4 — DEPLOY AND LIVE VERIFICATION
+
+Planned by the orchestrator rather than a fresh next-phase planner (logged deviation): this phase
+has no code to specify, only commands to run and evidence to gather. The part of the discipline
+that matters — writing the acceptance criteria BEFORE doing any of it — was kept: all 11 criteria
+were committed in plan.md before `vercel --prod` ran.
+
+Deployed: dpl_Eia3YKRS7FxVdfbPg3r4piqhhBYr, readyState READY, target production.
+Canonical production URL: https://english-app-three-tan.vercel.app
+
+RESULTS — all 11 criteria pass:
+  1. deploy READY.
+  2. live /styles.css has `--color-bg: #241305`, and no `white`/#faf7f2/#7c3aed/#1f2937/#6b7280.
+  3. live /sw.js has magic-vet-v3, not magic-vet-v2.
+  4. live manifest: background_color #241305, theme_color #2e1806.
+  5. live /icons/icon.svg has #2e1806, no #7c3aed/#faf7f2.
+  6. live index.html has both the theme-color and the new color-scheme meta.
+  7. live placement/reader/words .js: no white, no black, no #dc2626.
+  8. real browser on production after SW unregister + cache clear + hard reload:
+     tokens bg #241305 / card #3a1d08 / nav #2e1806 / ink #fdf1d8; body rgb(36,19,5);
+     nav rgb(46,24,6); card rgb(58,29,8); .spot-image border-radius 50%; hero mask active.
+     NOTE: `caches.keys()` on the live origin returned BOTH `magic-vet-v2` AND `magic-vet-v3` —
+     direct proof the cache bump worked: the new SW installed its own cache alongside the stale
+     one instead of silently serving the old shell forever. That is the exact failure the last
+     run hit, and the reason for field-guide lesson 9.
+  9. measured rendered contrast on the LIVE home screen: 8/8 pass (greeting 9.88, app title 7.92
+     against a 3.0 large-text minimum, card title 13.80, card subtitle 8.50, lock note 8.50,
+     primary button 7.62, active nav 7.42, inactive nav 9.25).
+ 10. profile safety: `git diff 563dd41..HEAD -- api/ lib/ data/` is EMPTY, and no API call was
+     made at any point during verification. Verification touched only #/home (static markup, no
+     fetch) and an offline scratchpad harness. `GET /api/profile` was deliberately avoided
+     because it calls saveProfile() on a null profile — a read that writes.
+ 11. 146/146 tests green and the contrast gate exits 0 at the deployed commit.
+
+RUN CLOSED
+  files changed in the entire run (11): docs/visual-design.md · public/icons/icon.svg ·
+  public/index.html · public/manifest.webmanifest · public/styles.css · public/sw.js ·
+  public/views/placement.js · public/views/reader.js · public/views/words.js ·
+  scripts/check-contrast.mjs · tests/shell.test.js
+  steps accepted: 7 · first-try validation passes: 6/7
+  escalations up the model ladder: 0 (no step ever needed a stronger model)
+  interventions: 2 — BOTH were orchestrator spec defects, neither was a worker mistake
+  audits: 7/7 match, all CONFIDENCE high
+  total subagent tokens: 654963 (planner 121483 + reviewer/auditors 256387 + workers 277333);
+    dollar cost unavailable — the harness does not expose a per-subagent cost readout here.
+  orchestrator_context: unavailable (no /context readout accessible from inside the run)
+  field_guide: 40/40
+
+  HONESTY CLAUSE — did the machinery earn its keep? Yes, and the evidence is specific:
+  · The plan reviewer (66k tokens, before any code was written) caught 5 defects, two of which
+    would have let a broken step report a false PASS: `npm test | tail` masking npm's exit code,
+    and a leftover-colour regex blind to bare `color: white;`.
+  · The fresh Phase-2 planner caught that `<button>` does not inherit `color` — three answer
+    buttons would have shipped as black-on-dark-brown at ~1.9:1, on the controls the child taps
+    to answer. The contrast gate was structurally incapable of seeing it, because the offending
+    colour comes from the browser and exists in no file.
+  · The executor escalation rule fired twice, both times on MY bad specs, and both times the
+    cheap model stopped and asked instead of quietly editing outside its boundary or bending
+    geometry to satisfy a wrong constant. One of those stops surfaced the entirely unplanned
+    fact that the app icon still carried the whole old palette.
+  · The orchestrator's own tamper test proved the accessibility gate actually fails when the
+    palette is broken, and Chrome's rendered color-mix values matched the gate's arithmetic to
+    two decimals — so the gate is faithful to what ships, not merely self-consistent.
+  Counted honestly, three of the four highest-value findings in this run came from an agent
+  OTHER than the one doing the work.

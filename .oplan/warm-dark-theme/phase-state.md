@@ -1,8 +1,9 @@
-CURRENT: phase 2 CLOSED (gate passed) — phase 3 "PWA chrome + service-worker cache", next step 3.1
-BASELINE (phase 3): to be set at the phase-3 commit; phase 2 baseline was ee87ab8
+CURRENT: RUN CLOSED — all 4 phases complete. The warm-dark re-theme is live on production at
+  https://english-app-three-tan.vercel.app (deployment dpl_Eia3YKRS7FxVdfbPg3r4piqhhBYr).
+BASELINES: phase 1 = 563dd41 · phase 2 = ee87ab8 · phase 3 = 814473a · phase 4 = bd9ccdb
 PLAN: .oplan/warm-dark-theme/plan.md
 ACCEPTED: 1.1 d6309ab · 1.2 8271d0e · 1.3 c26a050 · 1.4 preview · 2.1 7363faf · 2.2 ac9110d ·
-  2.3 87331b3 · 2.4 harness measurement (no commit)
+  2.3 87331b3 · 2.4 harness measurement · 3.1 bd9ccdb · phase 4 deploy + live verify (no commit)
 FROZEN CONTRACTS IN FORCE:
   WDT-1 palette tokens (17 values, art-derived) — now live in public/styles.css ·
   WDT-2 WCAG AA gate, enforced by scripts/check-contrast.mjs (28 pairs, ALL PASS, exit 0) ·
@@ -26,4 +27,9 @@ OPEN QUESTIONS: none. Both owner-gate questions were answered on 2026-07-24:
   with a text underline. This predates the re-theme; fixing it is outside "colors only" scope.
 KNOWN, ACCEPTED, NOT A DEFECT: `.btn[disabled]` renders at 4.26:1 — below 4.5 but explicitly
   exempt under WCAG 1.4.3 (inactive components), and deliberately muted so it reads as disabled.
-BLOCKED: no — executing phase 3 autonomously.
+PHASE 3 GATE: PASSED. PHASE 4 GATE: PASSED (11/11 criteria, verified against the live site).
+BLOCKED: no — run complete.
+OWNER FYI (neither is a defect, both are one-line reverts if unwanted):
+  · public/icons/icon.svg was re-coloured to the new palette — it had been carrying the entire
+    old cream/violet palette and was found only because an executor escalated.
+  · the "בואי נתחיל" primary button renders with a link underline; pre-existing, left alone.
