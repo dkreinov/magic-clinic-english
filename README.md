@@ -18,7 +18,7 @@ npm test
 npm run dev
 ```
 
-(arrives later this phase)
+Serves the app at http://localhost:3000 (override with the `PORT` env var).
 
 ## Secrets
 
