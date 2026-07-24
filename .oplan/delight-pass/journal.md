@@ -122,3 +122,11 @@ PHASE 1 CLOSED
 ## OWNER GATE PASSED (GC-D8)
 - Owner reviewed all 8 assets: APPROVE ALL, no redos, no notes. Asset set is FROZEN as the
   app's visual library. Continuing autonomously: Phase 2 planning (fresh planner) next.
+
+## Phase 2 planning
+- Fresh next-phase planner (Opus, files-only): returned full 2-step plan. BLOCKERS: none.
+  RECORD GAPS: 2 minor, both resolved in-plan (asset px dimensions derived from PNG headers
+  and frozen into 2.1 contract; §7 link-line placement decided = end of section). Orchestrator
+  review: accepted as-is; validations mechanical, write sets disjoint (2.1 docs/visual-design.md,
+  2.2 design.md), every content decision cites a source file. Written into plan.md verbatim
+  (condensed formatting only). Planner tokens: 61321.

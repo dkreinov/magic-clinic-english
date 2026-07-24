@@ -167,15 +167,60 @@ producing step with a corrective prompt appended, then re-gate.
 
 ---
 
-## PHASE 2 — Codify the style (skeleton)
+## PHASE 2 — Codify the style (planned in full by fresh planner, accepted by orchestrator)
 
-Goal: `docs/visual-design.md` — the binding visual doc per §7: direction summary, palette map
-(tokens ↔ artwork), typography (Rubik scale/weights), spacing/radius/shadow rules, the full
-asset inventory with usage map AND the frozen generation prompts (for future regens), the §7
-pipeline procedure, do/don'ts (fixed library = consistency; no live character art; owner gates
-new assets). Plus one link line added to design.md §7 (explicitly provided for by §7's text:
-"in this file (or a linked design doc)"). Validation: file exists with required sections
-(grep), design.md diff is exactly the one link line. Inputs: approved asset set + GC contracts.
+GOAL: `docs/visual-design.md` — the binding visual doc per §7 — built entirely from facts in
+the record (no invented taste), plus exactly one link line added to design.md §7.
+ACCEPTANCE: (1) 2.1 validation passes clean (doc + 8 headings + 8 assets + frozen facts);
+(2) 2.2 validation passes (design.md diff = exactly 1 added line containing the link);
+(3) git clean outside docs/visual-design.md, design.md, workspace; (4) npm test still 146.
+
+### STEP 2.1 — Write docs/visual-design.md from the record
+- files: docs/visual-design.md ONLY. commands: none.
+- validation (frozen):
+  ```
+  cd C:/Users/dkreinov/claude/english-app && f=docs/visual-design.md && test -f "$f" && for h in "## 1. Status and scope" "## 2. Visual direction" "## 3. Color palette" "## 4. Typography" "## 5. Spacing, radius, and shadow" "## 6. Asset library" "## 7. Generation pipeline" "## 8. Do and do-not rules"; do grep -qF "$h" "$f" || { echo "MISSING HEADING: $h"; exit 1; }; done && for a in hero-clinic chapter-clinic chapter-forest chapter-night heroine placement-friend celebration words-treasure; do grep -qF "$a.png" "$f" || { echo "MISSING ASSET: $a"; exit 1; }; done && for t in "--color-primary" "#7c3aed" "#0d9488" "#f59e0b" "#faf7f2" "#1f2937" "Rubik" "FROZEN STYLE SUFFIX" "6a632008-2d04-83ed-8557-370a2881a0dc"; do grep -qF "$t" "$f" || { echo "MISSING FACT: $t"; exit 1; }; done && echo PASS
+  ```
+- contracts: title `# Visual Design — English Learning App` + FROZEN status banner (house
+  style of design.md); 8 numbered H2 sections exactly as the validation greps them.
+  Section sources (transcribe/derive, never invent; omit facts not in sources):
+  §1 scope ← design.md §7 + journal "OWNER GATE PASSED". §2 direction ← GC-D6 + journal
+  orientation note (anchor `assets/design-tests/dragon-clinic-test.png`; recurring cast:
+  girl apprentice, teal baby dragon, lavender creature; 11yo, never babyish). §3 palette
+  table ← styles.css :root + GC-D1 (5 frozen tokens w/ hexes + --radius 16px + additive
+  tokens --color-primary-ink #ffffff, --color-muted #6b7280, --color-card #ffffff,
+  --shadow-soft, --nav-height 68px, --transition-fast; GC-D1 rule stated). §4 typography ←
+  index.html Google-Fonts link (Rubik 400/500/700) + styles.css stack + observed scale table
+  (app-title 1.6rem/700 · card-title 1.15/700 · empty-state-title 1.2/700 · body ~1rem ·
+  card-subtitle 0.95/400 · greeting 1/500 · nav-tab 0.75/500 · intro-note 0.85). §5 spacing
+  ← :root + #app (max-width 480, padding 20px 16px calc(nav+32)), card padding 20px,
+  shadow-soft, nav 68px, transition 150ms + :active scale 0.97-0.98. §6 asset library ←
+  GC-D5 table + dimensions (5 landscape 1536×1024; 3 square 1254×1254) + usage map incl.
+  chapter n%3 rotation + ALL 8 generation prompts transcribed verbatim from plan steps
+  1.1/1.2 + FROZEN STYLE SUFFIX verbatim + GC-D4 storage locations. §7 pipeline ← design.md
+  §7 + GC-D7 + field-guide 10-13 (ONE chat, one-at-a-time, Downloads path, click-ONCE +
+  Bash-poll incident lesson, md5 distinctness, webp derivatives later at public/assets/).
+  §8 do/don't ← GC-D1/D2/D5/D6/D8 + design.md §7 (fixed library not vibe; owner gate; no
+  runtime character art; sw.js untouchable; tokens frozen; never younger than 11).
+- non-goals: no design.md edit (that's 2.2); no styles/views/sw/assets/tests; no webp.
+- tier: WORKER. depends on: Phase 1 frozen set.
+
+### STEP 2.2 — Add the linked-doc pointer to design.md §7
+- files: design.md ONLY. commands: none.
+- validation (frozen):
+  ```
+  cd C:/Users/dkreinov/claude/english-app && git diff --numstat -- design.md | awk 'END{if(NR==1 && $1==1 && $2==0) exit 0; exit 1}' && git diff -- design.md | grep -E '^\+[^+]' | grep -qF '[`docs/visual-design.md`](docs/visual-design.md)' && echo PASS
+  ```
+- contracts: append as the LAST bullet of §7 (after the "Tone calibration…" bullet, before
+  the blank line preceding `## 8`), exactly this single line:
+  ``- **Linked design doc (frozen):** [`docs/visual-design.md`](docs/visual-design.md) — the codified visual system: direction, palette↔token map, typography, spacing/radius/shadow, the full asset library (usage map + generation prompts + STYLE SUFFIX), the generation pipeline, and do/don't rules.``
+  Single added line; no reflow/re-encoding (numstat must be 1/0).
+- non-goals: no §7 rewording; no other design.md changes; no commit.
+- tier: WORKER. depends on: 2.1 (link target must exist).
+
+RISKS (planner): 2.2 CRLF reflow would fail numstat (fix: pure append) · §6 prompt
+transcription errors pass grep (backstop: orchestrator read-through at acceptance) ·
+headings-present-but-empty (same backstop; contract enumerates content).
 
 ## PHASE 3 — Integration (skeleton)
 
