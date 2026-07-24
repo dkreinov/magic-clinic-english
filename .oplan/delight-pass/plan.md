@@ -463,11 +463,29 @@ inferred (Phase 4.1 backstop check) · dev-server lacked webp MIME (added 3.1) �
 unpinned (frozen encoder params give determinism) · no home-ui test exists (markup free within
 valid JS).
 
-## PHASE 4 — Deploy & verify (skeleton)
+## PHASE 4 — Deploy & verify (detailed by orchestrator; fresh-planner pass waived, logged)
 
-Goal: production deploy + live verification. Steps: (4.1) `"$(npm prefix -g)/vercel" deploy
---prod --yes` (project already linked; canonical URL https://english-app-three-tan.vercel.app);
-validation: HTTP 200 on canonical URL AND on one `/assets/*.webp`. (4.2) live browser smoke on
-the canonical URL: home/words/placement/reader render with new artwork, mobile viewport,
-screenshots journaled; no console errors. Close run: STATUS final, metrics, field-guide
-promotion.
+Waiver rationale (journaled): the skeleton is already step-complete — frozen command from the
+first-build record, canonical URL, mechanical validations; a fresh planner would re-derive the
+same two orchestrator-run steps.
+
+### STEP 4.1 — Production deploy (ORCHESTRATOR)
+- command (frozen, from first-build journal): `"$(npm prefix -g)/vercel" deploy --prod --yes`
+  (project already linked via .vercel/; deployment-specific URLs are Vercel-auth-gated, share
+  only the canonical URL).
+- validation (frozen): `curl --ssl-no-revoke -s -o /dev/null -w "%{http_code}"
+  https://english-app-three-tan.vercel.app/` = 200 AND same for
+  `/assets/hero-clinic.webp` = 200 with `content-type: image/webp` (curl -I).
+- non-goals: no env/config changes; no vercel.json edits.
+
+### STEP 4.2 — Live verify (ORCHESTRATOR, browser, READ-ONLY)
+- Canonical URL at mobile-ish viewport: #/home (hero + heroine), #/placement intro WITHOUT
+  starting the test, #/words. All /assets/*.webp 200; console free of app errors; screenshots
+  journaled.
+- HARD BOUNDARY: the production profile is the child's fresh profile — do NOT start the
+  placement test, do NOT generate chapters, do NOT tap words. Chapter-banner rotation and
+  celebration states were validated by tests + code review only (accepted residual).
+- Close run: STATUS final rewrite, phase metrics, field-guide promotion, handoff note.
+
+PHASE ACCEPTANCE: 4.1 both curls 200 (+webp content-type) · 4.2 three screens render artwork
+live with no app console errors · run record complete (STATUS/journal/phase-state consistent).
