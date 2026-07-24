@@ -469,3 +469,17 @@ STEP 4.3 setLearner/logCheck + GC-3 A2
        test; single-assertion update authorized)
   audit: match, confidence high
   commit: 4b62356 · accepted: 2026-07-24T14:56:55+03:00
+
+STEP 4.4 API: chapter, translate, profile actions
+  tier: WORKER (Sonnet)
+  did: api/chapter.js (generate->verify->persist, 502 degrade, nothing persisted on fail);
+       api/translate.js (single-word fallback, temp 0); api/profile.js +set-learner/+log-check;
+       3 test files (transport-injected, real-allowed-set fixture, 132/132).
+  surprises: fixture reuse from story tests kept it valid against real band1 without
+       profile-specific words.
+  deviations: none · validation_first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=66361, checker=39097, orchestrator_delta=unavailable
+  interventions: 0 (audit's import-line finding VOID — the spec itself mandated importing
+       setLearner/logCheck)
+  audit: match, confidence high
+  commit: d10beed · accepted: 2026-07-24T15:01:35+03:00
