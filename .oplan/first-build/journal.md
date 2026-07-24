@@ -432,3 +432,18 @@ STEP 4.1 OpenAI wrapper + coverageAgainst
   tokens: worker=30461, checker=25536, orchestrator_delta=unavailable · interventions: 0
   audit: match, confidence high (first round)
   commit: 5975c4d · accepted: 2026-07-24T14:19:14+03:00
+
+STEP 4.2 Story orchestrator lib/story.js
+  tier: WORKER (Sonnet)
+  did: lib/story.js (CORE_FUNCTION_WORDS+STORY_LEXICON frozen lists, buildAllowedSet,
+       verifyChapter 4-gate pipeline, buildPrompt, generateChapter retry loop w/ forbidden
+       feedback); tests/story.test.js (list pins, real-band1 allowed-set, accept/reject
+       fixtures, retry/give-up flows). 105/105.
+  surprises: worker noted Edit-tool converts \u escapes to literal Hebrew chars in code —
+       verified byte-identical regex via codePointAt (same quirk as my plan.md writes).
+  deviations: none · validation_first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=56655, checker=40510, orchestrator_delta=unavailable
+  interventions: 0 (auditor's Object.freeze hedge VOID — "frozen" is contract vocabulary in
+       this run, not runtime immutability)
+  audit: match, confidence high
+  commit: d580015 · accepted: 2026-07-24T14:53:43+03:00
