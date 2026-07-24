@@ -80,3 +80,41 @@ STEP 1.1 Generate the 4 landscape scene assets (amended: 3 new + adopted hero-cl
   rubric: orchestrator PASS on all 5 points for each of the 3 new images
   commit: (this commit)
   accepted: 2026-07-24
+
+STEP 1.2 Generate the 4 spot assets
+  tier: WORKER (Sonnet)
+  did: Generated 4 images in the dedicated ChatGPT chat and moved them into assets/delight/:
+       heroine.png (girl+dragon, square), placement-friend.png (purple creature, square),
+       celebration.png (dragon+creature confetti, landscape), words-treasure.png (crystal
+       jar, square)
+  surprises: Composer stray em-dash twice (caught+retyped per field-guide 14). During
+       celebration download a stuck click replayed → 17 duplicate copies in ~/Downloads;
+       executor detected them, hash-verified before each move, left them per boundary.
+       Orchestrator deleted all 17 post-acceptance (md5-verified = celebration.png; owner
+       precedent from the 89-file incident cleanup).
+  deviations: none
+  validation_first_try: yes (orchestrator clean-state re-run: 3x 1254x1254 squares +
+       1536x1024 landscape, all 8 asset hashes + anchor distinct)
+  retries: 0
+  escalations: 0
+  tokens: worker=196071, checker=40115, orchestrator_delta=unavailable
+  interventions: 0
+  audit: mismatch(1 finding)->accepted as match for the executor: the sole finding was the
+       orchestrator's own uncommitted phase-state.md bookkeeping write — the exact
+       workspace-write false positive SKILL.md §7 warns about; images themselves passed all
+       checks, confidence high. Executor's diff contained nothing outside its file list.
+  rubric: orchestrator PASS all 5 points on all 4 images; character consistency confirmed
+       (same girl+dragon as anchor; same creature across placement-friend/celebration).
+  commit: 09f2dca
+  accepted: 2026-07-24
+
+PHASE 1 CLOSED
+  steps: 2 (+1 pre-dispatch incident, journaled above), first-try passes: 2/2
+  escalations: 0
+  interventions: 1 (owner halt + duplicate-download incident audit before 1.1 acceptance)
+  cost: tokens worker=420942, checker=112120 (incl. plan reviewer 38467); $ unavailable
+  orchestrator_context: unavailable (harness display not readable mid-run)
+  field_guide: 34/40 lines (within budget)
+  acceptance criteria: (1) both frozen validations PASS clean-state ✓ (2) git status clean
+    outside assets/delight + workspace ✓ (3) rubric journaled per image, 8/8 PASS ✓
+    (4) OWNER GATE → presented now, run paused for owner review
