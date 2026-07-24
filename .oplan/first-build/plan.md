@@ -145,6 +145,9 @@ static files and API routes.
   `BLOB_READ_WRITE_TOKEN` is unset, and use a temp `DATA_DIR`.
 - **non-goals:** no word-update helpers, no skill-estimation logic (Phase 2), no API endpoints
   (step 1.3). Do not import `lib/store.js` from any existing file.
+- **amendment (during 1.2 audit):** the store test's updatedAt-bump assertion is the
+  conjunction `second >= first AND second !== first` (proves updatedAt advances); the packet's
+  original "differ or second ≥ first" phrasing was sloppy and is superseded.
 - **tier:** WORKER (Sonnet). budgets: 2 retries.
 
 ### STEP 1.3 — API endpoints: health + profile

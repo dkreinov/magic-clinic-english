@@ -59,3 +59,30 @@ STEP 1.1 Project scaffold
        covered by orchestrator's own clean-state run)
   commit: 7983095
   accepted: 2026-07-24T12:27:19+03:00
+
+## 2026-07-24T12:40+03:00 — STEP 1.2 AUDIT ROUND 1: mismatch (spec wording), re-audit
+- Auditor finding: store test asserts `second >= first AND notStrictEqual` where the step spec
+  said "differ or second ≥ first". Orchestrator ruling: spec phrasing was sloppy; the intent is
+  "prove updatedAt advances"; the conjunction implies the disjunction and is accepted. Step
+  spec amended (plan.md) to name the conjunction explicitly.
+- Process defect (mine): auditor received a natural-language SUMMARY of lib diffs instead of
+  raw hunks -> CONFIDENCE: low. Re-audit supplies the raw test hunks + validator excerpt.
+  Lesson candidate: never summarize the diff for the auditor; paste hunks verbatim.
+
+STEP 1.2 Profile + storage libraries
+  tier: WORKER (Sonnet)
+  did: lib/profile.js — defaultProfile(nowIso) + validateProfile(p) per schema v1.
+       lib/store.js — loadProfile/saveProfile, file/Blob backend by BLOB_READ_WRITE_TOKEN at
+       call time. tests/profile.test.js — shape/defaults + 8 mutation-rejection cases.
+       tests/store.test.js — temp DATA_DIR, null-on-empty, roundtrip, updatedAt bump.
+  surprises: none (worker noted orchestrator's uncommitted STATUS.md in git status; benign)
+  deviations: none
+  validation_first_try: yes
+  retries: 0
+  escalations: 0
+  tokens: worker=39288, checker=32666+33148 (two audit rounds), orchestrator_delta=unavailable
+  interventions: 1 (bad-spec: audit round 1 mismatch was my packet's sloppy "or" phrasing;
+       spec amended, re-audit passed. No code change needed.)
+  audit: match, confidence high (round 2)
+  commit: 2012689
+  accepted: 2026-07-24T12:34:21+03:00
