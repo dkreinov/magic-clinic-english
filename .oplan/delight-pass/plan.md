@@ -101,6 +101,9 @@ mechanically valid (PNG, right aspect, full-res) and on-brief.
   anchor asset or `assets/design-tests/`.
 - **tier:** WORKER (Sonnet) — browser procedure below.
 - **depends on:** nothing.
+- **AMENDED 2026-07-24 (post-incident):** `hero-clinic.png` already exists (adopted artifact,
+  journal) — re-dispatch covers ONLY the 3 chapter scenes; hero-clinic.png must not be
+  touched or regenerated. Validation still runs over all four files.
 
 **Browser procedure (both steps):** load chrome MCP tools in ONE ToolSearch
 (`select:mcp__claude-in-chrome__tabs_context_mcp,mcp__claude-in-chrome__navigate,mcp__claude-in-chrome__computer,mcp__claude-in-chrome__read_page,mcp__claude-in-chrome__tabs_create_mcp,mcp__claude-in-chrome__find`).
