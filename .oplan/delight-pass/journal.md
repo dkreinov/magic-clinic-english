@@ -237,3 +237,11 @@ STEP 3.5 reader.js banner rotation + start hero + celebration + popup polish
   surprises: none  deviations: none
   tokens: worker=44298, checker=0 (audit: orchestrator full-diff vs byte-exact contract)
   interventions: 0 · commit: (this commit) · accepted: 2026-07-24
+
+STEP 3.6 words.js treasure empty state + collection header
+  tier: WORKER (Sonnet) · validation_first_try: yes (146/146) · retries: 0 · escalations: 0
+  did: SVG placeholder block -> treasure spot img in renderEmpty; small treasure img above
+       words-count in renderList. Diff = exactly the 2 contract changes.
+  surprises: none  deviations: none
+  tokens: worker=36268, checker=0 (audit: orchestrator diff vs byte-exact contract)
+  interventions: 0 · commit: (this commit) · accepted: 2026-07-24
