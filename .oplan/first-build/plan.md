@@ -22,7 +22,9 @@ the journal.
 **GC-1 — Stack.** No build step, no bundler, no frontend framework. Frontend = static files in
 `public/` (vanilla ES modules). Backend = Vercel serverless functions in `api/` (Node runtime,
 ESM). `package.json` has `"type": "module"`. Only npm dependency: `@vercel/blob`. Tests:
-`node --test tests/` (built-in runner, zero test deps). Node >= 22.
+`node --test` (bare — built-in runner's default `**/*.test.js` discovery, zero test deps;
+AMENDED 2026-07-24 during step 1.1: the directory form `node --test tests/` fails through npm
+on Windows/Node 22). All test files live in `tests/` and end in `.test.js`. Node >= 22.
 
 **GC-2 — Storage.** One learner ⇒ one JSON document. `lib/store.js` exports
 `async loadProfile()` / `async saveProfile(profile)`. Backend selection: if
@@ -110,7 +112,7 @@ static files and API routes.
 - **commands:** `npm install --no-audit --no-fund`
 - **validation (frozen):** `npm install --no-audit --no-fund && npm test` → exit 0
 - **contracts:** GC-1. `package.json`: `name` "english-app", `private` true, `"type":"module"`,
-  `engines.node` ">=22", scripts `{"test":"node --test tests/","dev":"node scripts/dev-server.js"}`,
+  `engines.node` ">=22", scripts `{"test":"node --test","dev":"node scripts/dev-server.js"}` (AMENDED per GC-1),
   dependencies exactly `{"@vercel/blob":"^1.1.0"}`. `vercel.json`: exactly `{"cleanUrls": true}`.
   `.env.example`: three lines `OPENAI_API_KEY=`, `BLOB_READ_WRITE_TOKEN=`,
   `ANTHROPIC_API_KEY=` each with a short `#` comment above (Anthropic marked "dormant fallback —

@@ -3,15 +3,15 @@
 **Updated:** 2026-07-24 12:20 · **Where we are:** Phase 1 of 5, about to execute step 1.1.
 
 ## What's happening right now
-The plan for Phase 1 (project skeleton + the polished app shell) is written and passed
-fresh-eyes review (3 findings, all fixed). The first worker is being dispatched to create the
-npm/Vercel project scaffold.
+Step 1.1 (project scaffold) accepted and committed. Step 1.2 (profile + storage libraries) is being dispatched.
+
+
 
 ## The road
 
 ```mermaid
 flowchart LR
-    P1[Phase 1<br/>Skeleton & app shell<br/>IN PROGRESS 0/5 steps] --> P2[Phase 2<br/>Word data & profile engine]
+    P1[Phase 1<br/>Skeleton & app shell<br/>IN PROGRESS 1/5 steps] --> P2[Phase 2<br/>Word data & profile engine]
     P2 --> P3[Phase 3<br/>Placement test]
     P3 --> P4[Phase 4<br/>Story engine]
     P4 --> P5[Phase 5<br/>Deploy to Vercel]

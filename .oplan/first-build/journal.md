@@ -30,3 +30,32 @@
 - Note for the record: Write tool produced literal `\` for some `/` in plan.md prose
   (`icons\icon.svg` on line 194 render); harmless in prose, but exact-match Edits needed
   smaller anchors. Watch for this when writing specs containing many path strings.
+
+## 2026-07-24T12:30+03:00 — STEP 1.1 INTERVENTION (unanswered-question)
+- Executor (Sonnet) stopped correctly: frozen contract `"test": "node --test tests/"` cannot
+  pass — through npm (cmd.exe) on Windows/Node 22 the directory form throws MODULE_NOT_FOUND.
+  Orchestrator reproduced it (direct Git Bash invocation works; npm invocation fails).
+- DECISION: test script is bare `node --test` (default `**/*.test.js` discovery). plan.md
+  GC-1 and step 1.1 contract amended. Worker resumed with the answer.
+- Lesson candidate for field guide: npm scripts run under cmd.exe — a command that works in
+  Git Bash can fail via npm; validate through `npm test`, not direct invocation.
+
+STEP 1.1 Project scaffold
+  tier: WORKER (Sonnet)
+  did: Created package.json, vercel.json, .env.example, README.md, tests/smoke.test.js per
+       spec; appended `.data/` to .gitignore; npm install generated package-lock.json. Second
+       turn (after amendment): scripts.test -> "node --test", smoke assertion updated.
+  surprises: `node --test <dir>` fails through npm (cmd.exe) on Node v22 — directory-path
+       support removed post-v20; bare `node --test` / explicit files / globs only.
+  deviations: none
+  validation_first_try: no (first attempt blocked by the frozen-contract flaw; passed
+       first try after amendment)
+  retries: 0
+  escalations: 0
+  tokens: worker=46002+46358 (two turns, as reported), checker=29018,
+       orchestrator_delta=unavailable
+  interventions: 1 (unanswered-question -> contract amendment GC-1: bare `node --test`)
+  audit: match, confidence high (caveats — validation run + .gitignore prior content —
+       covered by orchestrator's own clean-state run)
+  commit: 7983095
+  accepted: 2026-07-24T12:27:19+03:00
