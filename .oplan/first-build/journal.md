@@ -291,3 +291,35 @@ PHASE 2 CLOSED
   Preempts the likeliest stopped-with-question round-trip. Decisions D1-D9 ratified.
 - Record-completeness test PASSED again (planner needed nothing outside the files).
 - Planner tokens: 89067.
+
+## 2026-07-24T15:45+03:00 — STEP 3.1 AUDIT ROUND 1: mismatch (3 tooling findings)
+- Committed bank itself is compliant (65/65 tests + orchestrator content inspection).
+  Findings hit the generator/test robustness: (1) task2 retry loop re-checked only vocab,
+  not full schema; (2) emoji distinctness enforced on only the a2p half in generator AND
+  test; (3) shortfall-fill drew from leftover preBandI beyond spec. Worker resumed to fix
+  all three with the bank byte-identical (no OpenAI re-run). Re-audit to follow.
+- Worker deviations ACCEPTED at acceptance review: retry-feedback prompting (temp-0 blind
+  retries pointless) and theme softening "vet's clinic"->"doctor checking an animal" (kept
+  texts in vocabulary).
+- Content notes for the OWNER review doc (3.5): weak emoji on t1-06 desk (🧑‍💻, he
+  "שולחן") and t1-04 fan (🌀) — flag these two for replacement or re-translation.
+
+STEP 3.1 Placement item-bank generator + committed bank
+  tier: WORKER (Sonnet)
+  did: scripts/build-item-bank.js (offline, mulberry32 seed 20260724, 2×gpt-4.1-mini calls,
+       full self-validation incl. retry-feedback prompting); data/placement-items.json
+       (12 task1 items — 6 a2p pet/mom/camp/fan/dad/desk + 6 p2w singer/horse/zoo/movie/
+       monkey/steak — and 2 task2 texts: dog-at-doctor, elephant-at-zoo, 3 Hebrew MCQs each);
+       tests/placement-items.test.js (full mechanical lint, no network).
+  surprises: "vet's clinic" theme clashes with band1 vocab (no vet/medicine lemmas);
+       temp-0 blind retries were identical -> retry-feedback prompting added (accepted).
+  deviations: 2 accepted (retry-feedback prompting; theme softened to "doctor checking an
+       animal")
+  validation_first_try: no · retries: 1 (generator engineering) · escalations: 0
+  tokens: worker=60730+90884, checker=57158+71603 (two audit rounds),
+       orchestrator_delta=unavailable
+  interventions: 1 (audit round 1: 3 tooling findings — retry-loop scope, emoji-distinctness
+       coverage, shortfall-fill source — fixed with bank byte-identical, sha256-verified)
+  audit: match, confidence high (round 2)
+  commit: 55be2d5
+  accepted: 2026-07-24T13:49:47+03:00
