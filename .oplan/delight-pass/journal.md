@@ -245,3 +245,11 @@ STEP 3.6 words.js treasure empty state + collection header
   surprises: none  deviations: none
   tokens: worker=36268, checker=0 (audit: orchestrator diff vs byte-exact contract)
   interventions: 0 · commit: (this commit) · accepted: 2026-07-24
+
+STEP 3.7 public/icons/icon.svg refresh
+  tier: ORCHESTRATOR-executed (DEVIATION, logged): the plan froze the file's entire content
+       byte-exactly, leaving an executor zero degrees of freedom; orchestrator wrote it
+       directly and ran the frozen validation. validation_first_try: yes (146/146).
+  did: icon.svg -> violet rx-112 rounded square, cream paw (5 ellipses), amber pad, teal
+       sparkle; same path/filename (manifest/PRECACHE untouched).
+  tokens: worker=0, checker=0 · interventions: 0 · commit: (this commit) · accepted: 2026-07-24
