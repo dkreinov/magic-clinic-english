@@ -323,3 +323,16 @@ STEP 3.1 Placement item-bank generator + committed bank
   audit: match, confidence high (round 2)
   commit: 55be2d5
   accepted: 2026-07-24T13:49:47+03:00
+
+STEP 3.2 TTS audio generator + committed mp3s
+  tier: WORKER (Sonnet)
+  did: scripts/build-tts.js (gpt-4o-mini-tts/nova, frozen instructions); 6 mp3s committed
+       under public/audio (12-24KB each, valid MPEG magic 0xFFF3, orchestrator-verified);
+       tests/placement-audio.test.js (existence/size, audio-iff-a2p, PRECACHE exclusion).
+  surprises: none · deviations: none
+  validation_first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=44470, checker=29012, orchestrator_delta=unavailable
+  interventions: 0
+  audit: match, confidence high (first round)
+  commit: 2dce91c
+  accepted: 2026-07-24T13:53:01+03:00
