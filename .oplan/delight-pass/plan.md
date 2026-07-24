@@ -222,20 +222,246 @@ RISKS (planner): 2.2 CRLF reflow would fail numstat (fix: pure append) · §6 pr
 transcription errors pass grep (backstop: orchestrator read-through at acceptance) ·
 headings-present-but-empty (same backstop; contract enumerates content).
 
-## PHASE 3 — Integration (skeleton)
+# PHASE 3 — Integration (planned in full by fresh planner, accepted by orchestrator)
 
-Goal: assets + style system live in the app; zero behavior change; 146 tests green.
-Expected steps: (3.1) add `sharp` devDependency + `scripts/optimize-assets.js` →
-`public/assets/*.webp` (landscape→960w, square→640w, quality tuned; each ≤200KB); (3.2)
-`styles.css` style-system upgrade (hero/banner/spot-image classes, polish tokens, refined
-cards/buttons/nav); (3.3) home.js hero + heroine; (3.4) placement.js intro + celebration;
-(3.5) reader.js chapter banner rotation (n % 3 per GC-D5) + start-story hero + popup/celebration
-polish; (3.6) words.js treasure empty state + collection header + badge polish; (3.7) new
-`public/icons/icon.svg` artwork (same path/filename — manifest+PRECACHE frozen). Risks: UI tests
-assert DOM (reader-ui/placement-ui/shell tests — planner must read them first); PRECACHE
-untouchable; webp weight on mobile. Validation per step: `npm test` green + grep for the new
-classes/asset refs. Phase gate: 146/146 green from clean checkout + local dev-server screenshot
-smoke (browser) on 412px mobile viewport.
+GOAL: Wire the 8 frozen masters + docs/visual-design.md into the app as web-optimized
+public/assets/*.webp plus additive CSS/markup, per the visual-doc usage map. ZERO
+behavior/copy/logic change; npm test stays 146/146 after every step.
+
+ACCEPTANCE CRITERIA:
+1. Each step's frozen validation passes clean (each includes npm test where it touches public/).
+2. public/assets/ = exactly 8 .webp (GC-D5 names), valid RIFF/WEBP, landscape 960w / square
+   640w, each ≤200KB, committed (not ignored). Per-screen weight ≤400KB (max 2 images/screen).
+3. sw.js byte-identical; PRECACHE + manifest unchanged; six token names still defined; all
+   frozen Hebrew strings + data-action/endpoint substrings still present (ui tests green).
+4. git changes only in: package.json, package-lock.json, scripts/optimize-assets.js,
+   scripts/dev-server.js, public/assets/*.webp, public/styles.css,
+   public/views/{home,placement,reader,words}.js, public/icons/icon.svg, .oplan/.
+5. STEP 3.8 orchestrator gate: `npm ci && npm test` 146/146 from clean checkout + dev-server
+   browser smoke at 412px (home hero+heroine, placement intro friend, words-empty treasure;
+   all /assets/*.webp 200; console clean; screenshots journaled).
+
+DEPENDS ON: Phase 1 frozen masters (5 landscape 1536×1024, 3 square 1254×1254) ·
+docs/visual-design.md §6 usage map + n%3 rotation (BINDING) · GC-D1..D8.
+
+SKELETON CHANGES: 3.1 also adds '.webp': 'image/webp' to scripts/dev-server.js MIME map
+(record gap). All artwork CSS lives in global styles.css (3.2) — home.js has no VIEW_STYLE and
+classes are cross-view; view steps are markup-only except reader popup polish (view-local).
+Widths landscape→960w square→640w, webp quality:72 effort:4. Warm page gradient frozen in 3.2.
+
+## STEP 3.1 — sharp devDep + scripts/optimize-assets.js → public/assets/*.webp (+ dev-server MIME)
+- files: package.json, package-lock.json (via npm), scripts/optimize-assets.js (new),
+  scripts/dev-server.js, public/assets/*.webp (8, new).
+- commands: `npm install --save-dev sharp` ; `node scripts/optimize-assets.js`.
+- validation (frozen):
+  ```
+  cd C:/Users/dkreinov/claude/english-app && npm ls sharp >/dev/null 2>&1 && node scripts/optimize-assets.js && node -e "const sharp=require('sharp'),fs=require('fs');const W={'hero-clinic':960,'chapter-clinic':960,'chapter-forest':960,'chapter-night':960,'celebration':960,'heroine':640,'placement-friend':640,'words-treasure':640};(async()=>{for(const n of Object.keys(W)){const p='public/assets/'+n+'.webp';const b=fs.readFileSync(p);if(b.toString('ascii',0,4)!=='RIFF'||b.toString('ascii',8,12)!=='WEBP')throw new Error(p+' not webp');if(b.length>200*1024)throw new Error(p+' '+b.length+' >200KB');const m=await sharp(b).metadata();if(m.width!==W[n])throw new Error(p+' width '+m.width+'!='+W[n]);console.log(p,m.width+'x'+m.height,Math.round(b.length/1024)+'KB')}console.log('ASSETS OK')})().catch(e=>{console.error(e.message);process.exit(1)})" && grep -qF "'.webp': 'image/webp'" scripts/dev-server.js && ! git check-ignore -q public/assets/hero-clinic.webp && npm test
+  ```
+- contracts: optimize-assets.js EXACT content (ESM; package "type":"module"):
+  ```js
+  import sharp from "sharp";
+  import { mkdir } from "node:fs/promises";
+  import path from "node:path";
+  import { fileURLToPath } from "node:url";
+
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const SRC = path.resolve(__dirname, "..", "assets", "delight");
+  const OUT = path.resolve(__dirname, "..", "public", "assets");
+
+  const WIDTHS = {
+    "hero-clinic": 960,
+    "chapter-clinic": 960,
+    "chapter-forest": 960,
+    "chapter-night": 960,
+    "celebration": 960,
+    "heroine": 640,
+    "placement-friend": 640,
+    "words-treasure": 640,
+  };
+  const QUALITY = 72;
+
+  async function main() {
+    await mkdir(OUT, { recursive: true });
+    for (const name of Object.keys(WIDTHS).sort()) {
+      const src = path.join(SRC, name + ".png");
+      const out = path.join(OUT, name + ".webp");
+      await sharp(src)
+        .resize({ width: WIDTHS[name], withoutEnlargement: true })
+        .webp({ quality: QUALITY, effort: 4 })
+        .toFile(out);
+      console.log("wrote", out);
+    }
+  }
+
+  main().catch((err) => { console.error(err); process.exit(1); });
+  ```
+  dev-server.js: add line `  '.webp': 'image/webp',` inside MIME_TYPES right after the
+  `'.png': 'image/png',` line (line 17). No other change. sharp goes under devDependencies via
+  npm (no hand-edit of version).
+- non-goals: no CSS/markup/view edits; no new npm scripts; don't touch masters; nothing into
+  sw.js PRECACHE.
+- tier: WORKER. depends on: nothing.
+
+## STEP 3.2 — styles.css: global artwork classes + warm page gradient
+- files: public/styles.css only.
+- validation (frozen):
+  ```
+  cd C:/Users/dkreinov/claude/english-app && for c in ".hero-banner" ".chapter-banner" ".celebrate-image" ".spot-image" ".spot-image--sm" "aspect-ratio"; do grep -qF -- "$c" public/styles.css || { echo "MISSING $c"; exit 1; }; done && for t in "--color-primary:" "--color-teal:" "--color-accent:" "--color-bg:" "--color-ink:" "--radius:"; do grep -qF -- "$t" public/styles.css || { echo "TOKEN GONE $t"; exit 1; }; done && node --check public/app.js && npm test
+  ```
+- contracts: (a) append at end of styles.css exactly the "Delight artwork" block:
+  ```css
+  /* ---------- Delight artwork ---------- */
+
+  .hero-banner,
+  .chapter-banner,
+  .celebrate-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .hero-banner { margin-bottom: 16px; }
+  .chapter-banner { margin-bottom: 14px; }
+  .celebrate-image { margin-bottom: 16px; }
+
+  .spot-image {
+    display: block;
+    width: 160px;
+    height: 160px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    margin: 0 auto 16px;
+  }
+
+  .spot-image--sm {
+    width: 96px;
+    height: 96px;
+    margin-bottom: 12px;
+  }
+  ```
+  (b) in the `body {}` rule replace the single line `  background: var(--color-bg);` with:
+  ```css
+    background: linear-gradient(180deg, #fdfbf7 0%, var(--color-bg) 240px);
+    background-color: var(--color-bg);
+    background-attachment: fixed;
+  ```
+- non-goals: keep .illustration rules; no rename/removal of any class/token; :root untouched.
+- tier: WORKER. depends on: nothing (3.3-3.6 depend on it).
+
+## STEP 3.3 — home.js: hero banner + heroine welcome
+- files: public/views/home.js only.
+- validation (frozen):
+  ```
+  cd C:/Users/dkreinov/claude/english-app && grep -qF 'class="hero-banner" src="/assets/hero-clinic.webp"' public/views/home.js && grep -qF 'class="spot-image" src="/assets/heroine.webp"' public/views/home.js && grep -qF 'data-testid="placement-card"' public/views/home.js && grep -qF 'data-testid="reader-card"' public/views/home.js && node --check public/views/home.js && npm test
+  ```
+- contracts: template starts exactly:
+  `<img class="hero-banner" src="/assets/hero-clinic.webp" alt="" />` then the existing
+  app-header block unchanged, then `<img class="spot-image" src="/assets/heroine.webp" alt="" />`,
+  then the existing `<section class="card" data-testid="placement-card">` onward unchanged.
+- non-goals: no text/copy/card changes; no new classes.
+- tier: WORKER. depends on: 3.1, 3.2.
+
+## STEP 3.4 — placement.js: intro friend + celebration ×2
+- files: public/views/placement.js only.
+- validation (frozen):
+  ```
+  cd C:/Users/dkreinov/claude/english-app && grep -qF 'class="spot-image" src="/assets/placement-friend.webp"' public/views/placement.js && [ "$(grep -cF 'src="/assets/celebration.webp"' public/views/placement.js)" = "2" ] && grep -qF 'dir="ltr"' public/views/placement.js && grep -qF '"submit"' public/views/placement.js && node --check public/views/placement.js && npm test
+  ```
+- contracts: 3 additive insertions, copy/data-actions byte-identical:
+  (1) renderIntro(): between `${header("מבחן היכרות", "בואי נכיר")}` and the card-subtitle
+  line insert `<img class="spot-image" src="/assets/placement-friend.webp" alt="" />`.
+  (2) renderTask1Done(): right after `${header("מבחן היכרות", "כל הכבוד!")}` insert
+  `<img class="celebrate-image" src="/assets/celebration.webp" alt="" />`.
+  (3) renderDone(): right after `${header("מבחן היכרות", "סיימת!")}` insert
+  `<img class="celebrate-image" src="/assets/celebration.webp" alt="" />`.
+- non-goals: no VIEW_STYLE edits; no flow/state/copy changes.
+- tier: WORKER. depends on: 3.1, 3.2.
+
+## STEP 3.5 — reader.js: banner rotation + start hero + celebration + popup polish
+- files: public/views/reader.js only.
+- validation (frozen):
+  ```
+  cd C:/Users/dkreinov/claude/english-app && grep -qF 'class="hero-banner" src="/assets/hero-clinic.webp"' public/views/reader.js && grep -qF 'CHAPTER_BANNERS' public/views/reader.js && grep -qF '"chapter-night"' public/views/reader.js && grep -qF '"chapter-clinic"' public/views/reader.js && grep -qF '"chapter-forest"' public/views/reader.js && grep -qF 'class="chapter-banner" src="/assets/${bannerName}.webp"' public/views/reader.js && grep -qF 'class="celebrate-image" src="/assets/celebration.webp"' public/views/reader.js && grep -qF 'chapter.n % 3' public/views/reader.js && node --check public/views/reader.js && npm test
+  ```
+- contracts: (1) module scope below the import line:
+  `const CHAPTER_BANNERS = { 0: "chapter-night", 1: "chapter-clinic", 2: "chapter-forest" };`
+  (BINDING per visual-design §6). (2) renderStartStory(): insert
+  `<img class="hero-banner" src="/assets/hero-clinic.webp" alt="" />` between header and card.
+  (3) renderChapter(): replace body with the planner's exact version — adds
+  `const bannerName = CHAPTER_BANNERS[chapter.n % 3];`, `celebrateHtml` (celebration image when
+  doneAll), `<img class="chapter-banner" src="/assets/${bannerName}.webp" alt="" />` between
+  chapter-label and card, `${celebrateHtml}` before `${continueHtml}`; everything else
+  byte-identical (full text in journal-linked planner output; the four additions are the only
+  deltas). (4) VIEW_STYLE: after `.reader-popup-confirm {}` append popup polish:
+  ```css
+  .reader-popup {
+    animation: reader-popup-in var(--transition-fast);
+  }
+
+  .reader-popup::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 4px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-muted) 40%, white);
+    margin: -6px auto 14px;
+  }
+
+  @keyframes reader-popup-in {
+    from { transform: translateY(12px); opacity: 0.6; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  ```
+- non-goals: no logic/endpoint/Hebrew changes; renderOnboarding untouched.
+- tier: WORKER. depends on: 3.1, 3.2.
+
+## STEP 3.6 — words.js: treasure empty state + collection header
+- files: public/views/words.js only.
+- validation (frozen):
+  ```
+  cd C:/Users/dkreinov/claude/english-app && [ "$(grep -cF 'src="/assets/words-treasure.webp"' public/views/words.js)" = "2" ] && grep -qF 'class="spot-image spot-image--sm" src="/assets/words-treasure.webp"' public/views/words.js && grep -qF 'עוד אין מילים באוסף' public/views/words.js && grep -qF 'יודעת' public/views/words.js && grep -qF 'לומדת' public/views/words.js && node --check public/views/words.js && npm test
+  ```
+- contracts: (1) renderEmpty(): replace the whole `<div class="illustration">…</div>` inline-SVG
+  block with `<img class="spot-image" src="/assets/words-treasure.webp" alt="" />`; keep
+  empty-state-title/text unchanged. (2) renderList(): between header and words-count insert
+  `<img class="spot-image spot-image--sm" src="/assets/words-treasure.webp" alt="" />`.
+- non-goals: no badge/sort/count/api changes; leave .illustration CSS in styles.css.
+- tier: WORKER. depends on: 3.1, 3.2.
+
+## STEP 3.7 — new public/icons/icon.svg (same path)
+- files: public/icons/icon.svg only.
+- validation (frozen):
+  ```
+  cd C:/Users/dkreinov/claude/english-app && grep -qF '<svg' public/icons/icon.svg && grep -qF '</svg>' public/icons/icon.svg && grep -qF 'viewBox="0 0 512 512"' public/icons/icon.svg && grep -qF '#7c3aed' public/icons/icon.svg && grep -qF '#0d9488' public/icons/icon.svg && grep -qF '#f59e0b' public/icons/icon.svg && npm test
+  ```
+- contracts: overwrite with the planner's exact SVG (violet rx-112 rounded square, cream
+  #faf7f2 paw of 5 ellipses, amber #f59e0b pad, teal #0d9488 4-point sparkle at top-right;
+  no text).
+- non-goals: filename/path unchanged; manifest/index/sw untouched.
+- tier: WORKER. depends on: nothing.
+
+## STEP 3.8 — Phase gate (ORCHESTRATOR): clean-checkout tests + 412px browser smoke
+- `npm ci && npm test` = 146/146. Then `npm run dev` + browser at 412px: #/home shows
+  hero-clinic + heroine; #/placement intro shows placement-friend after "מתחילים"; #/words
+  shows words-treasure empty state. All /assets/*.webp requests 200; console clean;
+  screenshots journaled. Deep-state screens (chapter banner, celebration) are Phase 4's
+  live-verify concern.
+
+RISKS (planner): webp >200KB → 3.1 hard-fails (remedy: orchestrator lowers QUALITY; executor
+may not retune) · sharp install blocked by TLS → loud npm failure, escalate, don't swap tools ·
+missing dev-server MIME → grep in 3.1 validation · dropped frozen string → ui tests fail loud ·
+layout shift → aspect-ratio grep · wrong master → impossible, 1:1 name map over hash-distinct set.
+
+RECORD GAPS (resolved in-plan): vercel.json only has cleanUrls:true — public/ as web root is
+inferred (Phase 4.1 backstop check) · dev-server lacked webp MIME (added 3.1) · sharp version
+unpinned (frozen encoder params give determinism) · no home-ui test exists (markup free within
+valid JS).
 
 ## PHASE 4 — Deploy & verify (skeleton)
 

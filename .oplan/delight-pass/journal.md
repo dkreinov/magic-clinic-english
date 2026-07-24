@@ -181,3 +181,12 @@ PHASE 2 CLOSED
   acceptance criteria: (1) 2.1 validation PASS clean ✓ (2) 2.2 validation PASS (1/0 numstat +
     exact line) ✓ (3) git clean outside docs/visual-design.md + design.md + workspace ✓
     (4) npm test 146/146 pass ✓
+
+## Phase 3 planning
+- Fresh planner (Opus, files-only): full 8-step plan (3.1 tooling → 3.2 global CSS → 3.3-3.6
+  per-view markup → 3.7 icon → 3.8 orchestrator gate). BLOCKERS: none. RECORD GAPS: 4, all
+  resolved in-plan (dev-server webp MIME; vercel web-root inference with Phase-4 backstop;
+  sharp version policy; no home-ui test). Orchestrator verified the plan's factual anchors
+  before accepting (placement header strings "כל הכבוד!"/"סיימת!", dev-server '.png' MIME line
+  17, "submit" action, words-ui.test.js existence, renderChapter body match). Accepted; written
+  to plan.md in full. Planner tokens: 113429.
