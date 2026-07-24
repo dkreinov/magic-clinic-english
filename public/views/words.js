@@ -54,13 +54,13 @@ const VIEW_STYLE = `
   }
 
   .word-badge.known {
-    background: color-mix(in srgb, var(--color-teal) 15%, white);
+    background: color-mix(in srgb, var(--color-teal) 18%, var(--color-card));
     color: var(--color-teal);
   }
 
   .word-badge.learning {
-    background: color-mix(in srgb, var(--color-accent) 20%, white);
-    color: color-mix(in srgb, var(--color-accent) 70%, black);
+    background: color-mix(in srgb, var(--color-accent) 18%, var(--color-card));
+    color: var(--color-accent);
   }
 `;
 
