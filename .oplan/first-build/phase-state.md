@@ -1,4 +1,4 @@
-CURRENT: phase 4 "Story engine", phase 5 "Integration, polish & deploy", next step 5.4 (5.1-5.3 done)
+CURRENT: phase 4 "Story engine", phase 5 "Integration, polish & deploy", RUN CLOSED — all 5 phases complete, deployed & verified
 PLAN: .oplan/first-build/plan.md
 ACCEPTED: 4.1 5975c4d · 4.2 d580015 · 4.3 4b62356 · 4.4 d10beed · 4.5 59cbf74 · 4.6 74a6979 · 4.7 088de6c · 3.1 55be2d5 · 3.2 2dce91c · 3.3 c00ce8a · 3.4 c3a2455 · 3.5 06348cf · 1.1 7983095 · 1.2 2012689 · 1.3 12dce41 · 1.4 16c1866 · 1.5 699ff2c ·
 2.1 fc1f0a6 · 2.2 204213b · 2.3 251f76c · 2.4 e42a9e6
@@ -7,4 +7,4 @@ FROZEN CONTRACTS IN FORCE: GC-1..GC-8 (plan.md) · band1.json entry schema · li
 POST /api/profile actions word-tap/mark-known (GC-4, 400 discipline) · readJsonBody throws on
 empty/invalid (test mocks stream Buffer chunks)
 OPEN QUESTIONS: none
-BLOCKED: no
+BLOCKED: no — run complete. Outstanding: OWNER review gate (item bank) before child use.

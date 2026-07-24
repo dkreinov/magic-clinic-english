@@ -580,3 +580,46 @@ PHASE 4 CLOSED
   serves a fresh default (completed=false, 0 words). She starts clean.
 - CLI quirk for the record: blob subcommands need either the rw token (source .env.local,
   unset VERCEL_OIDC_TOKEN) or both OIDC+store-id; bare invocation errors.
+
+STEP 5.4 Owner handoff doc
+  tier: WORKER (Sonnet)
+  did: docs/owner-handoff.md — 7 bilingual sections (install PWA, required pre-use review w/
+       weak items + manual tap check, first-weeks kill criteria + coverageRatio signal, run
+       locally, costs, privacy posture, the goal verbatim).
+  surprises: none · deviations: none · validation_first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=33714, checker=28296 · interventions: 0
+  audit: match, confidence high (first round; URL + facts verified verbatim)
+  commit: f663d57 · accepted: 2026-07-24T15:39:47+03:00
+
+## 2026-07-24T15:39:47+03:00 — PHASE 5 GATE + RUN CLOSE
+- AC1 final clean-state validation: 146/146, exit 0 — PASS. AC2-AC7 verified during 5.1-5.3
+  (see entries above) — PASS. AC8 handoff doc committed, porcelain clean — PASS.
+
+PHASE 5 CLOSED
+  steps: 4 (3 orchestrator-executed cloud steps + 1 worker doc step)
+  first-try passes: 4/4 (CLI syntax drift on create-store/blob auth were orchestrator
+    learning-curve, not step failures)
+  escalations: 0 · interventions: 0
+  cost: worker=33714, checker=28296, planner=88993 (Opus), phase total=151003 tokens
+  field_guide: 29/40 lines (within budget)
+
+RUN "first-build" CLOSED — 2026-07-24
+  phases: 5/5 · steps: 26 accepted (22 worker + 3 orchestrator-cloud + 1 amendment pair
+    counted in phase 4's 7) · escalations: 0 (Sonnet handled every step; the ladder was never
+    climbed) · orchestrator interventions: 12 (7 unanswered-question/planner-defect stops by
+    executors — every one legitimate; 3 audit-driven fix rounds; 2 gate-driven design
+    amendments A3/A4) · run total subagent tokens: 2,783,653 (workers 1,412,782 / checkers
+    999,915 / planners 402,105 incl. plan reviewer) — dollar figures unavailable from harness.
+  Deliverable: https://english-app-three-tan.vercel.app — deployed, production-verified
+    end-to-end (placement, story generation at >=0.95 measured coverage, tap-translate,
+    micro-checks, word bank, Blob persistence), profile reset pristine for first real use.
+  Honesty-clause verdict: the checker layer caught 2 pre-execution plan defects, 2 executor
+    contract slips, 1 real UI dead-end (retry lockout), and 3 tooling gaps; the executor
+    escalation rule caught 4 planner defects at zero wrong-code cost; the live gates caught
+    2 design flaws (cold-start floor, partial glossaries) that 146 mocked tests missed.
+    Total checker+planner overhead ≈ same order as worker spend — for this codebase-critical,
+    correctness-first project the machinery demonstrably earned its keep. Weakest link
+    observed: orchestrator summarization slips in audit packets (2 false-positive findings) —
+    the "paste verbatim" rule exists for a reason and was learned twice.
+  OWNER GATE outstanding (not run-blocking): review docs/item-bank-review.md before her
+    first placement; one manual tap-to-translate check; then install the PWA (handoff doc).
