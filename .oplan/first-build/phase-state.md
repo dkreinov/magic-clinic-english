@@ -1,12 +1,10 @@
-CURRENT: phase 1 "Skeleton & app shell", next step 1.5
+CURRENT: phase 2 "Word data & profile engine", next step 2.1
 PLAN: .oplan/first-build/plan.md
-ACCEPTED: step 1.1 — 7983095 · step 1.2 — 2012689 · step 1.3 — 12dce41 · step 1.4 — 16c1866
-FROZEN CONTRACTS IN FORCE: GC-1 stack (zero-build, ESM, @vercel/blob only, tests = bare
-`node --test`, files tests/*.test.js) · GC-2 store API (loadProfile/saveProfile, Blob
-"profile/profile.json" vs <DATA_DIR>/profile.json) · GC-3 profile schema v1 (lib/profile.js
-is now its reference implementation) · GC-4 API envelope {ok,data|error} via lib/http.js only ·
-GC-5 hash routes #/home #/placement #/reader #/words, rtl/he, app name "מרפאת הקסמים" ·
-GC-6 design tokens (purple #7c3aed / teal #0d9488 / amber #f59e0b / bg #faf7f2, Rubik) ·
-GC-7 keys server-side only · GC-8 one commit per step
+ACCEPTED: 1.1 — 7983095 · 1.2 — 2012689 · 1.3 — 12dce41 · 1.4 — 16c1866 · 1.5 — 699ff2c
+FROZEN CONTRACTS IN FORCE: GC-1..GC-8 (see plan.md; GC-1 tests = bare `node --test`) ·
+Phase 2 adds: band1.json entry schema {lemma,pos,meaning,reg,section,single} · lib/vocab.js
+API (tokenize/baseForms/knownLemmaSet/coverage; known-status-only counting) · profile mutators
+applyWordTap/markWordKnown (additive; mark-known requires explicit source) · POST /api/profile
+actions "word-tap"/"mark-known" (GC-4 envelope, 400 on bad input)
 OPEN QUESTIONS: none
 BLOCKED: no

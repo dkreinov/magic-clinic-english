@@ -241,20 +241,170 @@ static files and API routes.
 
 ---
 
-## PHASE 2 — Word data & profile engine  (skeleton)
-- **goal:** the calibration substrate: official MoE Band I word list as machine-usable data, and
-  the profile mutation engine (word taps, known-word marking, coverage computation).
-- **expected inputs:** Phase 1 libs (`lib/profile.js`, `lib/store.js`, GC-4 helpers).
-- **expected outputs:** `data/band1.json` (word list w/ frequency tier), `lib/vocab.js`
-  (coverage: % of a text's tokens known per profile; tokenizer + lemma normalization rules),
-  `api/profile.js` POST actions (`word-tap`, `mark-known`), tests.
-- **likely files/systems:** `data/raw/band1.pdf` (fetch with `curl --ssl-no-revoke`), a Python
-  or npm PDF extraction path — TO DECIDE at phase planning after checking available tooling.
-- **validation gate:** `npm test`; `data/band1.json` spot-checked against the PDF (sample words
-  present, count plausible vs the official list size).
-- **risks:** PDF extraction quality (two-column layout); corporate TLS blocking pip/npm installs.
-- **open questions (decide at planning):** extraction tool; lemma normalization policy;
-  whether Band words start as `source:"band"` known-hypotheses or empty until placement.
+## PHASE 2 — Word data & profile engine  (CURRENT — planned by fresh Opus planner, reviewed & approved by orchestrator 2026-07-24)
+
+**GOAL:** the official MoE Pre-Band I / Band I lexical list as committed machine-usable data
+(`data/band1.json`), a dependency-free vocabulary coverage engine (`lib/vocab.js`), and the
+profile word-mutation engine (word-tap / mark-known) as pure functions + GC-4 POST actions on
+`api/profile.js`. All green under `npm test`.
+
+**ACCEPTANCE CRITERIA (frozen):**
+- AC1: clean-state `npm install --no-audit --no-fund && npm test` exits 0; suite includes
+  tests/band1.test.js, tests/vocab.test.js, tests/profile-mutations.test.js,
+  tests/api-profile-post.test.js.
+- AC2: data/band1.json parses; `.meta.entryCount === .entries.length` ∈ [1250,1450];
+  `.meta.singleWordCount` ∈ [1050,1200]; frozen sample lemmas present; every entry passes the
+  frozen entry schema; at least one phrase entry has `single:false`.
+- AC3: one commit per step 2.1–2.4; `git status --porcelain` clean at gate.
+- AC4: coverage() returns the exact frozen fixture ratios in tests/vocab.test.js.
+- AC5: POST /api/profile word-tap / mark-known mutates AND persists (second GET reflects it).
+
+**DEPENDS ON (Phase 1):** lib/profile.js (defaultProfile/validateProfile + enums, extended
+additively), lib/store.js (GC-2), lib/http.js (GC-4; readJsonBody THROWS on empty/invalid —
+field guide 8), api/profile.js GET, test patterns from tests/api.test.js.
+
+**SKELETON CHANGES (approved):** (1) The source PDF has NO per-word frequency column — columns
+are Entry/PoS/Meaning/(Oral|Family member(s))/Rec-Prod. "Frequency tier" replaced by the two
+real signals: `section` ∈ {preBandI, bandI} and `reg` ∈ {Prod, Rec, null}. (2) lib/vocab.js
+operates on the PROFILE's known set only; band1.json is static reference for Phase 3. (3)
+band1.json is {meta, entries:[…]} (array — duplicate lemmas exist across PoS/section rows).
+
+**DECISIONS (planner-proposed, orchestrator-approved):**
+- D1 PDF extraction = Python + PyMuPDF (`import fitz`; pymupdf 1.27.2.3 verified importable
+  on this machine). Offline build tool only, never runtime; zero npm footprint (GC-1 intact).
+- D2 Lemma normalization = hand-rolled conservative inflection stripper in lib/vocab.js (rules
+  frozen in step 2.2); MoE list is already base-forms, only story-side inflections need reducing.
+- D3 Band words start EMPTY in the profile (NOT seeded as source:"band" known-hypotheses) —
+  seeding ~1000 unmeasured "known" words would repeat design.md §1's founding failure.
+  `source:"band"` stays reserved.
+- D4 coverage() counts `status==="known"` only; "learning" (tapped) words do NOT count toward
+  the 95–98% constraint.
+- D5 markWordKnown REQUIRES explicit `source` ∈ {"placement","tap","band"} (no default; API
+  returns 400 if missing/invalid). No GC-3 amendment needed.
+
+### STEP 2.1 — Extract MoE Band list → data/band1.json
+- **goal:** committed data/raw/band1.pdf + deterministic Python builder + data/band1.json
+  validated by a Node test.
+- **files (create):** scripts/build_band1.py, data/raw/band1.pdf, data/band1.json,
+  tests/band1.test.js
+- **commands:**
+  `curl --ssl-no-revoke -s -o data/raw/band1.pdf "https://meyda.education.gov.il/files/Mazkirut_Pedagogit/English/CurriculumFilesAugust21/LexicalBand1.pdf"` ·
+  `python scripts/build_band1.py` (pymupdf already importable; fallback `pip install --user pymupdf`)
+- **validation (frozen):** `npm test`
+- **contracts:** PDF: 52 pages; pages 0–1 cover/sources (SKIP); pages 2–7 PRE-BAND I (page
+  text lacks "Family member"); pages 8–51 BAND I (contains "Family member").
+  build_band1.py algorithm FROZEN (reproduce exactly):
+  open PDF; for pages 2..end: section = "bandI" if "Family member" in page text else
+  "preBandI"; words = page.get_text("words") filtered to y0 > 90 (drops top banner); group
+  into rows by round(y0), each row sorted by x0; header = first row whose word-set contains
+  "Entry" AND ("PoS" or "Meaning"), skip page if none; xs = sorted distinct round(x0) of
+  header words, entry_left=xs[0], second_left=xs[1]; reg_left = min x0 of tokens "Prod"/"Rec"
+  on the page (fallback max header x0); meaning_left = x0 of header word starting "Meaning"
+  (else None); header_y = round(header row y); for each row below header_y+2:
+  entry = join of words with x0 < second_left-2 (whitespace-collapsed, stripped);
+  reg = join of words with x0 >= reg_left-2, kept only if in {"Prod","Rec"} else null;
+  meaning = join of words with meaning_left-2 <= x0 < reg_left-2 (if meaning_left) else "";
+  pos = join of words with second_left-2 <= x0 < (meaning_left-2 if meaning_left else
+  reg_left-2); skip row if entry empty; skip if neither reg nor pos (wrapped-continuation
+  fragments); lemma = entry.lower();
+  emit {"lemma", "pos": pos or None, "meaning": ws-collapsed or None, "reg", "section",
+  "single": bool(re.fullmatch(r"[a-z]+", lemma))}.
+  Sort by (section=="bandI", lemma, pos or "", meaning or "") — preBandI first, deterministic.
+  Write {"meta":{"source":"Israel MoE — Lexical Pre-Band I & Band I (Elementary), Nov 2020,
+  rev. 2023-01-26","sourceUrl":<the URL>,"extractedWith":"pymupdf","entryCount":len,
+  "singleWordCount":count single},"entries":[...]} with ensure_ascii=False, indent=2,
+  trailing newline.
+  Entry schema (frozen): lemma lowercase/trimmed/ws-collapsed string; pos string|null;
+  meaning string|null; reg "Prod"|"Rec"|null; section "preBandI"|"bandI"; single boolean ===
+  /^[a-z]+$/.test(lemma).
+  tests/band1.test.js asserts: parses; meta counts equal recomputed counts and in ranges
+  ([1250,1450] entries, [1050,1200] single); every entry passes schema; sample single lemmas
+  present with section — preBandI: dog,cat,pet,friend,run · bandI: animal,because,beautiful,
+  apple,water; ≥1 entry with single===false and non-null pos. (Reference: entryCount≈1341,
+  singleWordCount≈1137.)
+- **non-goals:** no runtime PDF parsing; no npm PDF dep; no profile seeding; do not touch
+  lib/ or api/.
+- **tier:** WORKER (Sonnet). depends on: nothing (first step). Needs network + Python.
+
+### STEP 2.2 — Coverage engine lib/vocab.js
+- **goal:** pure, dependency-free tokenizer + conservative lemmatizer + coverage() over a profile.
+- **files (create):** lib/vocab.js, tests/vocab.test.js
+- **commands:** none — direct file edits. **validation (frozen):** `npm test`
+- **contracts (pure ESM, zero imports):**
+  `tokenize(text)` → `(String(text).toLowerCase().match(/[a-z]+(?:'[a-z]+)?/g) || [])`.
+  `baseForms(token)` → de-duplicated array, token first, adding candidates only when result
+  length ≥ 2: ends "ies"(len≥5)→stem+"y"; "es"(len≥4)→slice(0,-2); "s"(len≥4, not "ss")→
+  slice(0,-1); "ied"(len≥5)→stem+"y"; "ed"(len≥4)→slice(0,-2) AND slice(0,-1);
+  "ing"(len≥5)→slice(0,-3) AND slice(0,-3)+"e"; "est"(len≥5)→slice(0,-3); "er"(len≥4)→slice(0,-2).
+  `knownLemmaSet(profile)` → Set of keys where words[k].status==="known" (missing words ⇒ empty).
+  `coverage(text, profile)` → {total, known, unknown: sorted unique unknown tokens, ratio:
+  total===0?0:known/total}; token known iff baseForms(token).some(b=>known.has(b)).
+  tests/vocab.test.js fixture: known dog,cat,run,big; "swim" status "learning" (must NOT
+  count). Asserts: tokenize("The dogs RUN!")=["the","dogs","run"]; baseForms("dogs")∋"dog";
+  baseForms("running")∋"run"; baseForms("bigger")∋"big"; baseForms("ss") no crash;
+  coverage("dogs run")→{total:2,known:2,ratio:1}; coverage("dogs swim")→known:1, ratio:0.5,
+  unknown:["swim"]; coverage("")→{total:0,known:0,unknown:[],ratio:0}.
+- **non-goals:** no band1.json import; no story generation; no profile mutation; don't touch
+  lib/profile.js or api/.
+- **tier:** WORKER (Sonnet). depends on: nothing (independent of 2.1).
+
+### STEP 2.3 — Profile word-mutation functions (lib/profile.js, additive)
+- **goal:** pure mutators applyWordTap / markWordKnown added to lib/profile.js (ADDITIVE
+  exports only; existing exports unchanged — GC-3).
+- **files:** lib/profile.js (modify), tests/profile-mutations.test.js (create)
+- **commands:** none. **validation (frozen):** `npm test`
+- **contracts:**
+  `applyWordTap(profile, {lemma, he=null, now=new Date().toISOString()})`: k =
+  String(lemma).trim().toLowerCase(); throw Error("lemma required") if ""; new entry →
+  {status:"learning", source:"tap", he:he??null, taps:1, firstSeen:now, lastSeen:now};
+  existing → taps+=1, lastSeen=now, he backfilled only if currently null (status/source
+  unchanged). Returns profile (in-place).
+  `markWordKnown(profile, {lemma, source, he=null, now=...})`: same lemma normalization/throw;
+  throw Error("invalid source") if source ∉ WORD_SOURCES {"placement","tap","band"}; new →
+  {status:"known", source, he:he??null, taps:0, firstSeen:now, lastSeen:now}; existing →
+  status="known", lastSeen=now, he backfill-if-null (source and taps preserved). Returns profile.
+  All produced entries satisfy validateProfile.
+  tests/profile-mutations.test.js: new tap → learning/tap/taps 1/he set/firstSeen===lastSeen;
+  second tap with later `now` → taps 2, lastSeen advanced, firstSeen unchanged, still
+  "learning"; markWordKnown new lemma source "placement" → known/taps 0; markWordKnown on
+  existing tapped lemma → flips to known, taps + original source preserved; bad/missing source
+  throws; blank lemma throws; final validateProfile ok.
+- **non-goals:** no API/HTTP; no store I/O; no coverage; don't modify enum VALUES; don't touch
+  api/ or lib/vocab.js.
+- **tier:** WORKER (Sonnet). depends on: step 1.2's lib/profile.js (already accepted).
+
+### STEP 2.4 — Profile API POST actions
+- **goal:** api/profile.js gains GC-4 POST word-tap / mark-known using 2.3's mutators,
+  persisted via store.
+- **files:** api/profile.js (modify), tests/api-profile-post.test.js (create)
+- **commands:** none. **validation (frozen):** `npm test`
+- **contracts:** keep existing GET. POST: readJsonBody in try/catch → 400
+  {ok:false,error:"invalid JSON body"} on throw. action==="word-tap": require non-blank string
+  lemma (else 400 "lemma required"); applyWordTap(p,{lemma, he: body.he ?? null}).
+  action==="mark-known": require lemma AND source ∈ {"placement","tap","band"} (else 400
+  "source required"/"lemma required"); markWordKnown(...). other action → 400 "unknown
+  action". Mutator throws → 400 with err.message. Then saveProfile(p); 200 {ok:true,data:p}.
+  p = await loadProfile() ?? defaultProfile(). Non-GET/POST → 405 (unchanged shape).
+  tests/api-profile-post.test.js: reuse withTempDataDir pattern + mock res; req = node:stream
+  Readable of the JSON string with `method` property set (readJsonBody consumes `for await`).
+  Asserts: word-tap dog/כלב → 200, words.dog.status "learning", taps 1; GET persists (taps 1);
+  second tap → taps 2; mark-known cat/placement → known; mark-known no source → 400; unknown
+  action → 400; malformed body "{" → 400; missing lemma → 400; PUT → 405; all envelopes GC-4.
+- **non-goals:** no new endpoints; no placement/scoring; no coverage endpoint; don't modify
+  lib/*, data/*, public/*.
+- **tier:** WORKER (Sonnet). depends on: 2.3.
+
+**RISKS:** R1 pymupdf version drift → band1.json committed + count-range tests. R2
+over-aggressive baseForms over-credits knowledge → conservative rules, known-only counting
+(D4), frozen unit pins; residual risk re-reviewed in Phase 4. R3 readJsonBody throws on empty
+body → 2.4 try/catch → 400, tested. R4 the 2.4 mock req MUST be a real Readable (async
+iterable), not `{method}` — a plain object hangs readJsonBody.
+
+**RECORD GAPS (patched at planning):** G1 design.md §3 says the lexical list has "frequency
+data" — the actual PDF has none (PoS/Meaning/Rec-Prod/section only). Phase 3 item ordering
+must use section+reg or an external corpus (decide at Phase 3 planning); do NOT assume a
+frequency field exists. G2 no `source` enum value for learner-asserted "known" outside
+placement — D5 sidesteps; additive enum amendment only if a future phase needs it.
 
 ## PHASE 3 — Placement test  (skeleton)
 - **goal:** the pre-built, owner-reviewable item bank + TTS audio + the two-task placement UI

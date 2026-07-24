@@ -154,3 +154,16 @@ PHASE 1 CLOSED
     caught 2 real defects (empty-body choice, unrequested icon links) and the plan reviewer 3;
     escalation rule fired once and was correct. Machinery earning its keep so far, but
     checker-cost parity is the number to watch.
+
+## 2026-07-24T13:03:20+03:00 — PHASE 2 PLANNED (fresh Opus planner, files only)
+- Planner did live reconnaissance: pymupdf 1.27.2.3 importable; MoE PDF fetched & inspected
+  (52 pages); extraction algorithm pre-validated (~1341 entries, ~1137 single-word lemmas).
+- BLOCKERS: none. RECORD GAPS: G1 — design.md §3 claims the lexical list carries "frequency
+  data"; the real PDF has NO frequency column (record patched in plan.md; Phase 3 must not
+  assume frequency). G2 — no enum value for self-asserted known words; sidestepped by D5.
+- Orchestrator review: APPROVED with no step changes. Decisions D1–D5 ratified (PyMuPDF
+  offline extraction; conservative hand-rolled lemmatizer; word bank starts EMPTY — no
+  band-seeded "known" words, honoring design §1's founding failure; coverage counts
+  status==="known" only; mark-known requires explicit source).
+- Record-completeness test PASSED: the fresh planner planned the phase from files alone.
+- Planner tokens: 99579.
