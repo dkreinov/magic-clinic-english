@@ -56,3 +56,27 @@
   owner decision — all 89 are exact duplicates of the preserved repo file, safe to delete.
 - Owner decisions: delete duplicates = YES (89 files removed from ~/Downloads, each md5-checked
   = c4985de1... before rm; 0 remain); resume 1.1 = YES. Re-dispatching with amended packet.
+
+STEP 1.1 Generate the 4 landscape scene assets (amended: 3 new + adopted hero-clinic)
+  tier: WORKER (Sonnet)
+  did: Generated chapter-clinic.png, chapter-forest.png, chapter-night.png in the dedicated
+       ChatGPT chat (frozen prompts), downloaded and moved into assets/delight/. hero-clinic.png
+       untouched (adopted pre-incident artifact).
+  surprises: (1) ChatGPT composer occasionally prepended stray em-dashes to typed text; executor
+       verified via read_page before every send and retyped clean. (2) chapter-night first
+       generation errored server-side; one resend per protocol succeeded. (3) Executor twice
+       mis-clicked "Share conversation" instead of Download — created 2 public share links,
+       then deleted both via ChatGPT Settings > Data controls > Shared Links before finishing.
+       RISK LOGGED: deletion claim not independently verified by orchestrator; chat contains
+       only cartoon image prompts, no secrets or personal data.
+  deviations: none
+  validation_first_try: yes (orchestrator clean-state re-run: 4 files 1536x1024, all hashes
+       distinct incl. vs anchor; stray Downloads file checked = pre-existing Jul 20 file)
+  retries: 1 (chapter-night generation error, resent once)
+  escalations: 0
+  tokens: worker=224871, checker=33538, orchestrator_delta=unavailable
+  interventions: 0 (this dispatch; the pre-dispatch incident is journaled separately above)
+  audit: match, confidence high (fresh-eyes viewed all 3 images + anchor, verified dims/hashes)
+  rubric: orchestrator PASS on all 5 points for each of the 3 new images
+  commit: (this commit)
+  accepted: 2026-07-24
