@@ -336,3 +336,20 @@ STEP 3.2 TTS audio generator + committed mp3s
   audit: match, confidence high (first round)
   commit: 2dce91c
   accepted: 2026-07-24T13:53:01+03:00
+
+STEP 3.3 Placement scoring lib + API endpoint
+  tier: WORKER (Sonnet)
+  did: lib/placement.js (scoreTask1/scoreTask2/bandForScore/clientView, pure); api/placement.js
+       (GET stripped bank via JSON import-attributes, POST submit -> deterministic scoring ->
+       skills + markWordKnown(placement) + placement.task1/2 + completed); 2 test files
+       (inline-fixture units + real-bank API flow incl. persistence via api/profile.js).
+  surprises: none · deviations: none
+  validation_first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=51744, checker=38611, orchestrator_delta=unavailable
+  interventions: 0 (audit's single finding VOID — my audit-packet abbreviation "??" vs the
+       authoritative packet text "if (p === null)", which the code matches verbatim; GC-2 +
+       store tests guarantee null. Second occurrence of the abbreviation slip — reminder:
+       quote spec text verbatim in auditor packets.)
+  audit: match (finding voided against authoritative spec), confidence high
+  commit: c00ce8a
+  accepted: 2026-07-24T13:57:14+03:00
