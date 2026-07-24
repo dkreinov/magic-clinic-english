@@ -214,3 +214,10 @@ STEP 3.2 styles.css global artwork classes + warm gradient
   tokens: worker=38279, checker=0 (audit: orchestrator byte-exact diff vs frozen contract,
        zero degrees of freedom)
   interventions: 0 · commit: (this commit) · accepted: 2026-07-24
+
+STEP 3.3 home.js hero + heroine
+  tier: WORKER (Sonnet) · validation_first_try: yes (146/146) · retries: 0 · escalations: 0
+  did: two <img> insertions exactly per contract (+4 lines, nothing else in diff)
+  surprises: none  deviations: none
+  tokens: worker=34235, checker=0 (audit: orchestrator byte-exact diff vs contract)
+  interventions: 0 · commit: (this commit) · accepted: 2026-07-24
