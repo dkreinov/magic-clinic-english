@@ -54,3 +54,5 @@
   scenes. Adoption is provisional until step 1.1 validation passes over all four files.
 - ~/Downloads cleanup: NOT performed (owner's folder; packet forbids deletes there). Awaiting
   owner decision — all 89 are exact duplicates of the preserved repo file, safe to delete.
+- Owner decisions: delete duplicates = YES (89 files removed from ~/Downloads, each md5-checked
+  = c4985de1... before rm; 0 remain); resume 1.1 = YES. Re-dispatching with amended packet.
