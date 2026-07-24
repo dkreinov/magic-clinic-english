@@ -747,15 +747,27 @@ new words).
 
 BLOCKERS: none. RECORD GAPS: none.
 
-## PHASE 5 — Integration, polish & deploy  (skeleton)
-- **goal:** deployed, installable, verified on production URL; owner handoff doc.
-- **expected inputs:** everything above green locally.
-- **expected outputs:** Vercel project linked + Blob store provisioned + env vars set
-  (`vercel` CLI at `"$(npm prefix -g)/vercel"`), production deploy, PWA installability check,
-  app icon via the ChatGPT image pipeline (design §7, dedicated chat), `docs/owner-handoff.md`
-  (install steps, item-bank review, what to watch).
-- **validation gate:** `curl --ssl-no-revoke` production `/api/health` + `/` 200; Lighthouse-
-  style manifest/SW checks; full loop exercised once on production by the orchestrator.
-- **risks:** Blob provisioning via CLI; public-access Blob URL for profile data (low
-  sensitivity — no real name stored — but revisit `access` options here); Vercel project
-  settings (no framework preset).
+## PHASE 5 — Integration, polish & deploy  (CURRENT — planned by fresh Opus planner, orchestrator-approved 2026-07-24, no changes)
+
+See journal for the full planner output. Summary of record:
+- AC1 clean 146/146 · AC2 link · AC3 blob store + env vars (names only, never values) ·
+  AC4 prod deploy clean build · AC5 prod smoke (health/RTL/stripped placement/manifest/sw/
+  icon + full placement->set-learner->chapter->translate loop, coverage >=0.95) · AC6 blob
+  persistence proof (blob list + profile round-trip) · AC7 installability assets · AC8
+  docs/owner-handoff.md committed, porcelain clean.
+- DECISIONS: D1 cloud steps ORCHESTRATOR-executed (secrets/irreversibility); D2 blob token
+  auto-injected via create-store --environment production, OPENAI_API_KEY piped from .env via
+  stdin, never echoed; D3 PUBLIC blob store kept (frozen GC-2; @vercel/blob@1.1.1 put requires
+  access:'public'; profile holds no real name — document-and-accept in handoff); D4 GC-8
+  commit applies only to step 5.4 (cloud steps are commit-less); D5 engines ">=22" kept,
+  build log inspected.
+- SKELETON CHANGES: ChatGPT-image icon upgrade DROPPED (owner-involved, design §7); deploy
+  orchestrator-executed; private blob not adopted.
+- STEPS: 5.1 link+store+env [ORCH] · 5.2 prod deploy + build-log checks [ORCH] · 5.3 prod
+  smoke + blob proof [ORCH] · 5.4 docs/owner-handoff.md (WORKER; 7 required sections incl.
+  PWA install steps, item-bank-review reminder w/ t1-06 & t1-04, first-week watch + kill
+  criteria, run-locally, costs ~$5-10/mo, privacy posture D3, kill-criteria verbatim).
+- RISKS: engines major (build log guard) · token not auto-injected (env ls verify) · JSON
+  bundling (proven live) · chapter 502 = retriable · public blob (accepted, documented) ·
+  smoke seeds a real profile (orchestrator clears blob before handoff for a pristine start).
+- BLOCKERS: none. RECORD GAPS: none.
