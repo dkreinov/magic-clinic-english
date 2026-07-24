@@ -30,7 +30,7 @@ const VIEW_STYLE = `
 
   .reader-text .w:active,
   .reader-text .w.tapped {
-    background: color-mix(in srgb, var(--color-accent) 25%, white);
+    background: color-mix(in srgb, var(--color-accent) 28%, var(--color-card));
   }
 
   .reader-onboard-field {
@@ -47,7 +47,7 @@ const VIEW_STYLE = `
     width: 100%;
     min-height: 48px;
     border-radius: var(--radius);
-    border: 2px solid transparent;
+    border: 2px solid var(--color-border);
     background: var(--color-card);
     box-shadow: var(--shadow-soft);
     padding: 0 16px;
@@ -76,7 +76,7 @@ const VIEW_STYLE = `
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    border: 4px solid color-mix(in srgb, var(--color-primary) 20%, white);
+    border: 4px solid color-mix(in srgb, var(--color-primary) 25%, var(--color-card));
     border-top-color: var(--color-primary);
     animation: reader-spin 0.9s linear infinite;
   }
@@ -105,9 +105,10 @@ const VIEW_STYLE = `
   .reader-question-option {
     min-height: 48px;
     border-radius: var(--radius);
-    border: 2px solid transparent;
-    background: var(--color-bg);
+    border: 2px solid var(--color-border);
+    background: var(--color-surface-2);
     box-shadow: var(--shadow-soft);
+    color: var(--color-ink);
     font-size: 0.98rem;
     font-weight: 600;
     padding: 10px 16px;
@@ -122,12 +123,12 @@ const VIEW_STYLE = `
 
   .reader-question-option.correct {
     border-color: var(--color-teal);
-    background: color-mix(in srgb, var(--color-teal) 12%, white);
+    background: color-mix(in srgb, var(--color-teal) 16%, var(--color-card));
   }
 
   .reader-question-option.wrong {
-    border-color: #dc2626;
-    background: color-mix(in srgb, #dc2626 10%, white);
+    border-color: var(--color-danger);
+    background: color-mix(in srgb, var(--color-danger) 16%, var(--color-card));
   }
 
   .reader-question-option[disabled] {
@@ -144,13 +145,13 @@ const VIEW_STYLE = `
   }
 
   .reader-question-feedback.bad {
-    color: #dc2626;
+    color: var(--color-danger);
   }
 
   .reader-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -196,7 +197,7 @@ const VIEW_STYLE = `
     width: 40px;
     height: 4px;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--color-muted) 40%, white);
+    background: color-mix(in srgb, var(--color-muted) 45%, var(--color-card));
     margin: -6px auto 14px;
   }
 
