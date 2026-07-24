@@ -1,0 +1,351 @@
+:root {
+  --color-primary: #7c3aed;
+  --color-teal: #0d9488;
+  --color-accent: #f59e0b;
+  --color-bg: #faf7f2;
+  --color-ink: #1f2937;
+  --radius: 16px;
+
+  --color-primary-ink: #ffffff;
+  --color-muted: #6b7280;
+  --color-card: #ffffff;
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --nav-height: 68px;
+  --transition-fast: 150ms ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Rubik", system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+#app {
+  display: block;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px 16px calc(var(--nav-height) + 32px);
+  min-height: 100vh;
+}
+
+/* ---------- Header ---------- */
+
+.app-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.app-header .greeting {
+  font-size: 1rem;
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+.app-header .app-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* ---------- Cards ---------- */
+
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card:active {
+  transform: scale(0.98);
+}
+
+.card--locked {
+  opacity: 0.75;
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.card-subtitle {
+  font-size: 0.95rem;
+  color: var(--color-muted);
+  font-weight: 400;
+  margin-bottom: 14px;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  background: color-mix(in srgb, var(--color-primary) 12%, white);
+  color: var(--color-primary);
+}
+
+.card--locked .card-icon {
+  background: color-mix(in srgb, var(--color-muted) 15%, white);
+  color: var(--color-muted);
+}
+
+.lock-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 24px;
+  border-radius: var(--radius);
+  border: none;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
+  width: 100%;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-primary-ink);
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.28);
+}
+
+.btn[disabled] {
+  background: #e5e7eb;
+  color: var(--color-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ---------- Placement view ---------- */
+
+.intro-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.intro-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--color-card);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-soft);
+}
+
+.intro-step-number {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: white;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.intro-step-text strong {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.intro-step-text span {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.intro-note {
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  margin-top: 12px;
+}
+
+/* ---------- Empty states ---------- */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  padding: 40px 16px;
+}
+
+.empty-state-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.empty-state-text {
+  color: var(--color-muted);
+  font-size: 0.95rem;
+  max-width: 30ch;
+}
+
+/* Decorative illustration placeholder for reader view */
+
+.illustration {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--color-primary) 20%, white),
+    color-mix(in srgb, var(--color-accent) 25%, white)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  overflow: hidden;
+}
+
+.illustration::before,
+.illustration::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.illustration::before {
+  width: 60px;
+  height: 60px;
+  top: 24px;
+  left: 30px;
+}
+
+.illustration::after {
+  width: 30px;
+  height: 30px;
+  bottom: 30px;
+  right: 34px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.illustration svg {
+  width: 84px;
+  height: 84px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Bottom nav ---------- */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
+  height: var(--nav-height);
+  max-width: 480px;
+  margin: 0 auto;
+  z-index: 10;
+}
+
+.nav-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+  cursor: pointer;
+}
+
+.nav-tab svg {
+  width: 24px;
+  height: 24px;
+  transition: transform var(--transition-fast);
+}
+
+.nav-tab.active {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.nav-tab.active svg {
+  transform: translateY(-1px) scale(1.05);
+}
+
+.nav-tab:active svg {
+  transform: scale(0.9);
+}
