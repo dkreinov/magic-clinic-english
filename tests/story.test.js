@@ -81,6 +81,38 @@ test('buildAllowedSet merges known words, preBandI band1 entries, core words, an
   }
 });
 
+test('buildAllowedSet includes learner heroine and pet names when set, and excludes them when null', () => {
+  const band1 = loadBand1();
+
+  const profileWithNames = makePlacedProfile();
+  profileWithNames.learner.heroineName = 'Luna';
+  profileWithNames.learner.petName = 'Sparkle';
+  const allowedWithNames = buildAllowedSet(profileWithNames, band1);
+  assert.ok(allowedWithNames.has('luna'), 'expected heroine name "luna"');
+  assert.ok(allowedWithNames.has('sparkle'), 'expected pet name "sparkle"');
+
+  const profileWithoutNames = makePlacedProfile();
+  profileWithoutNames.learner.heroineName = null;
+  profileWithoutNames.learner.petName = null;
+  const allowedWithoutNames = buildAllowedSet(profileWithoutNames, band1);
+  assert.ok(!allowedWithoutNames.has('luna'), 'did not expect "luna" with null heroine name');
+  assert.ok(!allowedWithoutNames.has('sparkle'), 'did not expect "sparkle" with null pet name');
+});
+
+test('buildAllowedSet includes bandI-only lemmas when receptiveVocab.band is A1/A2, excludes when band is null', () => {
+  const band1 = loadBand1();
+
+  const profileA2 = makePlacedProfile();
+  profileA2.skills.receptiveVocab.band = 'A2';
+  const allowedA2 = buildAllowedSet(profileA2, band1);
+  assert.ok(allowedA2.has('afraid'), 'expected bandI-only word "afraid" when band is A2');
+
+  const profileNullBand = makePlacedProfile();
+  profileNullBand.skills.receptiveVocab.band = null;
+  const allowedNullBand = buildAllowedSet(profileNullBand, band1);
+  assert.ok(!allowedNullBand.has('afraid'), 'did not expect "afraid" when band is null');
+});
+
 const GOOD_TEXT = 'She is an apprentice at the vet clinic for magical animals. Now a big dragon came into the clinic. The dragon has a hurt wing and its tail is very little. She saw a little unicorn too. The unicorn has one horn and new feathers. She took a potion and gave it to the dragon. The potion is good magic from an old wizard. Then a witch came with a new spell. She said the spell is to heal the wing. She and the vet did the spell again and again. The wing got new again and the dragon was good again.';
 
 function goodChapterFixture() {
@@ -152,6 +184,37 @@ test('verifyChapter rejects a chapter whose glossary is missing an unknown token
     v.errors.some((e) => e.includes('hurt')),
     `expected an error naming token "hurt", got ${JSON.stringify(v.errors)}`
   );
+});
+
+test('verifyChapter normalizes a unicode-apostrophe possessive so it does not produce an unknown token', () => {
+  const allowedWithName = new Set([...CORE_FUNCTION_WORDS, ...STORY_LEXICON, 'sparkle']);
+  const text = 'Sparkle is a little dragon. Sparkle’s horn is very big and new. She ran to the cave again.';
+  const chapter = {
+    title: 'Sparkle the Dragon',
+    text,
+    cliffhanger: 'But then a shadow moved in the cave.',
+    glossary: [],
+    questions: [
+      {
+        id: 'ch1-q1',
+        prompt: 'מה ספרקל?',
+        options: ['דרקון', 'חתול', 'ציפור', 'סוס'],
+        correctIndex: 0,
+        evidence: 'Sparkle is a little dragon.',
+      },
+      {
+        id: 'ch1-q2',
+        prompt: 'איך הקרן של ספרקל?',
+        options: ['גדולה וחדשה', 'קטנה', 'שבורה', 'ירוקה'],
+        correctIndex: 0,
+        evidence: 'Sparkle’s horn is very big and new.',
+      },
+    ],
+  };
+
+  const v = verifyChapter(chapter, allowedWithName);
+  assert.strictEqual(v.ok, true, `expected ok, got errors ${JSON.stringify(v.errors)}`);
+  assert.deepStrictEqual(v.unknown, []);
 });
 
 test('generateChapter retries once after a chat failure and returns ok on the second attempt', async () => {
