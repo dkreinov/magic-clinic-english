@@ -1,39 +1,42 @@
 # STATUS — English learning app, run "first-build"
 
-**Updated:** 2026-07-24 21:15 · **Where we are:** Phase 4 CLOSED ✓ — planning Phase 5 (deploy), the last one.
+**Updated:** 2026-07-24 22:30 · **Where we are:** ✅ **RUN COMPLETE — all 5 phases. The app is live.**
 
-## What's happening right now
-**The story engine is alive.** I generated a real chapter with the real OpenAI key and read it
-in a real browser: "Luna and Sparkle" — 74 words, 97.3% within her allowed vocabulary,
-Hebrew glossary for every new word, 3 comprehension questions (wrong answers let her retry;
-right answers unlock the next chapter), ending on a cliffhanger. Word collection fills up as
-she taps. 146 tests green. A fresh planner is planning Phase 5: deploy to Vercel.
+## The app is deployed and verified
+**https://english-app-three-tan.vercel.app**
 
-## The road
+The full loop was exercised on production: placement test → she names the heroine and her
+magical animal → a real chapter generated live (97.8% of words within her allowed vocabulary,
+Hebrew glossary for every new word, 3 comprehension questions, cliffhanger) → tap-to-translate
+→ word collection → everything persisted in Vercel Blob. The test profile was then wiped —
+she starts completely fresh. 146 tests green from a clean checkout.
 
 ```mermaid
 flowchart LR
-    P1[Shell ✓] --> P2[Words & profile ✓] --> P3[Placement ✓] --> P4[Story engine ✓] --> P5[Phase 5<br/>Deploy<br/>PLANNING]
+    P1[Shell ✓] --> P2[Words & profile ✓] --> P3[Placement ✓] --> P4[Story engine ✓] --> P5[Deployed ✓]
     style P1 fill:#0d9488,color:#fff
     style P2 fill:#0d9488,color:#fff
     style P3 fill:#0d9488,color:#fff
     style P4 fill:#0d9488,color:#fff
-    style P5 fill:#f59e0b,color:#000
+    style P5 fill:#0d9488,color:#fff
 ```
 
-## What the live test taught us (design decisions made at the gate)
-- Her chosen hero/pet names are always "known" words (they were breaking the vocabulary check).
-- The starting vocabulary is **band-aware**: a measured A1/A2 placement unlocks the school's
-  full Band I list as the assumed floor; Pre-A1 keeps only the smaller pre-band list. Placement
-  is the prior — exactly what design §3 intended.
-- If the model forgets to translate a new word, the server now fills in that glossary entry
-  itself — every unknown word is always tappable. The ≥95% readability gate is unchanged, and
-  an unverifiable chapter is never shown (she sees a friendly "the magic is delayed" retry).
+## ⚠ Before she uses it — the owner's 3 steps (see docs/owner-handoff.md)
+1. **Review `docs/item-bank-review.md`** (~30 min) — every placement item with checkboxes;
+   two flagged weak items: t1-06 (desk → 🧑‍💻, "שולחן") and t1-04 (fan → 🌀).
+2. **Tap one story word yourself** to see the translation popup (the one thing robot fingers
+   couldn't physically test).
+3. **Install on her phone**: open the URL in Chrome on Android → ⋮ → "Add to Home screen".
+   Share only the canonical URL above (deployment-specific URLs redirect to a Vercel login).
 
-## ⚠ Needs the owner
-- **docs/item-bank-review.md** — review before she takes the placement test (~30 min).
-- On first real use: tap a word in the story yourself once to see the translation popup
-  (automation couldn't physically tap word spans; the code path is tested and audited).
+## Where everything lives
+- `docs/owner-handoff.md` — install, costs (~$5–10/mo), privacy posture, kill criteria.
+- `.oplan/first-build/` — the complete run record: plan, journal (every step, every audit,
+  every intervention), field guide, this file.
+- Weekly-update features (spaced repetition, writing, recordings, trophies) were deliberately
+  out of scope — design.md §6 lists them as the post-launch roadmap.
 
-## Totals so far
-21 steps · 0 escalations · ~3.0M subagent tokens · every step audited & committed.
+## Run numbers
+5 phases · 26 accepted steps · 0 escalations (Sonnet handled every step) · 12 orchestrator
+interventions (all logged) · ~2.78M subagent tokens · every step machine-validated, fresh-eyes
+audited, and committed individually.
