@@ -97,6 +97,7 @@ comprehensible and fun. The entire level system exists to enforce this.
 - Once frozen, every agent in every session follows the visual design doc.
 - Tone calibration: unknown what she finds cringe/babyish — calibrate from her reaction to
   the first chapters. Content must NOT be pitched younger than 11.
+- **Linked design doc (frozen):** [`docs/visual-design.md`](docs/visual-design.md) — the codified visual system: direction, palette↔token map, typography, spacing/radius/shadow, the full asset library (usage map + generation prompts + STYLE SUFFIX), the generation pipeline, and do/don't rules.
 
 ## 8. Assumptions (confirmed by owner)
 
