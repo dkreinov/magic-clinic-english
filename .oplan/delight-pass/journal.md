@@ -253,3 +253,25 @@ STEP 3.7 public/icons/icon.svg refresh
   did: icon.svg -> violet rx-112 rounded square, cream paw (5 ellipses), amber pad, teal
        sparkle; same path/filename (manifest/PRECACHE untouched).
   tokens: worker=0, checker=0 · interventions: 0 · commit: (this commit) · accepted: 2026-07-24
+
+STEP 3.8 Phase gate (orchestrator-run)
+  npm ci && npm test: 146/146 PASS from clean install.
+  Browser smoke (dev-server :3000): #/home hero-clinic + heroine render · #/placement intro
+  placement-friend renders · #/words empty state words-treasure renders. All /assets/*.webp
+  GET = 200. Console: only 2 chrome-extension message-channel artifacts (not app errors).
+  NOTE: 412px window resize did not shrink the outer viewport (DPI quirk, screenshots 1568w);
+  layout is max-width-480 centered, so rendering equals the mobile layout regardless.
+  sw.js + manifest: zero diff since run start (verified via git diff, 0 lines).
+
+PHASE 3 CLOSED
+  steps: 8 (7 execution + 1 gate), first-try passes: 7/7
+  escalations: 0
+  interventions: 0
+  cost: tokens worker=218,+... workers 3.1-3.6 = 219100 (28441+38279+34235+37579+44298+36268),
+    3.7 worker=0 (orchestrator-executed, logged deviation), checker=0 (all audits were
+    orchestrator byte-exact diff-vs-contract; every contract left zero degrees of freedom),
+    planner=113429
+  orchestrator_context: unavailable
+  field_guide: 38/40 lines (within budget)
+  acceptance: (1) all step validations re-run clean ✓ (2) 8 valid webp 34-88KB ✓ (3) sw.js/
+    manifest/tokens untouched, ui greps green ✓ (4) scope exactly per plan ✓ (5) 3.8 gate ✓
