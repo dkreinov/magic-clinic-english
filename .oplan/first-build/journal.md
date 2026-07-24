@@ -190,3 +190,30 @@ STEP 2.1 Extract MoE Band list -> data/band1.json
   extra orchestrator checks: rebuild byte-identical (md5); clean npm test 40/40.
   commit: fc1f0a6
   accepted: 2026-07-24T13:09:49+03:00
+
+## 2026-07-24T14:20+03:00 — STEP 2.2 INTERVENTION (unanswered-question / planner bug)
+- Executor implemented the frozen baseForms rules verbatim, hit the frozen test, and STOPPED
+  correctly: "running" -> slice(0,-3)="runn"/+"e"="runne", never "run"; same flaw makes
+  "bigger" -> "bigg" (never "big"). The Opus planner's frozen algorithm contradicted its own
+  frozen test fixtures; the worker deleted its files and reported cleanly rather than "fixing"
+  the spec itself — exactly the two-designs failure mode the escalation rule exists to prevent.
+- DECISION: doubled-consonant reduction added (undouble(stem): len>=3, last two chars equal
+  and not a vowel -> drop one), applied ONLY to the plain-slice stems of ed/ing/est/er rules.
+  plan.md step 2.2 contract amended; worker resumed with the exact rule.
+
+STEP 2.2 Coverage engine lib/vocab.js
+  tier: WORKER (Sonnet)
+  did: lib/vocab.js — tokenize/baseForms/knownLemmaSet/coverage, pure ESM zero imports,
+       with undouble() doubled-consonant reduction per the mid-step amendment.
+       tests/vocab.test.js — fixture (known: dog/cat/run/big; learning: swim) + 8 assertions.
+  surprises: none (after amendment)
+  deviations: none
+  validation_first_try: yes (after amendment; original frozen algorithm was self-contradictory)
+  retries: 1 (the stopped-with-question cycle)
+  escalations: 0
+  tokens: worker=28562+32302 (two turns), checker=31071, orchestrator_delta=unavailable
+  interventions: 1 (unanswered-question: planner's frozen baseForms rules could not satisfy
+       the planner's own frozen fixtures; undouble rule added by orchestrator amendment)
+  audit: match, confidence high
+  commit: 204213b
+  accepted: 2026-07-24T13:14:06+03:00

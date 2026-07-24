@@ -336,6 +336,10 @@ band1.json is {meta, entries:[…]} (array — duplicate lemmas exist across PoS
   length ≥ 2: ends "ies"(len≥5)→stem+"y"; "es"(len≥4)→slice(0,-2); "s"(len≥4, not "ss")→
   slice(0,-1); "ied"(len≥5)→stem+"y"; "ed"(len≥4)→slice(0,-2) AND slice(0,-1);
   "ing"(len≥5)→slice(0,-3) AND slice(0,-3)+"e"; "est"(len≥5)→slice(0,-3); "er"(len≥4)→slice(0,-2).
+  AMENDED during 2.2 (planner bug — "running"→"runn", "bigger"→"bigg"): for every stem
+  produced by the plain-slice variants of the "ed", "ing", "er", "est" rules (not the +"e"/+"y"
+  variants), if the stem has length ≥ 3 and ends in a doubled non-vowel letter (last two chars
+  equal and ∉ {a,e,i,o,u}), ALSO add stem.slice(0,-1). Same ≥2-length guard applies.
   `knownLemmaSet(profile)` → Set of keys where words[k].status==="known" (missing words ⇒ empty).
   `coverage(text, profile)` → {total, known, unknown: sorted unique unknown tokens, ratio:
   total===0?0:known/total}; token known iff baseForms(token).some(b=>known.has(b)).
