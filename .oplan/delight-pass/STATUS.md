@@ -1,25 +1,35 @@
 # STATUS — run "delight-pass" (visual design pass)
 
-**Updated:** 2026-07-24 · **Where we are:** Phase 1 planned — generating the artwork next.
+**Updated:** 2026-07-24 · **Where we are:** ✅ Phase 1 done — **waiting for YOUR asset review.**
 
-The app is live and working (see `.oplan/first-build/`). This run makes it *beautiful*:
-real cartoon artwork in the style of the approved dragon-clinic test image, a written style
-rulebook, and a polished UI — with zero behavior changes (all 146 tests must stay green).
+All 8 artworks are generated and machine-validated, in `assets/delight/`:
+hero-clinic (cottage exterior) · chapter-clinic / chapter-forest / chapter-night (story
+banners) · heroine (girl + dragon) · placement-friend (purple mascot) · celebration ·
+words-treasure (gem jar). Style matches the approved dragon-clinic test image; character
+consistency holds across images.
 
 ```mermaid
 flowchart LR
-    P1[1 Generate 8 artworks] --> GATE{{OWNER reviews assets}} --> P2[2 Write style rulebook] --> P3[3 Integrate into app] --> P4[4 Deploy + verify live]
-    style P1 fill:#7c3aed,color:#fff
+    P1[1 Generate 8 artworks ✓] --> GATE{{OWNER review ⬅ NOW}} --> P2[2 Style rulebook] --> P3[3 Integrate] --> P4[4 Deploy]
+    style P1 fill:#0d9488,color:#fff
+    style GATE fill:#f59e0b,color:#000
 ```
 
-## What happens next
-1. Two worker agents drive Chrome → the dedicated ChatGPT chat and generate 8 images
-   (clinic, heroine, placement mascot, celebration, word-treasure, 3 chapter banners).
-2. **You review them** in `assets/delight/` — approve or ask for redos. Nothing is integrated
-   before your OK.
-3. Then: style doc → integration (tests stay green) → Vercel deploy.
+## What you need to do
+Open `assets/delight/` and look at the 8 images. Then either approve, or name the ones to
+redo (and what bothers you) — redos re-run through the same pipeline.
 
-## Rules this run cannot break
-- The service worker + its precache list: untouched (frozen by tests).
-- App colors stay the existing violet/teal/amber/cream palette (frozen by tests).
-- No Hebrew copy changes, no logic changes — visuals only.
+## Notable events this phase (details in journal.md)
+- One incident before step 1.1 acceptance: repeated Download clicks created 89 identical
+  copies in your Downloads. Audited, root-caused, protocol + validation hardened (click-once
+  rule, content-hash distinctness). A smaller 17-copy recurrence in 1.2 was caught by the
+  hardened machinery. All duplicates deleted (each md5-verified first); your Downloads has
+  no leftovers from this run.
+- The 1.2 executor twice mis-clicked ChatGPT's "Share conversation" — it reports both share
+  links deleted (Settings → Data controls → Shared links). Chat contains only cartoon
+  prompts. You may want to double-check that list.
+
+## After your approval
+Phase 2 writes `docs/visual-design.md` (binding style rules + asset usage map), Phase 3
+integrates everything with all 146 tests green, Phase 4 deploys to
+https://english-app-three-tan.vercel.app.
