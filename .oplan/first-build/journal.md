@@ -131,3 +131,26 @@ STEP 1.4 PWA app shell + design system
        contract strings verified byte-for-byte by auditor -> accepted without ceremony round 2
   commit: 16c1866
   accepted: 2026-07-24T12:44:36+03:00
+
+## 2026-07-24T12:49:33+03:00 — PHASE 1 GATE
+- Acceptance criteria: (1) clean-state `npm install && npm test` exit 0, 35/35 tests — PASS;
+  (2) one commit per step 1.1–1.5 in git log — PASS; (3) live dev-server round-trip:
+  /api/health {ok:true}, / serves RTL index, /api/profile creates+returns valid default
+  profile — PASS. Temporary .data/ from the manual check removed.
+
+PHASE 1 CLOSED
+  steps: 5, first-try passes: 3/5 (1.1 blocked by contract flaw it correctly reported;
+    1.4 one self-fixed retry — trailing comma in PRECACHE)
+  escalations: 0 (steps: none)
+  interventions: 4 (1.1 unanswered-question; 1.2 bad-spec wording; 1.3 unauthorized
+    empty-body choice -> ruling; 1.4 extra icon links -> accepted by amendment)
+  cost: worker=281212 tokens, checker=276931 tokens (incl. plan reviewer 52395),
+    planner=orchestrator main thread (delta unavailable), total subagent=558143 tokens.
+    Dollar figures: unavailable (harness reports tokens per subagent, not $).
+  orchestrator_context: unavailable from within the run (/context is a human UI command);
+    qualitative: well within budget, no compaction observed.
+  field_guide: 25/40 lines (within budget; promoted lessons 5–9 at this gate)
+  observation for the honesty clause: checker spend ≈ worker spend this phase. The auditor
+    caught 2 real defects (empty-body choice, unrequested icon links) and the plan reviewer 3;
+    escalation rule fired once and was correct. Machinery earning its keep so far, but
+    checker-cost parity is the number to watch.
