@@ -110,3 +110,24 @@ STEP 1.3 API endpoints: health + profile
   audit: match, confidence high (round 2)
   commit: 12dce41
   accepted: 2026-07-24T12:38:15+03:00
+
+STEP 1.4 PWA app shell + design system
+  tier: WORKER (Sonnet)
+  did: public/index.html (RTL shell, manifest/theme/Rubik, bottom nav 3 tabs, inline SVG
+       icons); public/styles.css (GC-6 tokens + cards/buttons/nav/empty-states);
+       public/app.js (hash router, active tab, SW registration); public/api.js (envelope
+       fetch wrappers); views home/placement/reader/words (Hebrew layouts per spec);
+       manifest.webmanifest; icons/icon.svg (amber paw on purple); sw.js (PRECACHE literal,
+       cache-first + api network-first); tests/shell.test.js (5 static checks).
+  surprises: none
+  deviations: none (worker); audit found 1 extra: favicon + apple-touch-icon links in head.
+       Ruling: accepted INTO spec by amendment (serves PWA polish; avoids favicon 404).
+  validation_first_try: no
+  retries: 1 (trailing comma in PRECACHE made it non-JSON; worker self-fixed)
+  escalations: 0
+  tokens: worker=44181, checker=42506, orchestrator_delta=unavailable
+  interventions: 1 (extra-work ruling -> spec amendment, no code change)
+  audit: mismatch round 1 (sole finding = the icon links); resolved by amendment; all other
+       contract strings verified byte-for-byte by auditor -> accepted without ceremony round 2
+  commit: 16c1866
+  accepted: 2026-07-24T12:44:36+03:00

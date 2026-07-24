@@ -184,7 +184,8 @@ static files and API routes.
 - **validation (frozen):** `npm test` → exit 0
 - **contracts:** GC-5, GC-6. `index.html`: `<html lang="he" dir="rtl">`, `<meta name="viewport">`
   mobile-correct, `<link rel="manifest" href="/manifest.webmanifest">`, theme-color `#7c3aed`,
-  Google Fonts Rubik preconnect+stylesheet link, single `<main id="app">`, bottom nav with 3
+  Google Fonts Rubik preconnect+stylesheet link, `<link rel="icon">` + `<link rel="apple-touch-icon">` pointing at `/icons/icon.svg`
+  (AMENDED during 1.4 audit — icon links accepted into spec), single `<main id="app">`, bottom nav with 3
   tabs — "הסיפור" (`#/reader`), "בית" (`#/home`), "המילים שלי" (`#/words`) — inline SVG icons,
   `<script type="module" src="/app.js">`. `app.js`: hash router mapping GC-5 routes to view
   modules, default `#/home`, active-tab highlighting, registers `/sw.js` on load.
