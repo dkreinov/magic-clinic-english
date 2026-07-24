@@ -217,3 +217,15 @@ STEP 2.2 Coverage engine lib/vocab.js
   audit: match, confidence high
   commit: 204213b
   accepted: 2026-07-24T13:14:06+03:00
+
+STEP 2.3 Profile word-mutation functions
+  tier: WORKER (Sonnet)
+  did: lib/profile.js — applyWordTap/markWordKnown added (purely additive; existing code
+       untouched). tests/profile-mutations.test.js — 7 cases per spec.
+  surprises: none · deviations: none
+  validation_first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=32315, checker=27868, orchestrator_delta=unavailable
+  interventions: 0
+  audit: match, confidence high (first round, clean)
+  commit: 251f76c
+  accepted: 2026-07-24T13:16:12+03:00
