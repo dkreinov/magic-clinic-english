@@ -205,3 +205,12 @@ STEP 3.1 sharp devDep + optimize-assets.js -> public/assets/*.webp (+ dev-server
   interventions: 0
   commit: (this commit)
   accepted: 2026-07-24
+
+STEP 3.2 styles.css global artwork classes + warm gradient
+  tier: WORKER (Sonnet) · validation_first_try: yes (146/146) · retries: 0 · escalations: 0
+  did: appended Delight artwork block (banner/spot classes, aspect-ratio, radius+shadow);
+       body background → warm gradient (3 frozen lines). 37+/1- exactly per contract.
+  surprises: none  deviations: none
+  tokens: worker=38279, checker=0 (audit: orchestrator byte-exact diff vs frozen contract,
+       zero degrees of freedom)
+  interventions: 0 · commit: (this commit) · accepted: 2026-07-24
