@@ -15,6 +15,7 @@ const MIME_TYPES = {
   '.webmanifest': 'application/manifest+json',
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
+  '.webp': 'image/webp',
   '.mp3': 'audio/mpeg',
 };
 
