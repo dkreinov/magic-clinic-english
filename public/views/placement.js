@@ -217,6 +217,7 @@ export async function render(container, ctx) {
     return `
       ${styleTag()}
       ${header("מבחן היכרות", "בואי נכיר")}
+      <img class="spot-image" src="/assets/placement-friend.webp" alt="" />
       <p class="card-subtitle" style="margin-bottom: 16px;">
         יש שתי משימות קצרות, כל אחת לוקחת רק כמה דקות. אפשר לעצור ולנוח בין המשימות.
       </p>
@@ -284,6 +285,7 @@ export async function render(container, ctx) {
     return `
       ${styleTag()}
       ${header("מבחן היכרות", "כל הכבוד!")}
+      <img class="celebrate-image" src="/assets/celebration.webp" alt="" />
       <p class="card-subtitle" style="margin-bottom: 6px;">כל הכבוד! סיימת את המשימה הראשונה.</p>
       <p class="card-subtitle" style="margin-bottom: 20px;">אפשר לנוח רגע.</p>
       <div class="placement-actions">
@@ -337,6 +339,7 @@ export async function render(container, ctx) {
     return `
       ${styleTag()}
       ${header("מבחן היכרות", "סיימת!")}
+      <img class="celebrate-image" src="/assets/celebration.webp" alt="" />
       <p class="card-subtitle" style="margin-bottom: 6px;">סיימת את המבחן!</p>
       <p class="card-subtitle" style="margin-bottom: 20px;">עכשיו הסיפור יתאים בדיוק לך.</p>
       <button class="btn btn-primary" type="button" data-action="go-reader">לסיפור</button>
