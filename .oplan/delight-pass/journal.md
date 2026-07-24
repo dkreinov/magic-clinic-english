@@ -228,3 +228,12 @@ STEP 3.4 placement.js intro friend + celebration x2
   surprises: none  deviations: none
   tokens: worker=37579, checker=0 (audit: orchestrator byte-exact diff vs contract)
   interventions: 0 · commit: (this commit) · accepted: 2026-07-24
+
+STEP 3.5 reader.js banner rotation + start hero + celebration + popup polish
+  tier: WORKER (Sonnet) · validation_first_try: yes (146/146) · retries: 0 · escalations: 0
+  did: CHAPTER_BANNERS map (0:night 1:clinic 2:forest, per visual doc) · start-story hero img ·
+       renderChapter: bannerName + chapter-banner img + celebrateHtml when all correct ·
+       popup slide-in + grab handle CSS in VIEW_STYLE. Diff = exactly the 4 contract deltas.
+  surprises: none  deviations: none
+  tokens: worker=44298, checker=0 (audit: orchestrator full-diff vs byte-exact contract)
+  interventions: 0 · commit: (this commit) · accepted: 2026-07-24
