@@ -82,9 +82,9 @@ test('second profile GET returns the persisted profile', async () => {
   });
 });
 
-test('profile POST returns 405', async () => {
+test('profile PUT returns 405', async () => {
   await withTempDataDir(async () => {
-    const { req, res } = createMockReqRes('POST');
+    const { req, res } = createMockReqRes('PUT');
     await profileHandler(req, res);
     assert.strictEqual(res.statusCode, 405);
     const parsed = JSON.parse(res.body);
