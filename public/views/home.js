@@ -1,9 +1,13 @@
 export function render(container) {
   container.innerHTML = `
+    <img class="hero-banner" src="/assets/hero-clinic.webp" alt="" />
+
     <header class="app-header">
       <p class="greeting">שלום!</p>
       <h1 class="app-title">מרפאת הקסמים</h1>
     </header>
+
+    <img class="spot-image" src="/assets/heroine.webp" alt="" />
 
     <section class="card" data-testid="placement-card">
       <div class="card-icon" aria-hidden="true">
