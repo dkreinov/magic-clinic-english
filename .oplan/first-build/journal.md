@@ -566,7 +566,7 @@ PHASE 4 CLOSED
   .env.local (OIDC + blob token; gitignored via CLI's own .gitignore edit — committed).
 
 ## 2026-07-24T15:35:49+03:00 — STEPS 5.2 + 5.3 [ORCH] DONE
-- 5.2 Deploy:  clean build in 3s (only benign engines warnings —
+- 5.2 Deploy: "vercel deploy --prod --yes" clean build in 3s (only benign engines warnings —
   D5 accepted; NO JSON-bundling errors: Phase-3 R4 proven). Production domain:
   https://english-app-three-tan.vercel.app (deployment-specific URLs are Vercel-auth
   protected by default; the canonical alias is public — recorded for the handoff doc).
