@@ -192,6 +192,7 @@ function resumeStage(profile) {
 export async function render(container, ctx) {
   let bank = null;
   let stage = "intro";
+  let task2Index = 0;
   const answers = { task1: [], task2: {} };
 
   async function boot() {
@@ -298,12 +299,12 @@ export async function render(container, ctx) {
   }
 
   function currentTask2Text() {
-    const doneIds = new Set(Object.keys(answers.task2));
-    return bank.task2.find((text) => !text.questions.every((q) => doneIds.has(q.id)));
+    return bank.task2[task2Index] ?? null;
   }
 
   function renderTask2() {
     const text = currentTask2Text();
+    if (!text) return renderError();
     const questionsHtml = text.questions
       .map((question) => {
         const selected = answers.task2[question.id];
@@ -433,10 +434,10 @@ export async function render(container, ctx) {
     const task2SubmitBtn = container.querySelector('[data-action="task2-submit"]');
     if (task2SubmitBtn) {
       task2SubmitBtn.addEventListener("click", async () => {
-        const text = currentTask2Text();
-        const isLastText = bank.task2[bank.task2.length - 1].id === text.id;
+        const isLastText = task2Index >= bank.task2.length - 1;
 
         if (!isLastText) {
+          task2Index += 1;
           draw();
           return;
         }
