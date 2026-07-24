@@ -290,3 +290,38 @@ PHASE 3 CLOSED
   not precached. Owner constraint "146 tests stay green / no logic change" preserved in
   spirit and letter EXCEPT the single test-string amendment, which is surfaced in STATUS and
   the final report for owner review.
+
+STEP 4.1 Production deploy (orchestrator)
+  Deployed twice (first invocation's output was truncated by tail, re-ran to capture — both
+  succeeded; final: dpl_EeaS8GEuYFvwAKsTuw9kDq1Uqw5M + the v2-cache redeploy after 4.1b).
+  Canonical https://english-app-three-tan.vercel.app: root 200, hero-clinic.webp 200
+  image/webp. Then the 4.1b incident + amendment (see above): sw.js CACHE -> magic-vet-v2 +
+  matching test string; 146/146 green; redeployed and aliased.
+
+STEP 4.2 Live verify (orchestrator, browser, READ-ONLY)
+  #/home: hero-clinic + heroine render on production (after one reload — SW v2 install+claim
+  cycle, expected PWA behavior). #/words: treasure empty state (word bank empty — profile
+  untouched). #/placement intro: placement-friend (test NOT started). Network: 4/4 webp GETs
+  200. Console: no production errors (only 2 pre-existing localhost extension artifacts).
+  Child's profile: never touched — no placement answers, no chapters, no word taps.
+
+PHASE 4 CLOSED
+  steps: 2 (+1 amendment step 4.1b), first-try passes: deploy yes; live-verify surfaced the
+    SW-staleness defect before close (the gate did its job)
+  escalations: 0 · interventions: 1 (contract amendment GC-D2/GC-D3: cache-version bump)
+  acceptance: 4.1 curls 200+image/webp ✓ · 4.2 three screens live with artwork, console clean ✓
+    · record consistent ✓
+
+RUN CLOSED — delight-pass
+  phases: 4 · accepted steps: 13 (1.1 1.2 · 2.1 2.2 · 3.1-3.7 3.8gate · 4.1 4.1b 4.2)
+  first-try validation passes: 13/13 (every failure was caught pre-acceptance)
+  escalations: 0 (Sonnet handled every worker step)
+  owner interventions: 2 gates (asset approval; duplicate-download halt) — both by design
+  orchestrator interventions: 3 (validation grep bug amend · 3.7 direct-write deviation ·
+    SW cache-version contract amendment)
+  incidents: 2 (89-duplicate download burst pre-1.1, audited + machinery hardened;
+    SW stale-shell on production, root-caused + fixed via versioned cache bump)
+  subagent tokens: workers=730101, checkers=155774, planners=174750, total=1060625
+  field_guide: 41/40 lines — overflow justified: the SW-update lesson (16) cannot be
+    compressed without losing the mechanism, and nothing older is safe to evict
+  orchestrator_context: unavailable mid-run (harness display not programmatically readable)

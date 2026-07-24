@@ -29,3 +29,6 @@ New this run:
     content (read_page) before every send; clear and retype if polluted.
 15. `grep -qF "$pat"` breaks when the pattern starts with `--` (parsed as a long option).
     Always write `grep -qF -- "$pat"` in validation commands (bit step 2.1's validation).
+16. Shipping ANY change to precached shell files REQUIRES bumping the CACHE version in
+    sw.js (+ its assertion string in tests/shell.test.js) — a byte-identical sw.js means
+    returning clients serve the old shell from cache FOREVER (bit phase 4 on production).
