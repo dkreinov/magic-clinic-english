@@ -190,3 +190,18 @@ PHASE 2 CLOSED
   before accepting (placement header strings "כל הכבוד!"/"סיימת!", dev-server '.png' MIME line
   17, "submit" action, words-ui.test.js existence, renderChapter body match). Accepted; written
   to plan.md in full. Planner tokens: 113429.
+
+STEP 3.1 sharp devDep + optimize-assets.js -> public/assets/*.webp (+ dev-server MIME)
+  tier: WORKER (Sonnet)
+  did: sharp ^0.35.3 devDependency; scripts/optimize-assets.js (frozen content, verbatim);
+       '.webp' MIME line in dev-server.js; 8 webp generated (960w landscape / 640w square,
+       34-88KB each — total ~495KB for all 8, well under budgets).
+  surprises: none  deviations: none
+  validation_first_try: yes (orchestrator clean-state re-run PASS, 146/146)
+  retries: 0  escalations: 0
+  tokens: worker=28441, checker=0 (audit: orchestrator line-by-line — contract specified all
+       text content byte-exactly, zero degrees of freedom; diff confirmed exact + nothing extra;
+       lock file npm-generated; binaries machine-validated)
+  interventions: 0
+  commit: (this commit)
+  accepted: 2026-07-24
