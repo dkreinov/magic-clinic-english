@@ -13,3 +13,6 @@ dist/
 *.log
 .DS_Store
 .data/
+
+.vercel
+.env*
