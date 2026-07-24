@@ -685,7 +685,10 @@ STEP 4.2 — lib/story.js (allowed set + gates + generation loop)
   non-goals: no HTTP/store/live calls. tier WORKER. depends 4.1, 2.1.
 
 STEP 4.3 — setLearner/logCheck + GC-3 A2
-  files: lib/profile.js (modify additive), tests/profile-learner.test.js. validation: npm test.
+  files: lib/profile.js (modify additive), tests/profile-learner.test.js,
+    tests/profile.test.js (modify — AMENDED during 4.3: ONLY add `checkLog: []` to the
+    expected literal in the exact-shape defaultProfile assertion; planner missed that A2
+    invalidates that Phase-1 test — field-guide lesson 11 pattern). validation: npm test.
   contracts: defaultProfile story gains checkLog:[]; validator: story.checkLog must be array
     if present; setLearner (trim, ''→throw 'name required', >24→'name too long', set only
     provided); logCheck pushes {chapter,questionId,chosenIndex,correctIndex,correct,at}.

@@ -447,3 +447,25 @@ STEP 4.2 Story orchestrator lib/story.js
        this run, not runtime immutability)
   audit: match, confidence high
   commit: d580015 · accepted: 2026-07-24T14:53:43+03:00
+
+## 2026-07-24T18:20+03:00 — STEP 4.3 INTERVENTION (unanswered-question / planner miss, lesson-11 pattern)
+- Executor stopped correctly: A2 (story.checkLog in defaultProfile) breaks Phase-1's
+  exact-shape deepStrictEqual test in tests/profile.test.js — outside its file list. Exactly
+  the field-guide lesson 11 class (Phase-4 planner missed it, as the Phase-2 planner did).
+- DECISION: single-assertion update authorized; tests/profile.test.js added to 4.3 write set
+  for exactly that change. plan.md amended; worker resumed.
+- Note: lesson 11 should be GENERALIZED in the field guide at the phase gate: any additive
+  schema/endpoint change → grep existing tests for exact-shape/method-guard assertions first.
+
+STEP 4.3 setLearner/logCheck + GC-3 A2
+  tier: WORKER (Sonnet)
+  did: lib/profile.js — checkLog in defaultProfile + validator (A2), setLearner (trim/throw
+       rules), logCheck (migration-safe append); tests/profile-learner.test.js (10 cases);
+       tests/profile.test.js single authorized literal update. 113/113.
+  surprises: none (after amendment) · deviations: none
+  validation_first_try: yes (after amendment) · retries: 0 · escalations: 0
+  tokens: worker=36851+36940, checker=26619, orchestrator_delta=unavailable
+  interventions: 1 (unanswered-question, lesson-11 pattern: A2 broke Phase-1 exact-shape
+       test; single-assertion update authorized)
+  audit: match, confidence high
+  commit: 4b62356 · accepted: 2026-07-24T14:56:55+03:00
