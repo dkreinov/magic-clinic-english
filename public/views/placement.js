@@ -24,7 +24,7 @@ const VIEW_STYLE = `
     border-radius: var(--radius);
     border: none;
     background: var(--color-teal);
-    color: white;
+    color: var(--color-primary-ink);
     font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
@@ -56,9 +56,10 @@ const VIEW_STYLE = `
   .placement-option-btn {
     min-height: 76px;
     border-radius: var(--radius);
-    border: 2px solid transparent;
+    border: 2px solid var(--color-border);
     background: var(--color-card);
     box-shadow: var(--shadow-soft);
+    color: var(--color-ink);
     font-size: 2rem;
     display: flex;
     align-items: center;
@@ -80,7 +81,7 @@ const VIEW_STYLE = `
 
   .placement-option-btn.selected {
     border-color: var(--color-primary);
-    background: color-mix(in srgb, var(--color-primary) 10%, white);
+    background: color-mix(in srgb, var(--color-primary) 14%, var(--color-card));
   }
 
   .placement-text-card {
@@ -117,9 +118,10 @@ const VIEW_STYLE = `
   .placement-question-option {
     min-height: 48px;
     border-radius: var(--radius);
-    border: 2px solid transparent;
+    border: 2px solid var(--color-border);
     background: var(--color-card);
     box-shadow: var(--shadow-soft);
+    color: var(--color-ink);
     font-size: 0.98rem;
     font-weight: 600;
     padding: 10px 16px;
@@ -134,7 +136,7 @@ const VIEW_STYLE = `
 
   .placement-question-option.selected {
     border-color: var(--color-primary);
-    background: color-mix(in srgb, var(--color-primary) 10%, white);
+    background: color-mix(in srgb, var(--color-primary) 14%, var(--color-card));
   }
 
   .placement-actions {
