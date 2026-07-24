@@ -1,42 +1,44 @@
 # STATUS — English learning app, run "first-build"
 
-**Updated:** 2026-07-24 14:30 · **Where we are:** Phase 2 CLOSED ✓ — planning Phase 3 of 5.
+**Updated:** 2026-07-24 16:50 · **Where we are:** Phase 3 CLOSED ✓ — planning Phase 4 of 5.
 
 ## What's happening right now
-**Phase 2 is done.** The app now has its learning brain: the official Ministry-of-Education
-word list (1,341 entries extracted from the real MoE PDF), a coverage engine that can measure
-what fraction of any English text she can read, and working tap-to-translate plumbing (tap a
-word → saved as "learning"; placement/review can mark it "known"). 61 tests green. A fresh
-planner is now planning Phase 3 — the placement test.
+**The placement test is built and works.** I clicked through it in a real browser: Hebrew
+intro → listen-and-pick-the-picture items with real TTS audio → picture-to-word items →
+two reading texts with Hebrew questions → deterministic scoring that writes her starting
+level and marks measured words as known. 88 tests green. A fresh planner is now planning
+Phase 4 — the story engine, the heart of the app.
 
 ## The road
 
 ```mermaid
 flowchart LR
-    P1[Phase 1<br/>Skeleton & app shell<br/>DONE ✓] --> P2[Phase 2<br/>Word data & profile engine<br/>DONE ✓]
-    P2 --> P3[Phase 3<br/>Placement test<br/>PLANNING]
-    P3 --> P4[Phase 4<br/>Story engine]
-    P4 --> P5[Phase 5<br/>Deploy to Vercel]
+    P1[Phase 1<br/>Shell ✓] --> P2[Phase 2<br/>Words & profile ✓]
+    P2 --> P3[Phase 3<br/>Placement ✓]
+    P3 --> P4[Phase 4<br/>Story engine<br/>PLANNING]
+    P4 --> P5[Phase 5<br/>Deploy]
     style P1 fill:#0d9488,color:#fff
     style P2 fill:#0d9488,color:#fff
-    style P3 fill:#f59e0b,color:#000
+    style P3 fill:#0d9488,color:#fff
+    style P4 fill:#f59e0b,color:#000
 ```
 
+## ⚠ Needs the owner — IMPORTANT
+**`docs/item-bank-review.md` — REQUIRED BEFORE SHE USES THE TEST (~30 min).** Every test
+item, translation, emoji, audio clip and marked answer is laid out for your review with
+checkboxes. Two known weak spots are flagged for you: item t1-06 (desk → 🧑‍💻, translation
+says "שולחן") and t1-04 (fan → 🌀). This does not block the build — Phases 4–5 continue.
+
 ## Decisions locked so far (the big ones)
-- No build tools; PWA + Vercel functions; profile = one JSON document (Blob in prod).
-- App name **"מרפאת הקסמים"**; purple/teal/amber; Hebrew RTL UI.
-- Word bank starts EMPTY — nothing is assumed known until measured (the founding-failure fix).
-- Coverage counts only mastered ("known") words toward the 95–98% readability target.
-- Heads-up discovered in planning: the MoE PDF has NO frequency data (design.md §3 implied it
-  does) — item ordering in Phase 3 will use Pre-Band/Band + productive/receptive signals.
+- Placement: 12 word items (6 with audio) + 2 reading texts, fixed sets, pausable, no
+  right/wrong feedback during the test; answer keys never leave the server.
+- Level bands from scores: <50% → Pre-A1, 50–79% → A1, ≥80% → A2 (heuristic; you can
+  recalibrate in the review doc).
+- Only correctly-answered placement words are marked "known" — nothing is assumed.
 
-## Phase 1+2 numbers
-9 steps, 0 escalations, 7 interventions (2 were real planner bugs the escalation rule caught
-before any wrong code was written), ~997k subagent tokens total.
-
-## Needs the owner (not blocking yet)
-- Phase 3 produces the placement item bank — you review it (~30 min) before she uses it.
+## Phase totals so far
+14 steps · 0 escalations · ~2.1M subagent tokens · every step audited & committed.
 
 ## Risks being watched
-- Placement item pictures: likely emoji/inline-SVG at launch (decided in Phase 3 planning).
+- Story generation keeping to ≥95% known words (Phase 4, next — the core constraint).
 - Profile on a public-URL Blob (no real name stored; revisit in Phase 5).

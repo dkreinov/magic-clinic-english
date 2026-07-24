@@ -383,3 +383,31 @@ STEP 3.5 Owner review doc
   audit: mismatch round 1 on formalities only; accepted by amendment; facts verified clean
   commit: 06348cf
   accepted: 2026-07-24T14:06:23+03:00
+
+## 2026-07-24T14:07:44+03:00 — PHASE 3 GATE
+- AC1 clean-state install+test: exit 0, 88/88 — PASS. AC2 bank lint (in suite) — PASS.
+  AC3 audio files exist/sized (in suite) + live serve check (word-pet.mp3, 12288B) — PASS.
+  AC4/AC5 scoring + API persistence (in suite) + live GET /api/placement stripped (zero
+  "correctIndex") — PASS. AC6 five step commits + review doc with banner — PASS.
+- Manual DOM verification (Playwright, real browser): intro screen renders per spec; task1
+  a2p item shows progress "שאלה 1 מתוך 12", play button, 2x2 emoji grid; tapping an option
+  advances with NO feedback; item 2 options match the bank. UI clean/polished per GC-6.
+  Screenshot captured. .data cleaned after check.
+
+PHASE 3 CLOSED
+  steps: 5, first-try passes: 4/5 clean validation (3.1 needed one generator-engineering
+    retry); audits: 3 first-round match, 2 mismatch rounds resolved (3.1 tooling fixes;
+    3.5 formalities accepted by amendment)
+  escalations: 0
+  interventions: 3 (3.1 audit fixes; 3.3 void finding — my abbreviation slip again;
+    3.5 formalities amendment)
+  cost: worker=343174, checker=269014, planner=89067 (Opus), total subagent=701255 tokens.
+    Dollar figures: unavailable. One-time OpenAI content spend: 2-4 chat calls + 6 TTS calls.
+  orchestrator_context: unavailable from within the run; qualitative: mid-session, healthy.
+  field_guide: 25/40 + 2 = within budget (no new promotions this gate — lessons 10/11 added
+    during phase; nothing new to promote).
+  honesty note: the auditor's byte-level cross-check of the review doc against the bank
+    (12 rows + 6 answers, zero factual errors found) is exactly the check a tired human
+    skips; checker layer continues to earn its cost.
+  OWNER GATE (not run-blocking): docs/item-bank-review.md must be reviewed and signed off
+    BEFORE the child uses the placement test. Flagged in STATUS.
