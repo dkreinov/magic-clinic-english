@@ -23,3 +23,7 @@
     (Readable.from([Buffer.from(json)])) — string chunks crash Buffer.concat.
 11. When a step adds a NEW METHOD to an existing endpoint, check existing tests for
     now-obsolete method-guard assertions (Phase 1's POST-405 case broke Phase 2's 2.4).
+12. Before ANY additive schema field or new endpoint method: grep tests/ for exact-shape
+    (deepStrictEqual) and method-guard assertions — they WILL break (bit steps 2.4 and 4.3).
+13. Git Bash curl mangles Hebrew in -d arguments (console encoding). POST Hebrew via Node
+    scripts or the browser; never assert Hebrew round-trips through shell-quoted curl.

@@ -709,6 +709,19 @@ STEP 4.4 — api/chapter.js + api/translate.js + profile actions
     withTempDataDir + Readable-of-Buffer; resetTransport in finally.
   non-goals: no UI; no lib/data/sw changes; key never in public/. tier WORKER. depends 4.2/4.3/2.4.
 
+STEP 4.6 — Cold-start amendment A3 (added at the phase gate after AC5 live-smoke failure)
+  files: lib/story.js (modify), tests/story.test.js (modify — add cases). validation: npm test.
+  contracts: (a) buildAllowedSet(profile, band1) ALSO adds String(x).toLowerCase() of
+    learner.heroineName and learner.petName when each is a non-empty string; (b) if
+    profile.skills.receptiveVocab.band === "A1" || === "A2" -> add ALL band1 entry lemmas
+    (both sections); band preA1 or null -> preBandI only (unchanged); (c) verifyChapter:
+    before coverage, normalize a COPY of the text: replace /[‘’]/g with "'" then
+    strip possessives /'s/g; coverage/tokens computed on the normalized copy (structural +
+    evidence checks still use the original text). Tests: names in set; A2 profile -> bandI
+    lemma present; preA1 -> absent; possessive normalization case (text with "Sparkle's"
+    passes when "sparkle" allowed).
+  non-goals: no prompt changes, no API/UI changes. tier WORKER. depends 4.2.
+
 STEP 4.5 — Reader + Words views
   files: public/views/reader.js (rewrite), public/views/words.js (rewrite),
     tests/reader-ui.test.js, tests/words-ui.test.js. validation: npm test.

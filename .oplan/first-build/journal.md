@@ -483,3 +483,69 @@ STEP 4.4 API: chapter, translate, profile actions
        setLearner/logCheck)
   audit: match, confidence high
   commit: d10beed · accepted: 2026-07-24T15:01:35+03:00
+
+## 2026-07-24T19:10+03:00 — STEP 4.5 AUDIT ROUND 1: mismatch (real logic bug)
+- Auditor caught by CODE READING what the static string-tests cannot: wrong answer sets
+  answered=true + disables all options -> question locks forever -> "המשך הסיפור" unreachable.
+  Spec requires retry-until-right. Also: normalizeWord kept apostrophes (spec: letters only).
+- Worker resumed with both fixes (log-check still fires on first choice only). Re-audit next;
+  second mismatch on this step would stop the run.
+
+## 2026-07-24T19:50+03:00 — PHASE 4 GATE: AC5 LIVE SMOKE FAILED -> AMENDMENT A3 (orchestrator)
+- Real gpt-4.1-mini chapter failed verification 3x (502 degrade worked as designed). Diagnosis
+  (direct probe): ratio 0.65. Three causes: (1) learner-chosen names Luna/Sparkle counted
+  unknown (~10% of tokens); (2) unicode possessive "Sparkle's" -> stray "s" token; (3) D1
+  floor (preBandI only) is below the model's natural register (happy/head/look/must/small/
+  want/will are bandI) — while THIS profile measured A2 in placement, and design §3 says
+  placement is the prior.
+- AMENDMENT A3 (frozen): (a) buildAllowedSet also adds lowercased learner.heroineName/petName
+  when non-empty; (b) if skills.receptiveVocab.band is "A1" or "A2", the floor becomes ALL
+  band1 lemmas (both sections) — band-aware prior; preA1/null keeps preBandI only; (c)
+  verifyChapter normalizes text before coverage: unicode apostrophes -> ascii, then strip
+  possessive /'s\b/ (possessives tolerated at verification; no-contraction prompt rule
+  stands).
+- Empirical check of A3 against the failing chapter: ratio 0.962, unknown = glow/nervous/
+  suddenly (exactly the 2-5% glossed-new-words band). NOT the founding failure: the bandI
+  floor activates only on a MEASURED A1/A2 placement band.
+- Dispatching as step 4.6 to the 4.2 worker.
+
+## 2026-07-24T20:20+03:00 — PHASE 4 GATE round 2: ratio 0.9487 + partial glossary -> AMENDMENT A4
+- Post-A3 probe: ratio 0.9487 (4 unknown / 78 tokens, one word short) and the model glossed
+  only some off-list words — a passing-ratio chapter can still fail if 2-3 new words lack
+  glosses.
+- AMENDMENT A4 (frozen): (1) buildPrompt system gains: "You may use AT MOST 3 words that are
+  not on the ALLOWED WORD LIST. Every word not on the list MUST have an entry in the
+  glossary." (2) generateChapter: when a candidate fails ONLY on glossary-coverage errors
+  (ratio/structure/evidence all pass), auto-repair: per missing word, call the injected chat
+  with the translate-one-word prompt (temp 0, catch->skip), append {word,he}, re-verify once;
+  same attempt, no extra generation. Coverage gate (>=0.95) UNCHANGED.
+- Rationale: keeps design's comprehensibility promise and the mechanical guarantee that every
+  unknown word is tappable; removes the brittlest failure mode without weakening any gate.
+
+## 2026-07-24T15:25:10+03:00 — PHASE 4 GATE (round 3): PASSED
+- AC1 clean install+test 146/146 (after A3/A4) — PASS. AC2-AC4 in suite — PASS.
+- AC5 LIVE SMOKE — PASS: real gpt-4.1-mini chapter in 7.8s FIRST attempt: 74 words, ratio
+  0.973, 10-entry Hebrew glossary, 3 grounded questions, cliffhanger ("Luna and Sparkle").
+  Browser-verified: reader renders chapter LTR; micro-check wrong answer -> "לא נורא, ננסה
+  שוב" + retry stays open (the audited fix works live); 3 correct answers -> "המשך הסיפור";
+  words view: 14 words, lastSeen-desc, correct badges. Tap-to-translate popup's POST path
+  verified via API (the physical tap gesture flagged as an owner first-use check — word spans
+  carry no a11y refs for automation). 502 degrade observed live in rounds 1-2 (by design).
+- AC6 commits per step (4.1-4.7) — PASS.
+- Known display artifact: Git Bash curl mangles Hebrew in -d args (console encoding) — test
+  clients must POST Hebrew via Node/browser, never shell-quoted curl. Promoted to field guide.
+
+PHASE 4 CLOSED
+  steps: 7 (5 planned + 2 gate-driven amendment steps 4.6/4.7)
+  first-try passes: 5/7 clean; interventions: 4 (4.3 lesson-11 question; 4.5 real UI logic
+    bug caught by auditor CODE READING; A3+A4 gate-driven design amendments)
+  escalations: 0
+  cost: worker=517902, checker=291904, planner=124466 (Opus), total subagent=934272 tokens.
+    Live OpenAI spend: ~6 generation calls + probes (trivial).
+  orchestrator_context: unavailable from within run; qualitative: long session, still coherent;
+    continuous mode as instructed.
+  field_guide: promoting 2 lessons at this gate (12: schema/method changes invalidate
+    exact-shape tests — grep first; 13: curl+Hebrew mojibake).
+  honesty note: the live gate caught TWO real design flaws (names/floor cold-start; partial
+    glossaries) that 146 green mocked tests could not. The single most valuable check in the
+    run so far was AC5's "run it for real once".
