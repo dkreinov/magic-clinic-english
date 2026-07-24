@@ -33,35 +33,67 @@ The recurring cast, established by the anchor image and carried through the asse
 The audience is an 11-year-old: the tone must be charming and adventurous — **never babyish,
 never pitched younger than 11**.
 
-## 3. Color palette (tokens to artwork)
+## 3. Color palette (tokens to artwork) — AMENDED 2026-07-24
+
+**Amendment (warm-dark re-theme, 2026-07-24):** the app moved off the light cream surface
+onto the artwork's own deep warm palette, so the illustrations bleed into the page instead of
+sitting as dark boxes on a pale ground. Every value below was sampled from
+`public/assets/*.webp` (or lightened along a sampled hue to clear the accessibility gate). All
+8 `public/assets/*.webp` were decoded, resized to a common grid, and analysed by quantised
+color-bucket population, per-asset brightest-0.5% / darkest-2% luminance bands, and HSL band
+means over saturated pixels; percentages below are share of all sampled pixels.
 
 Source: `public/styles.css` `:root` block, cross-checked against plan.md contract GC-D1.
 
-| Token | Value | Role | How it reads in the artwork |
+| Token | Value | Role | Sampled from |
 |---|---|---|---|
-| `--color-primary` | `#7c3aed` | Primary violet; also the PWA theme color (`<meta name="theme-color">` in `public/index.html`) | The clinic's magic-accent violet — potion glows, sparkles, primary UI chrome matching the artwork's violet accents |
-| `--color-teal` | `#0d9488` | Teal accent | The baby dragon's signature color and the clinic's foliage/vine teal |
-| `--color-accent` | `#f59e0b` | Amber accent | Golden-hour lantern light, warm highlights, treasure/reward glow |
-| `--color-bg` | `#faf7f2` | Warm cream background | The warm cream that the whole cartoon palette sits on |
-| `--color-ink` | `#1f2937` | Body/ink text color | Dark neutral ink, unrelated to artwork hue but keeps text readable against the warm palette |
-| `--radius` | `16px` | Corner radius for cards/buttons/inputs | Soft, rounded, cozy shapes to match the illustration's soft-painterly rendering |
+| `--color-primary` | `#c39bf0` | Primary violet accent — buttons, links, primary UI chrome | mean saturated violet `#7d35b5`, lightened along its own hue to clear AA on the new surfaces |
+| `--color-teal` | `#4ecec0` | Teal accent — the baby dragon's signature color, secondary UI accents | mean saturated teal `#2db1a2`, lightened along its own hue to clear AA on the new surfaces |
+| `--color-accent` | `#f5c563` | Amber accent — golden highlights, treasure/reward glow, callouts | mean saturated gold highlight `#eec65a` (mean saturated amber overall is `#da903a`), lightened to clear AA on the new surfaces |
+| `--color-bg` | `#241305` | Page background — the deep warm ground the artwork now sits on | between the darkest-2%-of-pixels band (`#0a0903`–`#2e1207` across the 8 assets) and the `#281605` bucket (1.94%) |
+| `--color-ink` | `#fdf1d8` | Body/ink text color — primary readable text on the dark ground | the brightest-0.5% "glow" means, `#fcefd0` (heroine) and `#fdf8d9` (words-treasure) |
+| `--radius` | `16px` | Corner radius for cards/buttons/inputs | not a color — carried over unchanged from the light-cream era |
+| `--color-primary-ink` | `#2a1606` | Text/icon color used on top of `--color-primary`-colored surfaces (e.g. filled buttons) | the darkest-2% band of the square assets (`#240e0d`, `#2e1207`) |
+| `--color-muted` | `#d9bc92` | Muted/secondary text color | mean of the art's soft warm tan pixels `#c0a57b`, lightened along its own hue to clear AA on the card surface |
+| `--color-card` | `#3a1d08` | Card surface background | the single most populous color bucket across all 8 assets, `#381704` (3.07%) |
+| `--color-surface-2` | `#4d2a0e` | Secondary surface — raised/alternate panels distinct from cards | the `#482507` bucket (1.76%) |
+| `--color-border` | `#a35d22` | Border color for cards, inputs, dividers | mean of the art's mid warm surface band `#6c340c`, lightened along its own hue to clear the 3:1 non-text gate |
+| `--color-nav` | `#2e1806` | Bottom nav background | midpoint of the two dominant field buckets `#281605` and `#381704` |
+| `--color-danger` | `#ef9a7d` | Danger/error state color | mean saturated warm-red/terracotta `#b05525`, lightened along its own hue to clear AA and stay distinct from the amber accent |
+| `--color-glow` | `#fde3a2` | Glow/highlight color for sparkle and celebratory effects | the brightest-0.5% glow of `celebration.webp`; range across assets is `#fde3a2`–`#fef3a1` |
+| `--shadow-soft` | `0 0 0 1px rgba(253, 227, 162, 0.10), 0 4px 14px rgba(0, 0, 0, 0.45)` | Elevation shadow for cards/raised elements | rebuilt for a dark ground: a 10%-opacity glow-colored (`#fde3a2`) 1px ring plus a deeper black drop shadow, because the old light-theme shadow is invisible on a dark surface |
+| `--nav-height` | `68px` | Bottom nav height | not a color — carried over unchanged from the light-cream era |
+| `--transition-fast` | `150ms ease` | Fast UI transition timing | not a color — carried over unchanged from the light-cream era |
 
-Additive tokens (also defined in `:root`, not part of the GC-D1-frozen five but part of the
-same system):
+### Superseded (light-cream era, pre-2026-07-24)
 
-| Token | Value |
+These values are SUPERSEDED and must not be reintroduced.
+
+| Token | Old value |
 |---|---|
+| `--color-primary` | `#7c3aed` |
+| `--color-teal` | `#0d9488` |
+| `--color-accent` | `#f59e0b` |
+| `--color-bg` | `#faf7f2` |
+| `--color-ink` | `#1f2937` |
 | `--color-primary-ink` | `#ffffff` |
 | `--color-muted` | `#6b7280` |
 | `--color-card` | `#ffffff` |
 | `--shadow-soft` | `0 2px 8px rgba(0, 0, 0, 0.08)` |
-| `--nav-height` | `68px` |
-| `--transition-fast` | `150ms ease` |
 
-**GC-D1 rule:** the six token names `--color-primary --color-teal --color-accent --color-bg
---color-ink --radius` must stay defined in `public/styles.css` (frozen by `shell.test.js`);
-the values `#7c3aed` (primary/theme) and `#faf7f2` (bg) are additionally frozen by the
-manifest test. Test-frozen names and values may not change. NEW tokens may be added.
+**GC-D1 rule (amended):** the six token names `--color-primary --color-teal --color-accent
+--color-bg --color-ink --radius` must stay defined in `public/styles.css` (frozen by
+`shell.test.js`). `#7c3aed` and `#faf7f2` are no longer CSS values — they survive only as the
+PWA splash/chrome colors in `public/manifest.webmanifest`, which `tests/shell.test.js`
+asserts. NEW tokens may be added.
+
+### Accessibility gate
+
+The app is used by an 11-year-old, so every text/background pair must meet WCAG AA — at
+least 4.5:1 for body text, at least 3:1 for large text (>= 1.5rem, or >= 1.2rem bold) — and
+non-text control borders must meet 3:1 per WCAG 1.4.11. `node scripts/check-contrast.mjs`
+enforces this mechanically over 28 pairs, reads its token values live from `public/styles.css`,
+and must exit 0.
 
 ## 4. Typography
 
@@ -206,6 +238,6 @@ Source: plan.md GC-D1/GC-D2/GC-D5/GC-D6/GC-D8 + design.md §7.
   character reliably, which is why the app relies on a fixed, pre-generated asset library
   instead.
 - Touch `public/sw.js` or its PRECACHE list; it is untouchable and frozen by a test (GC-D2).
-- Change the test-frozen token values.
+- Reintroduce the superseded light-cream values (§3), or ship a text/background pair that fails the §3 accessibility gate.
 - Pitch anything younger than 11 — the direction must stay charming and adventurous, never
   babyish.
