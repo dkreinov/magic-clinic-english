@@ -368,3 +368,18 @@ STEP 3.4 Placement UI flow
   audit: match, confidence high (first round)
   commit: c3a2455
   accepted: 2026-07-24T14:03:03+03:00
+
+STEP 3.5 Owner review doc
+  tier: WORKER (Sonnet)
+  did: docs/item-bank-review.md — banner, intro, 12-row fact-checked task1 table, weak-spot
+       callouts (t1-06 desk, t1-04 fan), both texts + 6 answered questions, safe-edit guide,
+       sign-off.
+  surprises: none · deviations: none
+  validation_first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=39667, checker=33321, orchestrator_delta=unavailable
+  interventions: 1 (two over-literal audit findings — 4 sentences vs "2-3", extra audio-path
+       column — ACCEPTED into spec by amendment; auditor fact-checked all 12 rows + 6 answers
+       against the bank: zero factual mismatches)
+  audit: mismatch round 1 on formalities only; accepted by amendment; facts verified clean
+  commit: 06348cf
+  accepted: 2026-07-24T14:06:23+03:00
