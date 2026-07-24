@@ -294,6 +294,84 @@ test('generateChapter gives up after maxAttempts when chat always returns a too-
   assert.ok(prompts[1].user.includes('DO NOT USE THESE WORDS'));
 });
 
+const TRANSLATE_SYSTEM = 'Translate ONE English word to a single common Hebrew word. Respond ONLY with JSON {"he": "..."}.';
+
+test('generateChapter repairs a partial glossary in-attempt via one-word translate calls', async () => {
+  const profile = makePlacedProfile();
+  const band1 = loadBand1();
+  const calls = [];
+  let generationCalls = 0;
+  let translateCalls = 0;
+
+  async function chat({ system, user, temperature }) {
+    calls.push({ system, user, temperature });
+    if (system === TRANSLATE_SYSTEM) {
+      translateCalls++;
+      assert.strictEqual(user, 'hurt');
+      return { he: 'תרגום' };
+    }
+    generationCalls++;
+    const raw = goodChapterFixture();
+    return {
+      title: raw.title,
+      text: raw.text,
+      cliffhanger: raw.cliffhanger,
+      summarySoFar: 'summary so far',
+      // missing the "hurt" glossary entry on purpose; "old" stays covered
+      glossary: raw.glossary.filter((g) => g.word !== 'hurt'),
+      questions: raw.questions.map(({ id, ...rest }) => rest),
+    };
+  }
+
+  const result = await generateChapter({ profile, band1, chat });
+
+  assert.strictEqual(result.ok, true, `expected ok, got ${JSON.stringify(result)}`);
+  assert.ok(
+    result.chapter.glossary.some((g) => g.word === 'hurt' && g.he === 'תרגום'),
+    `expected a repaired glossary entry for "hurt", got ${JSON.stringify(result.chapter.glossary)}`
+  );
+  assert.ok(result.chapter.coverageRatio >= 0.95);
+  assert.strictEqual(generationCalls, 1);
+  assert.strictEqual(translateCalls, 1);
+  assert.strictEqual(calls.length, 2);
+});
+
+test('generateChapter does not attempt glossary repair when the chapter also fails coverage', async () => {
+  const profile = makePlacedProfile();
+  const band1 = loadBand1();
+  const calls = [];
+
+  async function chat({ system, user, temperature }) {
+    calls.push({ system, user, temperature });
+    return {
+      title: 'Too Hard',
+      text: 'The extraordinary veterinarian meticulously examined the peculiar creature with unprecedented diligence and thorough compassion under fluorescent illumination inside the laboratory.',
+      cliffhanger: 'Something happened.',
+      summarySoFar: 'irrelevant',
+      glossary: [],
+      questions: [
+        {
+          prompt: 'שאלה אחת?',
+          options: ['א', 'ב', 'ג', 'ד'],
+          correctIndex: 0,
+          evidence: 'The extraordinary veterinarian meticulously examined the peculiar creature with unprecedented diligence and thorough compassion under fluorescent illumination inside the laboratory.',
+        },
+        {
+          prompt: 'שאלה שתיים?',
+          options: ['ה', 'ו', 'ז', 'ח'],
+          correctIndex: 1,
+          evidence: 'The extraordinary veterinarian meticulously examined the peculiar creature with unprecedented diligence and thorough compassion under fluorescent illumination inside the laboratory.',
+        },
+      ],
+    };
+  }
+
+  const result = await generateChapter({ profile, band1, chat, maxAttempts: 1 });
+
+  assert.strictEqual(result.ok, false);
+  assert.ok(!calls.some((c) => c.system === TRANSLATE_SYSTEM), 'expected no translate calls for a ratio-failing chapter');
+});
+
 test('buildPrompt fills in names and assembles allowed list, summary, cliffhanger, and forbidden words', () => {
   const profile = makePlacedProfile();
   const { system, user } = buildPrompt({
@@ -312,4 +390,21 @@ test('buildPrompt fills in names and assembles allowed list, summary, cliffhange
   assert.ok(user.includes('STORY SO FAR:\nNoa started her apprenticeship.'));
   assert.ok(user.includes('CONTINUE FROM THIS CLIFFHANGER:\nA shadow moved in the cave.'));
   assert.ok(user.includes('DO NOT USE THESE WORDS (they failed the vocabulary check):\nextraordinary'));
+});
+
+test('buildPrompt system contains the at-most-3-words glossary rule verbatim', () => {
+  const profile = makePlacedProfile();
+  const { system } = buildPrompt({
+    profile,
+    allowedList: ['a', 'the', 'dragon'],
+    previousSummary: '',
+    previousCliffhanger: '',
+    n: 1,
+    forbidden: [],
+  });
+
+  assert.ok(
+    system.includes('You may use AT MOST 3 words that are not on the ALLOWED WORD LIST. Every word not on the list MUST have an entry in the glossary.'),
+    'expected the glossary-repair rule sentence verbatim in the system prompt'
+  );
 });
