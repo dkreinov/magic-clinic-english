@@ -25,3 +25,7 @@ New this run:
     Downloads is polluted with duplicates, the "newest file" heuristic grabs stale bytes.
 13. Any validation over generated assets must assert CONTENT distinctness (md5 across all
     assets + anchor), not just per-file format/aspect — duplicate grabs pass per-file checks.
+14. ChatGPT's composer sometimes prepends stray em-dashes to typed text — verify composer
+    content (read_page) before every send; clear and retype if polluted.
+15. `grep -qF "$pat"` breaks when the pattern starts with `--` (parsed as a long option).
+    Always write `grep -qF -- "$pat"` in validation commands (bit step 2.1's validation).
