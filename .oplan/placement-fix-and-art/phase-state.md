@@ -1,5 +1,5 @@
-CURRENT: phase 1 SHIPPED+LIVE · phase 2 (content fix) DONE in repo · phase 3 (images) BLOCKED,
-  run PAUSED for owner decision on the generation method
+CURRENT: phase 1 SHIPPED+LIVE · phase 2 (content fix) DONE in repo · phase 3 (images) BLOCKED by
+  an OpenAI OUTAGE (both API and web paths dead) · run STOPPED at owner instruction after checks
 BASELINE (phase 1): 04267f5
 PLAN: .oplan/placement-fix-and-art/plan.md
 ACCEPTED: 1.1 51854ec · 1.2 harness proof · 1.3 306f11f (deployed english-19wjsaomy, LIVE) ·
@@ -13,12 +13,14 @@ FROZEN CONTRACTS IN FORCE:
 OPEN QUESTIONS:
   1. RESOLVED: images approved via the ChatGPT dedicated-chat pipeline.
   2. RESOLVED: swap horse distractor for camp — done (2.1).
-  3. NEW / BLOCKING: the dedicated ChatGPT chat won't load ("content unavailable" then stalls),
-     though ChatGPT itself is up and logged in. How to proceed with the 12 icons? — OWNER
-     Options: (a) retry the dedicated chat later / from a fresh session with a stable browser;
-     (b) generate in a NEW chat, re-uploading the local anchor image (deviates from "the ONE
-     chat" the owner named, so it needs an OK); (c) reconsider the scripted OpenAI-API method,
-     which is not browser-dependent. Everything else for phase 3 is frozen and ready.
+  3. RESOLVED as to METHOD (owner approved scripted API, then approved the web fallback), but
+     NOW BLOCKED BY AVAILABILITY: an active OpenAI incident ("Elevated error rates") has Login,
+     Images, Sites, Responses and ~18 other components degraded. The API 500s on every endpoint
+     with a valid key; a new ChatGPT chat accepts the prompt but never returns an image (~4 min).
+     Owner also directed RICH scenes (not icon tiles) — prompts already re-frozen accordingly.
+     NEXT ACTION: wait for status.openai.com to go green, then run Phase 3 as a proper oplan step.
+     NOTE/RETRACTION: an earlier entry blamed the owner's account/billing. That was wrong — see
+     journal CORRECTION #2. Do not go hunting through billing.
 BLOCKED: YES — phase 3 image generation cannot start until OPEN QUESTION 3 is answered. Phases
   1–2 are complete; the urgent bug is fixed and live. (Prior note retained:) Phase 3 spends the owner's OpenAI credit.
 SCOPE CORRECTION since the plan was written: 12 unique concepts need artwork, not 11 — items

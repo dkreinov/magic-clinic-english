@@ -266,3 +266,54 @@ CORRECTION TO THE RUN: Phase 3 has NOT been dispatched. When the API question is
 generator ships as a real oplan step: a committed script under `scripts/`, a frozen validation
 (12 masters exist, square, content-distinct by md5), an executor packet, and a fresh-eyes audit.
 No image generation happens outside that.
+
+## 2026-07-25 — CORRECTION #2 (the decisive evidence) + WEB-PATH FEASIBILITY TEST
+
+### I was wrong to point at the owner's account. It IS an OpenAI outage.
+
+Last entry I said the 500s pointed at "something specific to this key / project / account
+(billing, quota, project config)" and that the owner should check platform.openai.com billing.
+**That advice was wrong. Retract it.** The owner then hit an auth failure on OpenAI's own login
+page, whose payload decodes to:
+
+    {"kind": "AuthApiFailure", "errorCode": "primaryapi_server_error", ...}
+
+and `status.openai.com/api/v2/summary.json` reports an ACTIVE INCIDENT ("Elevated error rates",
+investigating) with ~22 components in `degraded_performance`, explicitly including **Login**,
+**Images**, **Sites**, **Responses**, **Conversations**, **Files** and **Embeddings**.
+
+Why my invalid-key control test misled me: an INVALID key is rejected at the edge (fast 401, no
+backend lookup), while a VALID key requires the primary API to resolve the account — and the
+primary API is exactly what is erroring. So "garbage key -> clean 401" and "real key -> 500" are
+fully consistent with their outage, and are NOT evidence of an account problem. The control test
+was sound; my inference from it was not. Lesson for the field guide: an auth-layer control test
+only distinguishes edge-rejection from backend-resolution — it cannot, on its own, tell you whose
+fault a 500 is.
+
+### WEB-PATH FEASIBILITY TEST (owner-directed: "use the web option")
+
+Owner approved falling back to the browser/ChatGPT route. Tested it properly rather than assuming:
+- chatgpt.com loads, account logged in (Plus), composer functional.
+- Opened a NEW chat, typed the frozen `pet` rich prompt, verified the composer content before
+  sending (delight-pass lesson: stray em-dash injection), sent it.
+  Chat: https://chatgpt.com/c/WEB:9a715deb-bfbd-4588-92f4-dc13acd7af2c
+- RESULT: after ~4 minutes the response is still generating, zero images rendered, and the
+  sidebar again shows "Unable to load projects". Consistent with Images + Sites degraded.
+
+CONCLUSION: BOTH paths to image generation (API and web) are blocked by the same OpenAI incident.
+This is not a method problem — it is an availability problem, and no choice of method fixes it.
+The correct action is to WAIT for the incident to clear, not to keep retrying or to switch tools.
+
+### RUN STATE — STOPPED HERE BY OWNER INSTRUCTION ("once all checks are done stop")
+
+Nothing was generated, nothing was spent, nothing was deployed. No repo file changed in this
+stretch — the only artifacts are this journal entry and the scratchpad probes. The single
+untracked side effect is one throwaway ChatGPT chat containing one prompt.
+
+READY TO RESUME THE MOMENT status.openai.com IS GREEN:
+  - 12 rich scene prompts: frozen in plan.md (Phase 3).
+  - Tile-enlargement decision for rich art: frozen in plan.md (Phase 4).
+  - Pipeline + md5-distinctness validation: specified.
+  - Phase 3 will be dispatched as a PROPER oplan step (committed script under scripts/, frozen
+    validation, executor packet, fresh-eyes audit) — per the process correction logged above.
+    No generation happens outside that.
