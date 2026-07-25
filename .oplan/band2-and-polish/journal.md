@@ -79,3 +79,66 @@ FIELD GUIDE: 43/40 lines, justified — curation already evicted the two dark-th
 (WDT-5 shipped and frozen) and merged the SW-cache and stale-JSON-server traps into one entry.
 The remaining overage is the title and section headings, not content. Two lessons were ADDED this
 run: the image-capture method (15) and the Git-Bash-vs-node `/tmp` trap (16).
+
+## PHASE 1 — EXECUTION
+
+STEP 1.1 extract data/band2.json
+  tier: WORKER (Sonnet) · did: new scripts/build_band2.py — geometry + section carried forward,
+    CORE II tested before CORE I, Band II metadata, section-first sort key. Output: 2016 entries
+    (bandIIcoreI 1014 / bandIIcoreII 1002), 1610 single-word.
+  surprises/deviations: none · first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=36751, checker=36319 · audit: match/high · commit: c40eb7f
+  ORCHESTRATOR QUALITY CHECK beyond the frozen validation: md5 of two consecutive runs identical
+  (4812e246…), so the build is deterministic. Then checked the DATA, not just its shape: no digits,
+  no over-long lemmas, no empties. Three words looked like leaked table headers — `column`,
+  `state`, `education` — and each turned out to be genuine vocabulary with a proper pos/meaning
+  (`column` n "building"; `state` appears three times as distinct homonyms — v "say, express",
+  n "condition", n/adj "country"; `education` n). The 7 exact duplicates are words the MoE lists
+  in BOTH cores (duty, gather, come down…), harmless because the allowed set is a Set.
+  This mattered: it is a child's curriculum, so "well-formed" is not the same as "correct".
+
+STEP 1.2 make A2 unlock Band 2
+  tier: WORKER (Sonnet) · did: buildAllowedSet gains `band2 = null`; new guarded block adds band2
+    lemmas only when band === 'A2'; generateChapter passes it through.
+  surprises/deviations: none · first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=33255, checker=29165 · audit: match/high (auditor confirmed `band` is in scope at
+    the insertion point, the 2-arg call is still backward compatible, and preA1/A1 get nothing)
+  commit: a65067a
+  THE ACTUAL FIX, MEASURED: preA1 296 words · A1 1257 · A2 2850. Acing the test now gains 1593
+  words (abroad, accept, achieve, adequate, admire, advantage…). Before this step A1 and A2 were
+  both 1257 — identical — which was the whole defect.
+
+STEP 1.3 pass Band 2 through the chapter endpoint
+  tier: ORCHESTRATOR (deviation, logged) · A two-line mechanical edit — one import, one argument.
+  I applied it directly rather than paying a worker round-trip for it. Still validated with the
+  frozen command and still audited. Noting it because the discipline says workers do the typing,
+  and quietly doing a step myself is exactly the kind of drift worth recording.
+  first_try: yes · commit: 47c6a56
+
+STEP 1.4 regression test for the Band 2 data
+  tier: WORKER (Sonnet) · did: tests/band2.test.js, five tests mirroring band1.test.js.
+  first_try: no · retries: 0 · escalations: 0 · INTERVENTION: 1 (bad-spec, mine)
+  tokens: worker=38358, checker=33076 · audit: match/high · commit: 679dcc9
+  THE ESCALATION RULE EARNED ITS KEEP AGAIN. The executor stopped rather than guessing, and it
+  was right twice over: (a) my frozen validation compared `git diff HEAD --name-only` to exactly
+  `tests/band2.test.js`, but steps 1.2 and 1.3 were still UNCOMMITTED, so the check could never
+  pass; (b) it further pointed out that `git diff HEAD` never lists untracked files at all, so
+  even on a clean tree the check was wrong for a NEW file. Fix: commit 1.2/1.3 first, and use
+  `git status --porcelain` (which does see untracked files) instead of `git diff`. A weaker
+  worker would have "helpfully" committed or reverted my in-flight work to make the gate go green.
+
+STEP 1.5 orchestrator runtime proof (not dispatched)
+  Built allowed sets from the real data files: preA1 296 / A1 1257 / A2 2850, 1593 words gained at
+  A2, all sampled words genuinely junior-high level. No API call, no OpenAI spend, no profile
+  contact.
+
+PHASE 1 CLOSED — all 6 acceptance criteria pass
+  151/151 tests (146 -> 151 by design, five new), band2.json 2016 entries across both cores and
+  byte-identical across two builds, A2 exceeds A1 by 1593 words, exactly the six expected files
+  changed, nothing under public/ so no sw bump needed.
+  steps: 5 (4 dispatched, 1 orchestrator-run) · first-try passes: 3/4 dispatched
+  escalations up the model ladder: 0 · interventions: 1 (my bad validation, caught by the worker)
+  audits: 4/4 match, all CONFIDENCE high
+  tokens: reviewer=77894, workers=108364, checkers=98560, PHASE TOTAL=284818
+  field_guide: 43/40 (justified above) · orchestrator_context: unavailable
+  NOT DEPLOYED YET — deployment is Phase 3, after the visual work.
