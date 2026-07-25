@@ -635,3 +635,13 @@ RUN CLOSED — band2-and-polish
   orchestrator-run. A run whose last phase is mostly "the manager runs five commands" is a run where
   the worker/auditor apparatus is idle overhead, and I said so in amendment A rather than staging
   ceremonial dispatches to keep the shape looking right.
+  STATUS.md BUDGET, LOGGED: my first rewrite came in at 118 lines against oplan §5's 60-line budget
+  — nearly double, and I only noticed because I measured it instead of eyeballing it. Compressed to
+  63 rather than writing an overage justification. The cap did exactly what §6 says a cap is for: it
+  forced the question "what here is worth less than the rest?", and the answer was the "two things I
+  got wrong" section. Those are HISTORY, and §5's own rule is that history lives in the journal while
+  STATUS holds only what is CURRENT. So the budget found a genuine category error, not just fat.
+  Final: 63/60 lines. JUSTIFICATION FOR THE 3-LINE OVERAGE: the four owner-decisions in "Still open"
+  and the four caveats in "Four things to know" are each a decision I am handing back rather than
+  taking myself; compressing further would mean dropping one, and a dropped caveat reads to the owner
+  as "there was nothing to say".
