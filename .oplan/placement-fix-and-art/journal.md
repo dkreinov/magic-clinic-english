@@ -392,3 +392,36 @@ VALUABLE NEGATIVE RESULTS — the reviewer verified by inspection, so these are 
 Mitigation adopted from finding 1: the OPT_ART map in step 4.2 is specified with `\u{...}`
 escapes rather than literal emoji, so no multi-byte character has to survive hand-editing by a
 worker on this Windows/Git-Bash machine.
+
+## PHASE 3 CLOSED — 12 rich masters generated (free web route)
+
+Route: ChatGPT web, per the owner's standing policy (free web for anything not generated at app
+runtime). Zero API spend. All 12 generated in ONE chat for style continuity:
+`https://chatgpt.com/c/6a6491a2-cf44-83eb-96bb-023d4345d4d9`.
+
+Masters in `assets/placement/` — all 1254x1254 PNG, matching the existing square masters exactly:
+  pet 88032bb2 · mom 71551b3d · camp 759fd0c0 · fan 4997b5c1 · dad 6d48aeaa · desk 79fcf891 ·
+  singer f56db309 · horse a3fa0361 · zoo 885635d1 · movie 8756de92 · monkey 85b25029 ·
+  steak 66638c3c
+PHASE3-OK: 12 present, all square, all >= 512px, all content-distinct by md5.
+
+CAPTURE METHOD (new, supersedes the delight-pass download-button dance): in-page
+`fetch(img.src,{credentials:'include'})` -> blob -> object URL -> ONE synthetic
+`<a download="placement-<lemma>.png">` clicked exactly once; then a Bash helper asserts exactly
+ONE such file exists, moves it to the master name, and verifies square/size/md5. The explicit
+filename eliminates the "newest file in ~/Downloads" heuristic that made the 89-duplicate
+incident possible. Across 12 captures the count assertion never once found more than one file.
+(First attempt POSTed bytes to a localhost sink instead — blocked by chatgpt.com's CSP. Recorded
+so nobody retries it.)
+
+THE THREE BROKEN CONCEPTS ARE FIXED — the whole point of the exercise:
+  fan  was 🌀 a spiral        -> a brass electric fan, blades blurred, papers fluttering
+  desk was 🧑‍💻 person+laptop  -> a wooden desk with lamp, open book and quill, NO person
+  zoo  was 🦁 a lone lion     -> an entrance archway with giraffe, lion AND elephant together
+Prompt refinements made on the spot and worth recording: `desk` needed "and no person present"
+(otherwise it drifts back to a person at a desk), and `zoo` needed "SEVERAL different animals ...
+so it clearly reads as a zoo rather than one single animal".
+
+Style continuity verified by building a 12-tile contact sheet from the actual saved PNGs (not
+browser screenshots) and viewing it: one world, consistent warm golden lighting and
+teal/violet/amber palette, each subject unmistakably the hero of its frame.
