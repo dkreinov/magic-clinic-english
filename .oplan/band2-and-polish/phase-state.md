@@ -1,9 +1,9 @@
-CURRENT: phase 2 — next and last step 2.7 (manifest, iOS link, icons test, docs §6)
-BASELINES: phase 1 = bbdb60c · phase 2 = 679dcc9 (test baseline 151 pass / gate 28 pairs ALL PASS)
+CURRENT: phase 2 CLOSED (7/7 criteria). PAUSED at the phase boundary; phase 3 (deploy) not yet planned.
+BASELINES: phase 1 = bbdb60c · phase 2 = 679dcc9 · phase 3 = e51394e (157 tests, gate 52 pairs)
 PLAN: .oplan/band2-and-polish/plan.md
 DESIGN: .oplan/band2-and-polish/design.md (copied in 2026-07-25 — oplan §5 had been unmet)
 ACCEPTED: 1.1 c40eb7f · 1.2 a65067a · 1.3 47c6a56 · 1.4 679dcc9 · 1.5 runtime proof (no commit)
-  · 2.1 d4409a6 (gate now 52 pairs, 154 tests) · 2.2 0560910 · 2.3 1c58dfb · 2.4 c328d82 · 2.5 984b6f7 · 2.6 fce1e8f
+  · 2.1 d4409a6 (gate now 52 pairs, 154 tests) · 2.2 0560910 · 2.3 1c58dfb · 2.4 c328d82 · 2.5 984b6f7 · 2.6 fce1e8f · 2.7 e51394e
 FROZEN CONTRACTS IN FORCE:
   B2-1 Band 2 vocabulary comes from the official MoE PDF via the committed deterministic script
   scripts/build_band2.py — never LLM-invented, never hand-edited ·

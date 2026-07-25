@@ -817,6 +817,12 @@ console.log('ICONS-OK deterministic=yes');" \
     `icon-maskable-512.png` by `scripts/build-icons.js`" — add the step-2.5 prompt verbatim to the
     per-asset prompt list, and record the owner gate (`ICON-ART: APPROVED`) plus the fact that the
     maskable variant pads the artwork to the central 80% on `#2e1806`.
+    **SPEC CORRECTION (orchestrator, after the 2.7 audit found a real mismatch):** "the same format
+    the existing prompts use" was too vague. Stated explicitly: all 8 pre-existing entries close with
+    a literal ` + SUFFIX` after the quoted prompt, because the FROZEN STYLE SUFFIX is appended to
+    every generation. The new entry MUST end `…shrunk very small." + SUFFIX`. Dropping that marker
+    implies the icon was generated WITHOUT the frozen style suffix — false, and misleading to whoever
+    regenerates it next.
 - **Non-goals:** do not touch `public/sw.js` — `v7` from step 2.3 already covers `index.html` and
   `manifest.webmanifest` (VP-5); do not add anything to `PRECACHE`; do not edit
   `tests/shell.test.js` (step 2.3 owns that file — this is why the icon assertions live in their
