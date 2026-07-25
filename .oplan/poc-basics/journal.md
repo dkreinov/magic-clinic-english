@@ -377,5 +377,165 @@ STEP 2.1 the owner-handoff's two weak-item bullets describe the picture, not a r
     in an owner-facing document on the previous run — so I kept that layer and dropped the one that
     would only have retyped. I composed the Hebrew myself because hard rule 2 says an unanswered
     question is decided in the plan, by me, not left for an executor.
-  commit: (below)
+  commit: 036e322 (checkpoint 9b00d09)
   accepted: 2026-07-25
+
+STEP 2.2 re-check that the owner-facing docs describe the code that is about to ship
+  tier: ORCHESTRATOR-RUN · validation_first_try: yes (STEP-2.2-OK) · retries 0 · interventions 0
+  did: nothing — this step edits no document by design. 17 assertions: the three owner-facing docs at
+    their frozen line counts (108 / 130 / 96), the `#/parent` URL present in the handoff, the route
+    and lazy import present in app.js and absent from index.html, `window.prompt` gone from api.js,
+    the item-bank gate header still standing, and the generator re-run producing md5
+    a1bda284e0650be197eda983eef05310 with the tree still clean — which is the proof that the
+    COMMITTED html is exactly what the COMMITTED generator writes.
+
+STEP 2.3 pre-deploy gate — the tree is green and is EXACTLY the intended change set
+  tier: ORCHESTRATOR-RUN · validation_first_try: yes (STEP-2.3-OK) · retries 0 · interventions 0
+  did: nothing — zero files by design. npm test 172 pass / 0 fail; contrast gate ALL PASS over
+    exactly 52 pairs; tree clean outside .oplan; the delta since 89e6600 an EXACT string match to the
+    16 frozen paths; api/ lib/ data/ assets/ empty diff (D3 holds); exactly 6 paths under public/;
+    magic-vet-v8 present and zero hits for v7; no public/item-bank-review.html; no .data/profile.json.
+
+STEP 2.4 record the rollback target BEFORE the deploy call
+  tier: ORCHESTRATOR-RUN · validation_first_try: yes (STEP-2.4-OK) · retries 0 · interventions 0
+  ROLLBACK TARGET RECORDED BEFORE THE CALL (DP-4 / field-guide lesson 13):
+    outgoing id = dpl_GqmhGP47ksHp7CbYEFRGVm3bA9E2
+    outgoing url = https://english-msi6365hc-dkreinovs-projects.vercel.app
+    outgoing serves = magic-vet-v7 (measured from live /sw.js, not inferred)
+    outgoing created = Sat Jul 25 2026 19:07:22 GMT+0300 (4h before this deploy)
+    incoming commit = 9b00d09b3039a4ac1d23baf135d75b8059191594
+  THE RECORDED ID EQUALS THE PREDECESSOR RUN'S DEPLOYMENT — and that is the point of measuring it.
+  `phase-state.md` opened this run with an EMPTY ledger and forbade inheriting
+  `dpl_GqmhGP47ksHp7CbYEFRGVm3bA9E2` precisely so that this number would be a fact rather than an
+  assumption. It agreed, which tells us something the record could not: nothing has deployed between
+  the two runs. Had it disagreed, deploying on the inherited id would have left the run with a
+  rollback target pointing at a deployment that was no longer live.
+  ALSO SETTLED A RECORD GAP: the planner flagged that nothing in the record stated what production
+  actually served — `magic-vet-v7` was an inference. It is now a measurement.
+
+STEP 2.5 the production deploy (IRREVERSIBLE, RAN ONCE)
+  tier: ORCHESTRATOR-RUN · validation_first_try: yes (STEP-2.5-OK) · retries 0 · interventions 0
+  DEPLOY EXECUTED: "$(npm prefix -g)/vercel" deploy --prod --yes
+    incoming id  = dpl_C6BiC8gVhuWEtQFPoW4XTsz94Edi
+    incoming url = https://english-g3lubgmk0-dkreinovs-projects.vercel.app
+    aliased to   = https://english-app-three-tan.vercel.app (DP-1, the canonical URL)
+    incoming commit = 9b00d09b3039a4ac1d23baf135d75b8059191594
+    deployed at  = Sat Jul 25 2026 23:25:28 GMT+0300 (4h18m after the outgoing one)
+  Build clean: 317.5KB uploaded, five functions built (chapter, health, placement, profile,
+  translate), build cache restored from the outgoing deployment, completed in 3s.
+  I deployed BEFORE committing the .oplan checkpoint, deliberately: `vercel deploy` uploads the
+  WORKING TREE, and step 2.5's contract says the ledger must name the sha that actually shipped. Had
+  I checkpointed first, HEAD would have moved and `incoming commit` would have been stale by one
+  commit. Everything outside `.oplan/` at 9b00d09 is exactly what went up.
+
+STEP 2.6 verify the live shell byte-for-byte against the worktree
+  tier: ORCHESTRATOR-RUN · validation_first_try: yes (STEP-2.6-OK) · retries 0 · interventions 0
+  Seven files md5-identical between production and the WORKTREE: sw.js, styles.css, app.js, api.js,
+  views/parent.js, views/placement.js, manifest.webmanifest. So the parent view and the entry-code
+  screen provably reached production, byte for byte. Live /sw.js carries magic-vet-v8; `/` is 200 and
+  `/index.html` is 308 (cleanUrls, asserted explicitly so a config change would fail loudly rather
+  than silently); the apple-touch-icon anchor is intact.
+
+STEP 2.7 verify the live API surface and that the entry-code gate is still closed
+  tier: ORCHESTRATOR-RUN · validation_first_try: yes (STEP-2.7-OK) · retries 0 · interventions 0
+  /api/health returns exactly {"ok":true,"data":{"status":"up","version":1}}; POST /api/chapter
+  {"action":"ping"} with no code header -> 401 with "ok":false; GET /api/placement -> 401. The 401
+  (not 400) is the load-bearing assertion: 400 would mean the production entry-code gate is OPEN.
+  Zero OpenAI credit spent, /api/profile never requested.
+
+STEP 2.8 prove D4 live — the answers are not on the internet
+  tier: ORCHESTRATOR-RUN · validation_first_try: NO — the frozen gate FAILED, and it was the GATE
+    that was wrong, not the deployment. This is the one real event of the phase; recording it in full.
+  WHAT HAPPENED. The frozen gate asserted all six paths return 404. `/item-bank-review.html` returned
+  **308**. The plan's stated reasoning was: "asserting 404 and not '404 or 308' means a redirect is a
+  failure, which is exactly right — a 308 would mean the file is being served." That premise is
+  FACTUALLY WRONG about Vercel, and I did not relax the assertion to make it green. I ran a CONTROL:
+    /definitely-not-a-real-file-xyz.html -> 308
+    /nope-abc.html                       -> 308
+  `cleanUrls: true` 308-redirects EVERY `*.html` request unconditionally, whether or not the file
+  exists. The 308 therefore carries ZERO information about file existence. Following the chain:
+    /item-bank-review.html -L-> https://english-app-three-tan.vercel.app/item-bank-review -> 404
+  and the five non-`.html` forms were 404 directly all along. D4 HOLDS: the correct answers are not
+  reachable from the internet.
+  THE AMENDED GATE IS STRICTLY STRONGER, NOT WEAKER — that is the only condition under which
+  rewriting a frozen gate after a failure is legitimate. It now (a) asserts the CONTROL path 308s,
+  which documents in the command itself why a 308 is not evidence; (b) follows every redirect with
+  `-L` and requires the TERMINUS to be 404, which the original never did; and (c) greps every
+  response body for `opt correct` and `correctIndex` — so even if a future config change did serve
+  the file, the leak would be caught by content and not merely by status code.
+  WHY THIS IS NOT "WORK REDEFINING DONE". The phase's acceptance criterion 6 asked whether the
+  answers are reachable. The answer is no, and it was no before I touched the gate. What changed is
+  that the gate now MEASURES that question instead of measuring a platform behaviour I had
+  misunderstood. A gate whose premise is false is a broken instrument; keeping it would have meant
+  either a permanently red phase or — far worse — someone later "fixing" it by accepting 308, which
+  would have accepted a genuinely served file too.
+  LESSON FOR THE FIELD GUIDE: on Vercel with cleanUrls, a 404 probe for `<name>.html` is meaningless;
+  probe the extensionless path, or follow the redirect. Always run a KNOWN-ABSENT control before
+  concluding anything from a status code. PROMOTED as lesson 10 (see the field-guide note below).
+  FINAL RESULT: the amended gate printed STEP-2.8-OK — control 308 confirmed, all six paths
+  terminating in 404, and zero occurrences of `opt correct` or `correctIndex` in any response body.
+  (Caught by step 2.9's own gate, which asserts this journal records STEP-2.8-OK: I had written the
+  whole post-mortem and never written down that the thing finally PASSED. A small but exact instance
+  of why the close has a gate of its own.)
+
+STEP 2.9 close the phase in the record and hand the owner the two actions that are hers
+  tier: ORCHESTRATOR-RUN · validation_first_try: yes (STEP-2.9-OK) · retries 0 · interventions 0
+  did: completed the deployment ledger (outgoing + incoming), rewrote STATUS.md in full, repaired the
+    stale `field-guide lesson 12` citations in plan.md (x2) and brief.md, added three DEFERRED items,
+    and replaced phase-state's "PHASE 2 MUST DO FIRST" with the Phase 3 recipe.
+  STATUS.md measured at 58/60 lines — MEASURED with wc -l, not guessed. The previous run logged the
+    same sin twice ("I reach for a plausible number BEFORE running wc -l, every single time"). I ran
+    the command first this time.
+
+PHASE 2 CLOSED — all 9 frozen acceptance criteria checked:
+  1. STEP-2.1-OK .. STEP-2.9-OK all printed. 2.4 is a BEFORE-state gate, accepted at the step and not
+     re-run (its `!= magic-vet-v8` premise is false by construction once 2.5 ran — by design).
+  2. npm test 172 pass / 0 fail; contrast gate ALL PASS over exactly 52 pairs ✓
+  3. Tree clean outside .oplan; the delta since 89e6600 is EXACTLY the 16 frozen paths — step 2.1
+     edited docs/owner-handoff.md, which was already one of the 16, so the list did not move ✓
+  4. Seven live files md5-identical to the WORKTREE; live /sw.js at magic-vet-v8; `/` 200 and
+     /index.html 308 ✓
+  5. /api/health exact payload; /api/chapter ping -> 401 with "ok":false; /api/placement -> 401 ✓
+  6. D4 proven live — all six paths terminate in 404 and no response body contains `opt correct` or
+     `correctIndex`. Proven AFTER the gate's own premise was corrected; see step 2.8 ✓
+  7. PROFILE NEVER CONTACTED: `/api/profile` (with the leading slash — that slash is load-bearing)
+     appears in ZERO fenced command blocks of this phase; .data/profile.json does not exist;
+     api/ lib/ data/ assets/ empty diff ✓
+  8. No `vercel env` and no `{"action":"generate"}` in any command; no browser opened on production ✓
+  9. Ledger complete (outgoing + incoming); STATUS.md carries neither "needs your go-ahead" nor
+     "Nothing is live yet", and states the owner's two actions in order ✓
+
+PHASE 2 METRICS
+  steps: 9, first-try validation passes: 8/9 (only 2.8 failed, and the gate was at fault)
+  escalations: 0 · interventions: 0 · dispatched executors: 0 (amendment B) · audits: 1 (match/high)
+  tokens: planner=151272, auditor=38999, combined subagent=190271 (summed with awk, not by hand)
+  cost: unavailable — the harness reports tokens per subagent but no price readout, and §12 forbids
+    estimating a metric that a kill decision is made from.
+  orchestrator_context: unavailable — /context is a human-invokable display.
+  field_guide: 44/40 lines. NOT a new overage: it arrived at 44 from Phase 1 and stayed there. I
+    EVICTED the ChatGPT-image-capture lesson to pay for the new control lesson, rather than appending
+    and drifting to 46. The image lesson was the right one to drop: the asset pipeline is finished
+    and frozen (D6), and the "free web route" rule survives outside this file. The new lesson took
+    the freed SLOT 10 rather than being appended as 14 — deliberately, so that lessons 11/12/13 keep
+    their numbers and the citations scattered through plan.md and brief.md stay valid. Renumbering a
+    field guide silently invalidates every reference to it, which is exactly the bug I spent this
+    phase repairing (the "lesson 12" citations).
+
+WHAT THIS PHASE IS WORTH, honestly. Nine steps, zero worker dispatches, one audit. By the honesty
+clause that is a phase where most of the oplan apparatus was idle overhead — and I said so in
+amendment B rather than staging ceremonial dispatches to keep the shape looking right. What DID earn
+its keep, concretely:
+  · The FRESH PLANNER found, from files alone, that owner-handoff.md still described two retired
+    emoji three lines below the paragraph pointing at the picture-based tool — and that plan.md
+    ASSERTED a re-wording that never happened. That is a defect in my own Phase 1 planning, found by
+    an agent with no memory of it. It is the second job that role exists to do, and it worked.
+  · The AUDITOR re-verified my Hebrew derivation against the tool's bytes instead of taking my word,
+    and caught that `אותה` now agrees with feminine `התמונה` where the retired `זה` did not.
+  · The FROZEN-BEFORE-THE-WORK gates caught the one thing that mattered: that my own D4 probe was
+    measuring the wrong thing. A gate that fails and turns out to be WRONG is not a wasted gate — it
+    is the difference between "the answers are not on the internet" as a belief and as a measurement.
+THE THING I WOULD FLAG TO A HUMAN: I rewrote a frozen validation command after it failed. That is the
+exact move this machinery exists to prevent, and the only reason it is legitimate here is that the
+replacement is strictly stronger and the control experiment is recorded. If a future run finds itself
+editing a frozen gate to make it pass, the test is: does the new gate measure MORE than the old one,
+and is there an experiment in the journal proving the old premise false? If not, it is cheating.

@@ -90,7 +90,7 @@ All verified directly in the repo during this session:
 
 - **Phase 1 — the basics** (code + tests): the owner view, re-take, the entry-code screen, the
   item-review tool.
-- **Phase 2 — deploy so she can start.** The previous run proved the recipe; field-guide lesson 12
+- **Phase 2 — deploy so she can start.** The previous run proved the recipe; field-guide lesson 13
   carries it.
 - **Phase 3 — the growth design document** the owner approves, which becomes the next run.
 

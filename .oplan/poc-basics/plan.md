@@ -86,7 +86,7 @@ SKELETON FOR LATER PHASES:
 
 **Phase 2 — deploy so she can start.** No new design. Correct any owner-facing doc that Phase 1
 made false (Phase 1's step 1.6 already does the known ones, so Phase 2 should re-check rather than
-assume), then run the recipe field-guide lesson 12 carries: record the outgoing production
+assume), then run the recipe field-guide lesson 13 carries: record the outgoing production
 deployment id + url + commit via `"$(npm prefix -g)/vercel" inspect https://english-app-three-tan.vercel.app`
 **before** the deploy call (it is the only rollback target), deploy with
 `"$(npm prefix -g)/vercel" deploy --prod --yes`, then verify live by md5 against the **worktree**
@@ -1069,7 +1069,7 @@ RECORD GAPS:
   records `dpl_GqmhGP47ksHp7CbYEFRGVm3bA9E2` / `https://english-msi6365hc-dkreinovs-projects.vercel.app`
   as what went live at commit `00a100c`, but that is a different run's ledger and this workspace has
   no deployment ledger of its own. Phase 2 must re-establish the rollback target with
-  `vercel inspect` **before** deploying (DP-4 / field-guide lesson 12) rather than inheriting that
+  `vercel inspect` **before** deploying (DP-4 / field-guide lesson 13) rather than inheriting that
   number. Not needed by Phase 1; recorded so Phase 2 does not inherit a stale id.
 - **`docs/item-bank-review.md` still describes the task-1 options as emoji** (`🐕`, `🌀`, `🧑‍💻`),
   but `README.md` records that they were replaced by illustrations, and `public/views/placement.js`
@@ -1502,12 +1502,22 @@ STEP 2.8: prove D4 live — the answers are not on the internet
   files: none.
   commands: none beyond the frozen validation.
   validation:
+**AMENDED DURING EXECUTION — the original gate's premise was factually wrong. Logged in journal.md.**
+The original asserted a bare 404 on all six paths and reasoned that "a 308 would mean the file is
+being served". It is not: `cleanUrls: true` 308-redirects EVERY `*.html` request unconditionally,
+proven by a control (`/definitely-not-a-real-file-xyz.html` also 308s). The replacement below is
+strictly STRONGER — it follows every redirect to its terminus and adds a content-leak check — which
+is the only condition under which rewriting a frozen gate after a failure is legitimate.
 ```
-cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+TMP=<scratchpad>; cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
   && U=https://english-app-three-tan.vercel.app \
+  && CTL="$(curl --ssl-no-revoke -s -o /dev/null -w '%{http_code}' "$U/definitely-not-a-real-file-xyz.html")" \
+  && [ "$CTL" = "308" ] \
   && for p in /item-bank-review.html /item-bank-review /docs/item-bank-review.html /docs/item-bank-review /docs/item-bank-review.md /data/placement-items.json; do \
-       S="$(curl --ssl-no-revoke -s -o /dev/null -w '%{http_code}' "$U$p")"; \
-       [ "$S" = "404" ] || { echo "REACHABLE $p -> $S"; exit 1; }; \
+       F="$(curl --ssl-no-revoke -s -L -o "$TMP/probe-body.txt" -w '%{http_code}' "$U$p")"; \
+       if [ "$F" != "404" ]; then echo "REACHABLE $p -> $F"; exit 1; fi; \
+       if grep -qF -- 'opt correct' "$TMP/probe-body.txt"; then echo "ANSWERS LEAKED at $p"; exit 1; fi; \
+       if grep -qF -- 'correctIndex' "$TMP/probe-body.txt"; then echo "BANK LEAKED at $p"; exit 1; fi; \
      done \
   && echo STEP-2.8-OK
 ```
@@ -1515,9 +1525,11 @@ cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
     - D4 holds by construction — Vercel's zero-config output is `public/` and `scripts/dev-server.js`
       serves only `public/` — but "by construction" is a claim, and this step is the measurement.
       `docs/item-bank-review.html` contains the correct answers to the placement test.
-    - The extensionless forms are probed because `cleanUrls: true` makes `/x.html` a 308 to `/x`
-      whenever `public/x.html` exists; asserting 404 and not "404 or 308" means a redirect is a
-      failure, which is exactly right — a 308 would mean the file is being served.
+    - **A status code is only evidence next to a control.** The gate asserts that a KNOWN-ABSENT
+      `.html` path also 308s; that is what proves the 308 on the real path means nothing. Without the
+      control, 308 is unreadable — it is equally consistent with "served" and "absent".
+    - The terminus, not the first hop, is what "unreachable" means; and content is checked as well as
+      status, so a future config change that actually served the file is caught even if it 404s oddly.
     - `/data/placement-items.json` is the same secret by another route; the predecessor proved the
       equivalent for `/data/band2.json`.
   non-goals: no `/api/*` request here; never `/api/profile`; do not follow redirects (`-L` would turn

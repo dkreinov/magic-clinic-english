@@ -29,8 +29,8 @@
 9. Browser checks: a plain reload LIES — unregister the SW, `caches.delete(...)`, ctrl+shift+R, then
    confirm from the DOM. Restart dev servers after editing `data/*.json` (JSON imports are cached).
    A view's `<style>` lives inside `#app`, so overwriting `innerHTML` deletes its CSS.
-10. Images come from the FREE ChatGPT web route. Capture by fetching the blob in-page and clicking
-    ONE synthetic `<a download>`; the DOM can show NO reply while the image exists — reload first.
+10. A STATUS CODE IS EVIDENCE ONLY NEXT TO A CONTROL: `cleanUrls` 308s EVERY `*.html`, present or
+    not. Probe the extensionless path, follow `-L` to the terminus, and grep the BODY for the secret.
 11. HEBREW IS BIDI: never anchor a patch, a grep or a heredoc on a Hebrew string copied out of
     TERMINAL OUTPUT — display reordering makes a wrong byte order look identical. Extract the frozen
     text to a FILE and copy from the file; hand workers their validation as a script file too.
