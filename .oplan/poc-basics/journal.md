@@ -158,3 +158,26 @@ STEP 1.2 the owner-only `#/parent` view and its route
   handleResponse returns `payload.data`, so getJson("/api/profile") yields the profile itself, not
   the envelope. A wrong guess on any of those three would have shown the owner a screen of blanks
   and "טרם נעשתה" forever, with every test still green.
+
+STEP 1.3 a real entry-code first-run screen, replacing `window.prompt`
+  tier: WORKER (Sonnet)
+  did: public/api.js — replaced askForCode()+window.prompt with the singleton entryGate overlay
+    (PB-4 code verbatim); request() gained the `retried` parameter and awaits askForCode.
+    public/styles.css — appended the frozen "Entry code gate" block at the END of the file.
+    tests/entry-code.test.js (NEW) — the three frozen tests, shell.test.js header style.
+  surprises: none — and it answered the new question I added to the report format: it read ONLY the
+    files the packet named. The under-scoped-packet correction from 1.2 worked.
+  deviations: none
+  validation_first_try: yes (worker's first run AND my clean re-run — STEP-1.3-OK, 168 pass / 0 fail,
+    contrast gate 52 pairs ALL PASS)
+  retries: 0
+  escalations: 0
+  tokens: worker=45932, checker=47323
+  interventions: 0
+  auditor: match, CONFIDENCE high. Its one caveat — that it could not rule out a second
+    `z-index: 100;` elsewhere in the untouched part of styles.css — is precisely what the frozen
+    gate's `[ "$(grep -c 'z-index: 100;' public/styles.css)" = "1" ]` proves, and I ran it. This is
+    the two-layer design working as intended: the blind reviewer names what it cannot see, and the
+    mechanical gate covers exactly that.
+  commit: 5f89bf3
+  accepted: 2026-07-25
