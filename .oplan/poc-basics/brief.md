@@ -1,7 +1,7 @@
 # Brief — run `poc-basics`
 
 Written by the orchestrator BEFORE planning, so no decision lives only in a context window.
-Base commit: `e4c5885`. Predecessor run: `.oplan/band2-and-polish/` (closed, deployed).
+Base commit: `89e6600` (corrected from `e4c5885` — see plan.md). Predecessor run: `.oplan/band2-and-polish/` (closed, deployed).
 
 ## The owner's words
 
