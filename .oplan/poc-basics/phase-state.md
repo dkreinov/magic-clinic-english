@@ -1,13 +1,13 @@
-CURRENT: phase 1 "fix the basics" PLANNED IN FULL and REVIEWED (fresh planner + plan reviewer;
-  reviewer verdict fix-first, all 3 findings fixed). Next step 1.1. NOTHING EXECUTED YET.
+CURRENT: phase 1 "fix the basics" EXECUTING. Next step 1.2 (the owner-only #/parent view + route).
 BASELINE: 89e6600 (157 tests, 0 fail; contrast gate 52 pairs ALL PASS; tree clean)
+NOW: 159 tests, 0 fail; contrast gate 52 pairs ALL PASS; tree clean at a098d3d
 PLAN: .oplan/poc-basics/plan.md
 BRIEF: .oplan/poc-basics/brief.md — the owner's 3 scoping answers + design decisions D1-D6.
   READ THIS BEFORE THE PLAN. D1-D6 are frozen and must not be re-opened.
 DESIGN: .oplan/poc-basics/design.md (FROZEN product design)
 PREDECESSOR: .oplan/band2-and-polish/ — closed and deployed 2026-07-25. Its journal holds the
   deploy recipe, the rollback procedure and the reasoning behind the current live build.
-ACCEPTED: none yet.
+ACCEPTED: step 1.1 — a098d3d (validation first try, auditor match/high, 0 interventions)
 FROZEN CONTRACTS IN FORCE:
   PB-1 the owner route is exactly `#/parent`; view is public/views/parent.js, loaded by a DYNAMIC
   import inside renderRoute() — NOT a static import, because sw.js PRECACHE is frozen and a static

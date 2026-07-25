@@ -1,33 +1,29 @@
 # STATUS — poc-basics
 
-*Rewritten in full at every update. Last update: planned and reviewed, nothing built yet.*
+*Rewritten in full at every update. Last update: Phase 1 building — step 1 of 6 accepted.*
 
 ## Where we are
 
-The plan for "fix the basics" is written and has passed a fresh-eyes review. **No code has changed.**
+Phase 1 is being built, one step at a time. **Step 1 of 6 is done and committed.**
 
 ```mermaid
 flowchart LR
-    P1{{Phase 1 NEXT<br/>fix the basics<br/>6 steps, planned}} --> P2
+    P1{{Phase 1 BUILDING<br/>fix the basics<br/>1 of 6 steps accepted}} --> P2
     P2[Phase 2<br/>deploy so she can start]  --> P3
     P3[Phase 3<br/>the growth design]
     style P1 fill:#ffd27f
 ```
 
-## What I found before planning — the thing worth knowing
+| Step | What it does | State |
+|---|---|---|
+| 1.1 | the placement test can be restarted | **accepted** |
+| 1.2 | the parent-only `#/parent` screen + re-take button | next |
+| 1.3 | the real entry-code screen | waiting |
+| 1.4 | the service-worker cache bump | waiting |
+| 1.5 | the item-bank review tool | waiting |
+| 1.6 | the docs you actually read | waiting |
 
-I went looking for what's broken and found that **nothing is**. The core loop was verified
-end-to-end in production during the first build — placement, story generation, tap-to-translate,
-micro-checks, word bank — and her profile was reset clean afterwards. So this isn't repair work.
-It's about what stands between her and a good *first session*.
-
-But the placement problem is worse than I told you earlier. It isn't just that a wrong level is
-permanent. **The level is never shown anywhere in the app** — not to her, not to you. So a wrong
-placement is *invisible*: nobody can even know it happened.
-
-That changed the fix. You can't make a 12-question test precise; you make its verdict **visible and
-correctable**. A harder exam would need new artwork, new audio, a frozen-test change and a level
-above A2 to promote into — none of which helps her start this week.
+Tests: **159 passing, 0 failing** (was 157). Contrast gate: all 52 colour pairs pass.
 
 ## What Phase 1 will build
 
@@ -42,21 +38,19 @@ above A2 to promote into — none of which helps her start this week.
    its options, so the review you owe before her first test is a few minutes of tapping instead of
    30 minutes of opening mp3 files by hand.
 
+## Why this is the fix
+
+The core loop already works — it was verified end-to-end in production during the first build. The
+real problem is that **her level is never shown anywhere in the app**, so a wrong placement isn't
+just permanent, it's *invisible*: nobody can even know it happened. You can't make a 12-question
+test precise; you make its verdict visible and correctable.
+
 ## Two decisions I made that you should know about
 
 - **The item-bank review does not block the deploy.** Your design doc requires the review before
   *she sees the test* — not before the code is live. She can't reach the app without the entry code
-  anyway, and you hold that. So we ship, then you review, then you give her the code. That order is
-  in the plan.
+  anyway, and you hold that. So we ship, then you review, then you give her the code.
 - **`#/parent` goes into your handoff doc.** A route nobody can find delivers nothing.
-
-## How hard the plan was checked before any work started
-
-A fresh reviewer attacked it and returned **fix-first** — it found a closing gate that could never
-have passed (it asserted 5 changed files where the plan's own list has 6), a wrong number written
-into a frozen acceptance criterion, and that one step only spot-checked the Hebrew it inserts
-instead of every line. All three are fixed. That's the whole point of reviewing a plan before
-building from it rather than discovering it halfway through.
 
 ## Still open — your call, unchanged from last run
 

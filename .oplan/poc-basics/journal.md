@@ -94,3 +94,22 @@ STATUS.md OVERAGE, JUSTIFICATION PAID (§6's soft-cap price): 65/60 lines, measu
   over are the "two decisions I made that you should know about" section: both are places where I
   resolved something on the owner's behalf (the review does not gate the deploy; #/parent goes in
   the handoff doc), and a decision made FOR someone that they cannot see is worse than a long file.
+
+## PHASE 1 — EXECUTION
+
+STEP 1.1 placement.js honours a client-side re-take flag
+  tier: WORKER (Sonnet)
+  did: public/views/placement.js: added RETAKE_KEY const (edit1), consumeRetakeFlag() before
+    resumeStage (edit2), retake consumed in render() and used in boot()'s stage assignment (edit3).
+    tests/placement-ui.test.js: appended two new tests per edit4 spec, existing tests untouched.
+  surprises: none
+  deviations: none
+  validation_first_try: yes (worker's first run AND my clean re-run — STEP-1.1-OK, 159 pass / 0 fail)
+  retries: 0
+  escalations: 0
+  tokens: worker=42766, checker=31020, orchestrator_delta=unavailable
+  interventions: 0
+  auditor: match, CONFIDENCE high (it noted it could not execute the frozen command itself — it is
+    not supposed to; I ran it, in a clean tree, before dispatching the audit)
+  commit: a098d3d
+  accepted: 2026-07-25
