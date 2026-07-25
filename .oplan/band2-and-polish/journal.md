@@ -537,3 +537,15 @@ STEP 3.1 correct the two owner-facing docs that phases 1-2 made false
   because it is frozen by tests/shell.test.js and could not be replaced. The new sentence is about
   the install/home-screen icon, which genuinely is the artwork, so it stands. Recording the caveat
   anyway: if the owner ever asks "why is it still a paw print in the tab", this is the answer.
+
+STEP 3.3 production deploy (ORCHESTRATOR-RUN, not dispatched)
+  ROLLBACK TARGET RECORDED BEFORE THE CALL (DP-4), by `vercel inspect` on the canonical alias:
+    outgoing id   = dpl_J7zsYaqEQ4AwY4HU7qbnLqW7QCQd
+    outgoing url  = https://english-puiu1tyb9-dkreinovs-projects.vercel.app
+    created       = Sat Jul 25 2026 15:38:36 GMT+0300 (3h before this deploy)
+    serves        = magic-vet-v6
+    commit        = ef140ce (INFERRED by timestamp correlation, not recorded by anyone; the commit
+                    landed 15:38:28 and the deployment was created 15:38:36. Stated as inference.)
+  The plan predicted exactly this id and url at planning time, and DP-4 says the recorded value wins
+  regardless — it happened to agree, so nothing moved under us in the planning window.
+  INCOMING commit = 3bbc114345916f80055bd0ff58b561310922204c
