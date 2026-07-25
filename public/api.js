@@ -8,17 +8,61 @@ function storedCode() {
   }
 }
 
-function askForCode() {
-  const entered = window.prompt("קוד כניסה");
-  const code = entered ? entered.trim() : "";
-  if (code) {
-    try {
-      localStorage.setItem(CODE_KEY, code);
-    } catch {
-      /* private mode — the code just will not persist */
-    }
-  }
-  return code;
+const ENTRY_TITLE = "כניסה למרפאת הקסמים";
+const ENTRY_TEXT =
+  "כדי לפתוח את האפליקציה צריך קוד כניסה קצר. הקוד נמצא אצל ההורים שלך — מקלידים אותו פעם אחת, והאפליקציה זוכרת אותו.";
+const ENTRY_PLACEHOLDER = "קוד כניסה";
+const ENTRY_SUBMIT = "כניסה";
+const ENTRY_ERROR = "הקוד לא נכון. נסי שוב.";
+
+let entryGate = null;
+
+function askForCode(showError) {
+  if (entryGate) return entryGate;
+
+  entryGate = new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "entry-gate";
+    overlay.innerHTML = `
+      <form class="entry-gate-card">
+        <h1 class="entry-gate-title">${ENTRY_TITLE}</h1>
+        <p class="entry-gate-text">${ENTRY_TEXT}</p>
+        <input
+          class="entry-gate-input"
+          type="text"
+          dir="ltr"
+          placeholder="${ENTRY_PLACEHOLDER}"
+          autocomplete="off"
+          autocapitalize="off"
+          autocorrect="off"
+          spellcheck="false"
+        />
+        <p class="entry-gate-error" role="alert">${showError ? ENTRY_ERROR : ""}</p>
+        <button class="btn btn-primary" type="submit">${ENTRY_SUBMIT}</button>
+      </form>
+    `;
+    document.body.appendChild(overlay);
+
+    const form = overlay.querySelector("form");
+    const input = overlay.querySelector(".entry-gate-input");
+    input.focus();
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const code = input.value.trim();
+      if (!code) return;
+      try {
+        localStorage.setItem(CODE_KEY, code);
+      } catch {
+        /* private mode — the code just will not persist */
+      }
+      overlay.remove();
+      entryGate = null;
+      resolve(code);
+    });
+  });
+
+  return entryGate;
 }
 
 async function handleResponse(response) {
@@ -37,7 +81,7 @@ async function handleResponse(response) {
   return payload.data;
 }
 
-async function request(path, init, allowRetry = true) {
+async function request(path, init, retried = false) {
   let response;
   try {
     response = await fetch(path, {
@@ -48,9 +92,9 @@ async function request(path, init, allowRetry = true) {
     throw new Error("שגיאת רשת");
   }
 
-  if (response.status === 401 && allowRetry) {
-    askForCode();
-    return request(path, init, false);
+  if (response.status === 401) {
+    await askForCode(retried);
+    return request(path, init, true);
   }
 
   return handleResponse(response);
