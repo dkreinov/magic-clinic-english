@@ -289,3 +289,39 @@ STEP 2.4 amend the frozen visual contract and the README
   "Page background" and never documented the gradient at all — that omission was the record gap this
   step repairs. Relative to the contract's own prior claim, the background was a flat fill. Left as
   written rather than paying a re-dispatch to make a true sentence differently true.
+
+STEP 2.8 runtime proof in a real browser (ORCHESTRATOR-RUN, not dispatched)
+  Local server only: DATA_DIR pointed at the scratchpad, PORT=4173. No deployed app contacted, no
+  POST /api/chapter, so no OpenAI spend.
+  PROFILE ISOLATION PROVEN, NOT ASSUMED: after the session, the scratchpad held a fresh
+  profile.json (919 bytes) and the repo's real .data/ was still EMPTY. That is field-guide lesson 11
+  demonstrated live — merely LOADING the app creates a profile, because GET /api/profile writes when
+  none exists. Had I pointed DATA_DIR at the default, this verification would itself have written to
+  the learner's data. Repo tree clean afterwards.
+  Did the field-guide-12 cache dance first: unregistered the SW and deleted every cache key. Notable
+  finding — the live cache key was ALREADY `magic-vet-v7`, so step 2.3's bump genuinely takes effect
+  rather than merely existing in the source.
+  BACKGROUND, from the DOM (not from a screenshot): getComputedStyle(body).backgroundImage contains
+  all four resolved layer colours — rgb(50,31,26) / rgb(40,36,22) / rgb(51,31,12) / rgb(54,29,8) —
+  in 4 gradient layers (3 radial + 1 linear), and does NOT contain rgb(61,33,9), the retired
+  #3d2109. Plain hex tokens resolve to rgb(...), so field-guide lesson 14's color(srgb ...) trap did
+  not apply, as the plan predicted.
+  LOADING STATE: 56x56, conic-gradient present, mask applied, border-width 0 (the old border ring is
+  really gone), reader-spin 1.4s + reader-float 3.2s both attached, the webp loaded, the frozen
+  Hebrew string intact. Reduced-motion verified through the CSSOM, not by grep: the media rule reads
+  (prefers-reduced-motion: reduce) with .reader-spinner{animation-duration:3.2s} and
+  .reader-loading-art{animation:none}.
+  TWO TRAPS I HIT AND WORKED THROUGH — both worth recording because both would have produced a
+  confident WRONG conclusion:
+  (a) My first probe replaced #app's innerHTML, which DELETED the reader's own <style> tag — the
+      view injects its CSS inside #app, not into <head>. Computed styles then showed 448x0px with no
+      animation, which reads exactly like "the step is broken". The tell was that .spot-image--sm
+      still applied (96px), because THAT rule lives in the global sheet. Fix: copy the view's style
+      into <head> before replacing the markup.
+  (b) The ring reported animation `running` but its transform never changed across 5 samples,
+      because documentVisibility was "hidden" and Chrome freezes animation clocks in hidden tabs
+      (currentTime stuck at 0). Rather than conclude either way, I drove the Web Animations clock
+      manually: at 0/175/350/525/700/1050/1399ms the measured rotation was 0/45/90/135/180/270/360
+      degrees, exactly linear. The ring genuinely spins.
+  Screenshots taken of home and of the loading state; both look as intended (glows subtle but
+  present; the ring reads as a ring, not a disc).

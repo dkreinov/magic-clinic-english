@@ -1,4 +1,4 @@
-CURRENT: phase 2 "visual polish", steps 2.1-2.4 accepted; next 2.8 runtime proof, then 2.5 icon art + OWNER GATE
+CURRENT: phase 2 — steps 2.1-2.4 + 2.8 done; next 2.5 icon art, which ENDS AT AN OWNER GATE
 BASELINES: phase 1 = bbdb60c · phase 2 = 679dcc9 (test baseline 151 pass / gate 28 pairs ALL PASS)
 PLAN: .oplan/band2-and-polish/plan.md
 DESIGN: .oplan/band2-and-polish/design.md (copied in 2026-07-25 — oplan §5 had been unmet)
