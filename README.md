@@ -57,7 +57,7 @@ OpenAI for chapter generation and translation · `sharp` for image optimisation 
 ```bash
 npm install
 npm run dev      # http://localhost:3000  (override with PORT)
-npm test         # 146 tests, node:test, no framework
+npm test         # 157 tests, node:test, no framework
 ```
 
 Optimise generated artwork into web derivatives:
@@ -96,7 +96,7 @@ api/         serverless endpoints (profile, placement, chapter, translate, healt
 lib/         shared logic — placement scoring, story generation, storage, auth
 public/      the app itself: views, styles, service worker, optimised assets
 assets/      full-resolution artwork masters
-data/        the item bank and the band-1 vocabulary list
+data/        the item bank and the band 1 + band 2 vocabulary lists
 docs/        visual design system (frozen) + screenshots
 scripts/     dev server, asset optimisation, accessibility gate
 tests/       node:test suites
