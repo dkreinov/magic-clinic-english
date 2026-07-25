@@ -229,3 +229,40 @@ definitive — that chat is inaccessible to this account (deleted, or its share/
 It is not retryable. The approved method is therefore dead, and the remaining fork (new ChatGPT
 chat with the local anchor re-uploaded, vs the scripted OpenAI API) is back to the owner as the
 one blocking decision. All rich prompts and the pipeline are frozen and ready.
+
+## API DIAGNOSIS (2026-07-25) — and a CORRECTION to my earlier read
+
+I first said the OpenAI 500s were "a server-side outage on their end, not our key". That was
+too confident and is PARTLY WRONG. Evidence, gathered after the owner pushed back:
+
+- `/v1/models`, `/v1/chat/completions` and `/v1/images/generations` ALL return HTTP 500 with this
+  account's key — via node `fetch` AND via `curl --ssl-no-revoke` (so it is not the corporate TLS
+  proxy, and not a node-specific problem).
+- The error bodies carry genuine OpenAI request IDs (e.g. `req_3bd245e1f18743d5be12387eb6ef61ce`),
+  so we ARE reaching OpenAI; a proxy is not synthesising these.
+- DECISIVE CONTROL: a deliberately INVALID key returns a clean **401** with a correct
+  "Incorrect API key provided" message. Their auth layer is healthy and discriminating.
+- status.openai.com reports "Partial System Degradation" (indicator: minor).
+
+Conclusion: this is NOT a blanket outage. Garbage keys get correct 401s while THIS key 500s on
+every endpoint — which points at something specific to this key / project / account (billing,
+quota, project config, or a degraded backend for this org), possibly compounded by the reported
+partial degradation. I cannot see the account from here, so the next move is the owner's:
+check platform.openai.com billing + the project that issued this `sk-proj-...` key.
+
+## PROCESS NOTE (owner asked: "are we running oplan or freestyle?") — honest answer
+
+oplan, for everything that is committed. Phases 1 and 2 each went through the full discipline:
+plan -> fresh plan reviewer -> executor packet -> orchestrator re-runs the frozen validation ->
+fresh auditor -> commit -> journal + phase-state. Commits 51854ec, 306f11f, 33db1a6 are the
+record, and the two escalations/corrections are logged.
+
+But the last stretch DRIFTED. Probing the API is legitimate orchestrator work (like the 1.2 and
+2.4 harnesses). Writing `generate-placement-art.mjs` — real deliverable code that spends the
+owner's money — into the scratchpad with no frozen validation command and no auditor was NOT
+oplan; that should be a proper Phase 3 step. The owner interrupted at exactly the right moment.
+
+CORRECTION TO THE RUN: Phase 3 has NOT been dispatched. When the API question is resolved, the
+generator ships as a real oplan step: a committed script under `scripts/`, a frozen validation
+(12 masters exist, square, content-distinct by md5), an executor packet, and a fresh-eyes audit.
+No image generation happens outside that.
