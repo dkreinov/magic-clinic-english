@@ -1,8 +1,9 @@
-CURRENT: phase 1 "fix the basics" EXECUTING. Next step 1.4 (the single sw cache bump v7 -> v8).
+CURRENT: phase 1 "fix the basics" EXECUTING. Next step 1.5 (the item-bank review tool).
 BASELINE: 89e6600 (157 tests, 0 fail; contrast gate 52 pairs ALL PASS; tree clean)
-NOW: 168 tests, 0 fail; contrast gate 52 pairs ALL PASS; tree clean at 5f89bf3
-  ALL public/ CHANGES FOR THIS PHASE ARE NOW IN THE TREE — step 1.4's bump covers them, and no
-  later step may touch public/ (1.5 asserts `git status --porcelain -- public` = 0).
+NOW: 168 tests, 0 fail; contrast gate 52 pairs ALL PASS; tree clean at 52dc502
+  public/ IS NOW SEALED FOR THIS PHASE: all six public/ files changed, and the single sanctioned
+  cache bump (magic-vet-v8) has landed on top of them. Steps 1.5 and 1.6 touch public/ NOT AT ALL —
+  1.5's own gate asserts `git status --porcelain -- public` = 0. No step may bump to v9.
 DISPATCH RULE (learned in step 1.2, binding for the rest of the run): a worker's spec file is built
   as `plan.md lines 175-277 (the frozen contracts) + the step`. Slicing the step alone leaves it
   NAMING contracts it does not QUOTE, and the worker goes and reads plan.md instead of stopping.
@@ -16,6 +17,7 @@ ACCEPTED: step 1.1 — a098d3d (validation first try, auditor match/high, 0 inte
   step 1.2 — 639479f (validation first try; auditor mismatch then match/high after I supplied
   PB-2, which my first auditor packet had omitted; 1 intervention, mine)
   step 1.3 — 5f89bf3 (validation first try, auditor match/high, 0 interventions)
+  step 1.4 — 52dc502 (validation first try, auditor match/high, 0 interventions)
 FROZEN CONTRACTS IN FORCE:
   PB-1 the owner route is exactly `#/parent`; view is public/views/parent.js, loaded by a DYNAMIC
   import inside renderRoute() — NOT a static import, because sw.js PRECACHE is frozen and a static

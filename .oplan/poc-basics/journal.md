@@ -181,3 +181,22 @@ STEP 1.3 a real entry-code first-run screen, replacing `window.prompt`
     mechanical gate covers exactly that.
   commit: 5f89bf3
   accepted: 2026-07-25
+
+STEP 1.4 the service-worker cache bump (the one and only bump this phase)
+  tier: WORKER (Sonnet)
+  did: public/sw.js line 1 "magic-vet-v7" -> "magic-vet-v8". tests/shell.test.js line 58 the same
+    string in its assertion. No other line touched in either file.
+  surprises: none — read only the files the packet named.
+  deviations: none
+  validation_first_try: yes (worker's first run AND my clean re-run — STEP-1.4-OK, 168 pass / 0 fail;
+    the two "exactly 2 changed lines" diff counts are what prove PRECACHE stayed byte-identical)
+  retries: 0
+  escalations: 0
+  tokens: worker=38983, checker=25831
+  interventions: 0
+  auditor: match, CONFIDENCE high
+  commit: 52dc502
+  accepted: 2026-07-25
+  NOTE FOR PHASE 2: this is the phase's ONLY cache bump and it has now landed. Every public/ change
+  in the phase (api.js, app.js, styles.css, sw.js, views/parent.js, views/placement.js) is behind
+  it. Steps 1.5 and 1.6 must not touch public/ at all — 1.5's gate asserts that mechanically.
