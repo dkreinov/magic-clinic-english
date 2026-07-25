@@ -113,3 +113,48 @@ STEP 1.1 placement.js honours a client-side re-take flag
     not supposed to; I ran it, in a clean tree, before dispatching the audit)
   commit: a098d3d
   accepted: 2026-07-25
+
+STEP 1.2 the owner-only `#/parent` view and its route
+  tier: WORKER (Sonnet)
+  did: public/app.js — added OWNER_ROUTE const, updated currentRoute() and renderRoute() per the
+    frozen edits (dynamic import of parent.js, setActiveTab moved above the view call).
+    public/views/parent.js (NEW) — words.js-shaped view rendering the four PB-2 cards plus the
+    footer note; only getJson imported. tests/parent-ui.test.js (NEW) — the six frozen tests.
+  surprises: none reported
+  deviations: none reported — but see the process finding below; one went unreported
+  validation_first_try: yes (worker's first run AND my clean re-run — STEP-1.2-OK, 165 pass / 0 fail,
+    contrast gate 52 pairs ALL PASS)
+  retries: 0
+  escalations: 0
+  tokens: worker=62312 (+58733 for the follow-up question), checker=50456 + 51192 (re-audit)
+  interventions: 1 (bad-spec — MINE, see below)
+  auditor: mismatch on the first pass, then match/high on the re-audit after I supplied the missing
+    evidence. Neither pass was wrong: the first auditor could not see PB-2's frozen copy because my
+    excerpt did not contain it, and it said so in CONFIDENCE: low rather than guessing.
+  commit: 639479f
+  accepted: 2026-07-25
+
+  THE PROCESS FINDING, which matters more than the step. I built the worker's spec file by slicing
+  plan.md lines 360-537 (step 1.2 only). That slice NAMES PB-1/PB-2/PB-2a/PB-3/PB-8 but does not
+  QUOTE them — PB-2's frozen Hebrew copy lives at lines 175-277, outside the slice. So I dispatched
+  a packet with a hole in it, which oplan §4.2 calls a bug in the run, and it was mine.
+  The worker did not stop and ask. It grepped for "PB-1", found plan.md, read lines ~175-276 and
+  copied the contract. The OUTPUT is exactly right — I verified the card-4 paragraph is
+  byte-identical (148 chars) to plan.md's frozen text with a node string compare, not by eye. But
+  the rule that should have fired did not: an unanswered question was resolved by a worker's
+  resourcefulness instead of by me, and it was not even listed under DEVIATIONS. Had it wandered
+  further into plan.md it could have implemented a later step's work from the same file.
+  CORRECTION APPLIED for the rest of the phase: every worker spec file is now built as
+  `frozen contracts block (plan.md 175-277) + the step`, so the packet is self-contained and there
+  is nothing left to go looking for. Promote to the field guide at the phase boundary.
+  WHY I DID NOT REVERT: oplan §10.8 says revert on a mismatch, but that rule exists for work that
+  contradicts the spec. This work matches the true frozen contract; what was wrong was the evidence
+  I gave the auditor. So I supplied the evidence and re-audited once, which is exactly §10.8's
+  low-confidence remedy. Reverting correct, mechanically-verified work to re-run it against a
+  better-worded packet would have burned a worker to change nothing on disk.
+  ALSO VERIFIED BY ME, because no auditor could: the view's field reads match the real API.
+  api/placement.js:57 stores `placement.task1 = {correct, total, score, answeredAt}` and sets
+  `placement.completedAt`; lib/profile.js:33 makes `words` a plain object; public/api.js's
+  handleResponse returns `payload.data`, so getJson("/api/profile") yields the profile itself, not
+  the envelope. A wrong guess on any of those three would have shown the owner a screen of blanks
+  and "טרם נעשתה" forever, with every test still green.
