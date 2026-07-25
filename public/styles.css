@@ -155,6 +155,7 @@ a {
   cursor: pointer;
   transition: transform var(--transition-fast), opacity var(--transition-fast), box-shadow var(--transition-fast);
   width: 100%;
+  text-decoration: none;
 }
 
 .btn:active {
