@@ -1,9 +1,9 @@
-CURRENT: phase 2 "visual polish", next step 2.2
+CURRENT: phase 2 "visual polish", next step 2.3
 BASELINES: phase 1 = bbdb60c · phase 2 = 679dcc9 (test baseline 151 pass / gate 28 pairs ALL PASS)
 PLAN: .oplan/band2-and-polish/plan.md
 DESIGN: .oplan/band2-and-polish/design.md (copied in 2026-07-25 — oplan §5 had been unmet)
 ACCEPTED: 1.1 c40eb7f · 1.2 a65067a · 1.3 47c6a56 · 1.4 679dcc9 · 1.5 runtime proof (no commit)
-  · 2.1 d4409a6 (gate now 52 pairs, 154 tests)
+  · 2.1 d4409a6 (gate now 52 pairs, 154 tests) · 2.2 0560910
 FROZEN CONTRACTS IN FORCE:
   B2-1 Band 2 vocabulary comes from the official MoE PDF via the committed deterministic script
   scripts/build_band2.py — never LLM-invented, never hand-edited ·

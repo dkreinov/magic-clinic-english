@@ -231,3 +231,22 @@ STEP 2.1 artwork-derived page background, provably AA-safe
   WHAT THIS STEP ACTUALLY FIXED, beyond the visual brief: the shipped app had --color-border at
   2.92:1 on the painted wash, under the binding 3:1 of WCAG 1.4.11, and the gate could not see it
   because the colour was a literal instead of a token. It is now 3.10:1 and permanently measured.
+
+STEP 2.2 themed loading state in the reader
+  tier: WORKER (Sonnet) · did: public/views/reader.js — .reader-spinner rule replaced (44px border
+    ring -> 56px conic-gradient primary/teal/accent ring cut out by a radial mask, 0.9s -> 1.4s);
+    .reader-loading-art float animation + @keyframes reader-float + a prefers-reduced-motion block
+    added after the reused @keyframes reader-spin; renderGenerating() gained the decorative
+    placement-friend.webp img.
+  surprises: none · deviations: none · first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=42153, checker=30085 · audit: match/high · commit: 0560910
+  ORCHESTRATOR QUALITY CHECK beyond the frozen validation. The gate can prove the CSS text is
+  present but not that the user sees anything: a mask whose opaque zone starts outside the clipped
+  circle renders an INVISIBLE spinner, and every test would still pass. So I computed the geometry.
+  For a 56px box, a `circle` radial-gradient defaults to farthest-corner = hypot(28,28) = 39.60px,
+  so `transparent 56%` ends at 22.17px and `#000 60%` becomes fully opaque at 23.76px, while
+  border-radius clips at 28px. Result: a real 4.24px opaque ring plus a 1.58px feather — matching
+  the 4px border ring it replaces. Had the stops been percentages of the RADIUS rather than the
+  farthest corner, the ring would have been ~1px; worth recording because that is the trap.
+  Also confirmed the frozen Hebrew string appears in the diff only as unchanged CONTEXT, not as a
+  +/- line, so it is byte-identical rather than merely re-typed correctly.
