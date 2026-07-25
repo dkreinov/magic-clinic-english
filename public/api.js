@@ -1,3 +1,26 @@
+const CODE_KEY = "appCode";
+
+function storedCode() {
+  try {
+    return localStorage.getItem(CODE_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
+function askForCode() {
+  const entered = window.prompt("קוד כניסה");
+  const code = entered ? entered.trim() : "";
+  if (code) {
+    try {
+      localStorage.setItem(CODE_KEY, code);
+    } catch {
+      /* private mode — the code just will not persist */
+    }
+  }
+  return code;
+}
+
 async function handleResponse(response) {
   let payload;
   try {
@@ -14,34 +37,39 @@ async function handleResponse(response) {
   return payload.data;
 }
 
-export async function getJson(path) {
+async function request(path, init, allowRetry = true) {
   let response;
   try {
     response = await fetch(path, {
-      method: "GET",
-      headers: { Accept: "application/json" },
+      ...init,
+      headers: { ...init.headers, "x-app-code": storedCode() },
     });
   } catch {
     throw new Error("שגיאת רשת");
+  }
+
+  if (response.status === 401 && allowRetry) {
+    askForCode();
+    return request(path, init, false);
   }
 
   return handleResponse(response);
 }
 
-export async function postJson(path, body) {
-  let response;
-  try {
-    response = await fetch(path, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-  } catch {
-    throw new Error("שגיאת רשת");
-  }
+export async function getJson(path) {
+  return request(path, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+  });
+}
 
-  return handleResponse(response);
+export async function postJson(path, body) {
+  return request(path, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(body),
+  });
 }

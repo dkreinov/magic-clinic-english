@@ -3,8 +3,14 @@ import { loadProfile, saveProfile } from '../lib/store.js';
 import { defaultProfile, markWordKnown } from '../lib/profile.js';
 import { scoreTask1, scoreTask2, bandForScore, clientView } from '../lib/placement.js';
 import bank from '../data/placement-items.json' with { type: 'json' };
+import { isAuthorized, rejectUnauthorized } from '../lib/auth.js';
 
 export default async function handler(req, res) {
+  if (!isAuthorized(req)) {
+    rejectUnauthorized(res, sendJson);
+    return;
+  }
+
   if (req.method === 'GET') {
     sendJson(res, 200, { ok: true, data: clientView(bank) });
     return;

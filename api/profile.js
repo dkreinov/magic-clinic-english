@@ -1,10 +1,16 @@
 import { sendJson, readJsonBody } from '../lib/http.js';
 import { loadProfile, saveProfile } from '../lib/store.js';
 import { defaultProfile, applyWordTap, markWordKnown, setLearner, logCheck } from '../lib/profile.js';
+import { isAuthorized, rejectUnauthorized } from '../lib/auth.js';
 
 const WORD_SOURCES = ['placement', 'tap', 'band'];
 
 export default async function handler(req, res) {
+  if (!isAuthorized(req)) {
+    rejectUnauthorized(res, sendJson);
+    return;
+  }
+
   if (req.method === 'GET') {
     let p = await loadProfile();
     if (p === null) {

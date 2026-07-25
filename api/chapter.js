@@ -4,8 +4,14 @@ import { defaultProfile } from '../lib/profile.js';
 import { generateChapter } from '../lib/story.js';
 import { chatJSON } from '../lib/openai.js';
 import band1 from '../data/band1.json' with { type: 'json' };
+import { isAuthorized, rejectUnauthorized } from '../lib/auth.js';
 
 export default async function handler(req, res) {
+  if (!isAuthorized(req)) {
+    rejectUnauthorized(res, sendJson);
+    return;
+  }
+
   if (req.method !== 'POST') {
     sendJson(res, 405, { ok: false, error: `Method ${req.method} not allowed` });
     return;

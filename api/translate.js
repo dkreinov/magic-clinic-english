@@ -1,7 +1,13 @@
 import { sendJson, readJsonBody } from '../lib/http.js';
 import { chatJSON } from '../lib/openai.js';
+import { isAuthorized, rejectUnauthorized } from '../lib/auth.js';
 
 export default async function handler(req, res) {
+  if (!isAuthorized(req)) {
+    rejectUnauthorized(res, sendJson);
+    return;
+  }
+
   if (req.method !== 'POST') {
     sendJson(res, 405, { ok: false, error: `Method ${req.method} not allowed` });
     return;
