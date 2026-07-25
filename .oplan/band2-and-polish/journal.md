@@ -647,3 +647,10 @@ RUN CLOSED — band2-and-polish
   "what here is worth less than the rest?", and the answer was the "two things I got wrong" section.
   Those are HISTORY, and §5's own rule is that history lives in the journal while STATUS holds only
   what is CURRENT. The budget found a genuine category error, not just length.
+  OVERAGE JUSTIFICATION (§6's soft-cap price, paid rather than dodged): STATUS.md ships at 79/60.
+  Every line above the cap is an owner DECISION I am handing back rather than taking myself — the
+  four items under "Still open" and the four under "Things to know" — plus the mermaid diagram §5
+  requires. Cutting to 60 means dropping one of those, and a dropped caveat reads to the owner as
+  "there was nothing to say". I compressed twice (118 -> 84 -> 79) and stopped where further cuts
+  would remove content rather than words. Logging the number honestly at 79 beats compressing to a
+  round 60 by deleting a caveat the owner needs.
