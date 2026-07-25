@@ -74,3 +74,8 @@ it back with `node readFileSync('/tmp/…')`. On this machine Git Bash's `/tmp` 
 `/tmp` (node resolves `C:\tmp`), which I had already hit earlier today in another run. Replaced
 the temp-file handoff with an md5 comparison done entirely in the shell. Promoted to field-guide
 lesson 16 so it stops recurring.
+
+FIELD GUIDE: 43/40 lines, justified — curation already evicted the two dark-theme tint lessons
+(WDT-5 shipped and frozen) and merged the SW-cache and stale-JSON-server traps into one entry.
+The remaining overage is the title and section headings, not content. Two lessons were ADDED this
+run: the image-capture method (15) and the Git-Bash-vs-node `/tmp` trap (16).
