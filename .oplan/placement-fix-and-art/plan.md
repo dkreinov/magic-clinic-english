@@ -281,10 +281,34 @@ method that produced the 89-duplicate incident. Superseded. The new method, prov
 4. Poll from Bash for `~/Downloads/placement-<lemma>.png`, assert exactly ONE such file exists,
    then `mv` it to `assets/placement/<lemma>.png`.
 
-### The 12 (prompts frozen earlier in this plan; masters committed to `assets/placement/`)
+### FROZEN RICH PROMPTS (restored — an earlier plan rewrite deleted them; see journal)
 
-`pet` (DONE, kept — owner: "the puppy looks great", 1254x1254) · `mom` · `camp` · `fan` · `dad` ·
-`desk` · `singer` · `horse` · `zoo` · `movie` · `monkey` · `steak`
+Owner directed RICH SCENES, not flat icons. Each prompt names its subject as the CENTRAL HERO so
+it still reads once shrunk to a tile. The first chat message carries the full style sentence;
+every later message begins "Same style, same square 1:1 format. Now:" and ends "No text, no
+letters, no watermark, no frame or border."
+
+Style sentence: "Warm cozy cartoon illustration: soft painterly 3D-cartoon look, warm golden
+lighting, wood-and-magic fantasy world, teal and violet and amber accents. Aimed at an
+11-year-old, charming and adventurous, not babyish."
+
+| lemma | subject clause |
+|---|---|
+| pet | a happy puppy dog curled on a cushion in a cozy magical veterinary clinic |
+| mom | a warm smiling cartoon mother in the clinic's round doorway, arms gently open in welcome |
+| camp | a cozy campsite at golden hour — a glowing tent, a small campfire, tall pine trees, fireflies |
+| fan | a cartoon electric fan with spinning blades on a wooden clinic shelf, papers fluttering |
+| dad | a warm smiling cartoon father in the clinic, sleeves rolled up |
+| desk | a cozy wooden study desk with a glowing lamp, an open book and potion bottles |
+| singer | a cheerful cartoon singer on a small stage holding a microphone in a warm spotlight |
+| horse | a friendly cartoon horse in a sunny magical meadow beside a wooden stable |
+| zoo | a magical zoo scene — an archway, a giraffe and a lion, colourful banners |
+| movie | a cozy movie-night scene — a glowing screen, a film clapperboard, a bucket of popcorn |
+| monkey | a cheerful cartoon monkey swinging on a vine in a leafy jungle, holding a banana |
+| steak | a hearty grilled steak on a plate on a rustic wooden table in warm tavern light |
+
+Progress: pet DONE (owner-approved) · mom DONE · camp DONE · remaining: fan, dad, desk, singer,
+horse, zoo, movie, monkey, steak.
 
 ### Phase 3 acceptance criteria (frozen)
 
@@ -311,37 +335,153 @@ console.log('PHASE3-OK 12 distinct square masters');})();"
 
 ## Phase 4 — optimize + wire into the UI  (executor steps)
 
-### Step 4.1 — web derivatives
+### Step 4.1 — web derivatives  (WORKER, retry 2)
 
-- Files: `scripts/optimize-placement.js` (NEW) only. Mirrors `scripts/optimize-assets.js` style
-  (sharp, ESM). Reads the 12 masters from `assets/placement/`, writes
-  `public/assets/placement/<lemma>.webp` at width 256, quality 72.
-- Validation: script runs clean; 12 webp files exist; each square; all 12 md5-distinct; each
-  < 60 KB; `npm test` 146/146.
+- **Files:** `scripts/optimize-placement.js` (NEW) only.
+- **Goal:** Node ESM script mirroring `scripts/optimize-assets.js`. It MUST
+  `await mkdir(OUT, { recursive: true })` — `public/assets/placement/` does not exist yet. Reads
+  the 12 masters `assets/placement/<lemma>.png`, writes `public/assets/placement/<lemma>.webp`
+  at `width: 256` (`withoutEnlargement: true`), `webp({ quality: 72, effort: 4 })`, logging each
+  file. LEMMAS, in order: pet, mom, camp, fan, dad, desk, singer, horse, zoo, movie, monkey, steak.
+- **Non-goals:** do not touch `scripts/optimize-assets.js`, the masters, `public/views/`, or tests.
+- **Validation (frozen):**
 
-### Step 4.2 — render images in the placement view
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && node scripts/optimize-placement.js \
+  && node -e "
+const sharp=require('./node_modules/sharp/dist/index.cjs');const fs=require('fs'),c=require('crypto');
+const L=['pet','mom','camp','fan','dad','desk','singer','horse','zoo','movie','monkey','steak'];
+(async()=>{const seen=new Map();
+for(const l of L){const f='public/assets/placement/'+l+'.webp';
+ if(!fs.existsSync(f))throw new Error('MISSING '+f);
+ const m=await sharp(f).metadata(); const b=fs.readFileSync(f);
+ if(m.format!=='webp')throw new Error('not webp: '+l);
+ if(m.width!==256)throw new Error('bad width '+m.width+': '+l);
+ if(m.width!==m.height)throw new Error('not square: '+l);
+ if(b.length>60000)throw new Error('too big '+b.length+': '+l);
+ const h=c.createHash('md5').update(b).digest('hex');
+ if(seen.has(h))throw new Error('DUPLICATE '+l+' == '+seen.get(h)); seen.set(h,l);}
+console.log('WEBP-OK 12 distinct');})();" \
+  && npm test 2>&1 | tail -4 \
+  && echo STEP-4.1-OK
+```
 
-- Files: `public/views/placement.js` only. ADDITIVE per PFA-2 — `data/` untouched, so every
-  existing assertion stays green.
-- Add a module-level constant mapping each emoji to its image + Hebrew alt text (the client
-  receives only emoji strings — `clientView` in `lib/placement.js` strips `lemma`/`he` — so the
-  map must live in the view):
-  `🐕 pet חיית מחמד · 👩 mom אמא · 🏕️ camp מחנה · 🌀 fan מאוורר · 👨 dad אבא · 🧑‍💻 desk שולחן ·
-   🎤 singer זמר · 🐎 horse סוס · 🦁 zoo גן חיות · 🎬 movie סרט · 🐒 monkey קוף · 🥩 steak סטייק`
-- `audio-to-picture` options: render `<img class="opt-art" src="/assets/placement/<lemma>.webp"
-  alt="<he>">` inside the existing `.placement-option-btn` when the emoji is mapped; fall back to
-  the raw emoji when it is not. Class names, `data-action`, `data-choice` unchanged.
-- `picture-to-word` prompt (`.placement-emoji-big`): render the same image large when mapped.
-- Enlarge the tiles in `VIEW_STYLE` so rich art is legible (owner-directed): `.placement-option-btn`
-  min-height ~150px, `.opt-art` fills the tile (`width:100%; height:100%; object-fit:cover;
-  border-radius:calc(var(--radius) - 4px); display:block`).
-- Validation: `npm test` 146/146; contrast gate exits 0; greps prove the map, the `<img>`, the
-  `alt`, and the enlarged tile exist; no Hebrew string removed; only that one file changed.
+### Step 4.2 — render the artwork  (WORKER, retry 2)
 
-### Step 4.3 — service-worker cache bump
+- **Files:** `public/views/placement.js` only. ADDITIVE — `data/` untouched, so every existing
+  assertion stays green.
+- **(a)** Add ONE module-level constant plus helper, immediately above `function header(`:
 
-- Files: `public/sw.js` + `tests/shell.test.js`. `magic-vet-v4` -> `magic-vet-v5` and its
-  assertion string. PRECACHE list frozen. Required because `placement.js` is precached.
+```js
+const OPT_ART = {
+  "\u{1F415}": { src: "/assets/placement/pet.webp", alt: "חיית מחמד" },
+  "\u{1F469}": { src: "/assets/placement/mom.webp", alt: "אמא" },
+  "\u{1F3D5}\uFE0F": { src: "/assets/placement/camp.webp", alt: "מחנה" },
+  "\u{1F300}": { src: "/assets/placement/fan.webp", alt: "מאוורר" },
+  "\u{1F468}": { src: "/assets/placement/dad.webp", alt: "אבא" },
+  "\u{1F9D1}\u200D\u{1F4BB}": { src: "/assets/placement/desk.webp", alt: "שולחן" },
+  "\u{1F3A4}": { src: "/assets/placement/singer.webp", alt: "זמר" },
+  "\u{1F40E}": { src: "/assets/placement/horse.webp", alt: "סוס" },
+  "\u{1F981}": { src: "/assets/placement/zoo.webp", alt: "גן חיות" },
+  "\u{1F3AC}": { src: "/assets/placement/movie.webp", alt: "סרט" },
+  "\u{1F412}": { src: "/assets/placement/monkey.webp", alt: "קוף" },
+  "\u{1F969}": { src: "/assets/placement/steak.webp", alt: "סטייק" },
+};
+
+function optArt(emoji) {
+  const a = OPT_ART[emoji];
+  return a ? `<img class="opt-art" src="${a.src}" alt="${a.alt}" />` : emoji;
+}
+```
+
+  The `\u{...}` escapes are deliberate: no multi-byte emoji has to survive hand-editing, which is
+  a known hazard on this machine. `\u{1F3D5}\uFE0F` carries the variation selector and
+  `\u{1F9D1}\u200D\u{1F4BB}` the ZWJ, exactly as the data file stores them.
+- **(b)** In `renderTask1Item`, in the `audio-to-picture` option map, the button template ends
+  `data-choice="${i}">${emoji}</button>`. Change ONLY `${emoji}` to `${optArt(emoji)}`.
+- **(c)** In the same function, `<div class="placement-emoji-big">${item.emoji}</div>` becomes
+  `<div class="placement-emoji-big">${optArt(item.emoji)}</div>`.
+- **(d)** In `VIEW_STYLE`: in `.placement-option-btn`, change `min-height: 76px;` to
+  `min-height: 150px;` and `padding: 8px;` to `padding: 6px;`. Then APPEND these two rules at the
+  very end of the template literal (exact values):
+
+```css
+  .opt-art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: calc(var(--radius) - 4px);
+  }
+
+  .placement-emoji-big .opt-art {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    border-radius: var(--radius);
+  }
+```
+
+- **Non-goals:** no Hebrew/English user-visible string changed; no class name, `data-action`,
+  `data-choice`, `data-src` or `dir` changed; `.placement-option-btn.word` untouched (it holds
+  English words, not pictures); no other file.
+- **Validation (frozen):**
+
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && npm test 2>&1 | tail -4 \
+  && [ "$(node scripts/check-contrast.mjs | tail -1)" = 'ALL PASS' ] \
+  && grep -qF -- 'const OPT_ART = {' public/views/placement.js \
+  && grep -qF -- 'function optArt(emoji)' public/views/placement.js \
+  && grep -qF -- '${optArt(emoji)}</button>' public/views/placement.js \
+  && grep -qF -- '${optArt(item.emoji)}</div>' public/views/placement.js \
+  && grep -qF -- 'min-height: 150px;' public/views/placement.js \
+  && grep -qF -- 'object-fit: cover;' public/views/placement.js \
+  && [ "$(grep -c 'assets/placement/' public/views/placement.js)" = "12" ] \
+  && [ "$(git diff HEAD --name-only -- public data lib api tests scripts)" = "public/views/placement.js" ] \
+  && echo STEP-4.2-OK
+```
+
+### Step 4.3 — service-worker cache bump  (WORKER, retry 2)
+
+- **Files:** `public/sw.js` + `tests/shell.test.js`. `magic-vet-v4` -> `magic-vet-v5`, plus the
+  matching assertion string. PRECACHE list frozen (deepStrictEqual). Required because
+  `placement.js` is precached; without it returning devices keep the old view forever.
+- **Validation (frozen):**
+
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && npm test 2>&1 | tail -4 \
+  && grep -qF -- 'magic-vet-v5' public/sw.js \
+  && grep -qF -- "sw.includes('magic-vet-v5')" tests/shell.test.js \
+  && [ "$(grep -rl 'magic-vet-v4' public/ tests/ | wc -l)" = "0" ] \
+  && [ "$(git diff HEAD -- public/sw.js | grep -c '^[+-][^+-]')" = "2" ] \
+  && [ "$(git diff HEAD -- tests/shell.test.js | grep -c '^[+-][^+-]')" = "2" ] \
+  && echo STEP-4.3-OK
+```
+
+### Step 4.4 — orchestrator RUNTIME proof (not dispatched)
+
+Static greps can pass while the feature is broken at runtime, so — as in step 1.2 — the
+orchestrator drives the REAL module headlessly (linkedom DOM, stubbed `Audio`/`location`, `fetch`
+pointed at the isolated sandbox on :3010), renders task1, and asserts from the LIVE DOM that:
+every `audio-to-picture` option button contains an `<img class="opt-art">` whose `src` starts
+`/assets/placement/` and whose `alt` is non-empty; the `picture-to-word` prompt likewise; and
+clicking an option still advances the item — proving the `<img>` child did not break the click
+handler. Sandbox only; the learner profile is never contacted.
+
+### Phase 4 acceptance criteria (frozen)
+
+1. `npm test` 146/146 and the contrast gate exits 0.
+2. STEP-4.1-OK, STEP-4.2-OK and STEP-4.3-OK all print.
+3. `git diff --name-only <phase-4 baseline> -- public data lib api tests scripts` lists exactly:
+   `public/sw.js`, `public/views/placement.js`, `scripts/optimize-placement.js`,
+   `tests/shell.test.js`, plus the 12 files under `public/assets/placement/`.
+4. No user-visible Hebrew string added or removed in `public/views/placement.js` — the only new
+   Hebrew is `alt` text inside `OPT_ART`.
+5. The step 4.4 runtime proof passes: 4 option `<img>`s on an audio item, a prompt `<img>` on a
+   picture item, all with non-empty `alt`, and a click still advances.
 
 ## Phase 5 — deploy and verify
 

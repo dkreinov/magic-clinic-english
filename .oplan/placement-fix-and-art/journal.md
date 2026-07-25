@@ -353,3 +353,42 @@ by md5), an executor packet, and a fresh-eyes audit.
 DECISION NOW OPEN FOR THE OWNER: both routes are viable again (API recovered; ChatGPT web proven
 working with a strong style match). Which to use for the remaining 11 — and note the proven
 sample already exists and can be kept as the `pet` master rather than regenerated.
+
+## PLAN REVIEW — phases 3–5 (fresh eyes, before any executor dispatch)
+
+VERDICT: fix-first. Six findings, ALL accepted and fixed:
+
+1. `[boundary] Phase 3` — "prompts frozen earlier in this plan" was a STALE CROSS-REFERENCE: my
+   own python rewrite of the Phase 3 section had DELETED the 12 frozen rich prompts from plan.md.
+   They survived only in my context — precisely the crash-only failure oplan exists to prevent.
+   **Fixed:** prompts restored to plan.md as a table, with the style sentence and the progress
+   marker. Had the session died there, the run's core content would have been unrecoverable.
+2. `[undecided] 4.2` — no markup/CSS specified for the `picture-to-word` `.placement-emoji-big`
+   image swap. **Fixed:** exact `optArt(item.emoji)` substitution plus a frozen
+   `.placement-emoji-big .opt-art` rule (200x200).
+3. `[undecided] 4.2` — "min-height ~150px" was approximate. **Fixed:** exact values frozen
+   (`min-height: 150px`, `padding: 6px`), no tilde anywhere.
+4. `[missing] 4.1/4.2/4.3` — no frozen validation commands and no Phase 4 acceptance criteria;
+   validation was prose ("greps prove the map exists"), leaving each cheap worker to invent its
+   own pass/fail. **Fixed:** three frozen validation blocks (STEP-4.1/4.2/4.3-OK) and five
+   mechanical acceptance criteria.
+5. `[acceptance] Phase 4` — static greps can pass while the feature is broken at runtime.
+   **Fixed:** added step 4.4, an orchestrator runtime proof driving the real module headlessly
+   (same technique as step 1.2) and asserting from the LIVE DOM that the imgs render with alt
+   text and that a click still advances the item.
+6. `[boundary] 4.1` — `public/assets/placement/` does not exist. **Fixed:** `mkdir recursive`
+   now stated explicitly rather than implied by "mirrors optimize-assets.js".
+
+VALUABLE NEGATIVE RESULTS — the reviewer verified by inspection, so these are settled facts:
+  · `clientView` really does strip `lemma`/`he`; the browser sees only emoji strings, so the
+    emoji->image map MUST live in the view. Plan claim confirmed.
+  · The 12-emoji map covers every emoji used as an option or prompt in the bank, byte-for-byte
+    including the ZWJ in desk and the variation selector in camp. No emoji is missed.
+  · Rendering an `<img>` inside `.placement-option-btn` CANNOT break click handling: the handler
+    reads `data-choice` off the closure variable `btn`, not `event.target`. This was my main
+    worry about the whole approach and it is now cleared.
+  · No test asserts emoji-as-text, so the swap is not a test break.
+
+Mitigation adopted from finding 1: the OPT_ART map in step 4.2 is specified with `\u{...}`
+escapes rather than literal emoji, so no multi-byte character has to survive hand-editing by a
+worker on this Windows/Git-Bash machine.
