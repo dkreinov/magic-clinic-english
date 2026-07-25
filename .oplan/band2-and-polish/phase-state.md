@@ -1,11 +1,13 @@
-CURRENT: phase 3 "deploy and verify". Step 3.1 ACCEPTED. Next: step 3.2 (pre-deploy gate,
-  orchestrator-run), then 3.3 THE DEPLOY.
+CURRENT: RUN CLOSED 2026-07-25. Phase 3 CLOSED (7/7 criteria). All three phases are LIVE on
+  https://english-app-three-tan.vercel.app · deployment dpl_GqmhGP47ksHp7CbYEFRGVm3bA9E2.
+  Nothing is in flight. Any further work starts a NEW run.
 BASELINES: phase 1 = bbdb60c · phase 2 = 679dcc9 · phase 3 = bc2f5eb (157 tests, gate 52 pairs)
 PLAN: .oplan/band2-and-polish/plan.md
 DESIGN: .oplan/band2-and-polish/design.md (copied in 2026-07-25 — oplan §5 had been unmet)
 ACCEPTED: 1.1 c40eb7f · 1.2 a65067a · 1.3 47c6a56 · 1.4 679dcc9 · 1.5 runtime proof (no commit)
   · 2.1 d4409a6 (gate now 52 pairs, 154 tests) · 2.2 0560910 · 2.3 1c58dfb · 2.4 c328d82 · 2.5 984b6f7 · 2.6 fce1e8f · 2.7 e51394e
-  · 3.1 537bbf1 (owner-facing docs corrected; audit match/high)
+  · 3.1 537bbf1 (owner-facing docs corrected; audit match/high) · 3.2 pre-deploy gate (no commit)
+  · 3.3 DEPLOYED · 3.4 live shell verified · 3.5 live API verified · 3.6 record closed
 FROZEN CONTRACTS IN FORCE:
   B2-1 Band 2 vocabulary comes from the official MoE PDF via the committed deterministic script
   scripts/build_band2.py — never LLM-invented, never hand-edited ·
@@ -51,7 +53,12 @@ DEPLOYMENT LEDGER (record-gap repair 3 — no prior run recorded which commit a 
     https://english-puiu1tyb9-dkreinovs-projects.vercel.app · commit ef140ce (INFERRED by timestamp
     correlation, not recorded anywhere — re-verify at step 3.3 before trusting it) · serves
     magic-vet-v6 · this is the ROLLBACK TARGET.
-  incoming = <filled by step 3.3, with its commit sha>
+  incoming (LIVE NOW) = dpl_GqmhGP47ksHp7CbYEFRGVm3bA9E2 ·
+    https://english-msi6365hc-dkreinovs-projects.vercel.app · commit 00a100cf · serves magic-vet-v7 ·
+    deployed 2026-07-25, aliased to the canonical URL, verified byte-for-byte by steps 3.4 and 3.5.
+  TO ROLL BACK: "$(npm prefix -g)/vercel" rollback https://english-puiu1tyb9-dkreinovs-projects.vercel.app --yes
+    (code-only; no storage code or profile schema changed, so nothing to un-migrate. The sw version
+    bump makes returning devices converge back to v6 after one reload.)
 OPEN QUESTIONS: none blocking. Phase 3's planner returned BLOCKERS: none; all 8 of its record gaps
   are repaired or explicitly deferred in plan.md's phase-3 repair table.
 OWNER-FACING NOTES (for the phase 3 STATUS rewrite, not blockers):
@@ -70,6 +77,9 @@ DEFERRED (needs owner approval when reached): harder placement items · the test
   across README.md and docs/owner-handoff.md with no cross-reference · the tracked
   bash.exe.stackdump at the repo root · amending FROZEN design.md §2/§9 to record the APP_CODE gate.
   All four are written up in plan.md's "Deferred" section.
-NOT DEPLOYED YET: phases 1-2 are committed but not live. Production still serves magic-vet-v6 and
-  the single-SVG manifest. Step 3.3 is the deploy.
-BLOCKED: no.
+DEPLOYED AND VERIFIED: all three phases are live. Nine static files are md5-identical between
+  production and the worktree; the live manifest carries the four-entry icon set; /api/health is up;
+  the /api/chapter 401 reject-path probe proves data/band2.json reached the production bundle.
+  THE LEARNER'S PROFILE WAS NEVER CONTACTED — no frozen command in phase 3 contains /api/profile
+  (checked mechanically), the storage code is untouched since bbdb60c, and .data/ is empty.
+BLOCKED: no. Run complete.

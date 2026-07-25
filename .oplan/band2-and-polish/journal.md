@@ -549,3 +549,89 @@ STEP 3.3 production deploy (ORCHESTRATOR-RUN, not dispatched)
   The plan predicted exactly this id and url at planning time, and DP-4 says the recorded value wins
   regardless — it happened to agree, so nothing moved under us in the planning window.
   INCOMING commit = 3bbc114345916f80055bd0ff58b561310922204c
+  DEPLOY EXECUTED: "$(npm prefix -g)/vercel" deploy --prod --yes
+    incoming id  = dpl_GqmhGP47ksHp7CbYEFRGVm3bA9E2
+    incoming url = https://english-msi6365hc-dkreinovs-projects.vercel.app
+    aliased to   = https://english-app-three-tan.vercel.app (the canonical URL, DP-1)
+    commit       = 00a100cf7624a6ca26c316745ce418cf33cca772 (the tree vercel uploaded)
+  VALIDATION: STEP-3.3-OK (canonical URL 200; live /sw.js contains const CACHE = "magic-vet-v7").
+
+STEP 3.4 verify the live shell byte-for-byte (ORCHESTRATOR-RUN — amendment A)
+  VALIDATION: LIVE-MANIFEST-OK, then STEP-3.4-OK. Nine files md5-identical between production and
+  the worktree: sw.js, styles.css, app.js, views/reader.js, manifest.webmanifest, icons/icon.svg and
+  the three icon PNGs. Live apple-touch-icon points at icon-192.png. All three PNGs answer
+  content-type: image/png. The live manifest's icons[] deep-equals the frozen four-entry array and
+  background_color/theme_color are unchanged.
+  DP-2 EARNED ITS PLACE IMMEDIATELY. The planner measured, before writing the gate, that live `/`
+  (3064 bytes) differs from `git show <sha>:public/index.html` (2983) purely because index.html is
+  CRLF on disk and LF in git. Comparing live bytes to a git BLOB would have failed on a perfectly
+  correct deploy — a false alarm mid-deploy, which is the worst moment for one. vercel uploads the
+  WORKING TREE, so the worktree is the only correct comparand.
+
+STEP 3.5 verify the live API surface, including that Band 2 reached production
+  VALIDATION: STEP-3.5-OK. /api/health returns exactly {"ok":true,"data":{"status":"up","version":1}};
+  POST /api/chapter {"action":"ping"} with no code header -> 401 with "ok":false; GET /api/placement
+  -> 401; GET /data/band2.json -> 404 (server-side data is not web-reachable).
+  THIS IS THE ONLY LIVE PROOF THAT PHASE 1 SHIPPED, AND IT COST NOTHING. api/chapter statically
+  imports data/band2.json, so if that 2016-entry file had failed to bundle the function would fail
+  to LOAD and answer 5xx. A 401 from the auth gate can only be produced by a module that loaded
+  successfully. So a reject-path probe proves the whole module graph — for free, with no OpenAI call
+  and without touching her profile. Promoted to field-guide lesson 12.
+  WHY 401 AND NOT "401 or 400" — the assertion is deliberately narrow. With APP_CODE set the handler
+  answers 401 before any loadProfile(); with APP_CODE UNSET the same request would fall through to
+  `action !== 'generate'` -> 400, also before any loadProfile() and before any chat(). Both branches
+  are free and profile-free, so the probe is safe either way — but a 400 would mean THE PRODUCTION
+  GATE IS OPEN, which is a finding, not a pass. Accepting both would have hidden that.
+
+PHASE 3 CLOSED — all 7 acceptance criteria pass
+  1. STEP-3.1-OK .. STEP-3.5-OK all printed, each re-run by me in a clean state.
+  2. npm test 157/157 0 fail; check-contrast.mjs exits 0, ALL PASS, exactly 52 PASS lines.
+  3. Working tree clean; the delta vs bbdb60c is an EXACT string match to the frozen 23-path list.
+  4. Nine live files md5-identical to the worktree; sw at v7; PNGs typed image/png; manifest icons
+     deep-equal.
+  5. /api/health exact payload; the /api/chapter 401 probe proves the module graph loaded.
+  6. PROFILE NEVER CONTACTED, proven three ways: `grep -c '/api/profile'` over every frozen command
+     in this phase = 0; storage code (api/profile.js, lib/store.js, lib/profile.js) untouched since
+     bbdb60c; .data/ exists but is EMPTY — no profile.json.
+  7. Rollback target recorded BEFORE the deploy, with its commit sha (DP-4).
+  ONE HONEST NOTE ON CRITERION 6. My first run of the check grepped the whole phase-3 section and
+  got 9 hits, which looked alarming for about ten seconds. Eight were PROHIBITIONS in prose ("never
+  request /api/profile") and one was `-- api/profile.js` as a git PATHSPEC in step 3.2's local gate
+  — the check that the storage code was never modified. Re-run against only the fenced command
+  blocks, and against the criterion's exact string `/api/profile` (with the leading slash, which is
+  what made `api/profile.js` not match), the count is 0. The leading slash in the frozen criterion
+  was load-bearing, and I did not notice that until it did its job.
+  ALSO LOGGED AGAINST ME: that same investigative command wrote a `p3.tmp` scratch file into the
+  REPO ROOT, which made `git status --porcelain` report a dirty tree in my own gate for one command.
+  I deleted it in the same breath and it postdates the deploy, so nothing shipped — but it is field-
+  guide lesson 1 violated by the person who wrote it, and lesson 1 now says "NEVER the repo root".
+  steps: 6 (1 dispatched to a worker, 5 orchestrator-run — see amendment A)
+  first-try passes: 1/1 dispatched · escalations: 0 · interventions: 0 · audits: 1 (match/high)
+  tokens: planner=165085, worker=37042, checker=52994, PHASE TOTAL=255121 (computed with awk).
+  cost split by model: unavailable — the harness reports no per-call cost readout. Not estimated.
+  orchestrator_context: unavailable — no context readout was taken. Not estimated.
+  field_guide: 40/40 lines (measured with wc -l) — AT BUDGET, not over. Adding the deploy lesson
+    forced real eviction: lesson 10 lost the CSP-sink detail, 11 lost the resize->extend note, 9 and
+    4 were tightened, and lesson 3's "146 tests" line became the contrast-gate-runs-in-npm-test fact
+    that phase 2 had parked for promotion. Four new facts landed (rollback-target-before-deploy,
+    worktree-not-blob md5, cleanUrls 308, the free reject-path module probe) for a net zero lines.
+
+RUN CLOSED — band2-and-polish
+  RUN TOTAL: 1,052,303 subagent tokens (phase1 284,818 + phase2 512,364 + phase3 255,121; summed
+  with awk, per §12's "compute every total with a command"). Interventions across the whole run: 2,
+  BOTH MINE (phase 1's step-1.4 uncommitted-predecessor gate, phase 2's step-2.6 extract/stats gate).
+  Zero escalations up the model ladder in three phases: every dispatched step was completed by
+  Sonnet from the spec, first try in 12 of 13 cases. That is the number that says the specs were
+  good, and it is the honest answer to §12's question of whether the cheap-worker idea paid.
+  WHERE THE MACHINERY EARNED ITS KEEP, concretely, over three phases:
+   · the executor escalation rule caught MY broken validation gate in 2.6 — the worker root-caused a
+     sharp bug instead of "fixing" the padding colour to make my wrong gate go green;
+   · the auditor caught a fluent, false sentence in a frozen document in 2.7 that no grep could see;
+   · the fresh planner found, from files alone, that the live API has an entry-code gate this run's
+     record never mentioned, and that no rollback procedure had EVER been written down here;
+   · and the frozen-before-the-work acceptance criteria caught nothing at all in phase 3 — which is
+     what a held-out test looks like when the work was actually right.
+  WHERE IT DID NOT: phase 3 needed six steps and only ONE of them had any typing in it. Five were
+  orchestrator-run. A run whose last phase is mostly "the manager runs five commands" is a run where
+  the worker/auditor apparatus is idle overhead, and I said so in amendment A rather than staging
+  ceremonial dispatches to keep the shape looking right.
