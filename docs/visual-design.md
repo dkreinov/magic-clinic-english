@@ -65,6 +65,46 @@ Source: `public/styles.css` `:root` block, cross-checked against plan.md contrac
 | `--nav-height` | `68px` | Bottom nav height | not a color — carried over unchanged from the light-cream era |
 | `--transition-fast` | `150ms ease` | Fast UI transition timing | not a color — carried over unchanged from the light-cream era |
 
+### Amendment 2026-07-25 — page background composition (visual-polish run)
+
+The page background is no longer a flat `--color-bg` fill. `body`'s `background-image` now
+paints three radial glows over a linear top wash, composited from four new tokens:
+
+| Token | Value | Role |
+|---|---|---|
+| `--color-bg-top` | `#361d08` | Warm top wash over the first 340px |
+| `--color-bg-glow-violet` | `#321f1a` | Upper-left violet light |
+| `--color-bg-glow-teal` | `#282416` | Upper-right teal light |
+| `--color-bg-glow-amber` | `#331f0c` | Lower amber lantern light |
+
+Each token's contrast against `--color-border` (`#a35d22`) has been measured and clears the
+3:1 WCAG 1.4.11 minimum this section declares binding: `--color-bg-top` 3.10:1,
+`--color-bg-glow-violet` 3.08:1, `--color-bg-glow-teal` 3.06:1, `--color-bg-glow-amber` 3.09:1.
+
+**The defect this amendment fixed:** before this change, `body` painted a raw literal top stop
+of `#3d2109`, never declared as a CSS custom property. `scripts/check-contrast.mjs` only parses
+hex values declared in `:root`, so it never measured that colour at all. On it, `--color-border`
+(`#a35d22`) measured **2.92:1** — below the binding 3:1 — and bordered controls such as
+`.placement-option-btn` and `.placement-question-option` sit directly on that surface. The gate
+reported `ALL PASS` over a surface that failed. The corrected `#361d08` measures 3.10:1.
+
+**The rule that prevents a recurrence:** any colour painted in the `body` background MUST be
+one of the four tokens above (or `--color-bg`, or `transparent`), and MUST carry its own six
+pairs in `scripts/check-contrast.mjs`. A raw hex in a background is invisible to the gate.
+
+**Why measuring only the four layer colours is sufficient:** gradients interpolate per channel,
+so every composited pixel is a convex combination of the layer colours; relative luminance is
+convex in each channel, so no composited pixel is lighter than the lightest layer. Checking the
+layers therefore bounds every pixel between them. This was also verified empirically by brute
+force over 14,641 composites of all four layers at every opacity: the worst `--color-border`
+contrast was 3.0618, occurring exactly at `#282416` — one of the four checked layers — so the
+check is not merely sufficient but tight.
+
+**The new test:** `tests/background.test.js` asserts the four token values, asserts the exact
+`background-image` composition and that it contains no `#` character, and asserts
+`scripts/check-contrast.mjs` exits 0 — which also means the gate now runs as part of `npm test`
+for the first time.
+
 ### Superseded (light-cream era, pre-2026-07-24)
 
 These values are SUPERSEDED and must not be reintroduced.
@@ -92,7 +132,7 @@ asserts. NEW tokens may be added.
 The app is used by an 11-year-old, so every text/background pair must meet WCAG AA — at
 least 4.5:1 for body text, at least 3:1 for large text (>= 1.5rem, or >= 1.2rem bold) — and
 non-text control borders must meet 3:1 per WCAG 1.4.11. `node scripts/check-contrast.mjs`
-enforces this mechanically over 28 pairs, reads its token values live from `public/styles.css`,
+enforces this mechanically over 52 pairs, reads its token values live from `public/styles.css`,
 and must exit 0.
 
 ## 4. Typography
@@ -127,7 +167,11 @@ Source: `public/styles.css`.
   + 32px)`.
 - Bottom nav: `68px` tall (`--nav-height: 68px`).
 - Motion: `--transition-fast: 150ms ease`, with `:active` press feedback scaling elements down
-  (`.card:active { transform: scale(0.98); }`, `.btn:active { transform: scale(0.97); }`).
+  (`.card:active { transform: scale(0.98); }`, `.btn:active { transform: scale(0.97); }`). The
+  reader's loading state uses `reader-spin 1.4s linear infinite` on a conic-gradient magic ring
+  (violet → teal → amber, cut out by a radial mask) and `reader-float 3.2s ease-in-out infinite`
+  on the `placement-friend` spot image. Both are damped under `@media (prefers-reduced-motion:
+  reduce)` — the ring slows to 3.2s and the floating image stops entirely.
 
 ## 6. Asset library
 
@@ -221,6 +265,11 @@ Source: `design.md` §7, plan.md GC-D7, and field-guide lessons 10–13
   different filename, which per-file checks alone would not catch.
 - Web-optimized derivatives (`public/assets/*.webp`) are produced later, by a script, from the
   committed masters in `assets/delight/`.
+- **Superseded capture method:** image capture is now done by the **field-guide lesson 15**
+  method — fetch the image blob in-page and click ONE synthetic `<a download="name.png">`
+  element. This supersedes the "Download button → newest file in `~/Downloads`" instruction
+  above in this section and in `design.md` §7. The `~/Downloads` heuristic is what produced the
+  89-duplicate burst already recorded in this section.
 
 ## 8. Do and do-not rules
 
@@ -238,6 +287,9 @@ Source: plan.md GC-D1/GC-D2/GC-D5/GC-D6/GC-D8 + design.md §7.
   character reliably, which is why the app relies on a fixed, pre-generated asset library
   instead.
 - Touch `public/sw.js` or its PRECACHE list; it is untouchable and frozen by a test (GC-D2).
+  The single sanctioned exception is the `CACHE` version string constant, which MUST be bumped
+  in the same phase as any change to a precached file, or returning devices serve the old shell
+  forever. Everything else in `sw.js` — above all the `PRECACHE` array — stays frozen.
 - Reintroduce the superseded light-cream values (§3), or ship a text/background pair that fails the §3 accessibility gate.
 - Pitch anything younger than 11 — the direction must stay charming and adventurous, never
   babyish.
