@@ -1,19 +1,20 @@
 # STATUS — poc-basics
 
-*Rewritten in full at every update. Last update: Phase 2 CLOSED — it is live.*
+*Rewritten in full at every update. Last update: Phase 3 CLOSED — the run is done; three things are yours.*
 
 ## Where we are
 
-**The app is live.** Everything Phase 1 built is now on the real address, verified file by file
-rather than assumed. Two things are left, and both are yours.
+**The app is live, and the run is finished.** Phase 1 built the fixes, Phase 2 deployed and verified
+them, Phase 3 wrote the growth design. Nothing is left for me. Three things are left for you.
 
 ```mermaid
 flowchart LR
-    P1[Phase 1 DONE<br/>fix the basics] --> P2[Phase 2 DONE<br/>deployed and verified]
-    P2 --> OWNER{{YOUR TURN<br/>sign the gate,<br/>then hand over the code}}
-    OWNER --> P3[Phase 3<br/>the growth design]
+    P1[Phase 1 DONE<br/>fix the basics] --> P2[Phase 2 DONE<br/>live and verified]
+    P2 --> P3[Phase 3 DONE<br/>growth design written]
+    P3 --> OWNER{{YOUR TURN<br/>3 actions, in order}}
     style P1 fill:#b7e4c7
     style P2 fill:#b7e4c7
+    style P3 fill:#b7e4c7
     style OWNER fill:#ffd27f
 ```
 
@@ -24,35 +25,35 @@ Your private screen: `https://english-app-three-tan.vercel.app/#/parent`
 
 1. **Open the review tool and sign the gate** — double-click `docs/item-bank-review.html`, then record the sign-off in `docs/item-bank-review.md` section 6.
 2. **Then give her the entry code** — the app sits behind the code you hold, so deploying does not put the test in front of her; only handing over the code does.
+3. **Read and sign the growth design** — `docs/growth.md`. Signing section 10 is what authorizes the
+   next run to build it. Nothing in it is built yet and nothing happens if you leave it unsigned.
 
-That order is the whole safety design. Until step 2, the deploy has changed nothing for her.
+Order matters for 1 and 2. Number 3 can wait until you have time; it is a proposal, not a fix.
 
-## What is live now
+## The thing worth reading in `docs/growth.md`
 
-- **Your parent-only screen** at `#/parent` — her level, both placement scores, the date, her word
-  count, and a **re-take** button. In no menu and no link, so she will not stumble into it.
-- **A real entry-code screen** instead of the raw browser popup, with unlimited retries.
-- **The review tool**, `docs/item-bank-review.html` — 6 recordings, 12 pictures, the answers marked.
+I found something while writing it, and it is the most important thing this run learned.
 
-## What I checked, rather than assumed
+The design says the app keeps learning about her: every word she taps and every question she misses
+should update her level. **It never did.** Tapped words are saved with the status "learning", and the
+part that builds her story vocabulary only counts words marked "known" — and nothing in the app ever
+marks a word "known". Her answers to the comprehension questions are written to a log that nothing
+reads. So her level is decided once, by the 12-question placement test, and then never moves again.
 
-- Seven files are byte-identical between the live site and this repo — so the new screens really
-  shipped, not "probably shipped".
-- The entry-code lock is still closed on the live API. I tested the *rejection*, which costs nothing
-  and never touches her data.
-- **The review tool is not on the internet.** This one nearly fooled me: the first check came back
-  "redirect" instead of "not found", which looked like the answers were being served. I tested a
-  filename that definitely does not exist — it redirected too. The redirect is automatic and means
-  nothing; every path ends in "not found". The answers are not reachable.
-- I never opened her profile. Loading any page would have created one, so I only used checks that
-  cannot touch it.
+That is not a bug I introduced and I have not changed it — changing it is exactly what `docs/growth.md`
+proposes, and it is your call. It does mean the re-take button matters more than I thought when I
+built it: today it is the *only* way her level can ever change.
+
+One more number, corrected: the parent screen says her stories are built from 2850 words at level A2.
+About 21% of those (596) can never actually be recognized — they are phrases and hyphenated entries
+the word-matcher cannot see. The real figure is 2254. The screen is not lying, but it is optimistic.
 
 ## Still open — your call, unchanged
 
 The placement test still can't tell "at the ceiling" from "far past it"; the test count is
 hand-written into two docs; `bash.exe.stackdump` ships on every deploy; the entry code isn't in the
-frozen design doc; a manual level override was left out (re-taking already recovers); and the
-README still calls the app "in daily use", which becomes true after step 2 above.
+frozen design doc; a manual level override was left out; and the README still calls the app "in daily
+use", which becomes true after action 2.
 
 If something looks wrong on her device, the way back is recorded: roll back to
 `english-msi6365hc-dkreinovs-projects.vercel.app`.

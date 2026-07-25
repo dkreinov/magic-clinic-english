@@ -1,10 +1,19 @@
-CURRENT: phase 2 "deploy so she can start" CLOSED — 9/9 steps accepted. THE APP IS LIVE at
-  https://english-app-three-tan.vercel.app serving magic-vet-v8, verified byte-for-byte.
-  Next: PHASE 3 (the growth design document — zero code). Phase 1 CLOSED before it, 6/6 steps.
-  TWO OWNER ACTIONS ARE OUTSTANDING and are NOT the run's to do: (1) open
+CURRENT: RUN COMPLETE. phase 1 CLOSED (6/6), phase 2 CLOSED (9/9), PHASE 3 CLOSED (2/2).
+  THE APP IS LIVE at https://english-app-three-tan.vercel.app serving magic-vet-v8, verified
+  byte-for-byte against the worktree. docs/growth.md is written and is
+  STATUS: AWAITING-OWNER-SIGN-OFF.
+  THREE OWNER ACTIONS ARE OUTSTANDING and are NOT the run's to do: (1) open
   docs/item-bank-review.html and sign the gate in docs/item-bank-review.md §6, (2) THEN give the
-  child the entry code. The app is behind APP_CODE, so until (2) the deploy has changed nothing
-  for her. docs/item-bank-review.md still says STATUS: REQUIRED-BEFORE-CHILD-USE, correctly.
+  child the entry code, (3) read and sign docs/growth.md §10 — that signature is what authorizes a
+  next run to build G1/G2/G3. The app is behind APP_CODE, so until (2) the deploy has changed
+  nothing for her. docs/item-bank-review.md still says STATUS: REQUIRED-BEFORE-CHILD-USE, correctly.
+  THE FINDING A NEXT RUN MUST NOT LOSE: both of design.md §3's calibration channels are DEAD in the
+  shipped code — a tapped word is stored 'learning' and only 'known' words reach the allowed set,
+  and nothing ever marks a word 'known' (mark-known at api/profile.js:51 has no caller);
+  story.checkLog and coverageRatio are written and read by nothing. So the band is set once by the
+  12-item placement test and never moves. The re-take button is currently the ONLY way it can
+  change. brief.md's "Tapped words accumulate into the allowed set" is FALSE and is corrected in
+  docs/growth.md §3 (brief.md is deliberately left as written — it is the owner's brief, not a wiki).
 GO-AHEAD GIVEN: 2026-07-25, by the owner, in the resume prompt that opened this session ("Resume at:
   Phase 2 — deploy", execution mode autonomous). This is the authorisation STATUS.md's "What I need
   from you" item 1 was waiting for, and it is the ONLY authorisation to publish to the internet in
@@ -108,6 +117,13 @@ DEFERRED (surfaced, not dropped): a manual owner band-override (D5 — re-taking
   · docs/item-bank-review.md's 12-row table still describes the options as EMOJI (stale BY DESIGN —
   the HTML tool supersedes it; owner-handoff's two weak-item bullets were fixed in step 2.1).
 PHASE 2 IS DONE — its recipe is now HISTORY and lives in journal.md, not here.
+PHASE 3 CLOSED — 2/2 steps. `docs/growth.md`, 326 lines, English/pure-ASCII, 10 sections, carrying
+  STATUS: AWAITING-OWNER-SIGN-OFF. Zero code: the diff 797cfa0..HEAD outside .oplan is EXACTLY
+  `docs/growth.md`, `public api lib tests scripts data assets` is an empty diff, sw.js is still
+  magic-vet-v8 and there is no v9 anywhere. Suite 172/0 and contrast 52 ALL PASS, unmoved.
+  step 3.1 — 3dadbd8 (WORKER; auditor match/high with 5 real findings, 4 of them MINE — see journal:
+  I verified a tokenizer claim against my own regex re-implementation instead of against `tokenize`,
+  and every count was off by one. Corrected to 222/1056/2254.)
 PHASE 3 MUST DO FIRST (from plan.md's skeleton, do not re-derive): Phase 3 is ONE DOCUMENT,
   `docs/growth.md`, and ZERO CODE. Its spine is the contradiction the brief exposed:
   `skills.receptiveVocab.band` is written in exactly ONE place (`api/placement.js:54`) and never

@@ -16,8 +16,8 @@
 6. Validation chains: always `set -o pipefail`; a stray `;` DETACHES the rest so `…-OK` prints over
    a broken build; `grep -qF --` before `--patterns`; never `! grep -q '<bare number>'`. Gate a DOC
    edit on a substring of EVERY new line plus `wc -l`, or a silent reflow passes every content grep.
-   A gate that COUNTS a literal in generated output can be tripped by the generator's own source:
-   `input[type="checkbox"]:checked` contains `type="checkbox"` — 18 checkboxes counted as 19.
+   NEVER verify a claim about the code against your own RE-IMPLEMENTATION of it: `^[a-z]+$` is not
+   `tokenize`'s `[a-z]+(?:'[a-z]+)?`, and that proxy put a wrong number in all three bands.
 7. The learner profile is LIVE. `GET /api/profile` CREATES one when absent — a read that writes, so
    merely loading the app writes. Point `DATA_DIR` at scratch, then VERIFY real `.data/` stayed
    empty. This is also why production can never be browser-verified: the views fetch it on load.

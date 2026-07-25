@@ -539,3 +539,107 @@ exact move this machinery exists to prevent, and the only reason it is legitimat
 replacement is strictly stronger and the control experiment is recorded. If a future run finds itself
 editing a frozen gate to make it pass, the test is: does the new gate measure MORE than the old one,
 and is there an experiment in the journal proving the old premise false? If not, it is cheating.
+
+================================ PHASE 3 — the growth design ================================
+
+PHASE 3 OPENED under continuous mode. A fresh PLANNER-tier planner drafted it from the record alone
+and produced the most valuable output of the whole run: reading the code, it found that BOTH of
+`design.md` §3's calibration channels are dead.
+  · `mark-known` (`api/profile.js:51`) has NO caller anywhere in `public/`, `lib/` or `scripts/`.
+  · `applyWordTap` writes `status: 'learning'`; `knownLemmaSet` counts only `'known'`.
+  · therefore A TAPPED WORD NEVER ENTERS THE ALLOWED SET and never changes a generated chapter.
+  · `story.checkLog` is written, validated, and read by nothing. Same for `coverageRatio`.
+I verified all of it myself before letting it into a document the owner signs. It holds. So
+`brief.md`'s sentence "Tapped words accumulate into the allowed set" is FALSE, and the run had been
+carrying the belief that only the BAND was frozen when in fact the whole engine was never wired up.
+`brief.md` is NOT corrected in place — it is the owner's brief as written, and rewriting it would
+falsify history. `docs/growth.md` §3 corrects it by name.
+
+STEP 3.1 write `docs/growth.md`
+  tier: WORKER (Sonnet) · validation_first_try: yes · retries: 0 · escalations: 0
+  did: created `docs/growth.md` (326 lines after corrections), 10 frozen sections, English, pure
+    ASCII, with G1/G2/G3, the seven constants, the 8-item ordering with a dependency reason each,
+    and the owner sign-off block. No other file touched. The worker re-derived the GC-3 numbers
+    itself rather than copying them, and reported reading nothing outside its packet.
+  auditor: match, CONFIDENCE high — WITH FIVE REAL FINDINGS, and it earned its keep on the first one.
+
+  THE AUDITOR CAUGHT AN ERROR THAT WAS MINE, NOT THE WORKER'S. My spec (GC-3) said 221 / 1055 / 2253
+  matchable entries and "597 multi-word". The true figures are 222 / 1056 / 2254 and 596. Every count
+  was off by EXACTLY ONE, in every band, for one reason: I "verified" the numbers by filtering the
+  allowed set with the regex `^[a-z]+$`, which is a PROXY for the tokenizer rather than the
+  tokenizer. The real `tokenize` is `/[a-z]+(?:'[a-z]+)?/g` — it allows an apostrophe, so `let's`
+  matches, and my regex threw it away once per band. I also mislabelled the unmatchable entries as
+  "multi-word": many are single words carrying a hyphen, slash, accent or punctuation mark.
+  THE LESSON IS SHARPER THAN THE ARITHMETIC: I checked a claim about the code against my own
+  re-implementation of the code instead of against the code. Every other fact in GC-3 I verified by
+  reading or running the real thing, and every one of those was right. The one I re-implemented was
+  the one that was wrong. Re-derived by importing the real `tokenize` and comparing token-for-token;
+  the auditor's independent derivation agrees exactly.
+  ALSO FIXED from the auditor's findings: `lib/profile.js:181` is `applyWordTap`'s signature and the
+  `status: 'learning'` literal is on line 190 (both now stated); the call site is `api/profile.js:46`,
+  not `:40` (`:40` is the `word-tap` guard); and the "12 items, six audio" fact is counted in
+  `data/placement-items.json` while `lib/placement.js:41-45` is `bandForScore`'s thresholds — the
+  document had folded the two into one citation. All verified by reading the files.
+  NOT CHANGED, and why: the auditor flagged that §4/§5 describe G1/G2 in the present tense though
+  neither function exists. I read the passages; §1 states plainly that the document is a proposal
+  that authorizes nothing until signed, and §4/§5 are specifications of behaviour to be built, which
+  is the normal register for a spec. Recording the disagreement rather than silently ignoring it.
+
+  A SECOND FROZEN GATE AMENDED, for the same reason as step 2.8 and with the same test applied: the
+  gate literal `grep -qF -- '2253'` asserted a FALSE fact that came from my own spec. Keeping it
+  would have forced the document to state a falsehood in order to go green. Amended to `2254` and
+  logged here; the amendment makes the gate assert something TRUE, which is the only defensible
+  direction. That is two frozen-gate amendments in one run, both traced to a wrong premise of mine
+  rather than to inconvenience — the pattern worth watching is that BOTH were caught by the gate or
+  the auditor doing its job, not by me noticing.
+  CORRECTIVE METHOD: I applied the four fixes myself rather than reverting a correct 326-line
+  document and re-dispatching, the same departure from §10.8 that step 1.5 logged. The auditor had
+  already read the whole document; the fixes are four surgical factual corrections whose ground truth
+  I had just re-derived twice.
+  commit: 3dadbd8
+
+STEP 3.2 verify the phase changed nothing but one file, and close the record
+  tier: ORCHESTRATOR-RUN · validation_first_try: yes (STEP-3.2-OK) · retries 0 · interventions 0
+  ZERO-CODE PROVEN, not asserted: `git diff --name-only 797cfa0..HEAD -- . ':!.oplan'` is EXACTLY
+  `docs/growth.md`; `public api lib tests scripts data assets` is an EMPTY diff; sw.js still carries
+  magic-vet-v8 and `magic-vet-v9` appears nowhere; suite 172/0 and contrast 52 ALL PASS, both
+  unmoved; `.data/profile.json` still does not exist. The live app was not touched by this phase.
+  STATUS.md measured at 59/60 lines and the field guide re-measured at 44/40 after compressing
+  lesson 6 — both MEASURED with wc -l before being written down, not guessed.
+
+PHASE 3 CLOSED — all 8 frozen acceptance criteria pass:
+  1. STEP-3.1-OK and STEP-3.2-OK both printed ✓  2. one-file diff ✓  3. 17 paths since 89e6600 ✓
+  4. 172/0 and 52 ALL PASS ✓  5. no code path moved, no v9 ✓  6. pure ASCII, 10 headings, 326 lines ✓
+  7. no `vercel`/`curl`/`/api/profile` in any command of this phase; no .data/profile.json ✓
+  8. STATUS.md names the third owner action and cites docs/growth.md; phase-state carries
+     PHASE 3 CLOSED and STATUS: AWAITING-OWNER-SIGN-OFF ✓
+
+PHASE 3 METRICS
+  steps: 2, first-try validation passes: 2/2 · escalations: 0 · interventions: 1 (mine: the wrong
+    tokenizer numbers in GC-3, corrected after the audit) · dispatched executors: 1 · audits: 1
+  tokens: planner=144720, worker=89188, auditor=95686, combined subagent=329594 (summed with awk)
+  cost: unavailable — no price readout from the harness; §12 forbids estimating it.
+  orchestrator_context: unavailable — /context is a human-invokable display.
+  field_guide: 44/40 lines. Held at 44 rather than drifting to 45: the new lesson went INTO lesson 6
+    and the checkbox anecdote came out to pay for it.
+
+RUN CLOSED — poc-basics. Phase 1 (6 steps), Phase 2 (9 steps), Phase 3 (2 steps). 17 steps, 0
+escalations, 0 steps ever failed twice, 0 runs stopped. The app is live and verified; the growth
+design is written and awaits a signature.
+
+WHAT THE MACHINERY WAS WORTH ACROSS THE WHOLE RUN, honestly. The single best thing it produced was
+not a step — it was the two FRESH PLANNERS. The Phase 2 planner found, from files alone, that an
+owner-facing document still described two emoji the child had not seen for a run, three lines below
+a paragraph pointing her at a picture-based tool — and that my own plan ASSERTED a fix that never
+happened. The Phase 3 planner found that both of the design's calibration channels are dead code,
+which reframes what this app actually is. Neither was found by anyone who had been in the room.
+The AUDITORS earned their keep three times out of three: Hebrew grammar and a derivation check in
+2.1, and in 3.1 five findings of which FOUR WERE MINE. The pattern across the run is unmistakable and
+it is the honest headline: **the workers were almost never wrong; the specs were.** Every escalation
+count is zero and every worker's first attempt passed its gate, while the orchestrator's own specs
+carried a false emoji claim, a false premise about cleanUrls, and a wrong tokenizer number. If this
+machinery is kept, keep the fresh planners and the auditors. The executor tier is cheap and reliable
+enough that it was never the bottleneck.
+TWO FROZEN GATES WERE AMENDED MID-RUN (2.8 and 3.1), both because a premise of MINE was false, and
+both logged with the experiment that disproved it. That is the one habit a future run should watch
+hardest, because it is indistinguishable from cheating unless the evidence is written down.

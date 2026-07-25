@@ -1626,3 +1626,316 @@ RISKS:
   stays 130 lines so nothing else moves; and the auditor is asked explicitly to read the Hebrew as
   Hebrew and rule on grammar, feminine voice and consistency with the tool — the same request that
   earned its keep on step 1.6.
+
+---
+
+# PHASE 3 — the growth design document
+
+Drafted by a fresh PLANNER-tier planner from the record alone, then reviewed by the orchestrator.
+Base commit `797cfa0`. ZERO CODE: one new file, `docs/growth.md`. The app is LIVE at `magic-vet-v8`
+and nothing in this phase may put that at risk.
+
+## Orchestrator amendments to the planner's draft
+
+**I VERIFIED THE PLANNER'S THREE CODE FINDINGS MYSELF BEFORE ACCEPTING THEM**, because they become
+frozen assertions in a document the owner signs, and "fluent and false" is this project's known
+failure class. All three hold:
+- `skills.receptiveVocab.band` is assigned in exactly ONE place, `api/placement.js:54`. Confirmed by
+  `grep -rn receptiveVocab api lib public scripts` — every other hit is a read or a schema default.
+- **A tapped word never enters the allowed set.** `applyWordTap` writes `status: 'learning'`
+  (`lib/profile.js:181`); `knownLemmaSet` counts only `status === "known"` (`lib/vocab.js:64`);
+  `mark-known` exists at `api/profile.js:51` and has **no caller anywhere** in `public/`, `lib/` or
+  `scripts/`. `story.checkLog` is written and validated and **read by nothing**. So BOTH of
+  `design.md` §3's calibration channels are captured and discarded. This is the phase's real finding.
+- The usable-lexicon numbers, re-derived by calling `buildAllowedSet` with the real band files:
+  preA1 296 total / **222** matchable; A1 1257 / **1056**; A2 2850 / **2254**. The 596 unmatchable
+  A2 entries contain characters `tokenize` (`lib/vocab.js:4`) can never emit — spaces, hyphens,
+  slashes, accents, punctuation — so ~21% of what the owner-facing 2850 counts is unrecognizable.
+
+  **CORRECTED DURING EXECUTION — I got this wrong first, and the auditor caught it.** My original
+  figures were 221 / 1055 / 2253 (597 unmatchable), and I had "verified" them by filtering the
+  allowed set with the regex `^[a-z]+$`. That is a PROXY for the tokenizer, not the tokenizer:
+  `tokenize` is `/[a-z]+(?:'[a-z]+)?/g` and therefore matches `let's`, which my regex rejected —
+  exactly one entry, in every band, which is why all three counts were off by exactly one. I also
+  called the unmatchable entries "multi-word", which is wrong: many are single words carrying a
+  hyphen, slash, accent or punctuation mark. The lesson is sharper than the arithmetic: **I checked
+  a claim about the code against my own re-implementation of the code instead of against the code.**
+  Re-derived by importing the real `tokenize` and comparing token-for-token; both the plan and
+  `docs/growth.md` are corrected, and the step's gate literal `2253` was amended to `2254` with it.
+
+**BLOCKER 1 — ANSWERED: route it to §9, do not invent a source.** Whether a Band III MoE list is
+obtainable is not decidable from this repo. G3 is deliberately designed so the answer is not needed:
+above A2 the app grows text difficulty and her personal set, not the list. Approved as planned.
+
+**BLOCKER 2 — ANSWERED: propose it, do not assume it.** Nothing records whether the owner accepts the
+app moving the band by itself. The correct resolution is exactly what the planner built: the document
+is a PROPOSAL carrying `STATUS: AWAITING-OWNER-SIGN-OFF`, her re-take always overrides the rule,
+every automatic move must be visible on `#/parent`, and §9 asks her directly. **Her signature on §10
+is the authorization; nothing is built without it.** §1 must say that in one sentence. This is the
+same shape as D2's reasoning: an automatic change the owner cannot see would re-introduce exactly the
+invisible-and-permanent defect this whole run exists to remove.
+
+**`brief.md` IS NOT CORRECTED IN PLACE.** It states a falsehood about the code ("Tapped words
+accumulate into the allowed set"). It is the owner's brief as written at a point in time, and
+rewriting it would falsify the record's history. `docs/growth.md` §3 corrects it explicitly and by
+name; the gap is logged in the journal and added to DEFERRED. Same treatment the stale emoji table in
+`docs/item-bank-review.md` already gets.
+
+**TIER CONFIRMED: WORKER for 3.1.** The document is long but every rule, constant, section and
+citation is already decided in the contracts below — the worker writes prose from a complete spec,
+which is exactly what WORKER tier is for. If the audit comes back mismatch, escalate one rung on the
+same packet before rewriting the spec (§7's ladder).
+
+GOAL: ship `docs/growth.md` — English, pure ASCII — stating what the code actually does to the band
+today with file:line citations, naming both contradictions with `design.md` §3, and freezing three
+implementable rules (G1 word promotion, G2 band promotion/demotion, G3 above-A2) plus the order
+`design.md` §6's parked items land. Zero code, zero tests, no cache bump, no re-deploy. It carries an
+owner sign-off line and becomes the next run's brief.
+
+ACCEPTANCE CRITERIA: (frozen before execution)
+1. `STEP-3.1-OK` and `STEP-3.2-OK` both print. 3.1 asserts its own single UNCOMMITTED path and so
+   cannot be re-run after the commit — accepted at the step, same construction as Phase 1's
+   criterion 1. 3.2 is re-runnable and is re-run at the close.
+2. `git diff --name-only 797cfa0..HEAD -- . ':!.oplan'` is exactly `docs/growth.md` — the phase's
+   entire repo footprint is one new file.
+3. `git diff --name-only 89e6600..HEAD -- . ':!.oplan' | grep -c ''` is `17` (Phase 1's 16 + growth).
+4. `npm test` prints `# pass 172` / `# fail 0`; contrast gate exits 0, `ALL PASS`, 52 pairs.
+5. `git diff --name-only 797cfa0..HEAD -- public api lib tests scripts data assets` is EMPTY and
+   `public/sw.js` still carries `magic-vet-v8` — no v9, no re-deploy, nothing shipped to her phone.
+6. `docs/growth.md` is pure ASCII; has exactly 10 `^## ` headings matching GC-2 verbatim and in
+   order; and is between 200 and 340 lines.
+7. Nothing touched production or the learner: no fenced command block in this phase contains
+   `vercel`, `curl`, or `/api/profile` (with the leading slash); `.data/profile.json` does not exist.
+8. `STATUS.md` names the third owner action and contains `docs/growth.md`; `phase-state.md` contains
+   `PHASE 3 CLOSED` and `STATUS: AWAITING-OWNER-SIGN-OFF`.
+
+---
+
+STEP 3.1: write `docs/growth.md`
+  goal: one new file, English, pure ASCII, 10 frozen sections, that (a) states what the code does
+    today with file:line citations, (b) names both contradictions with `design.md` §3, (c) freezes
+    rules G1/G2/G3 with named constants an implementer can code from, (d) fixes the order
+    `design.md` §6's parked items land with a dependency reason for each position, and (e) ends in an
+    owner sign-off block. It changes no other file.
+  files: `docs/growth.md` (NEW) — and nothing else.
+  commands: none — one file written directly.
+  validation: the full gate is in the executor packet; its assertions are (1) file exists, (2) pure
+    ASCII, (3) exactly 10 `^## ` headings, each of GC-2's ten present verbatim and §1 first,
+    (4) every file:line citation of GC-3 present, (5) every constant of GC-4 present verbatim,
+    (6) the sign-off block's three lines present, (7) 200 <= wc -l <= 340, (8) exactly ONE dirty path
+    outside `.oplan/` and it is `docs/growth.md`, ending `echo STEP-3.1-OK`.
+
+  **THE GATE PROVES NOTHING ABOUT WHETHER THIS DOCUMENT IS TRUE OR GOOD.** It checks presence,
+  structure, character set and line count. It cannot detect a fluent sentence that misstates the
+  code, a rule whose arithmetic does not close, or an ordering argument that begs its own question.
+  The AUDITOR CHARGE below is where that judgement is bought. This is stated in the plan, not left
+  implicit, because a doc phase that mistakes its gate for a quality check is fooling itself.
+
+  contracts:
+    - **GC-1 — LANGUAGE: English, pure ASCII** (0x20-0x7E, tab, newline). No Hebrew, no em/en dash,
+      no curly quotes, no `§`, no `>=` as `≥`, no emoji. Write `design.md section 3`, `>=`, `[ ]`.
+      Justified from the record: the owner's commissioning words in `brief.md` are English;
+      `design.md` — the frozen design this document extends section-by-section — is English, as are
+      `README.md` and `docs/visual-design.md`; the split the repo observes is *operational
+      instructions in Hebrew* (`owner-handoff.md`, `item-bank-review.md`) versus *specifications in
+      English*, and this is a specification that becomes the next run's brief; and field-guide lesson
+      11 — an ASCII-only document removes the entire bidi failure class from a phase whose only
+      deliverable is a document. `docs/item-bank-review.md` §6 already proves she signs an English
+      sign-off block. Paraphrase Hebrew sources in English; never paste from a Hebrew file.
+    - **GC-2 — STRUCTURE, frozen.** Line 1 exactly `# Growth Design: how the app grows with her`;
+      line 2 blank; line 3 exactly `STATUS: AWAITING-OWNER-SIGN-OFF`. Then exactly these ten `## `
+      headings, in order, verbatim, and no other `## ` heading anywhere (including inside code
+      fences): `## 1. What this document is` · `## 2. What the code does today` ·
+      `## 3. The contradiction` · `## 4. G1 - words she taps become words she knows` ·
+      `## 5. G2 - the band has to be able to move` ·
+      `## 6. G3 - above A2, when the Band II list runs out` ·
+      `## 7. The order the parked items land` · `## 8. What must not change` ·
+      `## 9. Open questions for the owner` · `## 10. Sign-off`.
+      `###` subheadings allowed. 200-340 lines. No Mermaid, no images, no HTML, no table of contents.
+    - **GC-3 — §2 IS AN EVIDENCE SECTION. These facts were MEASURED at `797cfa0`** (by the planner
+      and independently re-verified by the orchestrator). State them, cite them, do not soften them,
+      do not add unverified ones: band written only at `api/placement.js:54` and never again ·
+      `buildAllowedSet` reads it at `lib/story.js:30`; A1/A2 unlock `band1.json`, only A2 unlocks
+      `band2.json` (`lib/story.js:39`) · sizes 296 / 1257 / 2850 · of the 2850, only **2254** can ever
+      match text because `tokenize` (`lib/vocab.js:4`) emits `[a-z]+` and 597 entries are multi-word
+      (A1: 1055/1257; preA1: 221/296) — say once, plainly, that the owner-facing number overstates
+      the usable lexicon by ~21% · a tapped word is stored `status: 'learning'` (`lib/profile.js:181`)
+      while `knownLemmaSet` counts only `'known'` (`lib/vocab.js:64`), and `mark-known`
+      (`api/profile.js:51`) has NO caller, so **a tapped word never enters the allowed set and never
+      changes a generated chapter** · the only words ever `known` are placement task-1 correct answers
+      (`api/placement.js:55-57`) · micro-check answers are logged first-attempt-only
+      (`public/views/reader.js:563`) into `story.checkLog` and **nothing reads it** · each chapter
+      stores `coverageRatio` (`lib/story.js:240`), also unread · task 2 writes
+      `skills.readingComprehension` which `buildAllowedSet` never reads · the band rests on 12 items,
+      6 of them audio: 10/12 = A2, 9/12 = A1, a 1593-word difference (`lib/placement.js:41-45`) ·
+      `lib/profile.js:9` restricts `state` to `unknown|estimated`, `lib/profile.js:10` restricts
+      `band` to `preA1|A1|A2`.
+    - **GC-4 — §3-§6: the contradiction and the three rules. Decided; state and argue them, do not
+      offer alternatives.**
+      *§3* states two contradictions in order: (a) `design.md section 3` claims continuous
+      calibration is the real engine and the placement test only the prior — in the shipped code the
+      placement test is the ENTIRE posterior; (b) both channels are captured and discarded (taps land
+      in a status the generator ignores, checks in a log nothing reads). State explicitly that
+      `brief.md`'s sentence "Tapped words accumulate into the allowed set" is WRONG and that this
+      document corrects it. One-sentence conclusion: the engine `design.md` describes was never wired
+      up, and the rules below are the wiring.
+      *§4 — G1 `promoteKnownWords(profile)`*, a pure function called from `api/chapter.js` right
+      after `loadProfile()` and before `generateChapter` (the one place the profile is already loaded
+      and saved). A `'learning'` word becomes `'known'` (keeping `source`) once at least
+      `KNOWN_AFTER_QUIET_CHAPTERS = 2` chapters whose `generatedAt` is later than that word's
+      `lastSeen` contain it, matched with `baseForms` — the matcher `coverageAgainst` already uses.
+      One-way; nothing demotes a word. Reasoning to state: re-tapping is evidence she does NOT know
+      it, so tap count is the wrong signal; **meeting a word again and not needing the translation**
+      is the right one, computable from data already stored — no new field, no new capture surface.
+      Note the second-order effect: for words already on her band list this changes nothing, but for
+      the up-to-3 off-list words a chapter may carry (`lib/story.js:188`) it is the ONLY mechanism by
+      which her vocabulary grows past a fixed list — which is what makes G3 possible.
+      *§5 — G2 `evaluateBand(profile)`*, same call site, at most once per generation. Signals:
+      first-attempt accuracy from `story.checkLog`, and distinct new tapped words
+      (`words[k].firstSeen` inside the window). Constants, stated as a literal block:
+```
+KNOWN_AFTER_QUIET_CHAPTERS = 2
+PROMOTE_WINDOW = 6
+PROMOTE_ACCURACY = 0.85
+PROMOTE_MAX_NEW_TAPS = 6
+DEMOTE_WINDOW = 4
+DEMOTE_ACCURACY = 0.50
+DEMOTE_MIN_NEW_TAPS = 32
+```
+      PROMOTE one step (`preA1 -> A1 -> A2 -> A2+`) when all three hold: >= `PROMOTE_WINDOW` chapters
+      since the band was last set; first-attempt accuracy >= `PROMOTE_ACCURACY`; distinct new taps
+      <= `PROMOTE_MAX_NEW_TAPS`. DEMOTE one step (never below `preA1`) when >= `DEMOTE_WINDOW`
+      chapters have passed and either accuracy < `DEMOTE_ACCURACY` or distinct new taps >=
+      `DEMOTE_MIN_NEW_TAPS` (8/chapter). Guard rails, frozen: at most one step per evaluation;
+      `skills.receptiveVocab.sinceChapter` set to `story.chapters.length` on every write INCLUDING
+      the placement write, so no second move fires for another full window; every move appends
+      `{from,to,at,reason,window:{chapters,accuracy,newTaps}}` to `skills.receptiveVocab.history`;
+      `state` stays `'estimated'` because `lib/profile.js:9` allows no third value and provenance
+      belongs in `history`, not in a schema break. Two properties must be ARGUED, not asserted:
+      (i) **demotion is not optional** — the brief's whole finding is that a wrong verdict is
+      invisible and permanent, and an up-only rule rebuilds the trap facing the other way;
+      (ii) **the owner always wins** — Phase 1's re-take still overwrites the band unconditionally
+      and G2's next window starts from whatever she set. State that every move must be shown on
+      `#/parent` (band, when it moved, why), because an automatic change the owner cannot see
+      re-introduces exactly the defect D1 exists to remove. State plainly that these seven constants
+      have **no data behind them** — she has not read a chapter yet — that they are engineering
+      judgement, that they must live in ONE exported constants object re-tunable in one edit, and
+      that the first month on `#/parent` is what calibrates them.
+      *§6 — G3, above A2.* Facts first: `data/` holds `band1.json` (1341) and `band2.json` (2016) and
+      nothing above; at A2 the list is fully consumed; the usable ceiling is 2254, not 2850; and a
+      12-item test cannot tell "at the ceiling" from "far past it", which is why `bandForScore` is
+      left alone (D6) and **A2+ is reachable only by G2 promotion, never by the placement test**.
+      The rule: above A2 the app stops growing the LIST and grows two other things — (1) her personal
+      set via G1, the only channel with no ceiling; (2) the TEXT, not the vocabulary: `buildPrompt`
+      (`lib/story.js:178-190`) hardcodes "80-140 English words", "Use simple, short sentences" and
+      "AT MOST 3 words that are not on the ALLOWED WORD LIST"; the A2+ tier raises these to 140-200
+      words, permits compound sentences, and allows at most 5 off-list glossed words. It **never**
+      lowers `minRatio` (`lib/story.js:127`, 0.95) — that is `design.md` §1's founding principle and
+      the thing the previous failed attempt got wrong. Enumerate every touch point the next run must
+      change: `lib/profile.js:10` (`SKILL_BANDS` gains `'A2+'`), `lib/story.js:31` and `:39`,
+      `lib/story.js:178-190`, `public/views/parent.js` + its frozen copy + the `tests/parent-ui.test.js`
+      size assertion, and `lib/placement.js:41` (unchanged, deliberately). Say that a fourth MoE list
+      is not in this repo and that obtaining one is §9's question, not this document's answer.
+    - **GC-5 — §7: the order, frozen, one short paragraph of reasoning each. Do not reorder, add or
+      drop.** 1. G1+G2 (everything below is worth less if the level is wrong). 2. `design.md` §6 item
+      1a, daily spaced-repetition review of tapped words (same `words` data, no new capture surface,
+      and the second and faster evidence channel feeding G1). 3. §6 item 4b, the full parent view
+      (the route and view already exist from Phase 1; the owner must SEE the engine before it runs
+      unsupervised). 4. §6 item 1b, push notifications — split from item 1 and placed after it
+      because push needs an installed PWA and a permission grant, and `the PWA is not installed on
+      her phone`. 5. §6 item 4, trophies (cheap retention, no new API risk). 6. §6 item 2, writing
+      (needs a grading approach that does not exist). 7. §6 item 3, record-only speech — last, gated
+      on a storage change: `docs/owner-handoff.md` §6 records the profile store as a **public-access**
+      Vercel Blob store, acceptable for pseudonyms and word lists, NOT acceptable for a child's
+      recorded voice. 8. §6 item 5, pronunciation scoring — stays out of scope (`design.md` §10).
+    - **GC-6 — §1, §8, §9, §10.** §1: what this document is (a proposal, not a change), who reads it,
+      **that her signature on §10 is what authorizes the next run to build §4-§7 in §7's order**, and
+      that it changes no code. §8 what must not change: `design.md` and `docs/visual-design.md` are
+      FROZEN and this document proposes rather than amends; `minRatio` 0.95 stays; placement test,
+      `bandForScore` and item bank stay (D6); re-take stays client-only and `api/placement.js`'s
+      action surface stays closed (D3); the band stays off the child's screen (D2); any future
+      `public/` change still ships with a `sw.js` CACHE bump in the same phase. §9 open questions:
+      (a) does she accept the app moving the band by itself, given re-taking always overrides;
+      (b) is a higher MoE list obtainable, or is A2+ the permanent ceiling; (c) should FROZEN
+      `design.md` §3 be amended to describe what the code will actually do once G1/G2 land, since only
+      she can re-open it; (d) does she want the seven constants reviewed after the first month, on
+      what evidence; (e) does she accept a private Blob store as a prerequisite for §7 item 7.
+      §10 verbatim, blank line between each: `Date: ______________` /
+      `[ ] Approved - build this next run, in the order in section 7.` / `Signed: ______________`.
+      Register: `docs/owner-handoff.md`'s voice in English — direct, second person, short paragraphs,
+      no marketing, no hedging, numbers stated with where they came from. Not frozen, no FROZEN header.
+    - **AUDITOR CHARGE — the orchestrator must put these in the auditor packet by name:**
+      1. Re-derive every number in §2 from the code and say which, if any, is wrong — in particular
+         296/1257/2850, 2254, and the claim that `mark-known` has no caller.
+      2. Confirm the file:line citations point at what the document says they do.
+      3. Check G2's arithmetic closes: 6 chapters at 2-3 questions is 12-18 first-attempt answers and
+         `PROMOTE_ACCURACY = 0.85` is achievable on that denominator; `DEMOTE_MIN_NEW_TAPS = 32` over
+         4 chapters is 8/chapter; the guard rails make a second move within a window impossible.
+      4. Judge whether §7's ordering paragraphs are actual reasons or restatements of the order.
+      5. Judge whether any sentence is fluent and false.
+      6. Confirm the document PROPOSES and never asserts anything has been built, and contradicts
+         `design.md` nowhere without saying so explicitly in §3 or §9.
+  non-goals: create or modify NO file other than `docs/growth.md` — not `README.md`, not
+    `docs/owner-handoff.md`, not `docs/item-bank-review.md`, nothing under `public/`, `api/`, `lib/`,
+    `tests/`, `scripts/`, `data/`, `assets/`, and NEVER `.oplan/`; do not edit `design.md` or
+    `docs/visual-design.md` (FROZEN); do not write, stub or sketch any actual code FILE for G1/G2/G3
+    — code blocks inside the document are expected, files are not; do not bump `public/sw.js`; do not
+    run `npm test`, any `vercel` command, `curl`, a dev server, or anything touching `/api/profile`;
+    do not add a Hebrew translation, a summary, a changelog, a table of contents, a Mermaid diagram
+    or an image; do not invent a Band III source or any external reference not already in
+    `design.md`; do not add an eighth constant or rename the seven; do not propose changing
+    `minRatio`; do not propose a manual band override (D5 — Deferred, re-taking already recovers);
+    do not re-open D1-D6.
+  tier: WORKER (escalate one rung on the same packet if the audit returns mismatch)
+  depends on: HEAD `797cfa0`, clean tree.
+
+STEP 3.2: verify the phase changed nothing but one file, and close the record
+  goal: prove mechanically, against the COMMITTED tree, that Phase 3's entire repo footprint is
+    `docs/growth.md`; that the suite, the contrast gate and the live build's cache version are
+    exactly where Phase 2 left them; and hand the owner her third action.
+  files: `.oplan/poc-basics/{phase-state,journal,STATUS}.md`, `field-guide/index.md` — no repo file
+    outside `.oplan/`.
+  commands: `npm test`, `node scripts/check-contrast.mjs`, `git diff`, `git status` — read-only, no
+    network, no `vercel`, no server.
+  validation: as the planner froze it — clean tree outside `.oplan/`; `797cfa0..HEAD` diff is exactly
+    `docs/growth.md`; `89e6600..HEAD` is 17 paths; `public api lib tests scripts data assets` empty;
+    `magic-vet-v8` still present and no `magic-vet-v9` anywhere; growth.md pure ASCII, 10 headings,
+    sign-off + key constants + `api/placement.js:54` present, 200-340 lines; no `.data/profile.json`;
+    `npm test` 172/0; contrast `ALL PASS` over 52; `STATUS.md` mentions `docs/growth.md`;
+    `phase-state.md` contains `PHASE 3 CLOSED` and `STATUS: AWAITING-OWNER-SIGN-OFF`; ends
+    `echo STEP-3.2-OK`.
+  contracts:
+    - **Why a doc-only phase asserts the suite at all:** `npm test` proves nothing about a Markdown
+      file, and asserting it as a proxy for document quality would be theatre. It is asserted for a
+      different, real claim — the phase's headline is "zero code" and the app is LIVE. The path diff
+      is the primary proof; the suite and contrast gate are the belt to those braces: if either
+      moved, a worker went outside its file list. Asserted ONCE, here, not in 3.1.
+    - `phase-state.md`: replace `PHASE 3 MUST DO FIRST` with `PHASE 3 CLOSED`, record both step
+      commits, that `docs/growth.md` is `STATUS: AWAITING-OWNER-SIGN-OFF`, and the THREE owner
+      actions now outstanding in order. Move this phase's record gaps into DEFERRED.
+    - `STATUS.md`: rewritten in full, adding `3. Read and sign the growth design` with the path, and
+      one sentence on what signing authorizes. 60-line soft cap — MEASURE it or pay the justification.
+    - Field guide candidate lesson: *"a document's gate can only prove structure, presence and
+      character set — buy truth with an auditor charge that names the numbers to re-derive."* Add it
+      only by evicting something, or pay the overage in writing.
+  non-goals: do not edit any file outside `.oplan/` — in particular do not touch `docs/growth.md`
+    (if 3.1's output needs a change that is a corrective packet to 3.1, not an orchestrator edit); no
+    `vercel`, `curl`, dev server or network command; no browser against production; no cache bump; no
+    re-deploy; do not perform any of the owner's own actions.
+  tier: ORCHESTRATOR-RUN (amendment B precedent — creates no repo file, and I re-run every gate for
+    acceptance anyway)
+  depends on: 3.1 AUDITED and COMMITTED.
+
+RISKS:
+- **A fluent, false document** — the largest risk and the one no gate touches. Mitigated only by the
+  AUDITOR CHARGE, which names six specific things to re-derive rather than asking for an opinion. If
+  the auditor returns "match" without having re-run the numbers, the audit did not happen.
+- **The document over-promises and the next run cannot build it.** §4-§6 are plausibly a full run.
+  Mitigated by §7 ordering them first with dependency reasons and §9 naming what is undecided; the
+  document promises no timeline.
+- **Non-ASCII slips in** from a pasted `design.md` quote or a model-default curly quote. Caught by
+  the `LC_ALL=C` gate — which is why GC-1 says paraphrase, never paste.
+- **Scope creep into code.** A worker adds `lib/growth.js` or a test. 3.1 asserts exactly one dirty
+  path; 3.2 asserts exactly one committed path.
+- **The seven constants get treated as measured.** They are not — nothing has been measured because
+  she has not read a chapter. GC-4 requires the document to say so in its own text.
