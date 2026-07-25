@@ -10,10 +10,13 @@ const ROUTES = {
   "/words": renderWords,
 };
 
+const OWNER_ROUTE = "/parent";
+
 const DEFAULT_ROUTE = "/home";
 
 function currentRoute() {
   const hash = window.location.hash.replace(/^#/, "");
+  if (hash === OWNER_ROUTE) return OWNER_ROUTE;
   return ROUTES[hash] ? hash : DEFAULT_ROUTE;
 }
 
@@ -33,9 +36,17 @@ function renderRoute() {
   const route = currentRoute();
   const app = document.getElementById("app");
   app.innerHTML = "";
+  setActiveTab(route);
+  if (route === OWNER_ROUTE) {
+    import("./views/parent.js")
+      .then((mod) => mod.render(app, {}))
+      .catch(() => {
+        app.textContent = "לא הצלחתי לטעון את תצוגת ההורים. צריך חיבור לאינטרנט.";
+      });
+    return;
+  }
   const view = ROUTES[route];
   view(app, {});
-  setActiveTab(route);
 }
 
 window.addEventListener("hashchange", renderRoute);
