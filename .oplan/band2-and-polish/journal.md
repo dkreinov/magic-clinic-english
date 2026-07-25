@@ -356,3 +356,7 @@ STEP 2.5 generate the app-icon artwork (ORCHESTRATOR-RUN, not dispatched)
   remain distinguishable — and the maskable variant's subject is smaller because of the 80% safe-zone
   padding. But GC-D8 is the OWNER's call, not mine, and VP-6 makes 2.6/2.7 conditional on a recorded
   `ICON-ART: APPROVED`. Verdict slot is deliberately left OPEN.
+
+  ICON-ART: APPROVED — owner verdict recorded 2026-07-25 at the GC-D8 gate. The owner reviewed the
+  48px magnified previews (plain + Android circle crop) and approved. VP-6 is therefore satisfied and
+  steps 2.6 and 2.7 are UNBLOCKED. Phase 2's acceptance criterion 1 now takes its 157-test branch.
