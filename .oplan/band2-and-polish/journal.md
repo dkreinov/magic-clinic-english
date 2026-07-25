@@ -203,3 +203,31 @@ BLOCKERS — both answered in writing (plan.md), neither deferred to a worker:
      ONLY on a recorded `ICON-ART: APPROVED`. If the owner is unreachable, the phase closes green
      with the paw print — the caveat the owner pre-accepted. Acceptance criterion 1 therefore has
      two legal test totals (154 without the icon, 157 with it).
+
+## PHASE 2 — EXECUTION
+
+STEP 2.1 artwork-derived page background, provably AA-safe
+  tier: WORKER (Sonnet) · did: styles.css — 4 new :root tokens after --color-glow, body's
+    `background:` shorthand (with its raw #3d2109) replaced by background-color +
+    background-image with 3 radial glows over the token-based top wash + background-repeat.
+    check-contrast.mjs — 24 appended PAIRS entries (6 per new token), no function touched.
+    tests/background.test.js (NEW) — 3 tests: token freeze, composition freeze (and no `#`
+    permitted in the background value), and the gate exits 0.
+  surprises: none · deviations: none · first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=43552, checker=37492+37817 (two passes) · commit: d4409a6
+  audit: match — but CONFIDENCE: low on the first pass. Per §10.8 I supplied exactly what it said
+    it lacked (shell.test.js's header, and the verbatim validation output) and re-audited ONCE.
+    Second pass: match/high. Its reasoning on the one thing it flagged was better than mine would
+    have been: background.test.js imports only `readFileSync` where shell.test.js imports four fs
+    names, and it ruled that pulling in three UNUSED names to look more similar would itself have
+    been an unrequested addition. Correct call.
+  ORCHESTRATOR QUALITY CHECK beyond the frozen validation. The gate measures the four LAYER colours
+  and the plan argues by convexity that this bounds every composited pixel. An argument is not a
+  measurement, so I brute-forced it: 14,641 real composites (the base gradient at every stop, then
+  all three glows at every alpha 0..1 by 0.1) — worst --color-border contrast 3.0618, worst
+  --color-ink 13.8464. Both clear their minima, and the worst case lands EXACTLY on #282416, one of
+  the four layers the gate checks. So the 52 pairs are not merely sufficient, they are the tight
+  bound. Layer luminances confirm why: the teal glow is the lightest of the five paints.
+  WHAT THIS STEP ACTUALLY FIXED, beyond the visual brief: the shipped app had --color-border at
+  2.92:1 on the painted wash, under the binding 3:1 of WCAG 1.4.11, and the gate could not see it
+  because the colour was a literal instead of a token. It is now 3.10:1 and permanently measured.
