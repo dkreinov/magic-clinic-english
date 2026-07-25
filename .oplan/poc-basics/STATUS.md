@@ -32,18 +32,16 @@ covering my mistake. The review layer caught the hole, I checked the text charac
 against the frozen copy rather than by eye, and every later step now gets the full wording in its
 instructions. Nothing on your screen is affected.
 
-## What Phase 1 will build
+## What Phase 1 builds
 
-1. **A parent-only screen at `#/parent`** — her level and what it unlocks, both test scores, when
-   she took it, and how many words she's collected. Deliberately not in the menu: telling an
-   11-year-old "you are A1" is meaningless at best.
-2. **A re-take button** on that screen. Re-taking overwrites the old result, so a bad placement
-   stops being permanent. It's on your screen only — "redo the test" isn't a child's decision.
-3. **A real entry-code screen** replacing the raw browser popup she'd hit first. Explains what the
-   code is, says clearly when it's wrong, and lets her keep trying.
-4. **A review tool for the item bank** — a page that plays every clip and shows every picture and
-   its options, so the review you owe before her first test is a few minutes of tapping instead of
-   30 minutes of opening mp3 files by hand.
+The parent screen shows her level and what it unlocks, both test scores, when she took the test and
+how many words she's collected — deliberately not in the menu, because telling an 11-year-old "you
+are A1" is meaningless at best. Its re-take button overwrites the old result, so a bad placement
+stops being permanent; it's on your screen only, since "redo the test" isn't a child's decision.
+The entry-code screen replaces the raw browser popup she'd hit first: it explains what the code is,
+says clearly when it's wrong, and lets her keep trying. The review tool plays every clip and shows
+every picture and its options, so the review you owe before her first test is a few minutes of
+tapping instead of 30 minutes of opening mp3 files by hand.
 
 ## Why this is the fix
 
