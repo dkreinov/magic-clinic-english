@@ -251,3 +251,82 @@ STEP 1.5 the item-bank review tool, generated into `docs/`
   WRONG answer would have sailed through every count-based test in the file. (My first attempt at
   that cross-check reported 6 failures — the bug was in MY script, which read a field named `kind`
   when the bank calls it `direction`. Fixed and re-run before drawing any conclusion.)
+
+STEP 1.6 point the owner-facing docs at the new tool, the new route, and the real test count
+  tier: WORKER (Sonnet)
+  did: README.md line 60 157->172 (stays 108 lines). docs/owner-handoff.md: line 75 count, the §2
+    paragraph replaced by the five frozen lines, and the 13-line "## 2א. תצוגת הורים / Parent view"
+    section inserted before §3 (115 -> 130 lines). docs/item-bank-review.md: the 7-line quick-path
+    blockquote after the STATUS line and the §1 trailing sentence (89 -> 96 lines).
+  surprises: none — read only the packet's files.
+  deviations: none
+  validation_first_try: yes (worker's first run AND my clean re-run — STEP-1.6-OK, 28 content
+    assertions plus an exact wc -l on all three files)
+  retries: 0
+  escalations: 0
+  tokens: worker=51145, checker=48037
+  interventions: 0
+  auditor: match, CONFIDENCE high — and it did the job no gate can: it read the Hebrew AS HEBREW and
+    returned an explicit verdict that every inserted line is grammatical, natural and consistently
+    feminine singular, with no contradiction between the new lines. The plan named this as the one
+    residual risk of the step (greps prove presence, never truth or grammar), so the auditor packet
+    asked for it by name rather than hoping.
+  commit: 7e03fef
+  accepted: 2026-07-25
+
+PHASE 1 CLOSED — all 9 frozen acceptance criteria re-checked mechanically by me, in a clean tree,
+after the last commit:
+  1. STEP-1.1-OK .. STEP-1.6-OK — each re-run by me in a clean state at its own acceptance (they
+     cannot be re-run now: every one asserts its own uncommitted changed-path count, which is 0 on a
+     clean tree. That is by design, and it is why acceptance happens at the step, not at the close.)
+  2. `npm test` -> # pass 172 / # fail 0 ✓  (157 + 2 + 6 + 3 + 0 + 4 + 0 = 172, PB-7 exactly)
+  3. contrast gate exits 0, last line ALL PASS, `grep -c '^PASS'` = 52 ✓ (PB-8: no new token, no hex)
+  4. `magic-vet-v8` in sw.js, ZERO hits for `magic-vet-v7` under public/ and tests/, and exactly 2
+     changed lines in sw.js since the baseline — which is the mechanical proof PRECACHE is untouched
+  5. `git diff --name-only 89e6600 -- . ':!.oplan'` is EXACTLY the 16 frozen paths — verified with a
+     sorted `diff` against the written list, not by eye ✓
+  6. api/ lib/ data/ assets/ — empty diff ✓ (D3 holds: api/placement.js is byte-unchanged)
+  7. exactly 6 paths under public/, and `public/item-bank-review.html` does not exist ✓ (D4)
+  8. `.data/profile.json` does not exist; `.data/` is empty; no step ran a server or touched the
+     learner's profile ✓
+  9. the generator run twice more produces md5 a1bda284e0650be197eda983eef05310 both times, equal to
+     the COMMITTED file — so what is in git is exactly what the script writes ✓
+
+PHASE 1 METRICS
+  steps: 6, first-try validation passes: 6/6 (step 1.5 needed one retry INSIDE the worker; every
+    step passed my own clean re-run on the first attempt)
+  escalations: 0 — no step needed a rung up the model ladder. Every step ran on WORKER (Sonnet).
+  interventions: 2, both mine, both logged in full above: the under-scoped step-1.2 packet, and the
+    unspecified `alt` attribute in step 1.5 that I ratified rather than re-specified.
+  auditor verdicts: 4 match on the first pass, 2 mismatch. Both mismatches were real work for the
+    layer: 1.2's was my missing evidence (fixed by supplying it, then match), 1.5's was three genuine
+    contract deviations no gate would ever have caught (fixed by a corrective packet, then match).
+  tokens: worker=412356, checker=383698, combined subagent=796054 — summed with awk, not in my head
+    (§12: the previous run mis-added a six-number sum by hand).
+  cost: unavailable — the harness reports token counts per subagent but no price readout, and §12
+    forbids estimating a metric that a kill decision is made from.
+  orchestrator_context: unavailable — /context is a human-invokable display, not something I can
+    read from inside the loop.
+  field_guide: 44/40 lines. OVERAGE JUSTIFICATION (§6's price, paid deliberately): I evicted the
+    sharp chain-order lesson outright (the asset pipeline it describes is finished and frozen) and
+    compressed five others, and the file still runs four over. The two new entries are lessons 11
+    and 12 — never anchor on a bidi Hebrew string from terminal output, and a packet that names a
+    contract without quoting it is a hole. Both are failures THIS machinery hit this phase, and both
+    would silently repeat next run. Four lines is the right price for that; deleting a real lesson
+    to hit a round number would not be.
+
+WHAT THIS PHASE IS WORTH, honestly. Six steps, zero escalations, 6/6 first-try validation on my own
+re-runs. The cheap-worker bet paid: every step was executed by Sonnet from a spec, and the two
+things that actually went wrong were BOTH mine (an incomplete packet) or invisible-to-machines
+(three contract deviations in generated-code detail). That is the shape the design predicts — the
+gates catch mechanical failure, the auditor catches contract drift, and the orchestrator is the
+only one who can catch a bad spec. The one number I would watch next run: two of six audits came
+back mismatch, and only one of those was the worker's fault. If that ratio holds, my packets are
+the bottleneck, not the workers.
+
+PAUSED AT THE PHASE 1/2 BOUNDARY. The run was handed to me in "autonomous" execution mode, and I
+read that as autonomous WITHIN the phase — oplan §11 makes continuous multi-phase mode an explicit
+human opt-in ("never enter continuous mode on your own initiative"), and the handoff prompt I was
+given scoped itself to "Resume at: Phase 1, step 1.1". Phase 2 also publishes to the public
+internet, which is exactly the class of action that gets confirmed rather than assumed. So Phase 1
+closes here and the owner decides whether Phase 2 runs now.

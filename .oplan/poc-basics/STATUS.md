@@ -1,60 +1,57 @@
 # STATUS — poc-basics
 
-*Rewritten in full at every update. Last update: Phase 1 building — steps 1-5 of 6 accepted.*
+*Rewritten in full at every update. Last update: Phase 1 CLOSED — built, checked, not yet deployed.*
 
 ## Where we are
 
-Phase 1 is being built, one step at a time. **5 of 6 steps are done and committed.**
+**Phase 1 is done.** All six steps are built, reviewed and committed. Nothing is live yet — the app
+she would open today is still the old build. Phase 2 is the deploy, and it needs your go-ahead.
 
 ```mermaid
 flowchart LR
-    P1{{Phase 1 BUILDING<br/>fix the basics<br/>5 of 6 steps accepted}} --> P2
-    P2[Phase 2<br/>deploy so she can start]  --> P3
+    P1[Phase 1 DONE<br/>fix the basics<br/>6 of 6 steps accepted] --> P2
+    P2{{Phase 2 NEXT<br/>deploy so she can start<br/>needs your go-ahead}} --> P3
     P3[Phase 3<br/>the growth design]
-    style P1 fill:#ffd27f
+    style P1 fill:#b7e4c7
+    style P2 fill:#ffd27f
 ```
 
-| Step | What it does | State |
-|---|---|---|
-| 1.1 | the placement test can be restarted | **accepted** |
-| 1.2 | the parent-only `#/parent` screen + re-take button | **accepted** |
-| 1.3 | the real entry-code screen | **accepted** |
-| 1.4 | the service-worker cache bump | **accepted** |
-| 1.5 | the item-bank review tool | **accepted** |
-| 1.6 | the docs you actually read | next |
+## What you now have (built, not yet live)
 
-Tests: **172 passing, 0 failing** (was 157). Contrast gate: all 52 colour pairs pass.
+- **A parent-only screen.** Add `#/parent` to the app's address. It shows her vocabulary level and
+  how many words her stories are built from, both placement scores, the date she took the test, and
+  how many words she's collected. It is in no menu and no link — telling an 11-year-old "you are A1"
+  is meaningless at best.
+- **A re-take button on that screen.** The new result replaces the old one, so a wrong placement
+  stops being permanent. It's on your screen only: "redo the test" isn't a child's decision.
+- **A real entry-code screen** instead of the raw browser popup she'd have hit first. It explains
+  what the code is and where to get it, says clearly when it's wrong, and lets her keep trying —
+  the old one gave her exactly one retry and then a raw error string.
+- **`docs/item-bank-review.html`** — double-click it. It plays all 6 recordings, shows all 12
+  pictures with their options and the answer marked ✓, prints both reading texts with all 6
+  questions, and has a checkbox per item with a "checked N of 18" counter.
 
-One thing worth telling you: on step 1.2 the instructions I handed the builder were incomplete —
-they named the frozen wording for the parent screen without including it. The builder found it
-itself instead of stopping to ask and got it exactly right, but that was luck covering my mistake.
-The review layer caught the hole, I checked the text character-by-character against the frozen copy
-rather than by eye, and every later step now gets the full wording.
+Tests: **172 passing, 0 failing** (was 157). Colour-contrast gate: all 52 pairs pass.
 
-## What Phase 1 builds
+## What I need from you
 
-The parent screen shows her level and what it unlocks, both test scores, when she took the test and
-how many words she's collected — deliberately not in the menu, because telling an 11-year-old "you
-are A1" is meaningless at best. Its re-take button overwrites the old result, so a bad placement
-stops being permanent; it's on your screen only, since "redo the test" isn't a child's decision.
-The entry-code screen replaces the raw browser popup she'd hit first. The review tool plays every
-clip and shows every picture and its options, so the review you owe before her first test is a few
-minutes of tapping instead of 30 minutes of opening mp3 files by hand.
+1. **Say go for the deploy** (Phase 2). It publishes the four things above. The rollback target gets
+   recorded before the deploy, not after.
+2. **Then open the review tool and sign the gate** in `docs/item-bank-review.md` §6.
+3. **Then give her the entry code.** That order matters: the app sits behind the code you hold, so
+   deploying does not put the test in front of her — only handing over the code does.
 
-## Why this is the fix
+## Two things worth knowing
 
-The core loop already works — verified end-to-end in production. The real problem: **her level is
-never shown anywhere in the app**, so a wrong placement isn't just permanent, it's *invisible*. You
-can't make a 12-question test precise — you make its verdict visible and correctable.
+- I checked, with a script rather than by eye, that the answer marked ✓ in the review tool is the
+  one the item bank actually calls correct — all 18 items and questions, zero mismatches. A tool
+  that confidently marked the wrong answer would have passed every other test in the file.
+- The review tool never ships to the internet. It holds the correct answers, so it lives outside the
+  folder that gets deployed — and Phase 2 will prove that with a live 404 check.
 
-## Two decisions I made that you should know about
-
-- **The item-bank review does not block the deploy.** Your doc requires it before *she sees the
-  test*, not before the code is live. So we ship, you review, then you give her the code.
-- **`#/parent` goes into your handoff doc.** A route nobody can find delivers nothing.
-
-## Still open — your call, unchanged from last run
+## Still open — your call, unchanged
 
 The placement test still can't tell "at the ceiling" from "far past it"; the test count is
-hand-written into two docs; `bash.exe.stackdump` ships on every deploy; and the entry code isn't in
-the frozen design doc. All four are written up as deferred.
+hand-written into two docs; `bash.exe.stackdump` ships on every deploy; the entry code isn't in the
+frozen design doc; and a manual level override for you was deliberately left out (re-taking already
+recovers). All five are written up as deferred, not dropped.

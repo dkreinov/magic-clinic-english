@@ -1,6 +1,8 @@
-CURRENT: phase 1 "fix the basics" EXECUTING. Next step 1.6 (the owner-facing docs) — LAST.
+CURRENT: phase 1 "fix the basics" CLOSED — 6/6 steps accepted, all 9 acceptance criteria re-checked
+  mechanically. Next: PHASE 2 (deploy). PAUSED AT THE PHASE BOUNDARY for the owner's go-ahead —
+  Phase 2 publishes to the internet, which is not a call an autonomous loop makes for someone.
 BASELINE: 89e6600 (157 tests, 0 fail; contrast gate 52 pairs ALL PASS; tree clean)
-NOW: 172 tests, 0 fail; contrast gate 52 pairs ALL PASS; tree clean at b7e9077
+NOW: 172 tests, 0 fail; contrast gate 52 pairs ALL PASS; tree clean at 7e03fef (+ this checkpoint)
   public/ IS NOW SEALED FOR THIS PHASE: all six public/ files changed, and the single sanctioned
   cache bump (magic-vet-v8) has landed on top of them. Steps 1.5 and 1.6 touch public/ NOT AT ALL —
   1.5's own gate asserts `git status --porcelain -- public` = 0. No step may bump to v9.
@@ -20,6 +22,8 @@ ACCEPTED: step 1.1 — a098d3d (validation first try, auditor match/high, 0 inte
   step 1.4 — 52dc502 (validation first try, auditor match/high, 0 interventions)
   step 1.5 — b7e9077 (1 retry; auditor mismatch -> 3 real contract deviations fixed by a
   corrective packet -> match/high; HTML md5 unchanged across the fix)
+  step 1.6 — 7e03fef (validation first try; auditor match/high, and it read the Hebrew as Hebrew
+  and passed the grammar + feminine-voice check the plan named as this step's residual risk)
 FROZEN CONTRACTS IN FORCE:
   PB-1 the owner route is exactly `#/parent`; view is public/views/parent.js, loaded by a DYNAMIC
   import inside renderRoute() — NOT a static import, because sw.js PRECACHE is frozen and a static
@@ -58,4 +62,14 @@ OPEN QUESTIONS: none blocking. Both planner blockers are ANSWERED in plan.md's a
 DEFERRED (surfaced, not dropped): a manual owner band-override (D5 — re-taking already recovers) ·
   harder placement items · the test count duplicated across README and owner-handoff ·
   bash.exe.stackdump tracked at the repo root · amending FROZEN design.md §2/§9 to record APP_CODE.
-BLOCKED: no.
+PHASE 2 MUST DO FIRST (from plan.md's skeleton, do not re-derive): re-establish the rollback target
+  with `vercel inspect https://english-app-three-tan.vercel.app` BEFORE deploying; deploy with
+  `"$(npm prefix -g)/vercel" deploy --prod --yes`; verify live by md5 against the WORKTREE (never a
+  git blob) for sw.js, styles.css, app.js, api.js, views/parent.js, views/placement.js and
+  manifest.webmanifest; fetch the shell as `/` (cleanUrls 308s /index.html); assert live /sw.js
+  contains magic-vet-v8; assert /api/health returns exactly
+  {"ok":true,"data":{"status":"up","version":1}} and that POST /api/chapter {"action":"ping"} with
+  no code header returns 401; probe that GET /item-bank-review.html AND GET /docs/item-bank-review.html
+  both 404 (the live proof of D4). Never request /api/profile, never open a browser on production,
+  never spend OpenAI credit, never run `vercel env`.
+BLOCKED: no — waiting on the owner's go-ahead to deploy, which is a decision, not a blocker.
