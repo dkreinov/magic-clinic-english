@@ -937,11 +937,420 @@ criteria above are written to pass either way, which is why criterion 1 has two 
 | `scripts/check-contrast.mjs` was never wired into `npm test`. | Step 2.1's third test; promote to the field guide at the phase close. |
 | The Phase 2 skeleton assumed `icon.svg` could be replaced, which the frozen tests forbid. | Recorded under "How reality differs from the skeleton"; the skeleton was drafted without applying field-guide lesson 7. |
 
-## Phase 3 — deploy and verify  (skeleton)
+## Phase 3 — deploy and verify  (PLANNED IN FULL 2026-07-25)
 
-Deploy to Vercel, verify live by read-only GETs, and confirm the learner profile was never
-contacted. A real chapter generation at A2 costs an OpenAI call and writes a profile — so it is
-tested against a LOCAL server with a scratch `DATA_DIR`, never production.
+Planned by a fresh PLANNER-tier planner from the written record alone, then reviewed by the
+orchestrator (four amendments below, each labelled). Baseline commit `bc2f5eb`; test baseline
+157 pass / 0 fail; contrast gate 52 pairs, `ALL PASS`; working tree clean.
+
+**Goal.** The Band 2 difficulty fix and the whole visual-polish build (v7 shell, four-layer
+background, magic ring, girl-and-dragon icon) are live on the canonical production URL and
+mechanically verified from outside, byte-for-byte against the shipped tree. The learner's stored
+profile is never read or written at any point. A one-command rollback to the exact prior
+production deployment is recorded **before** the first outward-facing call is made.
+
+### How reality differs from the skeleton (verified, not assumed)
+
+1. **The skeleton's local A2 chapter generation is NOT run.** It said a real A2 generation "is
+   tested against a LOCAL server with a scratch `DATA_DIR`". A local server still calls the real
+   OpenAI API with the owner's key — a scratch `DATA_DIR` protects the profile, not the wallet —
+   and nothing in `design.md`, `plan.md` or `journal.md` authorises an OpenAI spend for
+   verification. It is also unnecessary: `lib/story.js:127-141` computes `ratio` as the share of
+   chapter tokens present in `allowedSet`, so **enlarging the allowed set can only raise the
+   ratio**. Band 2 cannot make `verifyChapter` fail more often than before. The live proof that
+   Band 2 reached production is the module-load probe in step 3.5.
+2. **No browser verification against production, at all.** Prior runs did one. It cannot be
+   repeated here: the views call `GET /api/profile` on load, and `api/profile.js:15-21` creates and
+   saves a profile when none exists (field-guide 7). Even against an existing profile that is a
+   *read* of her stored profile, which the standing rule forbids outright. Phase 2 step 2.8 already
+   proved the background and the ring from the live DOM against a local scratch server
+   (`journal.md` STEP 2.8). Nothing more is owed. All live verification here is `curl`.
+3. **A documentation-accuracy step was added (3.1).** Two owner-facing docs are now false because
+   of phases 1–2: `README.md:60` still says `# 146 tests` and `:99` says `data/` holds "the band-1
+   vocabulary list"; `docs/owner-handoff.md:22-24` tells the owner the icon "is currently a simple
+   paw print — a nicer illustrated icon is a future step", and `:74` says 146 tests. The handoff
+   doc is what the owner opens to install the app on the child's phone — exactly the wrong place to
+   be stale on the day the icon ships. Neither file carries a FROZEN header (unlike `design.md` and
+   `docs/visual-design.md`), so **no owner gate is required** — contrast BLOCKER 1 in Phase 2,
+   where amending the frozen doc did need one.
+4. **The production API is gated by an entry code that this run's record never mentioned.** The
+   deployed commit is `ef140ce "feat: gate the API behind a shared entry code (APP_CODE env var)"`,
+   made OUTSIDE any oplan run; `APP_CODE` is set in Vercel Production. Every `/api/*` except
+   `/api/health` answers 401 without the header. This phase is planned around that, not against it:
+   no env var is read, written or echoed, and every frozen command expects the 401 **explicitly**,
+   so a *disappearing* gate fails loudly instead of passing quietly. Recorded in `phase-state.md`
+   as record-gap repair 1.
+
+### Orchestrator amendments to the planner's draft (all four are mine, and logged)
+
+- **A — steps 3.2, 3.4 and 3.5 are ORCHESTRATOR-RUN, not WORKER dispatches.** The planner assigned
+  them to workers. They create and modify **zero files**: a worker would return an empty diff, so
+  there is nothing for an auditor to see, and §7 Layer 1 makes me re-run the frozen validation
+  myself for acceptance regardless. Dispatching would cost ~40k tokens each, save none of my
+  context (the commands are quiet by construction — they print one `STEP-3.n-OK` line or fail), and
+  hand a cheap model a live production network target for zero added verification. oplan's executor
+  exists to do the typing; where there is no typing there is no executor. **Phase 3 therefore has
+  exactly ONE dispatchable step, 3.1.** Note the direction of this call versus phase 1 step 1.3 and
+  phase 2 step 2.7, where I did a worker's typing myself — that was drift and I logged it as such.
+  This is the opposite and legitimate case: not "I'll type it faster" but "there is nothing to type".
+- **B — record-gap repairs are made before the first dispatch,** per oplan §10 step 11. See the
+  repair table at the end of this phase.
+- **C — record gap 6 is DECIDED, not carried:** no OpenAI credit is spent on verification in this
+  phase. Written as a phase non-goal below, so no later step can reopen it silently.
+- **D — record gaps 7 and 8 are surfaced into "Deferred"** rather than fixed opportunistically
+  inside a deploy phase.
+
+### Frozen contracts for this phase
+
+- **DP-1 — the canonical URL is `https://english-app-three-tan.vercel.app`.** Deployment-specific
+  `*-dkreinovs-projects.vercel.app` URLs sit behind a Vercel login and are never shared or used as
+  the verification target.
+- **DP-2 — live bytes are compared to the WORKTREE file, never to a `git show` blob.** `vercel
+  deploy` uploads the working tree; `public/index.html` is CRLF on disk and LF in git, so a blob
+  comparison is meaningless (3064 vs 2983 bytes). Measured at plan time.
+- **DP-3 — the page shell is fetched as `/`, never `/index.html`.** `vercel.json` sets
+  `cleanUrls: true`, so `/index.html` answers **308**.
+- **DP-4 — the rollback target is recorded BEFORE the deploy call, and the recorded value wins**
+  over any value predicted at plan time.
+- **DP-5 — `/api/profile` is never requested in this phase, by any step, with or without a header,
+  GET or POST.** This is the run-wide prohibition and it is absolute. Mechanically checked at the
+  phase gate: no frozen command in this phase may contain that path.
+
+### Phase 3 non-goals (run-wide rules restated where they bite hardest)
+
+- **No OpenAI spend** (amendment C): no `POST /api/chapter {"action":"generate"}` against anything,
+  live or local; no local chapter generation. A real A2 chapter is first seen by the learner.
+- No `vercel env` command of any kind — `APP_CODE`, `OPENAI_API_KEY` and `BLOB_READ_WRITE_TOKEN`
+  stay exactly as they are, and no value is read or echoed.
+- No `vercel.json` edit, no `.vercelignore`, no `vercel link`/`project`/domain change, no preview
+  deploy, no `git push`.
+- No browser opened against production. No repo file changed outside step 3.1.
+- No amendment to `design.md` or `docs/visual-design.md` (both FROZEN; phase 2 already amended the
+  latter under an answered blocker).
+
+### Phase 3 acceptance criteria (frozen before execution)
+
+1. `STEP-3.1-OK` … `STEP-3.5-OK` all printed, each from its own frozen command re-run by the
+   orchestrator in a clean state.
+2. At the deployed commit `npm test` prints `# pass 157` and `# fail 0`; `node
+   scripts/check-contrast.mjs` exits 0, last line `ALL PASS`, `grep -c '^PASS'` = **52**.
+3. `git status --porcelain -- . ':!.oplan'` is empty and `git diff --name-only bbdb60c..HEAD --
+   . ':!.oplan'` is exactly the frozen 23-path list of step 3.2.
+4. On the canonical URL the live md5 of `sw.js`, `styles.css`, `app.js`, `views/reader.js`,
+   `manifest.webmanifest`, `icons/icon.svg` and the three icon PNGs each equals the md5 of the
+   corresponding file under `public/`; `/sw.js` contains `const CACHE = "magic-vet-v7";`; the three
+   PNGs answer `content-type: image/png`; the live manifest's `icons` deep-equals the frozen
+   four-entry array.
+5. `GET /api/health` returns exactly `{"ok":true,"data":{"status":"up","version":1}}`; `POST
+   /api/chapter` with `{"action":"ping"}` and no code header returns **401** with `"ok":false` —
+   which proves the `api/chapter` module graph, **including `data/band2.json`**, loaded in
+   production (a JSON that failed to bundle makes the function fail to load and answer 5xx).
+6. Profile never contacted: `grep -c '/api/profile'` over this phase's frozen commands is **0**;
+   `git diff --name-only bbdb60c..HEAD -- api/profile.js lib/store.js lib/profile.js` is empty;
+   `.data/profile.json` does not exist locally.
+7. The outgoing production deployment's id and URL are in the journal as the rollback target,
+   recorded before the deploy, together with the deployed commit sha (record-gap repair 3).
+
+### Step 3.1 — correct the two owner-facing docs that phases 1–2 made false
+
+- **Tier:** WORKER (Sonnet) · **Retry budget:** 2 — the ONLY dispatched step in this phase.
+- **Files it may touch:** `README.md`, `docs/owner-handoff.md`. Nothing else.
+- **Commands:** none — direct file edits.
+- **Goal:** both docs state the real test count, the real contents of `data/`, and the real app
+  icon — including the Android re-install caveat that `phase-state.md` says is unknown and must be
+  *told* to the owner rather than discovered.
+- **Contracts (frozen, exact strings; all four "before" anchors verified present at plan time, all
+  "after" anchors verified absent):**
+  1. `README.md:60` — `npm test         # 146 tests, node:test, no framework` becomes
+     `npm test         # 157 tests, node:test, no framework`. Leading spaces unchanged.
+  2. `README.md:99` — `data/        the item bank and the band-1 vocabulary list` becomes
+     `data/        the item bank and the band 1 + band 2 vocabulary lists`. Leading spaces
+     unchanged.
+  3. `docs/owner-handoff.md:74` — `146 בדיקות` becomes `157 בדיקות`; the rest of the line is
+     untouched.
+  4. `docs/owner-handoff.md:22-24` — the three-line paragraph beginning
+     `אייקון האפליקציה הוא כרגע טביעת כפה (paw-print) פשוטה` is replaced, in full, by exactly these
+     FOUR lines (the file grows from 114 to 115 lines, which the validation checks):
+```
+אייקון האפליקציה הוא כעת האיור של הילדה עם הדרקון — אושר על ידך בגרסה הזו.
+שימי לב: אם האפליקציה כבר מותקנת על הטלפון שלה, אנדרואיד עשוי להמשיך להציג את
+האייקון הישן עד להסרה והתקנה מחדש (re-install). בפתיחה הראשונה האפליקציה תיפתח
+כמו אפליקציה רגילה, במסך מלא (ללא סרגל הכתובת של הדפדפן).
+```
+     Copy these lines byte-for-byte. Do NOT retype, reflow, re-wrap or "fix" the Hebrew. The final
+     sentence is carried over from the old paragraph unchanged; the feminine address (`שימי`)
+     matches the document's existing voice (`פתחי`, `בחרי`, `אשרי`).
+- **Non-goals:** do not touch `docs/visual-design.md` or `design.md` (both FROZEN); do not touch
+  `.oplan/`; do not change the production URL, the item-bank warnings, the costs section, or any
+  other Hebrew in the handoff; do not "modernise" the README's prose, structure or status line; do
+  not update a test count anywhere else (no other text file states one — verified with `git grep`);
+  do not add a changelog; do not remove `bash.exe.stackdump` (Deferred, below).
+- **Validation (frozen):**
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && grep -qF -- '# 157 tests, node:test, no framework' README.md \
+  && ! grep -qF -- '# 146 tests' README.md \
+  && grep -qF -- 'the item bank and the band 1 + band 2 vocabulary lists' README.md \
+  && ! grep -qF -- 'the band-1 vocabulary list' README.md \
+  && [ "$(wc -l < README.md)" = "108" ] \
+  && grep -qF -- '157 בדיקות' docs/owner-handoff.md \
+  && ! grep -qF -- '146 בדיקות' docs/owner-handoff.md \
+  && grep -qF -- 'אייקון האפליקציה הוא כעת האיור של הילדה עם הדרקון' docs/owner-handoff.md \
+  && grep -qF -- 'אנדרואיד עשוי להמשיך להציג את' docs/owner-handoff.md \
+  && grep -qF -- 'עד להסרה והתקנה מחדש (re-install)' docs/owner-handoff.md \
+  && grep -qF -- 'רגילה, במסך מלא (ללא סרגל הכתובת של הדפדפן).' docs/owner-handoff.md \
+  && ! grep -qF -- 'paw-print' docs/owner-handoff.md \
+  && ! grep -qF -- 'צעד עתידי שייעשה ביחד איתך' docs/owner-handoff.md \
+  && grep -qF -- 'https://english-app-three-tan.vercel.app' docs/owner-handoff.md \
+  && [ "$(wc -l < docs/owner-handoff.md)" = "115" ] \
+  && T="$(npm test 2>&1)" \
+  && printf '%s\n' "$T" | grep -qx '# fail 0' \
+  && printf '%s\n' "$T" | grep -qx '# pass 157' \
+  && [ "$(git status --porcelain -- README.md docs/owner-handoff.md | grep -c '')" = "2" ] \
+  && [ "$(git status --porcelain -- public scripts tests lib api data assets docs/visual-design.md | grep -c '')" = "0" ] \
+  && echo STEP-3.1-OK
+```
+  The two `wc -l` checks are the guard against a reflow that satisfies every grep while silently
+  re-wrapping the paragraph.
+- **Depends on:** nothing (baseline `bc2f5eb`). Must be COMMITTED before 3.2 — 3.2's 23-path delta
+  list expects `docs/owner-handoff.md` to be in it.
+
+### Step 3.2 — pre-deploy gate  (ORCHESTRATOR-RUN, NOT DISPATCHED — amendment A)
+
+- **Goal:** prove, immediately before the irreversible call, that HEAD is exactly the intended
+  change set, that it is fully green, and that nothing in it touches the profile storage path.
+- **Files:** none — this step creates and modifies nothing.
+- **Contract — the frozen expected delta since base commit `bbdb60c`, excluding `.oplan/`, is
+  exactly these 23 paths in git's order** (22 today; `docs/owner-handoff.md` joins in 3.1):
+```
+README.md api/chapter.js assets/delight/app-icon.png data/band2.json data/raw/band2.pdf docs/owner-handoff.md docs/visual-design.md lib/story.js public/icons/icon-192.png public/icons/icon-512.png public/icons/icon-maskable-512.png public/index.html public/manifest.webmanifest public/styles.css public/sw.js public/views/reader.js scripts/build-icons.js scripts/build_band2.py scripts/check-contrast.mjs tests/background.test.js tests/band2.test.js tests/icons.test.js tests/shell.test.js
+```
+- **Validation (frozen):**
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && T="$(npm test 2>&1)" \
+  && printf '%s\n' "$T" | grep -qx '# fail 0' \
+  && printf '%s\n' "$T" | grep -qx '# pass 157' \
+  && C="$(node scripts/check-contrast.mjs)" \
+  && printf '%s\n' "$C" | tail -1 | grep -qx 'ALL PASS' \
+  && [ "$(printf '%s\n' "$C" | grep -c '^PASS')" = "52" ] \
+  && [ "$(git status --porcelain -- . ':!.oplan' | grep -c '')" = "0" ] \
+  && [ "$(git diff --name-only bbdb60c..HEAD -- . ':!.oplan' | tr '\n' ' ')" = "README.md api/chapter.js assets/delight/app-icon.png data/band2.json data/raw/band2.pdf docs/owner-handoff.md docs/visual-design.md lib/story.js public/icons/icon-192.png public/icons/icon-512.png public/icons/icon-maskable-512.png public/index.html public/manifest.webmanifest public/styles.css public/sw.js public/views/reader.js scripts/build-icons.js scripts/build_band2.py scripts/check-contrast.mjs tests/background.test.js tests/band2.test.js tests/icons.test.js tests/shell.test.js " ] \
+  && [ "$(git diff --name-only bbdb60c..HEAD -- api/profile.js lib/store.js lib/profile.js | grep -c '')" = "0" ] \
+  && [ ! -e .data/profile.json ] \
+  && grep -qF -- 'const CACHE = "magic-vet-v7";' public/sw.js \
+  && echo STEP-3.2-OK
+```
+- **Non-goals:** do not run `npm ci`/`npm install` — Vercel installs during its own build, and
+  destroying `node_modules` here can only turn a green tree red (`sharp` behind corporate TLS); do
+  not deploy; do not start a server; do not create, delete or stage any file; do not `git commit`;
+  do not touch `.data/` even to create it; do not read `.env`.
+- **Depends on:** 3.1 committed.
+
+### Step 3.3 — production deploy  (ORCHESTRATOR-RUN, NOT DISPATCHED)
+
+- **Why not dispatchable:** an irreversible outward-facing call that re-points the app the child
+  uses. A cheap worker in a clean context must not own that.
+- **Goal:** the canonical alias serves the phase-1+2 build, and the rollback target is written down
+  *before* the call (DP-4).
+- **Procedure**, in this order, from the repo root:
+  1. **Record the outgoing target FIRST:**
+     `"$(npm prefix -g)/vercel" inspect https://english-app-three-tan.vercel.app 2>&1 | sed -n '1,20p'`
+     Copy the `id` and `url` lines into the journal verbatim, together with the sha this deploy
+     ships (record-gap repair 3). Predicted at plan time — **re-verify, do not assume**:
+     `dpl_J7zsYaqEQ4AwY4HU7qbnLqW7QCQd` / `https://english-puiu1tyb9-dkreinovs-projects.vercel.app`.
+     If the value differs, a newer deployment happened since planning and **the recorded one wins**.
+  2. `"$(npm prefix -g)/vercel" deploy --prod --yes`
+  3. Record the new deployment id/URL from the CLI output.
+- **Validation (frozen):**
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && U=https://english-app-three-tan.vercel.app \
+  && [ "$(curl --ssl-no-revoke -s -o /dev/null -w '%{http_code}' "$U/")" = "200" ] \
+  && curl --ssl-no-revoke -sf "$U/sw.js" | grep -qF -- 'const CACHE = "magic-vet-v7";' \
+  && echo STEP-3.3-OK
+```
+- **Contracts:** deploy only from a clean tree at the commit 3.2 gated. DP-1 and the phase
+  non-goals apply in full — above all, no `vercel env` command of any kind.
+- **Depends on:** 3.2 green.
+
+### Step 3.4 — verify the live shell byte-for-byte  (ORCHESTRATOR-RUN — amendment A)
+
+- **Goal:** every static file the browser and the OS consume on production is identical to the
+  repo's, and the three icon PNGs are served with a content type Android will accept.
+- **Files:** none.
+- **Contracts:** DP-1, DP-2, DP-3. Frozen live manifest `icons` array — the same four entries step
+  2.7 froze locally.
+- **Validation (frozen):**
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && U=https://english-app-three-tan.vercel.app \
+  && for f in sw.js styles.css app.js views/reader.js manifest.webmanifest icons/icon.svg icons/icon-192.png icons/icon-512.png icons/icon-maskable-512.png; do \
+       L="$(curl --ssl-no-revoke -sf "$U/$f" | md5sum | cut -d' ' -f1)"; \
+       R="$(md5sum "public/$f" | cut -d' ' -f1)"; \
+       [ "$L" = "$R" ] || { echo "MISMATCH $f live=$L local=$R"; exit 1; }; \
+     done \
+  && curl --ssl-no-revoke -sf "$U/sw.js" | grep -qF -- 'const CACHE = "magic-vet-v7";' \
+  && curl --ssl-no-revoke -sf "$U/" | grep -qF -- '<link rel="apple-touch-icon" href="/icons/icon-192.png" />' \
+  && for p in icon-192 icon-512 icon-maskable-512; do \
+       curl --ssl-no-revoke -sfI "$U/icons/$p.png" | tr -d '\r' | grep -qi '^content-type: image/png' || { echo "BAD CONTENT-TYPE $p"; exit 1; }; \
+     done \
+  && M="$(curl --ssl-no-revoke -sf "$U/manifest.webmanifest")" \
+  && printf '%s' "$M" | node -e "
+let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{
+const m=JSON.parse(s);
+const want=[{src:'/icons/icon.svg',sizes:'any',type:'image/svg+xml',purpose:'any'},{src:'/icons/icon-192.png',sizes:'192x192',type:'image/png',purpose:'any'},{src:'/icons/icon-512.png',sizes:'512x512',type:'image/png',purpose:'any'},{src:'/icons/icon-maskable-512.png',sizes:'512x512',type:'image/png',purpose:'maskable'}];
+if(JSON.stringify(m.icons)!==JSON.stringify(want)) throw new Error('live icons mismatch: '+JSON.stringify(m.icons));
+if(m.background_color!=='#241305'||m.theme_color!=='#2e1806') throw new Error('live manifest colors changed');
+console.log('LIVE-MANIFEST-OK');});" \
+  && echo STEP-3.4-OK
+```
+- **Non-goals:** **never request `/api/profile`** (DP-5); do not request any `/api/*` path in this
+  step (3.5 owns the API); do not open a browser; do not run `npm run dev`; do not modify any file;
+  do not add `--compressed` or `-L` to any curl — they change the bytes or follow the cleanUrls
+  redirect and would make the md5 comparison meaningless; on any mismatch STOP and report the exact
+  line rather than retrying with different flags.
+- **Depends on:** 3.3 green.
+
+### Step 3.5 — verify the live API surface, including that Band 2 reached production  (ORCHESTRATOR-RUN — amendment A)
+
+- **Goal:** the serverless functions are up, the entry-code gate is live, and `api/chapter`'s module
+  graph — which statically imports `data/band2.json` — loads in production, with **zero** OpenAI
+  spend and **zero** profile contact.
+- **Files:** none.
+- **Contracts and why each probe is provably safe:**
+  - `GET /api/health` — ungated by design (`api/health.js` has no `isAuthorized` call, no store
+    access) — must return exactly `{"ok":true,"data":{"status":"up","version":1}}`.
+  - `POST /api/chapter` with body `{"action":"ping"}` and **no** `x-app-code` header must return
+    **401** with `"ok":false`. Safe in BOTH branches of `lib/auth.js`: with `APP_CODE` set,
+    `isAuthorized` is false and the handler answers 401 before any `loadProfile()`; with `APP_CODE`
+    unset it falls through to `body.action !== 'generate'` → 400, also before any `loadProfile()`
+    and before any `chat()` call. Neither branch reads the profile, writes the profile, or spends
+    money. Asserting **401** and not "401 or 400" is deliberate: a 400 here means the production
+    gate is open, which is a finding, not a pass. A 5xx here means `data/band2.json` (or another
+    import) failed to bundle — which is precisely the Band 2 proof this step exists for.
+  - `GET /api/placement` with no header must return **401** (its GET branch is profile-free, so
+    this is a gate check, not a data read).
+  - `GET /data/band2.json` must return **404** — server-side data is not web-reachable.
+- **Validation (frozen):**
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && U=https://english-app-three-tan.vercel.app \
+  && H="$(curl --ssl-no-revoke -sf "$U/api/health")" \
+  && [ "$H" = '{"ok":true,"data":{"status":"up","version":1}}' ] \
+  && B="$(curl --ssl-no-revoke -s -X POST -H 'content-type: application/json' -d '{"action":"ping"}' -w '\n%{http_code}' "$U/api/chapter")" \
+  && [ "$(printf '%s\n' "$B" | tail -1)" = "401" ] \
+  && printf '%s\n' "$B" | grep -qF -- '"ok":false' \
+  && [ "$(curl --ssl-no-revoke -s -o /dev/null -w '%{http_code}' "$U/api/placement")" = "401" ] \
+  && [ "$(curl --ssl-no-revoke -s -o /dev/null -w '%{http_code}' "$U/data/band2.json")" = "404" ] \
+  && echo STEP-3.5-OK
+```
+- **Non-goals:** DP-5 — **no request to `/api/profile`, ever**; do not read `.env`; do not send an
+  `x-app-code` header; do not echo or reconstruct any secret; **do not POST
+  `{"action":"generate"}` to `/api/chapter` under any circumstances** (that spends OpenAI credit and
+  writes her profile); do not POST to `/api/placement` or `/api/translate`; do not retry a failing
+  assertion with a different body; do not "warm up" the function with extra calls.
+- **Depends on:** 3.3 green. Independent of 3.4 — disjoint concerns, either order.
+
+### Step 3.6 — close the phase and the run in the record  (ORCHESTRATOR-RUN, NOT DISPATCHED)
+
+- **Why not dispatchable:** it is the orchestrator's own record — phase metrics, token totals, the
+  §12 honesty clause, the field-guide curation decision and the owner-facing narrative are
+  judgement, not pattern-following, and no worker has the context.
+- **Files:** `journal.md`, `phase-state.md`, `STATUS.md`, `field-guide/index.md`. Nothing outside
+  `.oplan/`.
+- **Contracts — the journal entry must contain, at minimum:** the outgoing deployment id+URL
+  recorded in 3.3 and the new deployment id+URL **plus the commit sha each carries** (record-gap
+  repair 3); the verbatim `STEP-3.1-OK` … `STEP-3.5-OK` outputs; an explicit statement that no
+  request to `/api/profile` was made and that `.data/profile.json` does not exist; the residuals in
+  RISKS stated plainly rather than discovered; and phase metrics in the established format, with
+  token totals **measured, never estimated** (§12).
+  `STATUS.md` is rewritten in full and must carry both owner-facing notes from `phase-state.md`
+  (the pre-existing WCAG failure now fixed, and that an already-installed PWA may keep the old icon
+  until re-install), plus the A2 prompt-size cost change from RISKS.
+  Field-guide budget is 40 lines and the file is at 39 — promoting anything requires curating
+  something out first, **measured with `wc -l`, never estimated** (the §12 slip logged at the phase-2
+  close). Candidates earned this phase: the contrast gate now runs inside `npm test` (parked for
+  promotion by phase 2's record-gap table); `cleanUrls` makes `/index.html` a 308 so the shell must
+  be fetched as `/`; live-vs-local md5 must compare against the worktree because git normalises
+  CRLF; and "a reject-path probe proves a serverless module and its bundled JSON loaded, for free
+  and without touching data".
+- **Non-goals:** no repo file outside `.oplan/`; do not amend `design.md` or `docs/visual-design.md`;
+  do not re-open the deferred items — carry them forward unchanged; do not invent metrics.
+- **Depends on:** 3.4 and 3.5 green.
+
+### Rollback (written before the deploy, not after a fire)
+
+Trigger: any failure in 3.4 or 3.5 that leaves the child facing a worse app than before.
+**Authority: the orchestrator acts immediately and unilaterally** — the alternative is leaving a
+broken app in front of the learner while waiting for a human. No owner instruction on rollback
+authority exists anywhere in the record; that absence is itself record gap 2.
+
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && PREV=<the URL recorded in step 3.3 sub-step 1> \
+  && "$(npm prefix -g)/vercel" rollback "$PREV" --yes \
+  && "$(npm prefix -g)/vercel" rollback status \
+  && U=https://english-app-three-tan.vercel.app \
+  && [ "$(curl --ssl-no-revoke -s -o /dev/null -w '%{http_code}' "$U/")" = "200" ] \
+  && curl --ssl-no-revoke -sf "$U/sw.js" | grep -qF -- 'const CACHE = "magic-vet-v6";' \
+  && [ "$(curl --ssl-no-revoke -s -o /dev/null -w '%{http_code}' "$U/api/health")" = "200" ] \
+  && echo ROLLBACK-OK
+```
+
+What makes this a real rollback rather than a hopeful one:
+
+- It is a **code-only** rollback. This deploy changes no storage code (`api/profile.js`,
+  `lib/store.js`, `lib/profile.js` are untouched — asserted mechanically in 3.2) and no profile
+  schema, so there is nothing to un-migrate and her data cannot be left inconsistent.
+- **The service worker rolls back too, and does so *because* of the version bump.** The prior
+  deployment serves `sw.js` with `magic-vet-v6`; the browser byte-compares `sw.js` on next load,
+  sees a change, installs, activates and evicts the `v7` cache. Returning devices converge after one
+  reload. Rolling back does NOT strand a device on v7.
+- No git action is part of the rollback. The commits stay; only the alias moves. Withdrawing the
+  code itself would be a separate, deliberate `git revert` under a new plan.
+- `vercel rollback` re-aliases an existing Ready deployment and triggers no rebuild, so it cannot
+  fail for build reasons. Fallback if it does: `"$(npm prefix -g)/vercel" promote <PREV_URL> --yes`.
+
+### Risks
+
+- **The whole point of Phase 1 is unverifiable live without spending money.** A real A2 chapter is
+  never generated in this phase, so the first person to observe one is the learner. Two things bound
+  the risk: `verifyChapter` measures the share of chapter tokens found in `allowedSet`, and a
+  strictly larger `allowedSet` can only raise that ratio — Band 2 cannot increase the 502 rate; and
+  3.5's probe fails loudly if `data/band2.json` did not reach the production bundle. **Residual:
+  prompt-shape behaviour with a 2,850-word list has never been observed against the real model.**
+- **A2 chapters now carry a much bigger prompt.** The allowed list is pasted whole into the user
+  message (`lib/story.js:191`): 9,101 chars at A1 → **23,664 at A2**, roughly +3.6k input tokens per
+  attempt, up to 3 attempts. On `gpt-4.1-mini` that is well under a cent per chapter and invisible
+  against the $5–10/month ceiling (`design.md` §2) — but it is a real, previously unrecorded cost
+  change, noticeable only on the OpenAI dashboard, so it is stated in STATUS instead of discovered.
+- **We cannot know whether any of this reaches her yet.** Her band lives in the profile we may not
+  read. If she is at A1, Band 2 changes nothing for her until she re-places. Noticed only by the
+  owner, so STATUS must say it.
+- **The installed-PWA icon may not refresh.** Android often re-reads a manifest icon only on
+  re-install. Silent by nature — the owner looks at the phone, sees the old paw print and concludes
+  the deploy failed. Step 3.1 puts the caveat in the handoff doc; 3.6 puts it in STATUS.
+- **Deploying mid-session.** If she opens the app during the deploy she gets the old shell until the
+  SW update cycle completes on a later load. Benign, and the run-open note authorises changing the
+  live app in this window — but that window was recorded hours ago and nothing re-confirms it.
+- **Failure mode no mechanical gate can see:** the deploy succeeds, every byte matches, and the app
+  is nonetheless unusable for a reason only a human eye would catch. Prior runs covered that with a
+  production browser pass; this phase deliberately cannot, because that would read her profile.
+  Accepted; the mitigation is that phase 2 step 2.8 drove the identical build in a real browser.
+
+### Record gaps found by the fresh planner, and how each was repaired (amendment B)
+
+| Gap | Repair |
+|---|---|
+| The `APP_CODE` entry-code gate exists nowhere in this run's workspace — expected in `design.md` §2/§9 or the frozen contracts, found only in field-guide line 2 and in commit `ef140ce`, which was made outside any oplan run and is what production serves today. | **Written into `phase-state.md` under FROZEN CONTRACTS IN FORCE** before the first dispatch, and into "How reality differs from the skeleton" above. `design.md` §2/§9 is FROZEN, so amending it needs an owner gate — flagged for a future run, not done silently here. |
+| **No rollback procedure has ever been written down for this project** — `grep -rn -i "rollback\|promote" .oplan` returns nothing operational across five runs. Every prior run deployed with no stated way back. | The **Rollback** section above, written BEFORE the deploy (DP-4). Promote to the field guide at the phase close. |
+| Nobody ever recorded which commit each past deployment carries, so "roll back to the last good code" is not answerable from files alone. The current one was established by timestamp correlation — inference, not record. | Step 3.3 records `deployment id ← commit sha` for both the outgoing and incoming deployments; step 3.6 contracts require it in the journal. |
+| No record of whether the PWA is installed on the learner's device. | Unknowable from files. Already logged; now also written into the owner-facing handoff doc by step 3.1 so the owner is told rather than surprised. |
+| Her current band is unknown and unknowable under the profile prohibition, so this phase cannot state whether Band 2 changes anything for her today. | **Added to `phase-state.md` OWNER-FACING NOTES** and to STATUS via 3.6. Not solvable without reading her profile, which is forbidden. |
+| No owner authorisation exists for spending OpenAI credit on verification — the record says neither yes nor no. | **DECIDED, not carried (amendment C):** no spend. Written into the phase non-goals above so no later step reopens it silently, and surfaced as a residual in RISKS. |
+| `README.md` and `docs/owner-handoff.md` duplicate the test count with no cross-reference — the same drift class already logged for the contrast-pair count, now recurring in two more files. | Step 3.1 repairs the **values**. The structural fix (state it once, or stop stating it — field-guide 3 says the invariant is zero failures, not a count) is **Deferred**, below. |
+| `bash.exe.stackdump` was committed at the repo root by `ef140ce` and is uploaded on every deploy. | Harmless, unowned by any plan, and removing it is a repo change nobody asked for inside a deploy phase. **Deferred**, below — surfaced, not silently fixed. |
 
 ## Deferred (surfaced, not silently dropped)
 
@@ -951,3 +1360,19 @@ and both reading passages are elementary. Adding harder items would change
 `tests/placement-items.test.js` — a frozen-test contract change needing owner approval, plus new
 audio and/or artwork. Not in this run. Consequence to state plainly: after this run a strong
 reader still lands on A2, but A2 now actually means something.
+
+**The test count is stated in two docs with no cross-reference** (`README.md`, `docs/owner-handoff.md`).
+Phase 3 step 3.1 corrects both values, but the drift will recur at the next test added. The
+structural fix is to state it in one place or stop stating it at all — field-guide 3 already says
+the invariant is ZERO FAILURES, not a count. Needs an owner call on doc style; not done inside a
+deploy phase.
+
+**`bash.exe.stackdump` is tracked at the repo root** (committed by `ef140ce`, outside any oplan
+run) and is uploaded to production on every deploy. Harmless litter, one `git rm` to fix, owned by
+no plan. Left alone deliberately: removing a committed file is a repo change nobody asked for, and
+a deploy phase is the wrong place to widen scope.
+
+**`design.md` §2/§9 does not mention the `APP_CODE` entry-code gate** that now protects the live
+API. The document is FROZEN and its header requires explicit owner approval to change, so this run
+records the gate in `phase-state.md` and the journal instead. Amending the frozen design doc needs
+an owner gate in a future run.

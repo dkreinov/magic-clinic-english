@@ -451,3 +451,89 @@ PHASE 2 CLOSED — all 7 acceptance criteria pass
   widened from 28 to 52 pairs, and that gate wired into `npm test` for the first time — it had
   never run automatically, so any token change could have regressed accessibility silently.
   NOT DEPLOYED. Phase 3 deploys and verifies live.
+
+## PHASE 3 — PLANNING
+
+NEXT-PHASE PLANNER (PLANNER tier, fresh context, files only) — 2026-07-25
+  Returned the full phase-3 plan. BLOCKERS: none. RECORD GAPS: 8. tokens: 165085, 59 tool calls.
+  It did what this role is for: it found things the record does not contain, rather than guessing.
+  THE BIG ONE — the live API is gated by an entry code (APP_CODE) that appears NOWHERE in this
+  run's workspace. Commit ef140ce, made outside any oplan run, is what production serves. Every
+  /api/* except /api/health answers 401 without the header. A phase planned in ignorance of that
+  would have "verified" production by reading a wall of 401s as failures, or worse, gone hunting for
+  the secret. Now a frozen contract (APP-CODE in phase-state.md) and the reason every probe in 3.5
+  asserts 401 EXPLICITLY: a disappearing gate then fails loudly instead of passing quietly.
+  SECOND — no rollback procedure has ever been written down for this project. Five runs, four
+  deployments, `grep -rn -i "rollback\|promote" .oplan` returns nothing operational. Every prior
+  deploy went out with no stated way back. plan.md now carries one, written BEFORE the call (DP-4).
+  THIRD — nobody ever recorded which COMMIT a deployment carries, so "roll back to the last good
+  code" was not answerable from files. The planner established the current one by timestamp
+  correlation (ef140ce committed 15:38:28, deployment created 15:38:36) and said plainly that this
+  is inference, not record. phase-state.md now has a DEPLOYMENT LEDGER.
+
+ORCHESTRATOR REVIEW — 4 amendments, all mine, all logged
+  A. Steps 3.2/3.4/3.5 moved from WORKER to ORCHESTRATOR-RUN. They create and modify ZERO files.
+     A worker would return an EMPTY diff — nothing for an auditor to see — and §7 Layer 1 makes me
+     re-run the frozen validation myself for acceptance regardless. Dispatching would cost ~40k
+     tokens each, save none of my context (these commands print one STEP-3.n-OK line or fail), and
+     hand a cheap model a live production network target for zero added verification. oplan's
+     executor exists to do the TYPING; where there is no typing there is no executor.
+     I am deliberately noting the direction of this call, because it is the opposite of the drift I
+     logged twice in this run. Phase 1 step 1.3 and phase 2 step 2.7 were "I'll type it myself, it's
+     faster" — that is drift, and I recorded it as such both times. This is "there is nothing to
+     type": the deliverable of 3.2/3.4/3.5 IS the frozen validation's exit code. Phase 3 therefore
+     has exactly ONE dispatchable step, 3.1, and I would rather have one honest dispatch than three
+     ceremonial ones.
+  B. Record-gap repairs written into phase-state.md BEFORE the first dispatch (oplan §10 step 11
+     says answer every blocker and patch every file a gap names — not "later").
+  C. Record gap 6 DECIDED rather than carried: no OpenAI credit is spent on verification in this
+     phase. The record said neither yes nor no, and an undecided question is exactly what §4 rule 2
+     forbids dispatching. Written into the phase non-goals so no later step reopens it silently.
+     This also kills the skeleton's local A2 generation — a scratch DATA_DIR protects the profile,
+     not the wallet, and the skeleton had conflated the two.
+  D. Record gaps 7 (test count duplicated in two docs) and 8 (tracked bash.exe.stackdump) surfaced
+     into Deferred rather than fixed opportunistically. Both are one-line fixes and both are scope
+     I was not given inside a deploy phase.
+  I ALSO RE-VERIFIED THE PLANNER'S LOAD-BEARING FACTS MYSELF rather than trusting the report: the
+  22-path delta vs bbdb60c (23 after 3.1 adds owner-handoff), all four "before" grep anchors in
+  README.md/docs/owner-handoff.md present and all "after" anchors absent, `git grep 146` finding
+  exactly two text occurrences, public/ containing app.js + views/reader.js + the three PNGs, and
+  vercel.json = {"cleanUrls": true}. Every fact held.
+  ONE THING I TIGHTENED IN 3.1's GATE: the planner's greps prove the new Hebrew is present but not
+  that the paragraph was not silently re-wrapped around it. Added `wc -l` line-count assertions on
+  both files (README 108 unchanged, owner-handoff 114 -> 115) plus a grep for a substring of EACH
+  of the four new lines. A reflow now fails the gate.
+
+## PHASE 3 — EXECUTION
+
+STEP 3.1 correct the two owner-facing docs that phases 1-2 made false
+  tier: WORKER (Sonnet) · did: README.md line 60 (146 -> 157 tests) and line 99 ("the band-1
+    vocabulary list" -> "the band 1 + band 2 vocabulary lists"); docs/owner-handoff.md line 74
+    (146 -> 157 בדיקות) and lines 22-24, where the "the icon is currently a simple paw print, a
+    nicer one is a future step" paragraph became the girl-and-dragon paragraph plus the Android
+    re-install caveat.
+  surprises: none · deviations: none · first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=37042, checker=52994 · audit: match/high · commit: 537bbf1
+  WHY THIS STEP EXISTS AT ALL: it is not in the phase-3 skeleton. The fresh planner found it.
+  docs/owner-handoff.md is the document the owner opens to install the app on her daughter's phone,
+  and on the very day the new icon ships it still said the icon "is currently a simple paw print"
+  and that a nicer one "is a future step done together with you" — written in a document the owner
+  reads while standing at the phone. That is the worst possible day for that sentence to be false.
+  IT ALSO CLOSES A LONG-STANDING RECORD GAP IN THE RIGHT PLACE. phase-state.md has carried the note
+  "nothing says whether the PWA is installed, so it is unknown whether a new icon appears without a
+  re-install" since the phase-2 close. Leaving it only in .oplan means the owner discovers it by
+  looking at the phone, seeing the old paw print, and concluding the deploy failed. It is now in the
+  handoff doc, in Hebrew, where she will actually read it.
+  GATE I TIGHTENED BEYOND THE PLANNER'S DRAFT: its greps prove the new Hebrew is present but not
+  that the surrounding paragraph was left unreflowed. I added `wc -l` assertions on both files
+  (README 108 unchanged; owner-handoff 114 -> 115, since three lines become four) and a grep for a
+  substring of EACH of the four new lines. A re-wrap that satisfies every content grep now fails.
+  THE AUDITOR'S EXTRA DUTY EARNED ITS KEEP AGAIN, as it did on 2.4 and 2.7. A doc gate is weak by
+  nature: greps prove presence, never TRUTH. So the packet asked it to verify the Hebrew grammar,
+  the document's feminine voice (פתחי / בחרי / אשרי -> שימי), and whether the sentence "the app icon
+  is now the girl-and-dragon illustration" is actually TRUE of this repo. It checked the manifest
+  and the icon files rather than taking the claim on trust, and returned one caveat it correctly
+  ruled NOT a mismatch: public/icons/icon.svg — the browser-TAB favicon — is still the paw print,
+  because it is frozen by tests/shell.test.js and could not be replaced. The new sentence is about
+  the install/home-screen icon, which genuinely is the artwork, so it stands. Recording the caveat
+  anyway: if the owner ever asks "why is it still a paw print in the tab", this is the answer.
