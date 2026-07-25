@@ -276,35 +276,33 @@ gated. Questions and the recommendation are in `STATUS.md`.
 | monkey | קוף | 🐒 | picture→word PROMPT (no audio) |
 | steak | סטייק | 🥩 | picture→word PROMPT (no audio) |
 
-### DESIGN DECISION (frozen): these are ICON TILES, not scenes
+### DESIGN DECISION (frozen, owner-directed 2026-07-25): RICH SCENES + bigger tiles
 
-The option art renders at ~76px inside a button. A busy "wood-and-magic fantasy scene" is
-unreadable at that size and would not tell a 6th-grader "steak" from "camp". So each prompt is a
-SINGLE, CENTERED, INSTANTLY-RECOGNISABLE subject on a simple soft background, rendered in the
-frozen cartoon style/palette — NOT the full FROZEN STYLE SUFFIX scene language. This is a
-deliberate, logged departure from the §6 suffix, justified by the tile size; the owner approved
-"pictures in the frozen cartoon style", and readability at 76px is the governing constraint.
+The owner asked for rich scene artwork ("I want rich since this is for my kid"), overriding the
+earlier icon-tile idea. Rich art is unreadable at the current ~76px tile, so Phase 4 ALSO enlarges
+the option tiles: the audio-to-picture options become a 2-column grid of near-square tiles about
+150px tall with the image filling the tile (`object-fit: cover`), the Hebrew word as `alt`. The
+subject must still be the unmistakable hero of each scene so a 6th-grader reads it at a glance.
+This is additive styling (no logic/copy change) and does not affect the contrast gate (images are
+exempt; the selected-border and text alternative remain).
 
-### FROZEN ICON PROMPTS (concept + this shared ICON SUFFIX)
+### FROZEN RICH PROMPTS (concept + FROZEN STYLE SUFFIX from visual-design.md §6)
 
-ICON SUFFIX (verbatim on every one): "Centered single subject, simple soft warm-amber background
-with a gentle glow, generous empty margin around the subject, no scene clutter. Warm cozy
-3D-cartoon illustration, soft painterly rendering, warm golden lighting, teal + violet + amber
-accents — the same look as the girl-and-dragon magical-vet-clinic art. Aimed at an 11-year-old,
-charming not babyish. Square 1:1. No text, no letters, no watermark, no border, no frame."
+Each is sent with the §6 FROZEN STYLE SUFFIX appended (the warm wood-and-magic vet-clinic world),
+and each names its subject as the central hero so it is unmistakable at tile size:
 
-- pet: "A happy cartoon puppy dog sitting, looking at the viewer."
-- mom: "A warm friendly cartoon mother — a woman smiling, head and shoulders."
-- camp: "A cozy cartoon camping tent under a tree with a tiny campfire."
-- fan: "A cartoon electric desk fan with spinning blades."
-- dad: "A warm friendly cartoon father — a man smiling, head and shoulders."
-- desk: "A cartoon wooden study desk with a lamp and a book on it."
-- singer: "A cartoon singer holding a microphone and singing, mid-song."
-- horse: "A friendly cartoon horse standing, in profile."
-- zoo: "A cartoon zoo entrance archway with a giraffe and a lion peeking behind it."
-- movie: "A cartoon film clapperboard and a bucket of popcorn."
-- monkey: "A cheerful cartoon monkey sitting, holding a banana."
-- steak: "A cartoon grilled steak on a plate with a sprig of garnish."
+- pet: "A happy puppy dog curled on a cushion in the cozy magical vet clinic, the puppy the large central hero of the image."
+- mom: "A warm smiling cartoon mother standing in the clinic's round doorway, arms gently open, she is the central hero."
+- camp: "A cozy campsite at golden hour — a glowing tent, a small campfire, tall trees and fireflies, the tent the central hero."
+- fan: "A cartoon electric fan with spinning blades on a wooden clinic shelf, papers fluttering, the fan the large central hero."
+- dad: "A warm smiling cartoon father in the clinic, sleeves rolled up, he is the central hero of the image."
+- desk: "A cozy wooden study desk with a glowing lamp, an open book and potion bottles, the desk the central hero."
+- singer: "A cheerful cartoon singer on a small stage holding a microphone in a warm spotlight, tiny creatures watching, the singer the central hero."
+- horse: "A friendly cartoon horse standing in a sunny magical meadow by a wooden stable, the horse the large central hero."
+- zoo: "A magical zoo scene with an archway, a giraffe and a lion, colourful banners, animals the clear focus."
+- movie: "A cozy movie-night scene — a glowing screen, a film clapperboard and a bucket of popcorn, the screen the central hero."
+- monkey: "A cheerful cartoon monkey swinging on a vine in a leafy jungle holding a banana, the monkey the large central hero."
+- steak: "A hearty grilled steak on a plate on a rustic wooden table in warm tavern light, the steak the large central hero."
 
 ### Storage + pipeline (mirrors the delight-pass method, field-guide 10–13)
 
@@ -345,12 +343,16 @@ style (`docs/visual-design.md` §6 FROZEN STYLE SUFFIX), masters committed under
 and are content-distinct by md5 (delight-pass field-guide lesson: per-file checks alone do not
 catch duplicate grabs).
 
-## Phase 4 — wire images into the placement UI  (skeleton)
+## Phase 4 — wire images into the placement UI + enlarge tiles  (skeleton)
 
-Additive per PFA-2: a new emoji→image map, and `renderTask1Item` renders `<img>` with the
-Hebrew word as `alt` when a mapping exists, falling back to the emoji otherwise. `data/` item
-bank untouched, so every existing assertion stays green. Tap targets stay >= 48px; contrast gate
-stays passing.
+Additive per PFA-2: a new emoji→image map, and `renderTask1Item` renders `<img class="opt-art">`
+with the Hebrew word as `alt` when a mapping exists, falling back to the emoji otherwise. The
+`data/` item bank stays untouched, so every existing assertion stays green. ALSO (owner-directed
+rich art): enlarge the option tiles in `VIEW_STYLE` so the scenes are legible — near-square tiles
+~150px tall, image filling the tile (`object-fit: cover`, inherit `--radius`), subject centered.
+Tap targets stay >= 48px; the WCAG gate stays passing (images exempt; selected-border + `alt`
+text remain). Bump the sw CACHE (`magic-vet-v4` → `magic-vet-v5`) with its test string, since
+placement.js and styles.css are precached.
 
 ## Phase 5 — deploy and live verification  (skeleton)
 

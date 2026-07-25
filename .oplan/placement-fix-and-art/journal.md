@@ -214,3 +214,18 @@ readability, keeping the rendering style.
 
 RUN STATUS: Phase 1 (bug) shipped and live-verified. Phase 2 (fairness) in repo, ships with
 Phase 4. Phases 3–5 pending OPEN QUESTION 3.
+
+## OWNER DIRECTION (2026-07-25): RICH scenes, and dedicated chat CONFIRMED gone
+
+Owner: "I want rich since this is for my kid." The icon-tile decision is overridden: Phase 3
+prompts are now rich scenes in the full §6 FROZEN STYLE SUFFIX world, each naming its subject as
+the central hero so it still reads at tile size. Phase 4 correspondingly enlarges the option tiles
+(~150px near-square, image fills the tile) so rich art is legible — additive styling, gate
+unaffected.
+
+Dedicated ChatGPT chat re-tested a third time: navigating to the /c/6a632008... URL now REDIRECTS
+to chatgpt.com/ root (0 turns, 0 images, composer only). A redirect away from the conversation is
+definitive — that chat is inaccessible to this account (deleted, or its share/ownership lapsed).
+It is not retryable. The approved method is therefore dead, and the remaining fork (new ChatGPT
+chat with the local anchor re-uploaded, vs the scripted OpenAI API) is back to the owner as the
+one blocking decision. All rich prompts and the pipeline are frozen and ready.
