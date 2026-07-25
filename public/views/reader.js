@@ -73,18 +73,39 @@ const VIEW_STYLE = `
   }
 
   .reader-spinner {
-    width: 44px;
-    height: 44px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    border: 4px solid color-mix(in srgb, var(--color-primary) 25%, var(--color-card));
-    border-top-color: var(--color-primary);
-    animation: reader-spin 0.9s linear infinite;
+    background: conic-gradient(
+      from 0deg,
+      var(--color-primary),
+      var(--color-teal),
+      var(--color-accent),
+      var(--color-primary)
+    );
+    -webkit-mask-image: radial-gradient(circle, transparent 56%, #000 60%);
+    mask-image: radial-gradient(circle, transparent 56%, #000 60%);
+    animation: reader-spin 1.4s linear infinite;
   }
 
   @keyframes reader-spin {
     to {
       transform: rotate(360deg);
     }
+  }
+
+  .reader-loading-art {
+    animation: reader-float 3.2s ease-in-out infinite;
+  }
+
+  @keyframes reader-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reader-spinner { animation-duration: 3.2s; }
+    .reader-loading-art { animation: none; }
   }
 
   .reader-question-card {
@@ -362,6 +383,7 @@ export async function render(container, ctx) {
       ${styleTag()}
       ${header("הסיפור", "מרפאת הקסמים")}
       <div class="reader-loading">
+        <img class="spot-image spot-image--sm reader-loading-art" src="/assets/placement-friend.webp" alt="" />
         <div class="reader-spinner" aria-hidden="true"></div>
         <p>הקסם קורה... רגע אחד</p>
       </div>
