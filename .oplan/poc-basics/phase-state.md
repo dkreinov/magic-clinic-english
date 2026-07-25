@@ -1,6 +1,18 @@
 CURRENT: phase 1 "fix the basics" CLOSED — 6/6 steps accepted, all 9 acceptance criteria re-checked
-  mechanically. Next: PHASE 2 (deploy). PAUSED AT THE PHASE BOUNDARY for the owner's go-ahead —
-  Phase 2 publishes to the internet, which is not a call an autonomous loop makes for someone.
+  mechanically. Next: PHASE 2 (deploy), now PLANNING.
+GO-AHEAD GIVEN: 2026-07-25, by the owner, in the resume prompt that opened this session ("Resume at:
+  Phase 2 — deploy", execution mode autonomous). This is the authorisation STATUS.md's "What I need
+  from you" item 1 was waiting for, and it is the ONLY authorisation to publish to the internet in
+  this run. Recorded here because it arrived in chat and would otherwise die with the session.
+  Its scope is the deploy as the Phase 2 skeleton describes it — not the two owner actions that
+  follow it (sign the item-bank gate, then hand over the entry code), which remain the owner's.
+CONTINUOUS MODE: opted in by the owner, 2026-07-25, mid-run and explicitly ("I'm going to sleep now,
+  you can use oplan to create next phases if needed but I want a working app in the morning").
+  oplan §11 makes multi-phase continuous mode a human-only opt-in; this is it. So Phase 2 does NOT
+  pause at its boundary — plan Phase 3 with a fresh planner, review it, and keep going. What this
+  costs is MY context hygiene, not planning freshness. The deliverable the owner named is a WORKING
+  APP, which is Phase 2's deploy; Phase 3 is a zero-code document and must never be allowed to delay
+  or destabilise the deploy. The two owner actions are still hers and are NOT delegated by this.
 BASELINE: 89e6600 (157 tests, 0 fail; contrast gate 52 pairs ALL PASS; tree clean)
 NOW: 172 tests, 0 fail; contrast gate 52 pairs ALL PASS; tree clean at 7e03fef (+ this checkpoint)
   public/ IS NOW SEALED FOR THIS PHASE: all six public/ files changed, and the single sanctioned

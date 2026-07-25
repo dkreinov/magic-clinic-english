@@ -330,3 +330,52 @@ human opt-in ("never enter continuous mode on your own initiative"), and the han
 given scoped itself to "Resume at: Phase 1, step 1.1". Phase 2 also publishes to the public
 internet, which is exactly the class of action that gets confirmed rather than assumed. So Phase 1
 closes here and the owner decides whether Phase 2 runs now.
+
+================================ PHASE 2 — deploy ================================
+
+PHASE 2 OPENED. The owner gave the go-ahead in the resume prompt that opened this session, and
+mid-phase added continuous mode explicitly ("I'm going to sleep now… I want a working app in the
+morning"). Both are recorded in phase-state.md, because both arrived in chat and would otherwise die
+with the session. A fresh PLANNER-tier planner drafted Phase 2 from the record alone — forbidden to
+run any `vercel` command, since recording the rollback target is itself a step of the phase — and I
+reviewed and amended its draft. Its one BLOCKER was real and I answered it in writing in plan.md.
+
+THE PLANNER'S BLOCKER, AND WHY IT MATTERED. It found that `docs/owner-handoff.md:35-40` still told
+the owner to watch two EMOJI (`t1-06 desk → 🧑‍💻`, `t1-04 fan → 🌀`) that no child has seen since
+illustrations replaced them in an earlier run. I verified it before acting. It is worse than stale:
+step 1.6 rewrote the paragraph THREE LINES ABOVE it to send the owner to `docs/item-bank-review.html`,
+whose frozen warnings say `נקודה חלשה ידועה: התמונה…` — "the picture". The section contradicted the
+tool it points at, in the one document the owner opens to perform the gate that stands between this
+deploy and her daughter's first session. And plan.md:1077 ASSERTS the re-wording happened; no step
+contract ever carried it and no gate ever checked it. That is a defect in MY Phase 1 planning, and
+the fresh planner found it from files alone — which is the second job that role exists to do.
+
+STEP 2.1 the owner-handoff's two weak-item bullets describe the picture, not a retired emoji
+  tier: ORCHESTRATOR-RUN, then AUDITED (amendment B — see plan.md)
+  did: replaced `docs/owner-handoff.md` lines 35-40 with a six-line block: a two-line lead-in naming
+    the tool's own `נקודה חלשה ידועה` caption, then the two bullets with the emoji removed from the
+    labels and the explanations replaced by the tool's own warning sentences. 6 lines for 6 — the
+    file stays at 130, so every other frozen assertion in the record survives untouched.
+  surprises: the two retired emoji were the ONLY 4-byte (F0 9F) sequences in the whole file, measured
+    before writing the gate — which is what let the gate assert their absence in pure ASCII instead
+    of anchoring on a bidi Hebrew literal (field-guide lesson 11).
+  deviations: none
+  validation_first_try: yes (STEP-2.1-OK; 14 assertions, including an md5 freeze of the spliced
+    region and a CROSS-FILE derivation check that re-extracts both sentences from the generated HTML
+    at runtime and greps for them — so no Hebrew literal appears anywhere in the command)
+  retries: 0 · escalations: 0 · interventions: 0
+  auditor: match, CONFIDENCE high. It did the two jobs no gate can. It read the Hebrew AS HEBREW and
+    ruled it grammatical, natural and consistently feminine singular — and noted that `אותה` now
+    agrees with the feminine `התמונה`, where the retired bullet's `זה` did not. And it re-verified
+    the derivation claim ITSELF against `docs/item-bank-review.html` rather than taking my word:
+    both sentences byte-for-byte, first-sentence-only for `t1-04`. It also confirmed the untouched
+    neighbours (the paragraph above, the `הוראות תיקון` line below) are byte-identical.
+  WHY THIS STEP WAS NOT DISPATCHED TO A WORKER (amendment B, logged because a departure nobody can
+    see is how procedures rot): the splice is `head`+`cat`+`tail` from a file I had already prepared
+    and mechanically verified against the tool's bytes. Dispatching a worker to run that would be
+    ceremony. What genuinely pays here is the AUDITOR — the layer that caught a fluent false sentence
+    in an owner-facing document on the previous run — so I kept that layer and dropped the one that
+    would only have retyped. I composed the Hebrew myself because hard rule 2 says an unanswered
+    question is decided in the plan, by me, not left for an executor.
+  commit: (below)
+  accepted: 2026-07-25

@@ -1082,3 +1082,535 @@ RECORD GAPS:
 - **Nothing states what the app should do if `sessionStorage` is unavailable.** I decided it
   (PB-3: degrade to "no re-take", exactly as `public/api.js` already degrades on `localStorage`
   failure) rather than leave it for a worker to hit.
+
+---
+
+# PHASE 2 — deploy so she can start
+
+Drafted by a fresh PLANNER-tier planner from the written record alone (it was forbidden to run any
+`vercel` command, since recording the rollback target is itself a step of the phase), then reviewed
+and amended by the orchestrator. The Phase 2 SKELETON above is **superseded by this section**.
+
+## Orchestrator amendments to the planner's draft
+
+**BLOCKER 1 — ANSWERED: fix the stale emoji bullets, and fix them BEFORE the deploy.**
+The planner found that `docs/owner-handoff.md:35-40` still tells the owner to watch
+``t1-06 desk → 🧑‍💻`` and ``t1-04 fan → 🌀`` — options the child has not seen since illustrations
+replaced the emoji in a previous run. Verified by me, and it is worse than stale: step 1.6 rewrote
+the paragraph three lines above it to send the owner to `docs/item-bank-review.html`, whose frozen
+warnings say `נקודה חלשה ידועה: התמונה…` ("the picture"). The section now contradicts the tool it
+points at, in the one document the owner opens to perform the gate that stands between this deploy
+and her daughter's first session. `plan.md:1077` *asserts* the re-wording happened; no step contract
+carried it and no gate checked it. That is a defect in MY Phase 1 planning, not the worker's.
+
+It is in scope by the skeleton's own words ("Correct any owner-facing doc that Phase 1 made false…
+re-check rather than assume"), so it becomes **step 2.1**, before the deploy. The planner correctly
+refused to invent the Hebrew; composing it is the orchestrator's job (hard rule 2), and I have.
+The replacement reuses the two warning sentences that already exist **verbatim in the generated
+tool**, so the two documents cannot disagree — and step 2.1's gate proves that derivation
+mechanically rather than trusting my eye.
+
+**RECORD GAP REPAIRED — the deploy recipe is field-guide lesson 13, not 12.** `plan.md:89`,
+`plan.md:1072`, `phase-state.md:62` and `brief.md:93` all cite "lesson 12"; in the current 44-line
+guide lesson 12 is the under-scoped-packet lesson and **13** is the deploy recipe. All four
+citations corrected. A stale pointer in the record is exactly the bug class this machinery exists to
+kill, and it is a number, not a decision — correcting it re-opens nothing.
+
+**RECORD GAPS ACKNOWLEDGED AND DEFERRED, NOT FIXED** (each is real; none is this phase's job, and a
+deploy phase is the wrong place to widen scope): `README.md:108` says "Live and in daily use by its
+one intended user", which has been false for this whole run's premise and becomes true only after the
+owner completes step 2.9's two actions; `README.md`'s repository-layout block no longer mentions
+`scripts/build-item-review.js`. Both were explicitly excluded by step 1.6's non-goals, so both are
+deliberate omissions rather than oversights. Added to DEFERRED in `phase-state.md`.
+
+**AMENDMENT B — every step of this phase is ORCHESTRATOR-RUN, and step 2.1 is audited.**
+I re-derived this rather than inheriting the predecessor's amendment A. Steps 2.2-2.9 create or
+modify no repo file: a worker would return an empty diff with nothing for an auditor to read, I
+re-run every frozen gate myself for acceptance regardless, and 2.4/2.5 hand a live production target
+and an irreversible call to a cheap model in a clean context for zero added verification. Step 2.1
+*does* produce a diff — but it is a 6-line splice from a file I prepared, so dispatching a worker to
+run `sed` would be ceremony. What genuinely pays there is the **auditor**, which caught a fluent
+false sentence in an owner-facing document on the previous run and verified Hebrew grammar and
+feminine voice in step 1.6. So 2.1 is orchestrator-run and **audited**: I keep the layer that catches
+things and drop the layer that would only retype. Logged, per §12, because a departure nobody can see
+is how procedures rot.
+
+GOAL: `https://english-app-three-tan.vercel.app` serves the Phase-1 build (`magic-vet-v8`, the
+`#/parent` view, the entry-code screen, the re-take flag), proven file-by-file against the worktree
+rather than assumed; the rollback target is written down BEFORE the deploy call and is the only way
+back; and `docs/item-bank-review.html`, which contains the correct answers, is proven by live 404 to
+be unreachable from the internet. The learner's profile is never contacted, no browser is opened
+against production, and no OpenAI credit is spent. The owner is handed, in order, the two actions
+that remain hers: sign the item-bank gate, then give the child the entry code.
+
+ACCEPTANCE CRITERIA: (frozen before execution)
+1. `STEP-2.1-OK` … `STEP-2.9-OK` all print. 2.4 is a BEFORE-state gate and is accepted at the step —
+   it cannot be re-run after 2.5 by construction (see the step); every other gate is re-runnable and
+   is re-run by me at the close.
+2. `npm test` prints `# pass 172` / `# fail 0`; `node scripts/check-contrast.mjs` exits 0, last line
+   `ALL PASS`, `grep -c '^PASS'` = 52.
+3. `git status --porcelain -- . ':!.oplan'` is empty, and
+   `git diff --name-only 89e6600..HEAD -- . ':!.oplan'` is EXACTLY the same 16 paths Phase 1 froze —
+   this phase adds no repo path and removes none (step 2.1 edits a file already in the list).
+4. Seven live files md5-identical to the **worktree**: `sw.js`, `styles.css`, `app.js`, `api.js`,
+   `views/parent.js`, `views/placement.js`, `manifest.webmanifest`; live `/sw.js` contains
+   `const CACHE = "magic-vet-v8";`; `/` answers 200 and `/index.html` answers 308.
+5. `GET /api/health` returns exactly `{"ok":true,"data":{"status":"up","version":1}}`;
+   `POST /api/chapter {"action":"ping"}` with no code header returns **401** with `"ok":false`;
+   `GET /api/placement` returns 401.
+6. D4 proven live: `/item-bank-review.html`, `/item-bank-review`, `/docs/item-bank-review.html`,
+   `/docs/item-bank-review`, `/docs/item-bank-review.md` and `/data/placement-items.json` ALL 404.
+7. The profile was never contacted: the string `/api/profile` appears in ZERO of this phase's fenced
+   command blocks (grep the fenced blocks only, and **with the leading slash** — that slash is
+   load-bearing; without it `api/profile.js` as a git pathspec fabricates a false alarm, as it did on
+   the previous run); `.data/profile.json` does not exist; `git diff --name-only 89e6600..HEAD --
+   api lib data assets` is empty.
+8. No `vercel env` command and no `{"action":"generate"}` body appears in any fenced command block of
+   this phase (`grep -c` = 0 for both), and no browser tool was invoked against production.
+9. `phase-state.md` carries a DEPLOYMENT LEDGER with the outgoing id + url + what it served + the
+   incoming commit, recorded before the deploy, AND the incoming id + url + alias + commit;
+   `STATUS.md` no longer contains `needs your go-ahead` or `Nothing is live yet`, and states the two
+   remaining owner actions in order.
+
+DEPENDS ON: the 16-path change set at HEAD `053da30` (journal.md:286, re-measured by me and by the
+planner); `magic-vet-v8` already landed as PB-5's single bump — no step here may bump to v9; 172
+tests / 0 fail; `docs/item-bank-review.html` at md5 `a1bda284e0650be197eda983eef05310`, byte-identical
+to what the committed generator writes; and the owner's go-ahead, recorded in `phase-state.md`.
+
+SKELETON CHANGES:
+1. The skeleton's "re-check the owner-facing docs" produced a real finding, not a no-op — it is now
+   step 2.1 (see BLOCKER 1) plus the re-check in 2.2.
+2. The skeleton's single "record the rollback target, then deploy" becomes **two** steps (2.4, 2.5).
+   One step cannot prove its own internal ordering, and a half-failure inside it could deploy with no
+   recorded way back. This is a deliberate strengthening of the predecessor's step 3.3.
+3. The D4 probe is its own step (2.8) and also probes the **extensionless** forms, which the skeleton
+   does not name: with `cleanUrls: true` a bare `.html` probe is not by itself a complete proof.
+
+---
+
+STEP 2.1: the owner-handoff's two weak-item bullets describe the picture, not a retired emoji
+  goal: `docs/owner-handoff.md` §2 stops telling the owner to watch two emoji the child never sees,
+    and says what the review tool she is being sent to actually shows — using the tool's own warning
+    sentences, so the two documents cannot disagree. The file stays 130 lines, so every other frozen
+    assertion in the record survives untouched.
+  files: `docs/owner-handoff.md` — and nothing else.
+  commands: a 6-for-6 line splice of lines 35-40 from a prepared file in the scratchpad
+    (NEVER the repo root — field-guide lesson 1).
+  validation: (pure ASCII; both Hebrew sentences are DERIVED AT RUNTIME from the generated tool,
+    so no Hebrew literal appears anywhere in this command — field-guide lesson 11)
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && [ "$(wc -l < docs/owner-handoff.md)" = "130" ] \
+  && [ "$(sed -n '35,40p' docs/owner-handoff.md | md5sum | cut -d' ' -f1)" = "9fb11afabed401f82356b35b0004f01f" ] \
+  && ! LC_ALL=C grep -q $'\xf0\x9f' docs/owner-handoff.md \
+  && grep -qF -- '- **`t1-06` desk** —' docs/owner-handoff.md \
+  && grep -qF -- '- **`t1-04` fan** —' docs/owner-handoff.md \
+  && W1="$(grep -o 'class="warn">[^<]*' docs/item-bank-review.html | sed -n '1s/^class="warn">[^:]*: //p')" \
+  && W2="$(grep -o 'class="warn">[^<]*' docs/item-bank-review.html | sed -n '2s/^class="warn">[^:]*: //p')" \
+  && [ -n "$W1" ] && [ -n "$W2" ] \
+  && grep -qF -- "${W1%%. *}." docs/owner-handoff.md \
+  && grep -qF -- "$W2" docs/owner-handoff.md \
+  && grep -qF -- 'docs/item-bank-review.html' docs/owner-handoff.md \
+  && grep -qF -- 'docs/item-bank-review.md' docs/owner-handoff.md \
+  && [ "$(git status --porcelain -- . ':!.oplan' | grep -c '')" = "1" ] \
+  && [ "$(git status --porcelain -- docs/owner-handoff.md | grep -c '')" = "1" ] \
+  && echo STEP-2.1-OK
+```
+  contracts:
+    - **The frozen replacement for lines 35-40** (exactly six lines, md5
+      `9fb11afabed401f82356b35b0004f01f`):
+```
+שימי לב במיוחד לשני פריטים חלשים שזוהו מראש. הכלי מסמן את שניהם בכיתוב
+**נקודה חלשה ידועה** ליד התמונה עצמה:
+
+- **`t1-06` desk** — התמונה נקראת בעיקר כ"אדם מול מחשב", והתרגום "שולחן" עמום.
+- **`t1-04` fan** — התמונה עלולה להיקרא כ"סופה" ולא כ"מאוורר". ודאי מול הבת
+  שלך שהיא אכן מזהה אותה נכון.
+```
+    - **Derivation, not invention.** The `t1-06` sentence is the tool's second `<p class="warn">`
+      verbatim; the `t1-04` bullet's first sentence is the tool's first `<p class="warn">` first
+      sentence verbatim. Both were confirmed byte-identical against `docs/item-bank-review.html`
+      BEFORE this plan was written, with `grep -qF` and the file as the source — never retyped from
+      terminal output. The gate above re-proves it at acceptance time.
+    - `ודאי` (single vav) matches the tool's spelling; the retired bullet used `וודאי`. Feminine
+      imperative throughout (`שימי`, `ודאי`), matching both documents' existing voice.
+    - The two retired emoji are the ONLY 4-byte (`F0 9F…`) sequences in the file — measured, which is
+      what makes the `LC_ALL=C grep` a precise gate rather than a guess. The 12-row emoji table in
+      `docs/item-bank-review.md` is deliberately NOT touched (it is stale by design, plan.md:1074).
+  non-goals: do not renumber or restructure §2; do not touch the paragraph above (step 1.6's frozen
+    five lines) or the `הוראות תיקון` line below; do not touch `docs/item-bank-review.md`, its emoji
+    table, its `STATUS: REQUIRED-BEFORE-CHILD-USE` header or its §6 sign-off; do not touch `README.md`
+    (its two stale lines are DEFERRED above, not this step's job); do not touch `design.md` or
+    `docs/visual-design.md` (FROZEN); do not change the file's line count; do not deploy; do not
+    regenerate the HTML tool.
+  tier: ORCHESTRATOR-RUN, then AUDITED (amendment B) — the splice is mechanical, the Hebrew is not.
+  depends on: nothing (HEAD `053da30`).
+
+STEP 2.2: re-check that the owner-facing docs describe the code that is about to ship
+  goal: every mechanically-checkable claim the three owner-facing documents make about this build is
+    true of the tree about to be uploaded — the parent route exists in the code, the entry-code screen
+    replaced `window.prompt`, the review tool they point at is exactly what the committed generator
+    produces, and the item-bank gate is still open.
+  files: `docs/item-bank-review.html` — rewritten byte-identically by the generator; the gate proves
+    the tree stays clean. This step EDITS no document: if an assertion fails, STOP and report.
+  commands: `node scripts/build-item-review.js`
+  validation:
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && grep -qF -- '# 172 tests, node:test, no framework' README.md \
+  && [ "$(grep -c '172' README.md)" = "1" ] \
+  && [ "$(wc -l < README.md)" = "108" ] \
+  && [ "$(grep -c '172' docs/owner-handoff.md)" = "1" ] \
+  && [ "$(wc -l < docs/owner-handoff.md)" = "130" ] \
+  && [ "$(wc -l < docs/item-bank-review.md)" = "96" ] \
+  && grep -qF -- 'https://english-app-three-tan.vercel.app/#/parent' docs/owner-handoff.md \
+  && grep -qF -- 'const OWNER_ROUTE = "/parent";' public/app.js \
+  && grep -qF -- 'import("./views/parent.js")' public/app.js \
+  && ! grep -qF -- '#/parent' public/index.html \
+  && grep -qF -- 'scripts/build-item-review.js' docs/item-bank-review.md \
+  && grep -qF -- 'STATUS: REQUIRED-BEFORE-CHILD-USE' docs/item-bank-review.md \
+  && ! grep -qF -- 'window.prompt' public/api.js \
+  && grep -qF -- 'localStorage.setItem(CODE_KEY, code);' public/api.js \
+  && node scripts/build-item-review.js > /dev/null \
+  && [ "$(md5sum docs/item-bank-review.html | cut -d' ' -f1)" = "a1bda284e0650be197eda983eef05310" ] \
+  && [ "$(git status --porcelain -- . ':!.oplan' | grep -c '')" = "0" ] \
+  && echo STEP-2.2-OK
+```
+  contracts: the three owner-facing documents are `README.md`, `docs/owner-handoff.md`,
+    `docs/item-bank-review.md`; `design.md` and `docs/visual-design.md` are FROZEN and out of scope.
+    Frozen line counts 108 / 130 / 96. Frozen tool md5 `a1bda284e0650be197eda983eef05310`.
+    Regenerating must leave the tree clean — that is the proof the committed HTML is exactly what the
+    committed generator writes. Count checks are `grep -c` equalities, never `! grep -q '<number>'`
+    (field-guide lesson 6).
+  non-goals: do not edit any document; do not hand-edit the generated HTML; do not run `npm test`
+    (2.3 owns it); do not deploy; do not curl anything.
+  tier: ORCHESTRATOR-RUN — creates no file, produces no diff.
+  depends on: 2.1 accepted and COMMITTED.
+
+STEP 2.3: pre-deploy gate — the tree is green and is EXACTLY the intended change set
+  goal: prove, immediately before the irreversible call, that what will be uploaded is the Phase-1
+    change set and nothing else, that it is fully green, that the single cache bump is in place, and
+    that nothing under `api/ lib/ data/ assets/` moved (D3 and the profile-storage path).
+  files: none — this step creates and modifies no file.
+  commands: `npm test`, `node scripts/check-contrast.mjs` (both read-only; the suite writes nothing,
+    verified in Phase 1).
+  validation:
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && T="$(npm test 2>&1)" \
+  && printf '%s\n' "$T" | grep -qx '# fail 0' \
+  && printf '%s\n' "$T" | grep -qx '# pass 172' \
+  && C="$(node scripts/check-contrast.mjs)" \
+  && printf '%s\n' "$C" | tail -1 | grep -qx 'ALL PASS' \
+  && [ "$(printf '%s\n' "$C" | grep -c '^PASS')" = "52" ] \
+  && [ "$(git status --porcelain -- . ':!.oplan' | grep -c '')" = "0" ] \
+  && [ "$(git diff --name-only 89e6600..HEAD -- . ':!.oplan' | tr '\n' ' ')" = "README.md docs/item-bank-review.html docs/item-bank-review.md docs/owner-handoff.md public/api.js public/app.js public/styles.css public/sw.js public/views/parent.js public/views/placement.js scripts/build-item-review.js tests/entry-code.test.js tests/item-review.test.js tests/parent-ui.test.js tests/placement-ui.test.js tests/shell.test.js " ] \
+  && [ "$(git diff --name-only 89e6600..HEAD -- api lib data assets | grep -c '')" = "0" ] \
+  && [ "$(git diff --name-only 89e6600..HEAD -- public | grep -c '')" = "6" ] \
+  && grep -qF -- 'const CACHE = "magic-vet-v8";' public/sw.js \
+  && ! grep -rq 'magic-vet-v7' public/ tests/ \
+  && [ ! -e public/item-bank-review.html ] \
+  && [ ! -e .data/profile.json ] \
+  && echo STEP-2.3-OK
+```
+  contracts: the 16-path delta string is git's own output order, measured against `89e6600..HEAD`.
+    The `':!.oplan'` exclusion is load-bearing — my own checkpoints land between these steps and must
+    not break a deploy gate (this is a deliberate difference from Phase 1's gates, which counted
+    uncommitted paths and therefore required a commit between every step). Baseline is `89e6600`, not
+    the brief's stale `e4c5885`. `magic-vet-v8` is terminal for this phase.
+  non-goals: do not run `npm ci` or `npm install` — Vercel installs during its own build, and
+    rebuilding `node_modules` here (sharp, behind corporate TLS) can only turn a green tree red; do
+    not deploy; do not start a server; do not create, stage, delete or commit any file; do not touch
+    `.data/` even to create it; do not read `.env`; do not curl anything.
+  tier: ORCHESTRATOR-RUN — zero files; the deliverable IS the exit code.
+  depends on: 2.2 green.
+
+STEP 2.4: record the rollback target BEFORE the deploy call
+  goal: the outgoing production deployment's id, url, what it serves and the commit this deploy ships
+    are written into the record — the only way back — and it is proven that production does not
+    already serve `magic-vet-v8`.
+  files: `.oplan/poc-basics/phase-state.md`, `.oplan/poc-basics/journal.md`. Raw `vercel inspect`
+    output goes to the scratchpad, NEVER the repo root (field-guide lesson 1 — the predecessor dirtied
+    its own gate with a `p3.tmp` in the root).
+  commands:
+    1. `"$(npm prefix -g)/vercel" inspect https://english-app-three-tan.vercel.app > "$SCRATCH/inspect-outgoing.txt" 2>&1`
+       (vercel writes to stderr; capture all of it).
+    2. read what production serves now, and `git rev-parse HEAD`.
+    3. write the frozen ledger block below into `phase-state.md` (replacing the
+       `DEPLOYMENT LEDGER: EMPTY for this run` paragraph) and append it to `journal.md`.
+  validation:
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && U=https://english-app-three-tan.vercel.app \
+  && P=.oplan/poc-basics/phase-state.md \
+  && S="$(curl --ssl-no-revoke -sf "$U/sw.js" | sed -n 's/^const CACHE = "\(.*\)";$/\1/p')" \
+  && [ -n "$S" ] \
+  && [ "$S" != "magic-vet-v8" ] \
+  && grep -qF -- 'ROLLBACK TARGET (recorded BEFORE the deploy call' "$P" \
+  && grep -qE -- '^ *outgoing id = dpl_[A-Za-z0-9]{16,}$' "$P" \
+  && grep -qE -- '^ *outgoing url = https://[a-z0-9-]+\.vercel\.app$' "$P" \
+  && grep -qF -- "outgoing serves = $S" "$P" \
+  && grep -qE -- '^ *outgoing created = .+$' "$P" \
+  && grep -qE -- '^ *incoming commit = [0-9a-f]{40}$' "$P" \
+  && grep -qF -- 'rollback command = ' "$P" \
+  && [ "$(git rev-parse HEAD)" = "$(sed -n 's/^ *incoming commit = \([0-9a-f]\{40\}\)$/\1/p' "$P" | head -1)" ] \
+  && ID="$(sed -n 's/^ *outgoing id = \(dpl_[A-Za-z0-9]*\)$/\1/p' "$P" | head -1)" \
+  && grep -qF -- "$ID" .oplan/poc-basics/journal.md \
+  && echo STEP-2.4-OK
+```
+  contracts:
+    - Canonical URL is `https://english-app-three-tan.vercel.app` (DP-1). Deployment-specific
+      `*-dkreinovs-projects.vercel.app` urls sit behind a Vercel login and are never shared.
+    - **The frozen ledger block** — these key names, one space either side of `=`, four-space indent:
+```
+  ROLLBACK TARGET (recorded BEFORE the deploy call — field-guide lesson 13 / DP-4)
+    outgoing id = dpl_<from vercel inspect>
+    outgoing url = https://<from vercel inspect>.vercel.app
+    outgoing serves = magic-vet-v<what production answers right now>
+    outgoing created = <the created line from vercel inspect, verbatim>
+    incoming commit = <the 40-char sha of HEAD at this moment>
+    rollback command = "$(npm prefix -g)/vercel" rollback <outgoing url> --yes
+```
+    - **The recorded value wins** over anything predicted (DP-4). `phase-state.md` deliberately opened
+      this run with an EMPTY ledger and forbids inheriting the predecessor's
+      `dpl_GqmhGP47ksHp7CbYEFRGVm3bA9E2`. If the inspect returns that id, that is a fact to record,
+      not a value to assume.
+    - `[ "$S" != "magic-vet-v8" ]` is a PREMISE check: if production already serves v8 then a deploy
+      has already happened and the phase must stop and re-establish what is live before touching
+      anything. `public/sw.js` is LF on disk (measured), so the `sed` anchor holds.
+  non-goals: do not run `vercel deploy` in this step; no `vercel env`, `link`, `project`, `alias` or
+    `rollback`; do not request any `/api/*` path; do not write inspect output anywhere inside the
+    repo; do not edit any repo file outside `.oplan/`.
+  tier: ORCHESTRATOR-RUN — writes my own record and runs a credentialed CLI against production.
+  **RE-RUNNABILITY:** a BEFORE-state gate. Its `!= magic-vet-v8` assertion is false by construction
+    once 2.5 has run, so it is accepted at the step and NOT re-run at the phase close — the same
+    design Phase 1 used and logged for its changed-path gates. Acceptance criterion 1 records this.
+  depends on: 2.3 green.
+
+STEP 2.5: the production deploy (IRREVERSIBLE, RUNS ONCE)
+  goal: the canonical alias serves the Phase-1 build.
+  files: `.oplan/poc-basics/journal.md` (incoming id/url/commit appended immediately after the call).
+    CLI output to the scratchpad, never the repo root.
+  commands, in this exact order, from the repo root:
+    1. `"$(npm prefix -g)/vercel" deploy --prod --yes`
+    2. record the `Production:` url the CLI prints, then `vercel inspect` it and append
+       `incoming id` / `incoming url` / `incoming commit` / `deployed at` to the journal.
+  validation:
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && U=https://english-app-three-tan.vercel.app \
+  && [ "$(curl --ssl-no-revoke -s -o /dev/null -w '%{http_code}' "$U/")" = "200" ] \
+  && curl --ssl-no-revoke -sf "$U/sw.js" | grep -qF -- 'const CACHE = "magic-vet-v8";' \
+  && echo STEP-2.5-OK
+```
+  contracts:
+    - The command is exactly `"$(npm prefix -g)/vercel" deploy --prod --yes` (field-guide lesson 13;
+      npm's global bin is off PATH on this machine, lesson 1).
+    - `vercel deploy` uploads the **working tree**, not a commit. That is why 2.3 asserts the tree is
+      clean outside `.oplan/`, and why every md5 comparison later is against the worktree (DP-2).
+    - Deploy only from the tree 2.3 gated, at the commit 2.4 recorded. If an `.oplan/` checkpoint
+      commit lands between 2.4 and 2.5, re-record `incoming commit` first — the ledger must name the
+      sha that actually shipped.
+  **UN-RE-RUNNABLE. If it half-fails:**
+    - CLI error / build failure → the alias does not move → the gate fails on the `v8` grep. Do NOT
+      re-run the deploy blindly: read the captured output, fix the cause, deploy again as a conscious
+      decision, and log both attempts.
+    - Deploy succeeds but a LATER step (2.6/2.7/2.8) fails → roll back with the recorded target:
+      `"$(npm prefix -g)/vercel" rollback <outgoing url> --yes`, then re-run this gate and expect the
+      OLD cache string. The 2.4 record is the only input to that command.
+    - The gate itself is pure `curl` and is safely re-runnable at the phase close.
+  non-goals: no `vercel env` of any kind — `APP_CODE`, `OPENAI_API_KEY` and `BLOB_READ_WRITE_TOKEN`
+    are neither read, written nor echoed; no `vercel.json` edit, no `.vercelignore`, no `link` /
+    `project` / `alias` / domain change, no preview deploy, no `git push`; no browser opened against
+    production; no `/api/*` request here (2.7 owns it); do not add `-L` or `--compressed` to any curl.
+  tier: ORCHESTRATOR-RUN — an irreversible, outward-facing call that re-points the app the child uses.
+  depends on: 2.4 green (the rollback target must exist on disk before this runs).
+
+STEP 2.6: verify the live shell byte-for-byte against the worktree
+  goal: every static file the browser consumes on production is byte-identical to the repo's, the new
+    `views/parent.js` really shipped, and the shell is served at `/` as cleanUrls requires.
+  files: none.
+  commands: none beyond the frozen validation.
+  validation:
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && U=https://english-app-three-tan.vercel.app \
+  && for f in sw.js styles.css app.js api.js views/parent.js views/placement.js manifest.webmanifest; do \
+       L="$(curl --ssl-no-revoke -sf "$U/$f" | md5sum | cut -d' ' -f1)"; \
+       R="$(md5sum "public/$f" | cut -d' ' -f1)"; \
+       [ "$L" = "$R" ] || { echo "MISMATCH $f live=$L local=$R"; exit 1; }; \
+     done \
+  && curl --ssl-no-revoke -sf "$U/sw.js" | grep -qF -- 'const CACHE = "magic-vet-v8";' \
+  && [ "$(curl --ssl-no-revoke -s -o /dev/null -w '%{http_code}' "$U/index.html")" = "308" ] \
+  && [ "$(curl --ssl-no-revoke -s -o /dev/null -w '%{http_code}' "$U/")" = "200" ] \
+  && curl --ssl-no-revoke -sf "$U/" | grep -qF -- '<link rel="apple-touch-icon" href="/icons/icon-192.png" />' \
+  && echo STEP-2.6-OK
+```
+  contracts:
+    - DP-2: live bytes are compared to the WORKTREE, never to a `git show` blob — `public/index.html`
+      is CRLF on disk and LF in git, so a blob comparison fails on a perfectly correct deploy. A false
+      alarm mid-deploy is the worst possible false alarm.
+    - DP-3: the shell is fetched as `/`; `/index.html` answers 308 under `{"cleanUrls": true}` and is
+      asserted explicitly, so a cleanUrls change fails loudly instead of silently.
+    - `index.html` is checked by content anchor, not md5 — it is the one file whose line endings
+      differ between representations.
+    - The seven md5'd files are the six `public/` files this phase ships plus `manifest.webmanifest`.
+  non-goals: never request `/api/profile` (DP-5, field-guide lesson 7 — that GET CREATES a profile);
+    no `/api/*` request at all here (2.7 owns it); do not open a browser; do not add `--compressed`
+    or `-L` to any curl — both change the bytes or follow the 308 and make the md5 meaningless; on a
+    mismatch STOP and report the exact printed line rather than retrying with different flags.
+  tier: ORCHESTRATOR-RUN — zero files; live production target.
+  depends on: 2.5 green. Independent of 2.7 and 2.8.
+
+STEP 2.7: verify the live API surface and that the entry-code gate is still closed
+  goal: the serverless functions are up, the `APP_CODE` gate rejects, and `api/chapter`'s whole
+    module graph loads in production — at zero OpenAI cost and with zero profile contact.
+  files: none.
+  commands: none beyond the frozen validation.
+  validation:
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && U=https://english-app-three-tan.vercel.app \
+  && H="$(curl --ssl-no-revoke -sf "$U/api/health")" \
+  && [ "$H" = '{"ok":true,"data":{"status":"up","version":1}}' ] \
+  && B="$(curl --ssl-no-revoke -s -X POST -H 'content-type: application/json' -d '{"action":"ping"}' -w '\n%{http_code}' "$U/api/chapter")" \
+  && [ "$(printf '%s\n' "$B" | tail -1)" = "401" ] \
+  && printf '%s\n' "$B" | grep -qF -- '"ok":false' \
+  && [ "$(curl --ssl-no-revoke -s -o /dev/null -w '%{http_code}' "$U/api/placement")" = "401" ] \
+  && echo STEP-2.7-OK
+```
+  contracts:
+    - `GET /api/health` is ungated by design and must return that payload exactly.
+    - The `{"action":"ping"}` probe is free and profile-free in BOTH branches: with `APP_CODE` set the
+      handler answers 401 before any `loadProfile()`; with it unset the request falls through to
+      `action !== 'generate'` → 400, also before any `loadProfile()` and before any `chat()`.
+      Asserting **401** and not "401 or 400" is deliberate — a 400 would mean THE PRODUCTION GATE IS
+      OPEN, which is a finding, not a pass. Accepting both would hide it.
+    - A 5xx would mean a module in the `api/chapter` graph failed to bundle. This reject-path probe is
+      the only live proof the function graph loaded, and it costs nothing (field-guide lesson 13).
+  non-goals: DP-5 — no request to `/api/profile`, ever, GET or POST, with or without a header; do not
+    send an `x-app-code` header; do not read `.env` or echo any secret; **do not POST
+    `{"action":"generate"}` to `/api/chapter` under any circumstances** — that spends OpenAI credit
+    and writes her profile; do not POST to `/api/placement` or `/api/translate`; do not retry a
+    failing assertion with a different body; do not "warm up" the function with extra calls.
+  tier: ORCHESTRATOR-RUN — zero files; live production target.
+  depends on: 2.5 green. Independent of 2.6 and 2.8.
+
+STEP 2.8: prove D4 live — the answers are not on the internet
+  goal: the item-review tool and the item bank are unreachable from production, mechanically, in every
+    form the routing could expose them.
+  files: none.
+  commands: none beyond the frozen validation.
+  validation:
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && U=https://english-app-three-tan.vercel.app \
+  && for p in /item-bank-review.html /item-bank-review /docs/item-bank-review.html /docs/item-bank-review /docs/item-bank-review.md /data/placement-items.json; do \
+       S="$(curl --ssl-no-revoke -s -o /dev/null -w '%{http_code}' "$U$p")"; \
+       [ "$S" = "404" ] || { echo "REACHABLE $p -> $S"; exit 1; }; \
+     done \
+  && echo STEP-2.8-OK
+```
+  contracts:
+    - D4 holds by construction — Vercel's zero-config output is `public/` and `scripts/dev-server.js`
+      serves only `public/` — but "by construction" is a claim, and this step is the measurement.
+      `docs/item-bank-review.html` contains the correct answers to the placement test.
+    - The extensionless forms are probed because `cleanUrls: true` makes `/x.html` a 308 to `/x`
+      whenever `public/x.html` exists; asserting 404 and not "404 or 308" means a redirect is a
+      failure, which is exactly right — a 308 would mean the file is being served.
+    - `/data/placement-items.json` is the same secret by another route; the predecessor proved the
+      equivalent for `/data/band2.json`.
+  non-goals: no `/api/*` request here; never `/api/profile`; do not follow redirects (`-L` would turn
+    a 308 into a 200 and hide the finding); do not "confirm" a 404 by opening a browser; on any
+    non-404 STOP — treat it as a rollback candidate, not a curiosity.
+  tier: ORCHESTRATOR-RUN — zero files; live production target.
+  depends on: 2.5 green. Independent of 2.6 and 2.7.
+
+STEP 2.9: close the phase in the record and hand the owner the two actions that are hers
+  goal: the deployment ledger is complete (outgoing AND incoming), the journal carries the phase
+    record and metrics, and `STATUS.md` tells the owner — in order — to open the review tool, sign the
+    gate, then give the child the entry code, with no stale line left standing.
+  files: `.oplan/poc-basics/phase-state.md`, `.oplan/poc-basics/journal.md`,
+    `.oplan/poc-basics/STATUS.md`. No repo file outside `.oplan/`.
+  commands: none — direct file edits.
+  validation:
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && P=.oplan/poc-basics/phase-state.md \
+  && S=.oplan/poc-basics/STATUS.md \
+  && grep -qE -- '^ *incoming id = dpl_[A-Za-z0-9]{16,}$' "$P" \
+  && grep -qE -- '^ *incoming url = https://[a-z0-9-]+\.vercel\.app$' "$P" \
+  && grep -qF -- 'incoming alias = https://english-app-three-tan.vercel.app' "$P" \
+  && grep -qE -- '^ *incoming commit = [0-9a-f]{40}$' "$P" \
+  && grep -qE -- '^ *outgoing id = dpl_[A-Za-z0-9]{16,}$' "$P" \
+  && ! grep -qF -- 'DEPLOYMENT LEDGER: EMPTY for this run' "$P" \
+  && grep -qF -- 'PHASE 2 CLOSED' .oplan/poc-basics/journal.md \
+  && grep -qF -- 'STEP-2.8-OK' .oplan/poc-basics/journal.md \
+  && grep -qF -- '1. **Open the review tool and sign the gate**' "$S" \
+  && grep -qF -- '2. **Then give her the entry code**' "$S" \
+  && grep -qF -- 'https://english-app-three-tan.vercel.app' "$S" \
+  && ! grep -qF -- 'needs your go-ahead' "$S" \
+  && ! grep -qF -- 'Nothing is live yet' "$S" \
+  && [ "$(wc -l < "$S")" -le 60 ] \
+  && [ "$(git status --porcelain -- . ':!.oplan' | grep -c '')" = "0" ] \
+  && echo STEP-2.9-OK
+```
+  contracts:
+    - **The frozen incoming ledger block**, appended under the rollback target, same key style:
+```
+  DEPLOYED (poc-basics, phase 2)
+    incoming id = dpl_<from vercel inspect on the new deployment>
+    incoming url = https://<deployment-specific>.vercel.app
+    incoming alias = https://english-app-three-tan.vercel.app
+    incoming commit = <40-char sha the tree shipped at>
+    deployed at = <the created line from vercel inspect, verbatim>
+```
+    - **`STATUS.md` must carry these two lines verbatim** under "What I need from you":
+```
+1. **Open the review tool and sign the gate** — double-click `docs/item-bank-review.html`, then record the sign-off in `docs/item-bank-review.md` section 6.
+2. **Then give her the entry code** — the app sits behind the code you hold, so deploying does not put the test in front of her; only handing over the code does.
+```
+      This is the go-ahead's stated scope: the deploy was authorised; these two actions were not
+      delegated and remain the owner's.
+    - `STATUS.md` is REWRITTEN in full, not patched — a stale line in STATUS is worse than no STATUS,
+      because the owner trusts it. The two negative greps are the staleness gate, and the `<= 60`
+      line check is oplan §5's budget, MEASURED not guessed (the predecessor wrote a guessed figure
+      into its own journal twice; the only thing that has ever caught it is running `wc -l`).
+    - The journal entry records the outgoing and incoming ids, which gates passed first try, the
+      auditor's verdict on 2.1, and every deviation from this plan.
+  non-goals: do not touch any repo file outside `.oplan/`; do not open Phase 3 planning here; do not
+    close the RUN — Phase 3 (the growth design document) is still outstanding; do not deploy again;
+    do not run any `vercel` command; do not perform the owner's two actions for her.
+  tier: ORCHESTRATOR-RUN — phase metrics, the owner-facing narrative and §12's honesty clause are
+    judgement, and no worker has the context.
+  depends on: 2.6, 2.7 and 2.8 all green.
+
+RISKS:
+- **The deploy succeeds and a verification step fails.** The app is live and possibly wrong. Noticed
+  by 2.6/2.7/2.8 within seconds. The response is the recorded rollback, not a second deploy. This is
+  the entire reason 2.4 exists as its own step.
+- **A live md5 mismatch that is a false alarm.** Compare only to the worktree (DP-2), never add `-L`
+  or `--compressed`. Noticed as a `MISMATCH <file>` line; the rule is STOP and report the exact line,
+  never retry with different flags until it goes green.
+- **The entry-code gate silently disappears in production** — then `/api/chapter` answers 400 instead
+  of 401 and her data is open to anyone with the URL. Caught only because 2.7 asserts 401 narrowly.
+- **`/api/profile` gets requested by reflex.** It CREATES a profile when absent — a read that writes.
+  Mitigated by planning: the string appears in ZERO fenced commands here. Note the predecessor's trap
+  — grep with the LEADING SLASH, or `api/profile.js` as a pathspec fabricates a false alarm.
+- **Someone opens a browser on production "just to look".** Every view fetches the profile on load,
+  so one page load writes her live data. There is no browser step in this phase and no browser tool
+  may be pointed at the canonical URL. The only visual confirmation permitted is the owner's own, on
+  her own device, after she has the code.
+- **An `.oplan/` checkpoint commit lands between 2.4 and 2.5**, making the recorded `incoming commit`
+  stale by one. Harmless to the shipped bytes (the tree is identical outside `.oplan/`) but it makes
+  the ledger subtly wrong. 2.4 asserts the recorded sha equals HEAD at record time; 2.5's contract
+  says re-record if a commit intervenes.
+- **The deploy uploads the whole repo**, including `.oplan/` and the tracked `bash.exe.stackdump`,
+  because there is no `.vercelignore` and Vercel falls back to `.gitignore`. Nothing outside `public/`
+  is served — which is exactly what 2.8 measures. The stackdump is already DEFERRED; this phase
+  changes no deploy configuration.
+- **My own Hebrew in step 2.1 could be wrong** in a way no grep can see. Mitigated three ways: both
+  sentences are DERIVED from the tool's own bytes and re-proved by the gate at acceptance; the file
+  stays 130 lines so nothing else moves; and the auditor is asked explicitly to read the Hebrew as
+  Hebrew and rule on grammar, feminine voice and consistency with the tool — the same request that
+  earned its keep on step 1.6.
