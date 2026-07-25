@@ -54,7 +54,7 @@ const VIEW_STYLE = `
   }
 
   .placement-option-btn {
-    min-height: 76px;
+    min-height: 150px;
     border-radius: var(--radius);
     border: 2px solid var(--color-border);
     background: var(--color-card);
@@ -66,7 +66,7 @@ const VIEW_STYLE = `
     justify-content: center;
     cursor: pointer;
     transition: transform var(--transition-fast), border-color var(--transition-fast);
-    padding: 8px;
+    padding: 6px;
   }
 
   .placement-option-btn:active {
@@ -161,7 +161,42 @@ const VIEW_STYLE = `
     cursor: pointer;
     width: 100%;
   }
+
+  .opt-art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: calc(var(--radius) - 4px);
+  }
+
+  .placement-emoji-big .opt-art {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    border-radius: var(--radius);
+  }
 `;
+
+const OPT_ART = {
+  "\u{1F415}": { src: "/assets/placement/pet.webp", alt: "חיית מחמד" },
+  "\u{1F469}": { src: "/assets/placement/mom.webp", alt: "אמא" },
+  "\u{1F3D5}\uFE0F": { src: "/assets/placement/camp.webp", alt: "מחנה" },
+  "\u{1F300}": { src: "/assets/placement/fan.webp", alt: "מאוורר" },
+  "\u{1F468}": { src: "/assets/placement/dad.webp", alt: "אבא" },
+  "\u{1F9D1}\u200D\u{1F4BB}": { src: "/assets/placement/desk.webp", alt: "שולחן" },
+  "\u{1F3A4}": { src: "/assets/placement/singer.webp", alt: "זמר" },
+  "\u{1F40E}": { src: "/assets/placement/horse.webp", alt: "סוס" },
+  "\u{1F981}": { src: "/assets/placement/zoo.webp", alt: "גן חיות" },
+  "\u{1F3AC}": { src: "/assets/placement/movie.webp", alt: "סרט" },
+  "\u{1F412}": { src: "/assets/placement/monkey.webp", alt: "קוף" },
+  "\u{1F969}": { src: "/assets/placement/steak.webp", alt: "סטייק" },
+};
+
+function optArt(emoji) {
+  const a = OPT_ART[emoji];
+  return a ? `<img class="opt-art" src="${a.src}" alt="${a.alt}" />` : emoji;
+}
 
 function header(subtitle, title) {
   return `
@@ -255,7 +290,7 @@ export async function render(container, ctx) {
       const options = item.options
         .map(
           (emoji, i) =>
-            `<button class="placement-option-btn" type="button" data-action="task1-answer" data-choice="${i}">${emoji}</button>`
+            `<button class="placement-option-btn" type="button" data-action="task1-answer" data-choice="${i}">${optArt(emoji)}</button>`
         )
         .join("");
       return `
@@ -279,7 +314,7 @@ export async function render(container, ctx) {
       ${header("מבחן היכרות", "משימה 1")}
       <p class="placement-progress">${progress}</p>
       <p class="placement-instruction">הביטי בתמונה ובחרי את המילה</p>
-      <div class="placement-emoji-big">${item.emoji}</div>
+      <div class="placement-emoji-big">${optArt(item.emoji)}</div>
       <div class="placement-option-grid words">${options}</div>
     `;
   }
