@@ -43,10 +43,10 @@ frozen value) or accepting a contrast regression. I won't quietly do either.
 
 ## Four things to know, none of them broken
 
-1. **Her icon may not change by itself.** If the app is already installed, Android often refreshes an
-   icon only on remove-and-re-add. Old paw print ≠ failed deploy. Now written into
-   `docs/owner-handoff.md` in Hebrew, for when you're at the phone. (The browser *tab* icon stays a
-   paw print permanently — frozen by a test.)
+1. **The icon question is closed: the app is NOT on her phone** (you confirmed, 2026-07-25). So the
+   re-install caveat doesn't apply — she'll get the girl-and-dragon icon on the first install. The
+   caveat stays in `docs/owner-handoff.md` for any future icon change. (The browser *tab* icon stays
+   a paw print permanently — frozen by a test.)
 2. **I don't know whether this reaches her yet.** Her level lives in her profile, which I may not
    read. If she placed at A1, nothing changes for her until she re-takes the test. You can check.
 3. **Top-level stories cost slightly more** — the word list is sent with every request and grew from

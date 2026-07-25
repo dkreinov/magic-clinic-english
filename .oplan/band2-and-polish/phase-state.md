@@ -64,9 +64,10 @@ OPEN QUESTIONS: none blocking. Phase 3's planner returned BLOCKERS: none; all 8 
 OWNER-FACING NOTES (for the phase 3 STATUS rewrite, not blockers):
   · The shipped background contained a WCAG 1.4.11 failure BEFORE this run: --color-border on the
     painted top wash #3d2109 measured 2.92:1 against a binding 3:1. Step 2.1 fixed it (3.10:1).
-  · Nothing in the record says whether the PWA is currently installed on the learner's device, so
-    it is unknown whether the new icon appears without removing and re-adding the app. Step 3.1
-    writes this caveat into docs/owner-handoff.md so the owner is told, not surprised.
+  · RESOLVED 2026-07-25 by the owner: the PWA is NOT installed on the learner's device. So the
+    Android icon-refresh caveat does not apply — she gets the girl-and-dragon icon on first install.
+    This was logged as "unknowable from files" through phases 2 and 3; it took one sentence from the
+    owner. Worth noting for the next run: the record was right that no FILE could answer it.
   · HER CURRENT BAND IS UNKNOWN AND UNKNOWABLE under the profile prohibition. If she is at A1,
     Band 2 changes nothing for her until she re-places. No file records her placement outcome.
   · A2 chapters now carry a much larger prompt: the allowed list is pasted whole into the user

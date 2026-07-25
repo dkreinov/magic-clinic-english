@@ -654,3 +654,10 @@ RUN CLOSED — band2-and-polish
   "there was nothing to say". I compressed twice (118 -> 84 -> 79) and stopped where further cuts
   would remove content rather than words. Logging the number honestly at 79 beats compressing to a
   round 60 by deleting a caveat the owner needs.
+
+POST-RUN, OWNER ANSWER 2026-07-25: the PWA is NOT installed on the learner's device.
+  This closes the one question phases 2 and 3 both logged as "unknowable from files" (plan.md's
+  record-gap table, phase-state.md's owner-facing notes). The Android icon-refresh caveat is moot —
+  she gets the girl-and-dragon icon on first install. STATUS.md item 1 was rewritten, because a
+  STALE line in STATUS is worse than no STATUS (§5); phase-state.md's note now records the answer.
+  The caveat text stays in docs/owner-handoff.md, where it is still true of any FUTURE icon change.
