@@ -807,7 +807,11 @@ console.log('ICONS-OK deterministic=yes');" \
     3. `'index.html points apple-touch-icon at the png'` — asserts
        `<link rel="apple-touch-icon" href="/icons/icon-192.png" />` is present and the substring
        `apple-touch-icon" href="/icons/icon.svg` is absent.
-  - `docs/visual-design.md` §6: add ONE inventory row — `app-icon.png` | square | 1024×1024 |
+  - `docs/visual-design.md` §6: add ONE inventory row — `app-icon.png` | square | 1254×1254 |
+    (ORCHESTRATOR AMENDMENT 2026-07-25: the plan predicted 1024×1024 before the art existed; the
+    actual generation is 1254×1254, which happens to match the three existing square masters. The
+    frozen validation only ever required `width >= 1024`, so it passed — but the doc row must state
+    the real dimensions, not the predicted ones.) |
     "PWA install icon + Android splash; derived to `public/icons/icon-192.png`, `icon-512.png`,
     `icon-maskable-512.png` by `scripts/build-icons.js`" — add the step-2.5 prompt verbatim to the
     per-asset prompt list, and record the owner gate (`ICON-ART: APPROVED`) plus the fact that the

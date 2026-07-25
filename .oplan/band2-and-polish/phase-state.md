@@ -1,4 +1,4 @@
-CURRENT: phase 2 — steps 2.1-2.4 + 2.8 done; next 2.5 icon art, which ENDS AT AN OWNER GATE
+CURRENT: phase 2 — 2.1-2.5 + 2.8 done. PAUSED AT THE OWNER GATE: 2.6 and 2.7 need a recorded ICON-ART verdict.
 BASELINES: phase 1 = bbdb60c · phase 2 = 679dcc9 (test baseline 151 pass / gate 28 pairs ALL PASS)
 PLAN: .oplan/band2-and-polish/plan.md
 DESIGN: .oplan/band2-and-polish/design.md (copied in 2026-07-25 — oplan §5 had been unmet)
@@ -41,4 +41,6 @@ DEFERRED (needs owner approval when reached): harder placement items — every c
   elementary, so a strong reader just lands on A2. Requires new audio/artwork AND changes the
   frozen task2 counts in tests/placement-items.test.js.
 NOT DEPLOYED: phases 1-2 are committed but not live; deployment is phase 3.
-BLOCKED: no
+BLOCKED: not broken — WAITING on the GC-D8 owner gate for the app icon. Steps 2.6/2.7 (derive
+  the PNGs, wire the manifest) are the only work left in phase 2 and both are conditional on
+  ICON-ART: APPROVED. On rejection the phase closes green with the paw print, per VP-6.

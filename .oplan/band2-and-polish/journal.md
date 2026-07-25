@@ -325,3 +325,34 @@ STEP 2.8 runtime proof in a real browser (ORCHESTRATOR-RUN, not dispatched)
       degrees, exactly linear. The ring genuinely spins.
   Screenshots taken of home and of the loading state; both look as intended (glows subtle but
   present; the ring reads as a ring, not a disc).
+
+STEP 2.5 generate the app-icon artwork (ORCHESTRATOR-RUN, not dispatched)
+  Why not dispatched: needs browser automation of the FREE ChatGPT web route (field-guide 15) plus a
+  live GC-D8 owner review. A worker subagent can do neither.
+  Used the ONE dedicated chat from docs §7. Sent the frozen prompt with the FROZEN STYLE SUFFIX
+  appended verbatim (888 chars, verified in the composer before submitting: correct opening, correct
+  closing, suffix present, em dash intact, no stray newlines that would have submitted early).
+  Captured per field-guide lesson 15: fetched the blob in-page, clicked exactly ONE synthetic
+  <a download="app-icon.png">. Verified BEFORE the click that no stale app-icon.png existed in
+  ~/Downloads, and after it that exactly ONE file matched with a byte count identical to the blob
+  (1,938,670) — so the capture is deterministic by filename, not by "newest file" guessing.
+  VALIDATION: ICON-MASTER-OK 1254x1254 md5=cf091df541e3b15a49effcaf3680ae97 · STEP-2.5-OK
+  Distinctness confirmed against all 8 existing masters AND the style anchor.
+  commit: 984b6f7 (the master is committed; INTEGRATION is not — see the gate below)
+  PLAN AMENDMENT I MADE: step 2.7's doc row predicted 1024x1024. Reality is 1254x1254 (matching the
+  three existing square masters). The frozen validation only required width >= 1024 so it passed
+  either way, but the doc must state real dimensions. plan.md amended and the amendment logged here.
+  TWO TRAPS WORTH RECORDING:
+  (a) The generated image was ALREADY on the server but the DOM showed no assistant turn and
+      streaming=false — so "no response" was a rendering lie. A reload revealed the finished image.
+      Polling the live DOM alone would have concluded the generation failed.
+  (b) sharp applies resize BEFORE composite regardless of chain order, so
+      `sharp(x).composite([512px mask]).resize(48,48)` throws "Image to composite must have same
+      dimensions or smaller" — the base was already 48px when the mask landed. Derive small crops
+      from the finished large one instead. This will bite step 2.6 if a worker chains them.
+  OWNER GATE (GC-D8) — NOT YET ANSWERED. Rendered 48/96/192px previews plus a circle-cropped
+  simulation of Android's maskable crop, and magnified the real 48px pixels 5x with nearest
+  neighbour. My own read: at 48px both variants stay legible — the girl's face and the teal dragon
+  remain distinguishable — and the maskable variant's subject is smaller because of the 80% safe-zone
+  padding. But GC-D8 is the OWNER's call, not mine, and VP-6 makes 2.6/2.7 conditional on a recorded
+  `ICON-ART: APPROVED`. Verdict slot is deliberately left OPEN.
