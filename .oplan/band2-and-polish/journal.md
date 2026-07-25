@@ -142,3 +142,64 @@ PHASE 1 CLOSED — all 6 acceptance criteria pass
   tokens: reviewer=77894, workers=108364, checkers=98560, PHASE TOTAL=284818
   field_guide: 43/40 (justified above) · orchestrator_context: unavailable
   NOT DEPLOYED YET — deployment is Phase 3, after the visual work.
+
+## 2026-07-25 — PHASE 2 PLANNED (fresh planner, then orchestrator review)
+
+Resumed in a fresh session from files alone. The resume worked: phase-state -> plan -> journal ->
+field guide was enough to pick the run up with nothing lost, which is the first real evidence the
+file discipline survives a `/clear`.
+
+FRESH PLANNER (PLANNER tier, files only, no context spoon-fed). It returned a complete 8-step plan
+and, more valuably, nine RECORD GAPS. Two are worth naming here because they are defects in the
+RUN, not in the plan:
+
+  · `design.md` exists on disk and had never been copied into the workspace, which oplan §5
+    requires. My own planner packet even asserted "not present for this run" — the planner checked
+    the disk instead of believing me, and was right. COPIED IN. The run had been violating its own
+    file discipline since it opened, and only a fresh agent reading the record could see it.
+  · A REAL, PRE-EXISTING WCAG FAILURE nobody had recorded. `body` paints
+    `linear-gradient(180deg, #3d2109 0%, ...)` — a RAW LITERAL, so `check-contrast.mjs` (which only
+    parses `:root` hexes) never measured it. `--color-border` #a35d22 on #3d2109 = 2.92:1 against
+    the 3:1 that docs/visual-design.md §3 declares binding, and bordered controls sit directly on
+    that wash. The gate has been printing ALL PASS over a surface that fails. This is field-guide
+    lessons 13/14 all over again: the gate cannot see what is not a token.
+
+ORCHESTRATOR REVIEW — I did not take the numbers on trust. Re-derived every proposed contrast value
+with the gate's own formula: all 24 new pairs reproduce EXACTLY as planned (border floors
+3.10/3.08/3.06/3.09), and the 2.92:1 pre-existing failure reproduces too. Also independently
+verified: tests/shell.test.js:30 freezes manifest.icons[0].src and the PRECACHE deepStrictEqual
+includes /icons/icon.svg (so the skeleton's "replace icon.svg" is impossible — the plan appends
+PNGs instead); NO test touches .reader-loading/.reader-spinner (safe to restructure); .spot-image
+and .spot-image--sm already exist in styles.css (so step 2.2 needs no CSS there); sharp ^0.35.3
+present; `node -e` + require works despite "type": "module"; 410+51+51 = 512 and #2e1806 =
+rgb(46,24,6) for the maskable padding check.
+
+FIVE FIXES I made to the planner's plan before freezing it:
+  1. [validation] step 2.7 used `grep -qF -- '<link rel=\"...\" />'` — backslash-escaped quotes
+     INSIDE single quotes, so the pattern contained literal backslashes and the gate could never
+     pass. Same bug in its `'const CACHE = \"magic-vet-v7\";'`. Un-escaped both.
+  2. [validation] step 2.4 had `! grep -q '28' README.md` — forbidding the digit pair "28" anywhere
+     in the README forever. It happens to pass today (one match) but a worker could satisfy it by
+     deleting unrelated text. Tightened to `checks 28` / `checks 52`.
+  3. [validation] step 2.1's test 2 said "extract the `body { … }` rule" — a trap, because
+     `html,\nbody { … }` appears FIRST in styles.css and a naive rule regex matches that one.
+     Verified `background-image` appears ZERO times today, so I froze the extraction as
+     `/background-image:\s*([^;]*);/`, which is unique after the edit.
+  4. [missing] the planner's own record gap "two contradictory sw rules" named §8, but its step 2.4
+     only amended §3/§5/§7. Added Edit 5: write the VP-4 carve-out into §8 itself, so the
+     contradiction is resolved in the record and not merely in this plan.
+  5. [order] made "commit every step before dispatching the next" an explicit orchestrator note.
+     Every step's gate counts changed paths with `git status --porcelain`, so an uncommitted
+     predecessor makes the next gate unpassable — exactly what bit step 1.4 in phase 1.
+
+BLOCKERS — both answered in writing (plan.md), neither deferred to a worker:
+  1. Approval to amend the frozen docs/visual-design.md: PROCEED. The header rule exists to stop
+     silent unapproved drift; step 2.4 does the opposite, and the doc is ALREADY factually wrong
+     (28 pairs, and a capture method §7 itself records as having caused an 89-duplicate burst). The
+     one substantive value change (#3d2109 -> #361d08) enforces §3's own binding 3:1 rule rather
+     than altering the design.
+  2. The GC-D8 owner gate for a 9th asset: honoured, not bypassed. Steps 2.1-2.4 + 2.8 need no
+     owner and run now; 2.5 generates the art and shows 48/96/192px previews; 2.6/2.7 integrate it
+     ONLY on a recorded `ICON-ART: APPROVED`. If the owner is unreachable, the phase closes green
+     with the paw print — the caveat the owner pre-accepted. Acceptance criterion 1 therefore has
+     two legal test totals (154 without the icon, 157 with it).
