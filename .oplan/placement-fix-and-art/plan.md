@@ -257,104 +257,95 @@ gated. Questions and the recommendation are in `STATUS.md`.
 
 ---
 
-## Phase 3 — generate the option artwork  (DETAILED; execution BLOCKED — see STATUS)
+## Phase 3 — generate the 12 rich scenes  (ORCHESTRATOR-RUN, method proven)
 
-### The 12 concepts (one square icon each, keyed by the item's `emoji` field)
+Route: **ChatGPT web, free** — owner policy 2026-07-25: "whatever is not needed realtime
+generation in the app, always go with the free option of web." The paid API is reserved for
+runtime generation (`api/chapter.js`). This phase is orchestrator-run because it drives a
+browser; its OUTPUT is gated mechanically (below), which is where the oplan rigour lives.
 
-| lemma | he | emoji (replaced) | used as |
-|---|---|---|---|
-| pet | חיית מחמד | 🐕 | audio→picture answer |
-| mom | אמא | 👩 | audio→picture answer |
-| camp | מחנה | 🏕️ | audio→picture answer |
-| fan | מאוורר | 🌀 | audio→picture answer |
-| dad | אבא | 👨 | audio→picture answer |
-| desk | שולחן | 🧑‍💻 | audio→picture answer |
-| singer | זמר | 🎤 | picture→word PROMPT (no audio) |
-| horse | סוס | 🐎 | picture→word PROMPT (no audio) |
-| zoo | גן חיות | 🦁 | picture→word PROMPT (no audio) |
-| movie | סרט | 🎬 | picture→word PROMPT (no audio) |
-| monkey | קוף | 🐒 | picture→word PROMPT (no audio) |
-| steak | סטייק | 🥩 | picture→word PROMPT (no audio) |
+### Proven capture method (replaces the delight-pass download-button dance)
 
-### DESIGN DECISION (frozen, owner-directed 2026-07-25): RICH SCENES + bigger tiles
+The old method clicked ChatGPT's Download control and guessed "newest file in ~/Downloads" — the
+method that produced the 89-duplicate incident. Superseded. The new method, proven on `pet`:
 
-The owner asked for rich scene artwork ("I want rich since this is for my kid"), overriding the
-earlier icon-tile idea. Rich art is unreadable at the current ~76px tile, so Phase 4 ALSO enlarges
-the option tiles: the audio-to-picture options become a 2-column grid of near-square tiles about
-150px tall with the image filling the tile (`object-fit: cover`), the Hebrew word as `alt`. The
-subject must still be the unmistakable hero of each scene so a 6th-grader reads it at a glance.
-This is additive styling (no logic/copy change) and does not affect the contrast gate (images are
-exempt; the selected-border and text alternative remain).
+1. Generate in ONE chat, one image at a time (ChatGPT serialises within a chat; one chat also
+   keeps the style consistent). Chat in use:
+   `https://chatgpt.com/c/6a6491a2-cf44-83eb-96bb-023d4345d4d9`.
+2. Verify composer text before every send (stray-character injection is a known ChatGPT quirk).
+3. Capture with in-page JS: `fetch(img.src, {credentials:'include'})` -> blob -> object URL ->
+   a single synthetic `<a download="placement-<lemma>.png">` clicked **exactly once**.
+   The explicit filename removes the "newest file" guesswork entirely, and one programmatic
+   click cannot double-fire. (Posting bytes straight to a localhost sink was tried first and is
+   blocked by chatgpt.com's CSP — do not retry that.)
+4. Poll from Bash for `~/Downloads/placement-<lemma>.png`, assert exactly ONE such file exists,
+   then `mv` it to `assets/placement/<lemma>.png`.
 
-### FROZEN RICH PROMPTS (concept + FROZEN STYLE SUFFIX from visual-design.md §6)
+### The 12 (prompts frozen earlier in this plan; masters committed to `assets/placement/`)
 
-Each is sent with the §6 FROZEN STYLE SUFFIX appended (the warm wood-and-magic vet-clinic world),
-and each names its subject as the central hero so it is unmistakable at tile size:
+`pet` (DONE, kept — owner: "the puppy looks great", 1254x1254) · `mom` · `camp` · `fan` · `dad` ·
+`desk` · `singer` · `horse` · `zoo` · `movie` · `monkey` · `steak`
 
-- pet: "A happy puppy dog curled on a cushion in the cozy magical vet clinic, the puppy the large central hero of the image."
-- mom: "A warm smiling cartoon mother standing in the clinic's round doorway, arms gently open, she is the central hero."
-- camp: "A cozy campsite at golden hour — a glowing tent, a small campfire, tall trees and fireflies, the tent the central hero."
-- fan: "A cartoon electric fan with spinning blades on a wooden clinic shelf, papers fluttering, the fan the large central hero."
-- dad: "A warm smiling cartoon father in the clinic, sleeves rolled up, he is the central hero of the image."
-- desk: "A cozy wooden study desk with a glowing lamp, an open book and potion bottles, the desk the central hero."
-- singer: "A cheerful cartoon singer on a small stage holding a microphone in a warm spotlight, tiny creatures watching, the singer the central hero."
-- horse: "A friendly cartoon horse standing in a sunny magical meadow by a wooden stable, the horse the large central hero."
-- zoo: "A magical zoo scene with an archway, a giraffe and a lion, colourful banners, animals the clear focus."
-- movie: "A cozy movie-night scene — a glowing screen, a film clapperboard and a bucket of popcorn, the screen the central hero."
-- monkey: "A cheerful cartoon monkey swinging on a vine in a leafy jungle holding a banana, the monkey the large central hero."
-- steak: "A hearty grilled steak on a plate on a rustic wooden table in warm tavern light, the steak the large central hero."
+### Phase 3 acceptance criteria (frozen)
 
-### Storage + pipeline (mirrors the delight-pass method, field-guide 10–13)
+1. `assets/placement/` contains exactly 12 PNGs, named `<lemma>.png` for the 12 lemmas above.
+2. Every one is square (width === height) and >= 512px.
+3. All 12 are content-distinct by md5 (guards against a duplicate grab — the delight-pass lesson).
+4. `npm test` still 146/146 and the contrast gate still exits 0 (nothing in `public/` changed yet).
 
-- Masters (full-res PNG) committed under `assets/placement/<lemma>.png` (12 files).
-- Web derivatives at `public/assets/placement/<lemma>.webp`, produced by extending
-  `scripts/optimize-assets.js` (or a sibling script) with a 256px width for the 12 tiles.
-- Generation is ONE image at a time. Activate the ChatGPT Download control EXACTLY ONCE per
-  image and poll `~/Downloads` via Bash — re-clicking caused the 89-duplicate incident.
-- Validation MUST assert content-distinctness by md5 across all 12 masters plus the anchor —
-  per-file format/size checks alone do not catch a duplicate grab.
+```
+cd C:/Users/dkreinov/claude/english-app && node -e "
+const sharp=require('./node_modules/sharp/dist/index.cjs');const fs=require('fs'),crypto=require('crypto');
+const L=['pet','mom','camp','fan','dad','desk','singer','horse','zoo','movie','monkey','steak'];
+(async()=>{const seen=new Map();
+for(const l of L){const f='assets/placement/'+l+'.png';
+ if(!fs.existsSync(f))throw new Error('MISSING '+f);
+ const m=await sharp(f).metadata(); const b=fs.readFileSync(f);
+ const h=crypto.createHash('md5').update(b).digest('hex');
+ if(m.width!==m.height)throw new Error('not square: '+l);
+ if(m.width<512)throw new Error('too small: '+l);
+ if(seen.has(h))throw new Error('DUPLICATE bytes: '+l+' == '+seen.get(h));
+ seen.set(h,l); console.log(l,m.width+'x'+m.height,h.slice(0,8));}
+console.log('PHASE3-OK 12 distinct square masters');})();"
+```
 
-### BLOCKER (why Phase 3 is not executing now)
+## Phase 4 — optimize + wire into the UI  (executor steps)
 
-The method the owner approved is "reuse the ONE dedicated ChatGPT chat" (visual-design.md §7,
-`https://chatgpt.com/c/6a632008-2d04-83ed-8557-370a2881a0dc`). On 2026-07-25 that chat will not
-load: it returns "This content is unavailable or could not be found", and on retry stalls
-indefinitely on a spinner with zero conversation turns rendered — while a NEW chat and the rest
-of ChatGPT load fine and the account is logged in (Plus). The chat is months old and dense with
-large images, which is the likely cause. The browser tooling has also been intermittently flaky
-this session. Driving 12 sequential generations under these conditions is high-risk with a known
-catastrophic failure mode, so the run STOPS here and asks the owner (see OPEN QUESTION 3) rather
-than loop or silently switch chats.
+### Step 4.1 — web derivatives
 
-Fallback available if approved: generate in a NEW chat, re-establishing style by uploading the
-local anchor `assets/design-tests/dragon-clinic-test.png` (present, 2.0 MB) plus one or two of
-the committed masters in `assets/delight/`. This deviates from "the ONE dedicated chat", so it
-needs the owner's OK — hence the gate.
+- Files: `scripts/optimize-placement.js` (NEW) only. Mirrors `scripts/optimize-assets.js` style
+  (sharp, ESM). Reads the 12 masters from `assets/placement/`, writes
+  `public/assets/placement/<lemma>.webp` at width 256, quality 72.
+- Validation: script runs clean; 12 webp files exist; each square; all 12 md5-distinct; each
+  < 60 KB; `npm test` 146/146.
 
-## Phase 4 — wire images into the placement UI  (skeleton)
+### Step 4.2 — render images in the placement view
 
+- Files: `public/views/placement.js` only. ADDITIVE per PFA-2 — `data/` untouched, so every
+  existing assertion stays green.
+- Add a module-level constant mapping each emoji to its image + Hebrew alt text (the client
+  receives only emoji strings — `clientView` in `lib/placement.js` strips `lemma`/`he` — so the
+  map must live in the view):
+  `🐕 pet חיית מחמד · 👩 mom אמא · 🏕️ camp מחנה · 🌀 fan מאוורר · 👨 dad אבא · 🧑‍💻 desk שולחן ·
+   🎤 singer זמר · 🐎 horse סוס · 🦁 zoo גן חיות · 🎬 movie סרט · 🐒 monkey קוף · 🥩 steak סטייק`
+- `audio-to-picture` options: render `<img class="opt-art" src="/assets/placement/<lemma>.webp"
+  alt="<he>">` inside the existing `.placement-option-btn` when the emoji is mapped; fall back to
+  the raw emoji when it is not. Class names, `data-action`, `data-choice` unchanged.
+- `picture-to-word` prompt (`.placement-emoji-big`): render the same image large when mapped.
+- Enlarge the tiles in `VIEW_STYLE` so rich art is legible (owner-directed): `.placement-option-btn`
+  min-height ~150px, `.opt-art` fills the tile (`width:100%; height:100%; object-fit:cover;
+  border-radius:calc(var(--radius) - 4px); display:block`).
+- Validation: `npm test` 146/146; contrast gate exits 0; greps prove the map, the `<img>`, the
+  `alt`, and the enlarged tile exist; no Hebrew string removed; only that one file changed.
 
-11 unique concepts, taken from the emoji currently used as picture options:
-`🐕 pet` · `🎬 movie` · `🐎 horse` · `👩 mom` · `🥩 steak` · `🌀 fan` · `🏕️ camp` · `🦁 zoo` ·
-`👨 dad` · `🎤 singer` · `🧑‍💻 desk`. Generate one square illustration per concept in the frozen
-style (`docs/visual-design.md` §6 FROZEN STYLE SUFFIX), masters committed under
-`assets/placement/`, web derivatives at `public/assets/placement/<lemma>.webp` via the existing
-`scripts/optimize-assets.js` pattern. Validation asserts 11 files exist, are square, are webp,
-and are content-distinct by md5 (delight-pass field-guide lesson: per-file checks alone do not
-catch duplicate grabs).
+### Step 4.3 — service-worker cache bump
 
-## Phase 4 — wire images into the placement UI + enlarge tiles  (skeleton)
+- Files: `public/sw.js` + `tests/shell.test.js`. `magic-vet-v4` -> `magic-vet-v5` and its
+  assertion string. PRECACHE list frozen. Required because `placement.js` is precached.
 
-Additive per PFA-2: a new emoji→image map, and `renderTask1Item` renders `<img class="opt-art">`
-with the Hebrew word as `alt` when a mapping exists, falling back to the emoji otherwise. The
-`data/` item bank stays untouched, so every existing assertion stays green. ALSO (owner-directed
-rich art): enlarge the option tiles in `VIEW_STYLE` so the scenes are legible — near-square tiles
-~150px tall, image filling the tile (`object-fit: cover`, inherit `--radius`), subject centered.
-Tap targets stay >= 48px; the WCAG gate stays passing (images exempt; selected-border + `alt`
-text remain). Bump the sw CACHE (`magic-vet-v4` → `magic-vet-v5`) with its test string, since
-placement.js and styles.css are precached.
+## Phase 5 — deploy and verify
 
-## Phase 5 — deploy and live verification  (skeleton)
-
-Bump the sw `CACHE` version (`magic-vet-v3` → `magic-vet-v4`) plus its assertion string, deploy,
-verify live, and confirm the learner profile was never contacted.
+Deploy to the existing Vercel project. Verify live: `/views/placement.js` serves the image map,
+`/assets/placement/pet.webp` returns 200 `image/webp`, `/sw.js` serves `magic-vet-v5`. Confirm
+via READ-ONLY GETs only — the learner profile is never contacted (no API call, no placement run
+on production; the sandbox on :3010 is used for any interactive check).
