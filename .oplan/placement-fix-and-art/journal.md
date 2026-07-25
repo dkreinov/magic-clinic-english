@@ -317,3 +317,39 @@ READY TO RESUME THE MOMENT status.openai.com IS GREEN:
   - Phase 3 will be dispatched as a PROPER oplan step (committed script under scripts/, frozen
     validation, executor packet, fresh-eyes audit) — per the process correction logged above.
     No generation happens outside that.
+
+## 2026-07-25 — OWNER HYPOTHESIS CONFIRMED: a chat created AFTER the mitigation works
+
+Owner's hypothesis: "maybe old generation chats are having the spinning problem, try new chat."
+Refinement made before testing: the earlier failed attempt WAS also a new chat, but it was created
+DURING the outage — so the testable claim is that a chat created AFTER OpenAI applied their
+mitigation behaves differently. Tested exactly that, like-for-like (same `pet` rich prompt, same
+composer-verification step).
+
+RESULT: **SUCCESS.** Fresh tab -> new chat -> same prompt -> image returned in under 60 seconds.
+  chat: https://chatgpt.com/c/6a6491a2-cf44-83eb-96bb-023d4345d4d9 ("Puppy in Magical Clinic")
+  generation completed (stillGenerating:false), 3 img nodes, Download control present.
+Meanwhile the OLD chat (WEB:9a715deb..., created mid-outage) is STILL spinning ~30 min later.
+So stuck conversations do not recover; new ones work. The owner was right.
+
+QUALITY / STYLE CHECK (orchestrator, by eye): the result is a golden puppy on a teal cushion in
+a warm wood-and-lantern magical clinic with potion bottles, violet + teal + amber accents. It
+matches the app's existing world closely, and the subject is unmistakably the hero of the frame —
+which is the property that has to survive at tile size. Rich scene as the owner directed, not a
+flat icon.
+
+CORROBORATING RECOVERY SIGNALS at the same time: /v1/models and /v1/chat/completions both return
+200 (were 500 on every call), gpt-image-1 and gpt-image-1-mini both listed as available on this
+key, the ChatGPT sidebar now loads Pinned/Projects instead of "Unable to load projects", and the
+status incident has moved to "monitoring — mitigation applied". The Images component is still
+flagged degraded, so throughput may still be uneven.
+
+STOPPED HERE per the owner's standing instruction ("work from oplan, once all checks are done
+stop"). This was a feasibility CHECK, not Phase 3. Nothing was downloaded, no repo file changed,
+no asset committed. Phase 3 remains undispatched and will run as a proper oplan step:
+a committed generation/optimize script, a frozen validation (12 masters, square, content-distinct
+by md5), an executor packet, and a fresh-eyes audit.
+
+DECISION NOW OPEN FOR THE OWNER: both routes are viable again (API recovered; ChatGPT web proven
+working with a strong style match). Which to use for the remaining 11 — and note the proven
+sample already exists and can be kept as the `pet` master rather than regenerated.

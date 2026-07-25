@@ -1,5 +1,5 @@
-CURRENT: phase 1 SHIPPED+LIVE · phase 2 (content fix) DONE in repo · phase 3 (images) BLOCKED by
-  an OpenAI OUTAGE (both API and web paths dead) · run STOPPED at owner instruction after checks
+CURRENT: phase 1 SHIPPED+LIVE · phase 2 (content fix) DONE in repo · phase 3 (images) UNBLOCKED
+  (OpenAI recovered; ChatGPT web generation PROVEN working) · STOPPED per owner, awaiting go-ahead
 BASELINE (phase 1): 04267f5
 PLAN: .oplan/placement-fix-and-art/plan.md
 ACCEPTED: 1.1 51854ec · 1.2 harness proof · 1.3 306f11f (deployed english-19wjsaomy, LIVE) ·
@@ -18,7 +18,10 @@ OPEN QUESTIONS:
      Images, Sites, Responses and ~18 other components degraded. The API 500s on every endpoint
      with a valid key; a new ChatGPT chat accepts the prompt but never returns an image (~4 min).
      Owner also directed RICH scenes (not icon tiles) — prompts already re-frozen accordingly.
-     NEXT ACTION: wait for status.openai.com to go green, then run Phase 3 as a proper oplan step.
+     STATUS 2026-07-25: UNBLOCKED. API back (models+chat 200, gpt-image-1 available) AND a NEW
+     ChatGPT chat generated the `pet` scene successfully in <60s with a strong style match.
+     NEXT ACTION: owner picks the route (API vs ChatGPT web), then Phase 3 runs as a proper
+     oplan step. The proven `pet` sample can be kept rather than regenerated.
      NOTE/RETRACTION: an earlier entry blamed the owner's account/billing. That was wrong — see
      journal CORRECTION #2. Do not go hunting through billing.
 BLOCKED: YES — phase 3 image generation cannot start until OPEN QUESTION 3 is answered. Phases
