@@ -1,74 +1,74 @@
 # STATUS — placement-fix-and-art
 
-*Rewritten in full at every update. Last update: stopped after checks — OpenAI is down.*
+*Rewritten in full at every update. Last update: RUN CLOSED — everything live.*
 
-## Bottom line
+## Done. All of it is live.
 
-The bug that was actually hurting her is **fixed and live**. The pictures can't be made right now
-because **OpenAI is having an outage** — not because of your account, and not because of the
-method we picked.
+**https://english-app-three-tan.vercel.app**
 
 ```mermaid
 flowchart LR
-    P1[Phase 1 DONE + LIVE<br/>placement crash fixed] --> P2
-    P2[Phase 2 DONE in repo<br/>unfair 'pet' item fixed] --> P3
-    P3{{Phase 3 WAITING<br/>OpenAI outage<br/>both routes dead}}
-    P3 --> P4[Phase 4-5<br/>wire pictures in, deploy]
+    P1[Phase 1<br/>crash fixed] --> P2[Phase 2<br/>unfair item fixed]
+    P2 --> P3[Phase 3<br/>12 pictures made]
+    P3 --> P4[Phase 4<br/>pictures wired in]
+    P4 --> P5[Phase 5<br/>deployed + verified]
     style P1 fill:#cfe8cf
     style P2 fill:#cfe8cf
-    style P3 fill:#ffd27f
+    style P3 fill:#cfe8cf
+    style P4 fill:#cfe8cf
+    style P5 fill:#cfe8cf
 ```
 
-## I gave you bad advice last message — retracting it
+## What she'll see now
 
-I told you the errors pointed at your OpenAI account and suggested you check billing. **That was
-wrong. Don't go looking through billing.**
+**The test actually finishes.** It never could before — answering the last question crashed the
+screen silently. That's fixed and was shipped first.
 
-The login error you hit decodes to `primaryapi_server_error`, and OpenAI's status page shows an
-active incident, "Elevated error rates", with about 22 services degraded — including **Login**,
-**Images**, and **Sites**.
+**Real pictures instead of emoji.** Twelve hand-generated scenes in the same warm world as the
+rest of the app, on bigger tiles so they're properly visible. The three that were genuinely
+unguessable are now obvious:
 
-What misled me: I tested a deliberately fake API key and it got a clean rejection, so I assumed
-their systems were healthy and the problem must be yours. But a fake key gets rejected instantly
-at the front door, while a *real* key needs their main backend to look up the account — and that
-backend is exactly what's broken. Both behaviours are explained by their outage. My test was fine;
-the conclusion I drew from it wasn't.
+| Word | Was | Now |
+|---|---|---|
+| fan / מאוורר | 🌀 a spiral | a brass fan with blurred spinning blades and papers flying |
+| desk / שולחן | 🧑‍💻 a person at a laptop | a wooden desk with a lamp, open book and quill — no person |
+| zoo / גן חיות | 🦁 a lion | an entrance archway with a giraffe, lion and elephant |
 
-## What I checked, and what it proved
+**A fairer first question.** "Pet" used to offer a dog *and a horse* — a horse is a pet, so the
+question had two defensible answers. The horse is now a tent.
 
-- **The API route**: every endpoint — images, chat, even a simple model list — returns a server
-  error with your key, through two different tools. Not this computer, not the network.
-- **The web route** (the fallback you approved): ChatGPT loads and accepts the prompt, but after
-  **four minutes** it produced no image and the sidebar couldn't even load your projects.
+## What it cost
 
-So both routes are blocked by the same incident. No choice of method gets around it — it's an
-availability problem. Stopping and waiting is the right move, not retrying in a loop.
+**Nothing.** The pictures were made through your ChatGPT subscription in the browser, per your
+rule about not paying the API for things that aren't generated live in the app. The paid route
+would have been about $2.30. I've saved that preference so I default to it from now on.
 
-**Nothing was spent, nothing generated, nothing deployed.** The only trace is one throwaway
-ChatGPT chat with a single prompt in it.
+## Checks that passed
 
-## Also worth knowing
+- 146 of 146 tests green, unchanged throughout.
+- Readability gate (WCAG AA) still passes.
+- The 27 MB of full-size artwork ships as **166 KB** of optimised images.
+- Every picture carries Hebrew alt text for screen readers.
+- A runtime test drives the real app and confirms the pictures actually render and that tapping
+  one still works — not just that the code looks right.
+- Offline cache bumped, so her phone fetches the new version instead of the old one.
 
-`api/chapter.js` — the story generator — uses that same OpenAI key. So while this outage lasts,
-**her story reader likely won't generate new chapters either**. That's their outage, not
-something we broke, and it should clear on its own.
+**Her profile was never touched.** Every interactive check ran against an isolated local copy.
+That mattered more than usual here: simply opening the placement screen on the live site would
+have created profile data, so I deliberately never did.
 
-## Ready to go the moment it clears
+## Two things worth knowing
 
-- All 12 **rich scene** prompts are written and frozen (you asked for rich, not flat icons).
-- The plan to enlarge the answer tiles so the rich art is actually visible: frozen.
-- The download → shrink → verify pipeline, including a check that no two images are duplicates.
-- Phase 3 will run as a proper oplan step — committed script, frozen validation, and a fresh-eyes
-  audit — not ad-hoc.
+**The story reader depends on OpenAI.** Their outage earlier today broke it; it recovered while
+we worked. If chapters ever fail to generate, check https://status.openai.com/ before assuming
+the app is broken.
 
-Check https://status.openai.com/ ; when it's green, say the word and this picks up exactly where
-it left off.
+**One cosmetic thing left alone.** The "בואי נתחיל" button shows a link underline. It predates
+all this work and isn't a colour or picture issue, so it stayed outside scope. One line to fix if
+you want it.
 
-## Standing state
+## The record
 
-| Thing | State |
-|---|---|
-| Placement crash | **Fixed, deployed, verified live** |
-| "pet" horse-vs-dog fairness fix | Committed, ships with the pictures |
-| 12 rich pictures | Waiting on OpenAI |
-| Her profile | Never touched, as promised |
+`.oplan/placement-fix-and-art/` — plan, full journal, and lessons. Notably, the fresh-eyes review
+caught that my own edit had deleted the twelve image prompts from the plan file, where they
+existed nowhere else. That's the kind of thing the written record exists to catch.
