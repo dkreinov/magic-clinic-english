@@ -87,3 +87,10 @@ match — bidi display reordering makes a copied Hebrew line look identical whil
 order. The fix was to stop inlining the script and write it to the scratchpad as a file with
 `\uXXXX` escapes. Worth recording as the general lesson: never anchor a patch on a bidi string you
 copied out of terminal output.
+
+STATUS.md OVERAGE, JUSTIFICATION PAID (§6's soft-cap price): 65/60 lines, measured with wc -l, not
+  guessed — the phase-2 and phase-3 closes of the previous run both caught me writing a plausible
+  number before running the command, so the number above is the command's output. The five lines
+  over are the "two decisions I made that you should know about" section: both are places where I
+  resolved something on the owner's behalf (the review does not gate the deploy; #/parent goes in
+  the handoff doc), and a decision made FOR someone that they cannot see is worse than a long file.
