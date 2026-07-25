@@ -1,6 +1,6 @@
-CURRENT: phase 1 "fix the basics" EXECUTING. Next step 1.5 (the item-bank review tool).
+CURRENT: phase 1 "fix the basics" EXECUTING. Next step 1.6 (the owner-facing docs) — LAST.
 BASELINE: 89e6600 (157 tests, 0 fail; contrast gate 52 pairs ALL PASS; tree clean)
-NOW: 168 tests, 0 fail; contrast gate 52 pairs ALL PASS; tree clean at 52dc502
+NOW: 172 tests, 0 fail; contrast gate 52 pairs ALL PASS; tree clean at b7e9077
   public/ IS NOW SEALED FOR THIS PHASE: all six public/ files changed, and the single sanctioned
   cache bump (magic-vet-v8) has landed on top of them. Steps 1.5 and 1.6 touch public/ NOT AT ALL —
   1.5's own gate asserts `git status --porcelain -- public` = 0. No step may bump to v9.
@@ -18,6 +18,8 @@ ACCEPTED: step 1.1 — a098d3d (validation first try, auditor match/high, 0 inte
   PB-2, which my first auditor packet had omitted; 1 intervention, mine)
   step 1.3 — 5f89bf3 (validation first try, auditor match/high, 0 interventions)
   step 1.4 — 52dc502 (validation first try, auditor match/high, 0 interventions)
+  step 1.5 — b7e9077 (1 retry; auditor mismatch -> 3 real contract deviations fixed by a
+  corrective packet -> match/high; HTML md5 unchanged across the fix)
 FROZEN CONTRACTS IN FORCE:
   PB-1 the owner route is exactly `#/parent`; view is public/views/parent.js, loaded by a DYNAMIC
   import inside renderRoute() — NOT a static import, because sw.js PRECACHE is frozen and a static

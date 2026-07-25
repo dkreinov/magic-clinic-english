@@ -1,14 +1,14 @@
 # STATUS — poc-basics
 
-*Rewritten in full at every update. Last update: Phase 1 building — steps 1-4 of 6 accepted.*
+*Rewritten in full at every update. Last update: Phase 1 building — steps 1-5 of 6 accepted.*
 
 ## Where we are
 
-Phase 1 is being built, one step at a time. **4 of 6 steps are done and committed.**
+Phase 1 is being built, one step at a time. **5 of 6 steps are done and committed.**
 
 ```mermaid
 flowchart LR
-    P1{{Phase 1 BUILDING<br/>fix the basics<br/>4 of 6 steps accepted}} --> P2
+    P1{{Phase 1 BUILDING<br/>fix the basics<br/>5 of 6 steps accepted}} --> P2
     P2[Phase 2<br/>deploy so she can start]  --> P3
     P3[Phase 3<br/>the growth design]
     style P1 fill:#ffd27f
@@ -20,10 +20,10 @@ flowchart LR
 | 1.2 | the parent-only `#/parent` screen + re-take button | **accepted** |
 | 1.3 | the real entry-code screen | **accepted** |
 | 1.4 | the service-worker cache bump | **accepted** |
-| 1.5 | the item-bank review tool | next |
-| 1.6 | the docs you actually read | waiting |
+| 1.5 | the item-bank review tool | **accepted** |
+| 1.6 | the docs you actually read | next |
 
-Tests: **168 passing, 0 failing** (was 157). Contrast gate: all 52 colour pairs pass.
+Tests: **172 passing, 0 failing** (was 157). Contrast gate: all 52 colour pairs pass.
 
 One thing worth telling you: on step 1.2 the instructions I handed the builder were incomplete —
 they named the frozen wording for the parent screen without including it. The builder found it
