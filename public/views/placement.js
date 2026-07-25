@@ -1,5 +1,7 @@
 import { getJson, postJson } from "../api.js";
 
+const RETAKE_KEY = "retakePlacement";
+
 const VIEW_STYLE = `
   .placement-progress {
     font-size: 0.9rem;
@@ -216,6 +218,18 @@ async function loadState() {
   return { bank, profile };
 }
 
+function consumeRetakeFlag() {
+  try {
+    if (sessionStorage.getItem(RETAKE_KEY) === "1") {
+      sessionStorage.removeItem(RETAKE_KEY);
+      return true;
+    }
+  } catch {
+    /* private mode — no re-take flag */
+  }
+  return false;
+}
+
 function resumeStage(profile) {
   const placement = profile && profile.placement ? profile.placement : null;
   if (!placement) return "intro";
@@ -229,13 +243,14 @@ export async function render(container, ctx) {
   let stage = "intro";
   let task2Index = 0;
   const answers = { task1: [], task2: {} };
+  const retake = consumeRetakeFlag();
 
   async function boot() {
     container.innerHTML = renderLoading();
     try {
       const { bank: loadedBank, profile } = await loadState();
       bank = loadedBank;
-      stage = resumeStage(profile);
+      stage = retake ? "intro" : resumeStage(profile);
       draw();
     } catch (err) {
       showError();

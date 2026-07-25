@@ -50,3 +50,19 @@ test('placement.js uses the expected endpoints, submit action, and ltr direction
   assert.ok(src.includes('"submit"'));
   assert.ok(src.includes('dir="ltr"'));
 });
+
+test('placement.js restarts at the intro when the re-take flag is set', () => {
+  const src = readFileSync(viewPath, 'utf8');
+  assert.ok(src.includes('const RETAKE_KEY = "retakePlacement";'));
+  assert.ok(src.includes('sessionStorage.getItem(RETAKE_KEY) === "1"'));
+  assert.ok(src.includes('sessionStorage.removeItem(RETAKE_KEY);'));
+  assert.ok(src.includes('const retake = consumeRetakeFlag();'));
+  assert.ok(src.includes('stage = retake ? "intro" : resumeStage(profile);'));
+});
+
+test('placement.js adds no new API action for the re-take', () => {
+  const src = readFileSync(viewPath, 'utf8');
+  assert.ok(src.includes('"submit"'));
+  assert.ok(!src.includes('"retake"'));
+  assert.ok(!src.includes('"reset"'));
+});
