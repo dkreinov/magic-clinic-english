@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>סקירת מאגר השאלות — מבחן המיון</title>
+<style>
+    body { font-family: system-ui, sans-serif; max-width: 960px; margin: 0 auto; padding: 24px; line-height: 1.5; color: #1a1a1a; background: #fafafa; }
+    h1 { font-size: 1.6em; }
+    h2 { margin-top: 2em; border-bottom: 2px solid #ccc; padding-bottom: 0.2em; }
+    h3 { margin-bottom: 0.2em; }
+    p.kind { color: #555; margin-top: 0; font-size: 0.9em; }
+    p.warn { background: #fff3cd; border: 1px solid #e0c36a; padding: 8px 12px; border-radius: 6px; }
+    article.item, article.text { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin: 16px 0; }
+    div.question { border-top: 1px dashed #ccc; padding-top: 10px; margin-top: 10px; }
+    p.english { direction: ltr; text-align: left; background: #f0f4f8; padding: 10px 12px; border-radius: 6px; }
+    div.opts { display: flex; flex-wrap: wrap; gap: 12px; margin: 10px 0; }
+    div.opts.words { align-items: center; }
+    figure.opt { margin: 0; text-align: center; width: 120px; }
+    figure.opt img { width: 100px; height: 100px; object-fit: contain; background: #f4f4f4; border-radius: 6px; }
+    img.prompt { width: 140px; height: 140px; object-fit: contain; background: #f4f4f4; border-radius: 6px; display: block; margin: 10px 0; }
+    span.opt, li.opt { display: inline-block; padding: 4px 10px; border: 1px solid #ccc; border-radius: 6px; margin: 2px; }
+    ul.opts { list-style: none; padding: 0; }
+    .opt.correct { border: 2px solid #2e8b57; background: #e6f4ea; font-weight: bold; }
+    figcaption.correct, figure.correct figcaption { color: #2e8b57; }
+    label.check { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font-weight: bold; cursor: pointer; }
+    audio { display: block; margin: 10px 0; width: 100%; max-width: 320px; }
+</style>
+</head>
+<body>
+<h1>סקירת מאגר השאלות</h1>
+<p>עברי על כל השאלות: השמיעי כל הקלטה, הביטי בכל תמונה, ובדקי שהתשובה המסומנת ב-✓ היא באמת הנכונה ושאין אפשרות שנייה שיכולה להיות נכונה. סמני כל שאלה שבדקת.</p>
+<p>נבדקו <span id="review-done">0</span> מתוך 18</p>
+<h2>משימה 1 — מילים ותמונות (12)</h2>
+<article class="item" id="t1-01">
+<h3>t1-01 · pet · חיית מחמד</h3>
+<p class="kind">שומעת מילה, בוחרת תמונה</p>
+<audio controls preload="none" src="../public/audio/word-pet.mp3"></audio>
+<div class="opts">
+<figure class="opt correct"><img src="../public/assets/placement/pet.webp" alt="חיית מחמד"><figcaption>pet ✓</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/movie.webp" alt="סרט"><figcaption>movie</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/camp.webp" alt="מחנה"><figcaption>camp</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/mom.webp" alt="אמא"><figcaption>mom</figcaption></figure>
+</div>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</article>
+<article class="item" id="t1-02">
+<h3>t1-02 · mom · אמא</h3>
+<p class="kind">שומעת מילה, בוחרת תמונה</p>
+<audio controls preload="none" src="../public/audio/word-mom.mp3"></audio>
+<div class="opts">
+<figure class="opt"><img src="../public/assets/placement/steak.webp" alt="סטייק"><figcaption>steak</figcaption></figure>
+<figure class="opt correct"><img src="../public/assets/placement/mom.webp" alt="אמא"><figcaption>mom ✓</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/fan.webp" alt="מאוורר"><figcaption>fan</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/camp.webp" alt="מחנה"><figcaption>camp</figcaption></figure>
+</div>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</article>
+<article class="item" id="t1-03">
+<h3>t1-03 · camp · מחנה</h3>
+<p class="kind">שומעת מילה, בוחרת תמונה</p>
+<audio controls preload="none" src="../public/audio/word-camp.mp3"></audio>
+<div class="opts">
+<figure class="opt correct"><img src="../public/assets/placement/camp.webp" alt="מחנה"><figcaption>camp ✓</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/mom.webp" alt="אמא"><figcaption>mom</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/pet.webp" alt="חיית מחמד"><figcaption>pet</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/horse.webp" alt="סוס"><figcaption>horse</figcaption></figure>
+</div>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</article>
+<article class="item" id="t1-04">
+<h3>t1-04 · fan · מאוורר</h3>
+<p class="warn">נקודה חלשה ידועה: התמונה עלולה להיקרא כ"סופה" ולא כ"מאוורר". ודאי שהיא מזהה אותה נכון.</p>
+<p class="kind">שומעת מילה, בוחרת תמונה</p>
+<audio controls preload="none" src="../public/audio/word-fan.mp3"></audio>
+<div class="opts">
+<figure class="opt"><img src="../public/assets/placement/zoo.webp" alt="גן חיות"><figcaption>zoo</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/dad.webp" alt="אבא"><figcaption>dad</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/singer.webp" alt="זמר"><figcaption>singer</figcaption></figure>
+<figure class="opt correct"><img src="../public/assets/placement/fan.webp" alt="מאוורר"><figcaption>fan ✓</figcaption></figure>
+</div>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</article>
+<article class="item" id="t1-05">
+<h3>t1-05 · dad · אבא</h3>
+<p class="kind">שומעת מילה, בוחרת תמונה</p>
+<audio controls preload="none" src="../public/audio/word-dad.mp3"></audio>
+<div class="opts">
+<figure class="opt"><img src="../public/assets/placement/desk.webp" alt="שולחן"><figcaption>desk</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/singer.webp" alt="זמר"><figcaption>singer</figcaption></figure>
+<figure class="opt correct"><img src="../public/assets/placement/dad.webp" alt="אבא"><figcaption>dad ✓</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/zoo.webp" alt="גן חיות"><figcaption>zoo</figcaption></figure>
+</div>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</article>
+<article class="item" id="t1-06">
+<h3>t1-06 · desk · שולחן</h3>
+<p class="warn">נקודה חלשה ידועה: התמונה נקראת בעיקר כ"אדם מול מחשב", והתרגום "שולחן" עמום.</p>
+<p class="kind">שומעת מילה, בוחרת תמונה</p>
+<audio controls preload="none" src="../public/audio/word-desk.mp3"></audio>
+<div class="opts">
+<figure class="opt correct"><img src="../public/assets/placement/desk.webp" alt="שולחן"><figcaption>desk ✓</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/horse.webp" alt="סוס"><figcaption>horse</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/fan.webp" alt="מאוורר"><figcaption>fan</figcaption></figure>
+<figure class="opt"><img src="../public/assets/placement/steak.webp" alt="סטייק"><figcaption>steak</figcaption></figure>
+</div>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</article>
+<article class="item" id="t1-07">
+<h3>t1-07 · singer · זמר</h3>
+<p class="kind">רואה תמונה, בוחרת מילה</p>
+<img class="prompt" src="../public/assets/placement/singer.webp" alt="זמר">
+<div class="opts words">
+<span class="opt">dad</span>
+<span class="opt">pet</span>
+<span class="opt correct">singer ✓</span>
+<span class="opt">camp</span>
+</div>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</article>
+<article class="item" id="t1-08">
+<h3>t1-08 · horse · סוס</h3>
+<p class="kind">רואה תמונה, בוחרת מילה</p>
+<img class="prompt" src="../public/assets/placement/horse.webp" alt="סוס">
+<div class="opts words">
+<span class="opt correct">horse ✓</span>
+<span class="opt">pet</span>
+<span class="opt">camp</span>
+<span class="opt">mom</span>
+</div>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</article>
+<article class="item" id="t1-09">
+<h3>t1-09 · zoo · גן חיות</h3>
+<p class="kind">רואה תמונה, בוחרת מילה</p>
+<img class="prompt" src="../public/assets/placement/zoo.webp" alt="גן חיות">
+<div class="opts words">
+<span class="opt">fan</span>
+<span class="opt">mom</span>
+<span class="opt">steak</span>
+<span class="opt correct">zoo ✓</span>
+</div>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</article>
+<article class="item" id="t1-10">
+<h3>t1-10 · movie · סרט</h3>
+<p class="kind">רואה תמונה, בוחרת מילה</p>
+<img class="prompt" src="../public/assets/placement/movie.webp" alt="סרט">
+<div class="opts words">
+<span class="opt">desk</span>
+<span class="opt">steak</span>
+<span class="opt">pet</span>
+<span class="opt correct">movie ✓</span>
+</div>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</article>
+<article class="item" id="t1-11">
+<h3>t1-11 · monkey · קוף</h3>
+<p class="kind">רואה תמונה, בוחרת מילה</p>
+<img class="prompt" src="../public/assets/placement/monkey.webp" alt="קוף">
+<div class="opts words">
+<span class="opt">movie</span>
+<span class="opt">steak</span>
+<span class="opt correct">monkey ✓</span>
+<span class="opt">camp</span>
+</div>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</article>
+<article class="item" id="t1-12">
+<h3>t1-12 · steak · סטייק</h3>
+<p class="kind">רואה תמונה, בוחרת מילה</p>
+<img class="prompt" src="../public/assets/placement/steak.webp" alt="סטייק">
+<div class="opts words">
+<span class="opt">camp</span>
+<span class="opt">horse</span>
+<span class="opt correct">steak ✓</span>
+<span class="opt">singer</span>
+</div>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</article>
+<h2>משימה 2 — הבנת הנקרא (2 טקסטים, 6 שאלות)</h2>
+<article class="text" id="t2-t1">
+<h3>t2-t1 · בדיקת חיה בבית החולים</h3>
+<p class="english" dir="ltr">The doctor is at the hospital. She looks at the dog. The dog is not well. The doctor gives advice to the owner. They will come again tomorrow.</p>
+<div class="question" id="t2-t1-q1">
+<p class="prompt">איפה נמצא הרופא?</p>
+<ul class="opts">
+<li class="opt correct">בבית החולים ✓</li>
+<li class="opt">בבית</li>
+<li class="opt">בגן</li>
+<li class="opt">בבית הספר</li>
+</ul>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</div>
+<div class="question" id="t2-t1-q2">
+<p class="prompt">מה עושה הרופא לכלב?</p>
+<ul class="opts">
+<li class="opt correct">בודק אותו ✓</li>
+<li class="opt">משחק איתו</li>
+<li class="opt">נותן לו אוכל</li>
+<li class="opt">רואה סרט</li>
+</ul>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</div>
+<div class="question" id="t2-t1-q3">
+<p class="prompt">מתי הם יחזרו?</p>
+<ul class="opts">
+<li class="opt correct">מחר ✓</li>
+<li class="opt">היום</li>
+<li class="opt">אתמול</li>
+<li class="opt">בשבוע הבא</li>
+</ul>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</div>
+</article>
+<article class="text" id="t2-t2">
+<h3>t2-t2 · חיות בגן החיות</h3>
+<p class="english" dir="ltr">There is a big elephant at the zoo. The elephant is near a tree. A boy and a girl look at the elephant. They like the animal very much. The sun is bright and the day is warm.</p>
+<div class="question" id="t2-t2-q1">
+<p class="prompt">איזה חיה יש בגן החיות?</p>
+<ul class="opts">
+<li class="opt correct">פיל ✓</li>
+<li class="opt">כלב</li>
+<li class="opt">חתול</li>
+<li class="opt">ציפור</li>
+</ul>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</div>
+<div class="question" id="t2-t2-q2">
+<p class="prompt">איפה הפיל נמצא?</p>
+<ul class="opts">
+<li class="opt correct">ליד עץ ✓</li>
+<li class="opt">על המים</li>
+<li class="opt">בבית</li>
+<li class="opt">במכונית</li>
+</ul>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</div>
+<div class="question" id="t2-t2-q3">
+<p class="prompt">איך הילדים מרגישים לגבי הפיל?</p>
+<ul class="opts">
+<li class="opt correct">הם אוהבים אותו ✓</li>
+<li class="opt">הם מפחדים ממנו</li>
+<li class="opt">הם לא רואים אותו</li>
+<li class="opt">הם עייפים</li>
+</ul>
+<label class="check"><input type="checkbox" /> בדקתי</label>
+</div>
+</article>
+<p>סיימת? רשמי את האישור בסעיף 6 של docs/item-bank-review.md. הוראות לתיקון פריט נמצאות בסעיף 5 של אותו מסמך.</p>
+<script>
+    document.addEventListener('change', function (event) {
+      if (event.target && event.target.type === 'checkbox') {
+        var checked = document.querySelectorAll('input:checked');
+        document.getElementById('review-done').textContent = String(checked.length);
+      }
+    });
+</script>
+</body>
+</html>
