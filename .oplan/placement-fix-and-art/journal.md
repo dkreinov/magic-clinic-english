@@ -156,3 +156,61 @@ So unclear emoji hurt the second group MORE. Worst case is t1-09: the prompt is 
 the learner must choose "zoo". t1-07 shows 🎤 (a microphone) for "singer".
 Unique concepts needing artwork across BOTH groups: 12 (the 11 option emoji plus 🐒 monkey,
 which appears only as a prompt).
+
+## OWNER GATE — PASSED (2026-07-25)
+
+Shown: the shipped fix, the 12-concept image scope, and the two decisions.
+
+DECISION A — image method: **reuse the ChatGPT dedicated-chat pipeline** (docs/visual-design.md
+§7), not the OpenAI API. Strongest style continuity with the existing 8 assets; browser-driven,
+one image at a time, subject to the 89-duplicate incident guarded by field-guide lessons 12–13.
+
+DECISION B — the unfair "pet" item: **swap the horse distractor for camp.** t1-01 options
+`["🐕","🎬","🐎","👩"]` → `["🐕","🎬","🏕️","👩"]`. Correct answer 🐕 and correctIndex 0 unchanged;
+🏕️ already passes the pictographic test as t1-03's emoji; 4 options stay distinct. One data edit.
+
+ORCHESTRATOR NOTE (risk, surfaced not hidden): the browser tooling has been unreliable this
+session — screenshots erroring, a tab dying, JS eval timing out. The ChatGPT pipeline is entirely
+browser-driven. The content fix (Decision B) is browser-free and ships first. The image phase
+will be attempted; if the browser proves too flaky to drive ChatGPT safely, the run STOPS and
+reports rather than looping or risking a duplicate-download mess.
+
+## PHASE 2 CLOSED — content fix shipped to repo (not yet deployed; batched with Phase 4)
+
+STEP 2.1 swap horse distractor for camp in t1-01
+  tier: WORKER (Sonnet) · did: data/placement-items.json t1-01 options[2] 🐎 -> 🏕️, byte-copied
+    from t1-03 to preserve the variation selector; correctIndex/emoji/everything else unchanged.
+  surprises: none · deviations: none · validation_first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=25885, checker=23902 · interventions: 0 · audit: match / high (auditor confirmed
+    options[2] is U+1F3D5 U+FE0F, the camp emoji, correctly)
+  commit: 33db1a6 · accepted: 2026-07-25
+  NOTE: not deployed on its own — a data-only change ships with the Phase 4 image wiring so there
+  is one deploy, not two. Until then production still shows the horse distractor; the fix is in
+  the repo and the sandbox.
+
+## PHASE 3 — BLOCKED, run paused for the owner
+
+Phase 3 (generate 12 option icons) is fully SPECIFIED — 12 frozen icon prompts, a shared ICON
+SUFFIX, storage/optimize/validation pipeline, all in plan.md — but NOT executed, because the
+method the owner approved cannot currently be driven:
+
+- The dedicated ChatGPT chat (visual-design.md §7 URL) returns "This content is unavailable or
+  could not be found", then on retry stalls forever on a spinner with 0 conversation turns.
+- A NEW chat and the rest of ChatGPT load fine; the account is logged in (Plus). So ChatGPT is
+  up — the specific months-old, image-dense chat is the problem.
+- The browser tooling has been intermittently flaky this whole session (screenshots erroring, a
+  tab dying, JS eval timing out earlier), which compounds the risk of a 12-image manual run.
+
+Per oplan's terminal-state rule, a stopped run beats a loop nobody is watching. Everything
+deterministic is frozen so the phase resumes cleanly once the method question is answered:
+prompts, pipeline, validation, and the fact that the local style anchor
+(assets/design-tests/dragon-clinic-test.png) and all 8 masters still exist for a new-chat
+fallback.
+
+DESIGN DECISION logged in the plan: the option art is ICON TILES (single centered subject, simple
+background) not full scenes, because they render at ~76px; a busy fantasy scene is unreadable at
+that size. This is a deliberate departure from the §6 FROZEN STYLE SUFFIX, governed by tile-size
+readability, keeping the rendering style.
+
+RUN STATUS: Phase 1 (bug) shipped and live-verified. Phase 2 (fairness) in repo, ships with
+Phase 4. Phases 3–5 pending OPEN QUESTION 3.

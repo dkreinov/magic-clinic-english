@@ -1,66 +1,71 @@
 # STATUS — placement-fix-and-art
 
-*Rewritten in full at every update. Last update: Phase 1 shipped; paused at the owner gate.*
+*Rewritten in full at every update. Last update: bug fixed and live; images blocked, waiting on you.*
 
-## The bug is fixed and live
+## The important thing: the bug is fixed and live
 
-The placement test can now be completed. Deployed to production and verified there.
+The placement test can be completed now. It's deployed and verified on production. That was the
+urgent part, and it's done.
 
 ```mermaid
 flowchart LR
-    P1[Phase 1 DONE + SHIPPED<br/>placement crash fixed<br/>cache bumped so phones update] --> GATE{{YOU ARE HERE<br/>owner gate<br/>2 decisions}}
-    GATE --> P2[Phase 2<br/>generate the pictures]
-    P2 --> P3[Phase 3<br/>put them in the test]
-    P3 --> P4[Phase 4<br/>publish + verify]
+    P1[Phase 1 DONE + LIVE<br/>placement crash fixed] --> P2
+    P2[Phase 2 DONE in repo<br/>unfair 'pet' item fixed] --> P3
+    P3{{Phase 3 BLOCKED<br/>the picture pipeline<br/>needs your call}}
+    P3 --> P4[Phase 4-5<br/>wire pictures in,<br/>deploy]
     style P1 fill:#cfe8cf
-    style GATE fill:#ffd27f
+    style P2 fill:#cfe8cf
+    style P3 fill:#ffb3b3
 ```
 
-## What was wrong
+## What shipped
 
-The reading part of the test shows one story, then a second story. The code worked out *which*
-story to show by asking "which story still has an unanswered question?" — so the instant you
-answered the very last question, the answer was "none", and the code tried to draw a story that
-didn't exist. It crashed. Your click was actually recorded; the screen just never redrew, which
-is why it felt like the button was dead.
+**The crash fix — live now.** The reading test worked out which story to show by asking "which
+story still has an unanswered question?", so the moment the last question was answered it tried
+to show a story that didn't exist, and crashed. Fixed by tracking the current story explicitly.
+Proven with a harness that plays the whole test start to finish: it crashes on the old code at the
+elephant question and completes cleanly on the new code. All 146 tests pass, the cache was bumped
+so returning phones fetch the fix, and it's verified on the live site.
 
-It was always going to happen on the last question of the last story — the elephant one. **This
-predates all the colour work**; it came in with the original placement flow. It also means the
-test has never once been completable, which is almost certainly why her profile still says
-"placement not started".
+**The unfair "pet" item — fixed in the code, not yet published.** The horse option (a horse is a
+pet) is swapped for a tent/camp. It's committed and will go out with the pictures in one deploy
+rather than two.
 
-The fix makes the app track which story it's on explicitly, instead of guessing from the answers.
-A side benefit: the "ממשיכים" button now actually does the advancing. Before, the app silently
-jumped to story two the moment you answered story one's third question.
+Her profile was never touched — everything ran against an isolated sandbox.
 
-## How we know it's really fixed
+## Why the pictures are blocked
 
-We built a test harness that loads the real app code and plays the whole test start to finish.
-Run against the **old** code it crashes on the elephant question with the exact error above. Run
-against the **new** code it plays through and reaches the "you finished!" screen. A regression
-test that doesn't fail before the fix proves nothing, so we checked both directions.
+You chose to make the 12 pictures in your dedicated ChatGPT chat — the one that made the original
+artwork — for the closest style match. **That chat won't load today.** It returns "content
+unavailable," and on retry just spins forever without showing anything. A brand-new chat loads
+fine and you're logged in, so ChatGPT itself is working — it's that specific old, image-heavy
+chat that's stuck. My browser tools have also been glitchy this whole session, and generating 12
+pictures one at a time through a flaky browser is exactly how the last run accidentally saved 89
+duplicate files. So I stopped rather than risk a mess.
 
-All 146 tests still pass, and the service-worker cache was bumped to `magic-vet-v4` so her phone
-actually downloads the fix instead of serving the old broken copy from memory.
+**Everything else for the pictures is ready.** I've written and frozen all 12 prompts (as clear
+single-subject icons, since they show at thumbnail size), the download-and-shrink pipeline, and
+the checks. The moment the method is unblocked, it runs.
 
-**Her profile was never touched.** Everything was tested against an isolated local sandbox.
+## Your call (one question)
 
-## Now: two decisions before we spend anything
+How do you want the 12 pictures made?
 
-### 1. The pictures
+1. **Try the dedicated chat again later** — from a fresh session, once it loads. Best style match,
+   but it's stuck right now and I can't tell when it'll recover.
+2. **Use a new ChatGPT chat** — I re-upload the original style-reference image (it's saved locally)
+   so the look still matches, and generate there. Sidesteps the stuck chat. This differs from "the
+   one dedicated chat" you picked, so I'm asking rather than assuming.
+3. **Switch to the scripted OpenAI method** — not browser-dependent at all, fully repeatable, about
+   $0.25–$2.30 on your key. You'd earlier preferred the ChatGPT route for style; this trades a
+   little style-continuity for reliability.
 
-You were right, and it's worse than it looks. There are two kinds of question:
+Nothing is spent and nothing is deployed until you pick. The crash — the thing that was actually
+breaking for her — is already fixed and live.
 
-- **Hear a word, pick a picture** (6 items) — you pick from four emoji.
-- **See a picture, pick the word** (6 items) — the emoji is the *only* clue; these have no audio
-  at all.
+## One thing to flag about the picture style
 
-So bad emoji hurt the second kind more. The worst offenders: "zoo" is shown as 🦁 a lion,
-"fan" (מאוורר) is 🌀 a spiral, "desk" (שולחן) is 🧑‍💻 a person at a laptop, and "singer" is
-🎤 a microphone. Twelve distinct pictures would cover the entire test.
-
-### 2. A question that's unfair no matter how it's drawn
-
-Item 1 asks for **pet** (חיית מחמד). The correct answer is a dog — but one of the wrong answers
-is a **horse**. A horse is a pet. That item has two defensible answers, and a picture won't fix
-it; only changing the wrong-answer option will. That's a content change, so it's your call.
+The options show at about thumbnail size on the buttons. A full detailed scene is unreadable that
+small, so I wrote the prompts as single clear objects (a dog, a tent, a steak) in the same warm
+cartoon look, rather than busy scenes. If you'd rather they be richer little scenes, say so and
+I'll rewrite the prompts before generating.

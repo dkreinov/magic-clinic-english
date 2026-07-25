@@ -226,7 +226,115 @@ No repo file is created; the harness lives in the scratchpad. No network, no API
 The image work spends the owner's OpenAI credit and changes what the test looks like, so it is
 gated. Questions and the recommendation are in `STATUS.md`.
 
-## Phase 2 — generate the option artwork  (skeleton)
+## Phase 2 — content fix: the unfair "pet" item  (owner-approved)
+
+### Step 2.1 — swap the horse distractor in t1-01
+
+- **Tier:** WORKER (Sonnet) · **Retry budget:** 2
+- **Files it may touch:** `data/placement-items.json` — and nothing else.
+- **Goal:** in the object with `"id": "t1-01"`, change its `options` array from
+  `["\🐕","🎬","🐎","👩"]` to `["🐕","🎬","🏕️","👩"]` — i.e. replace the third element
+  `🐎` (horse) with `🏕️` (camp). Change nothing else: `correctIndex` stays `0`, the correct
+  answer `🐕` stays at index 0, `emoji`/`lemma`/`he`/`audio`/`section`/`direction` all unchanged.
+  Do not touch any other item, or `meta`.
+- **Why:** a horse is a pet, so the old item had two defensible answers. `🏕️` (camp) is
+  unambiguously not a pet, already appears elsewhere in the bank so it is a known-good pictograph,
+  and keeps the four options distinct.
+- **Non-goals:** only `data/placement-items.json`, only the t1-01 options array, only element 2
+  (0-indexed). No test change, no other file.
+- **Validation (frozen):**
+  ```
+  cd C:/Users/dkreinov/claude/english-app && set -o pipefail     && npm test 2>&1 | tail -8     && node -e "const b=require('./data/placement-items.json');const it=b.task1.find(i=>i.id==='t1-01');const o=it.options;if(JSON.stringify(o)!==JSON.stringify(['🐕','🎬','🏕️','👩']))throw new Error('options wrong: '+JSON.stringify(o));if(it.correctIndex!==0)throw new Error('correctIndex moved');if(o[it.correctIndex]!==it.emoji)throw new Error('correct answer moved');console.log('DATA-OK');"     && [ "$(git diff HEAD -- data/placement-items.json | grep -c '^[+-][^+-]')" = "2" ]     && echo STEP-2.1-OK
+  ```
+  Pass = `# pass 146` / `# fail 0`, `DATA-OK`, and final line `STEP-2.1-OK`. The last clause proves
+  exactly one line changed (one removed, one added).
+
+### Phase 2 acceptance criteria
+
+1. `npm test` 146/146. 2. The step 2.1 validation prints `STEP-2.1-OK`.
+3. `git diff --name-only <phase-2-baseline> -- .` (excluding `.oplan`) lists only
+   `data/placement-items.json`.
+
+---
+
+## Phase 3 — generate the option artwork  (DETAILED; execution BLOCKED — see STATUS)
+
+### The 12 concepts (one square icon each, keyed by the item's `emoji` field)
+
+| lemma | he | emoji (replaced) | used as |
+|---|---|---|---|
+| pet | חיית מחמד | 🐕 | audio→picture answer |
+| mom | אמא | 👩 | audio→picture answer |
+| camp | מחנה | 🏕️ | audio→picture answer |
+| fan | מאוורר | 🌀 | audio→picture answer |
+| dad | אבא | 👨 | audio→picture answer |
+| desk | שולחן | 🧑‍💻 | audio→picture answer |
+| singer | זמר | 🎤 | picture→word PROMPT (no audio) |
+| horse | סוס | 🐎 | picture→word PROMPT (no audio) |
+| zoo | גן חיות | 🦁 | picture→word PROMPT (no audio) |
+| movie | סרט | 🎬 | picture→word PROMPT (no audio) |
+| monkey | קוף | 🐒 | picture→word PROMPT (no audio) |
+| steak | סטייק | 🥩 | picture→word PROMPT (no audio) |
+
+### DESIGN DECISION (frozen): these are ICON TILES, not scenes
+
+The option art renders at ~76px inside a button. A busy "wood-and-magic fantasy scene" is
+unreadable at that size and would not tell a 6th-grader "steak" from "camp". So each prompt is a
+SINGLE, CENTERED, INSTANTLY-RECOGNISABLE subject on a simple soft background, rendered in the
+frozen cartoon style/palette — NOT the full FROZEN STYLE SUFFIX scene language. This is a
+deliberate, logged departure from the §6 suffix, justified by the tile size; the owner approved
+"pictures in the frozen cartoon style", and readability at 76px is the governing constraint.
+
+### FROZEN ICON PROMPTS (concept + this shared ICON SUFFIX)
+
+ICON SUFFIX (verbatim on every one): "Centered single subject, simple soft warm-amber background
+with a gentle glow, generous empty margin around the subject, no scene clutter. Warm cozy
+3D-cartoon illustration, soft painterly rendering, warm golden lighting, teal + violet + amber
+accents — the same look as the girl-and-dragon magical-vet-clinic art. Aimed at an 11-year-old,
+charming not babyish. Square 1:1. No text, no letters, no watermark, no border, no frame."
+
+- pet: "A happy cartoon puppy dog sitting, looking at the viewer."
+- mom: "A warm friendly cartoon mother — a woman smiling, head and shoulders."
+- camp: "A cozy cartoon camping tent under a tree with a tiny campfire."
+- fan: "A cartoon electric desk fan with spinning blades."
+- dad: "A warm friendly cartoon father — a man smiling, head and shoulders."
+- desk: "A cartoon wooden study desk with a lamp and a book on it."
+- singer: "A cartoon singer holding a microphone and singing, mid-song."
+- horse: "A friendly cartoon horse standing, in profile."
+- zoo: "A cartoon zoo entrance archway with a giraffe and a lion peeking behind it."
+- movie: "A cartoon film clapperboard and a bucket of popcorn."
+- monkey: "A cheerful cartoon monkey sitting, holding a banana."
+- steak: "A cartoon grilled steak on a plate with a sprig of garnish."
+
+### Storage + pipeline (mirrors the delight-pass method, field-guide 10–13)
+
+- Masters (full-res PNG) committed under `assets/placement/<lemma>.png` (12 files).
+- Web derivatives at `public/assets/placement/<lemma>.webp`, produced by extending
+  `scripts/optimize-assets.js` (or a sibling script) with a 256px width for the 12 tiles.
+- Generation is ONE image at a time. Activate the ChatGPT Download control EXACTLY ONCE per
+  image and poll `~/Downloads` via Bash — re-clicking caused the 89-duplicate incident.
+- Validation MUST assert content-distinctness by md5 across all 12 masters plus the anchor —
+  per-file format/size checks alone do not catch a duplicate grab.
+
+### BLOCKER (why Phase 3 is not executing now)
+
+The method the owner approved is "reuse the ONE dedicated ChatGPT chat" (visual-design.md §7,
+`https://chatgpt.com/c/6a632008-2d04-83ed-8557-370a2881a0dc`). On 2026-07-25 that chat will not
+load: it returns "This content is unavailable or could not be found", and on retry stalls
+indefinitely on a spinner with zero conversation turns rendered — while a NEW chat and the rest
+of ChatGPT load fine and the account is logged in (Plus). The chat is months old and dense with
+large images, which is the likely cause. The browser tooling has also been intermittently flaky
+this session. Driving 12 sequential generations under these conditions is high-risk with a known
+catastrophic failure mode, so the run STOPS here and asks the owner (see OPEN QUESTION 3) rather
+than loop or silently switch chats.
+
+Fallback available if approved: generate in a NEW chat, re-establishing style by uploading the
+local anchor `assets/design-tests/dragon-clinic-test.png` (present, 2.0 MB) plus one or two of
+the committed masters in `assets/delight/`. This deviates from "the ONE dedicated chat", so it
+needs the owner's OK — hence the gate.
+
+## Phase 4 — wire images into the placement UI  (skeleton)
+
 
 11 unique concepts, taken from the emoji currently used as picture options:
 `🐕 pet` · `🎬 movie` · `🐎 horse` · `👩 mom` · `🥩 steak` · `🌀 fan` · `🏕️ camp` · `🦁 zoo` ·
@@ -237,14 +345,14 @@ style (`docs/visual-design.md` §6 FROZEN STYLE SUFFIX), masters committed under
 and are content-distinct by md5 (delight-pass field-guide lesson: per-file checks alone do not
 catch duplicate grabs).
 
-## Phase 3 — wire images into the placement UI  (skeleton)
+## Phase 4 — wire images into the placement UI  (skeleton)
 
 Additive per PFA-2: a new emoji→image map, and `renderTask1Item` renders `<img>` with the
 Hebrew word as `alt` when a mapping exists, falling back to the emoji otherwise. `data/` item
 bank untouched, so every existing assertion stays green. Tap targets stay >= 48px; contrast gate
 stays passing.
 
-## Phase 4 — deploy and live verification  (skeleton)
+## Phase 5 — deploy and live verification  (skeleton)
 
 Bump the sw `CACHE` version (`magic-vet-v3` → `magic-vet-v4`) plus its assertion string, deploy,
 verify live, and confirm the learner profile was never contacted.
