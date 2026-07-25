@@ -270,3 +270,22 @@ STEP 2.3 service-worker cache bump (magic-vet-v6 -> v7)
   CONTRACT NOTE: this is the single sanctioned exception to the frozen "sw.js is untouchable" rule
   (VP-4). Step 2.4 writes that carve-out into docs/visual-design.md §8 so the contradiction is
   resolved in the record and not only in this plan.
+
+STEP 2.4 amend the frozen visual contract and the README
+  tier: WORKER (Sonnet) · did: docs/visual-design.md — new §3 "Amendment 2026-07-25" subsection
+    (token table, measured border floors, the 2.92:1 defect, the no-raw-hex rule, the convexity +
+    brute-force justification, the new test); "28 pairs" -> "52 pairs"; §5 motion rules; §7
+    superseding capture method; §8 CACHE carve-out. README.md — "checks 28" -> "checks 52".
+  surprises: none · deviations: none · first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=45971, checker=41325 · audit: match/high · commit: c328d82
+  I gave the auditor an EXTRA duty for this step, because a doc gate is weak by nature: greps prove
+  a keyword is present, never that a sentence is TRUE. So the packet asked it to check factual
+  accuracy and internal consistency against the supplied measurements, not just presence. It
+  verified every number and independently re-derived 28 + 4x6 = 52.
+  ONE THING I CONSIDERED AND RESOLVED AGAINST CHANGING: the amendment opens "The page background is
+  no longer a flat --color-bg fill", but the immediate predecessor was a two-stop gradient, not a
+  flat fill. I sent the diff to audit WITHOUT steering attention to it; the auditor did not flag it,
+  and on reflection it is correct as written: the DOCUMENT had only ever described --color-bg as
+  "Page background" and never documented the gradient at all — that omission was the record gap this
+  step repairs. Relative to the contract's own prior claim, the background was a flat fill. Left as
+  written rather than paying a re-dispatch to make a true sentence differently true.
