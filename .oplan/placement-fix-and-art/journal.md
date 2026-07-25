@@ -425,3 +425,101 @@ so it clearly reads as a zoo rather than one single animal".
 Style continuity verified by building a 12-tile contact sheet from the actual saved PNGs (not
 browser screenshots) and viewing it: one world, consistent warm golden lighting and
 teal/violet/amber palette, each subject unmistakably the hero of its frame.
+
+## PHASE 4 CLOSED — artwork wired in
+
+STEP 4.1 scripts/optimize-placement.js
+  tier: WORKER (Sonnet) · did: new ESM script mirroring optimize-assets.js; mkdir recursive;
+    12 masters -> public/assets/placement/<lemma>.webp at 256px q72.
+  surprises/deviations: none · first_try: yes · retries: 0 · escalations: 0
+  tokens: worker=31876, checker=29733 · audit: match/high · commit: c417424
+  RESULT: 27 MB of masters -> 166 KB total shipped payload (12 files, all 256x256, all distinct).
+
+STEP 4.2 render the artwork
+  tier: WORKER (Sonnet) · did: OPT_ART map + optArt() helper; audio-to-picture options and the
+    picture-to-word prompt now render <img class="opt-art"> with Hebrew alt; tiles enlarged
+    76px -> 150px; two new CSS rules.
+  surprises: the executor found that its Edit/Bash tooling silently JSON-decodes 4-hex \uXXXX
+    escapes into literal characters, so its first attempt wrote literal ZWJ/variation-selector
+    bytes instead of the escape TEXT; it self-corrected via a Node script. Worth noting that
+    this was cosmetic — in JS both forms produce the same string — but it was right to fix.
+  deviations: none · first_try: no · retries: 1 · escalations: 0
+  tokens: worker=51955, checker=32845 · audit: match/high (auditor dumped the 12 keys' codepoints
+    and confirmed camp keeps U+FE0F and desk keeps U+200D) · commit: b1e253c
+  ORCHESTRATOR CHECK BEYOND THE FROZEN VALIDATION: because a mangled key would silently fall back
+    to raw emoji rather than fail loudly, I extracted the live OPT_ART literal and matched it
+    against every emoji the app can display, computed from the bank: 12 mapped, 12 displayable,
+    0 misses, all 12 files present with non-empty Hebrew alt.
+
+STEP 4.3 sw cache magic-vet-v4 -> magic-vet-v5 (+ test string)
+  tier: WORKER (Sonnet) · first_try: yes · retries: 0 · tokens: worker=30748, checker=27268
+  audit: match/high · commit: ac95fd8
+
+STEP 4.4 orchestrator RUNTIME proof (not dispatched)
+  Drove the REAL placement.js headlessly against the isolated sandbox and asserted from the LIVE
+  DOM — not from greps: all 4 options on an audio item render <img> pointing at
+  /assets/placement/ with non-empty Hebrew alt; the picture-to-word prompt renders its image
+  (singer.webp, alt "זמר"); every option still carries data-choice; and CLICKING AN OPTION WITH
+  AN <img> CHILD STILL ADVANCES THE ITEM. 10/10 assertions passed. This is the check that would
+  have caught a broken emoji key, since a bad key degrades silently to emoji.
+
+PHASE 4 GATE: PASSED (5/5) — 146/146 tests, contrast ALL PASS, exactly the 16 expected files
+changed, no user-visible Hebrew added or removed, runtime proof green.
+
+## PHASE 5 CLOSED — deployed and verified live
+
+Deployment english-4wpo2b8bf, READY, production. Verified on https://english-app-three-tan.vercel.app:
+  · /views/placement.js serves OPT_ART, optArt(), min-height:150px, 12 /assets/placement/ refs,
+    and still carries the earlier crash fix (let task2Index = 0)
+  · /sw.js serves magic-vet-v5
+  · all 12 /assets/placement/*.webp return 200 image/webp
+  · /api/placement returns t1-01 options 🐕 🎬 🏕️ 👩 — the owner-approved fairness fix is live
+Learner profile NEVER contacted: verification used read-only GETs of static assets plus the
+public item bank. The interactive visual check ran on the isolated sandbox, never production,
+precisely because loading #/placement calls GET /api/profile, which CREATES a default profile
+when none exists — a read that writes.
+
+TRAP FOUND DURING VISUAL VERIFICATION (worth recording): the first sandbox screenshot showed a
+HORSE where the tent should have been. Not a defect — the long-running sandbox server had the
+pre-fix bank cached in memory, because Node caches JSON imports at module load and that server
+had been started before the data fix. Disk and production were both correct all along. Lesson:
+after changing data/*.json, RESTART any long-running dev server before believing what it serves.
+
+## RUN CLOSED
+
+Delivered:
+  1. The placement crash — fixed, shipped, live (the app's onboarding was previously impossible
+     to complete, which is why the profile still read "not started").
+  2. The unfair "pet" item — horse distractor swapped for camp, live.
+  3. Twelve rich scene illustrations replacing unguessable emoji, live, with the three broken
+     concepts (fan/desk/zoo) genuinely fixed.
+  4. Enlarged answer tiles so the rich art is legible.
+
+Files changed across the run: public/views/placement.js · public/sw.js · tests/shell.test.js ·
+data/placement-items.json · scripts/optimize-placement.js · 12 masters in assets/placement/ ·
+12 derivatives in public/assets/placement/
+
+METRICS
+  steps accepted: 7 dispatched (1.1, 1.3, 2.1, 4.1, 4.2, 4.3 + phase-3 orchestrator generation)
+  first-try validation passes: 5/6 dispatched (4.2 needed one corrective pass, worker's own)
+  escalations up the model ladder: 0
+  interventions: 0 executor stops this run (contrast with the previous run's 2)
+  audits: 6/6 match, all CONFIDENCE high
+  plan reviews: 2, both fix-first, 8 findings total, ALL accepted and fixed before any dispatch
+  subagent tokens: reviewers 124,924 · workers 193,293 · checkers 163,995 · TOTAL 482,212
+  DOLLARS SPENT ON IMAGE GENERATION: $0.00 — the free ChatGPT web route, per owner policy.
+    The scripted API alternative would have cost roughly $2.30.
+  orchestrator_context: unavailable
+
+HONESTY CLAUSE — did the machinery earn its keep this run? Yes, on specifics:
+  · Plan review #1 caught that `grep -c` counts LINES not occurrences, so my step-1.1 validation
+    asserted 5 where the truth was 4 — it would have failed a perfectly correct implementation
+    twice and burned the whole retry budget. It also caught that every code block I quoted was
+    indented 2 spaces too deep, which would have made literal search-and-replace find nothing.
+  · Plan review #2 caught that my own plan rewrite had DELETED the 12 frozen image prompts from
+    plan.md — they existed only in my context. That is the exact crash-only failure this
+    machinery exists to prevent, and nothing else would have noticed.
+  · The runtime proofs (1.2 and 4.4) are the only checks that could distinguish "renders
+    correctly" from "greps pass" — and 4.4 covers a failure mode (bad emoji key) that degrades
+    silently rather than loudly.
+  · Cost discipline: the owner's free-web policy saved the API spend outright.
