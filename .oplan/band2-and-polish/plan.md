@@ -762,7 +762,8 @@ for (const [p, n] of Object.entries(want)) {
   const m = await sharp(p).metadata();
   if (m.format !== 'png' || m.width !== n || m.height !== n) throw new Error(p + ' is ' + m.format + ' ' + m.width + 'x' + m.height);
 }
-const c = await sharp('public/icons/icon-maskable-512.png').extract({ left: 4, top: 4, width: 8, height: 8 }).stats();
+const crop = await sharp('public/icons/icon-maskable-512.png').extract({ left: 4, top: 4, width: 8, height: 8 }).png().toBuffer();
+const c = await sharp(crop).stats();
 const [r, g, b] = c.channels.map(ch => Math.round(ch.mean));
 if (r !== 46 || g !== 24 || b !== 6) throw new Error('maskable padding is rgb(' + r + ',' + g + ',' + b + '), expected rgb(46,24,6)');
 console.log('ICONS-OK deterministic=yes');" \

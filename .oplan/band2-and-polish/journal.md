@@ -360,3 +360,32 @@ STEP 2.5 generate the app-icon artwork (ORCHESTRATOR-RUN, not dispatched)
   ICON-ART: APPROVED — owner verdict recorded 2026-07-25 at the GC-D8 gate. The owner reviewed the
   48px magnified previews (plain + Android circle crop) and approved. VP-6 is therefore satisfied and
   steps 2.6 and 2.7 are UNBLOCKED. Phase 2's acceptance criterion 1 now takes its 157-test branch.
+
+STEP 2.6 derive the icon PNGs from the master
+  tier: WORKER (Sonnet) · did: scripts/build-icons.js (NEW, mirrors optimize-assets.js) plus its
+    three outputs — icon-192.png, icon-512.png, icon-maskable-512.png (410px artwork extended by
+    51px of #2e1806 on each side = 512, subject inside the central 80% safe zone).
+  first_try: no · retries: 0 · escalations: 0 · INTERVENTION: 1 (bad-spec, MINE)
+  tokens: worker=58564, checker=30378 · audit: match/high · commit: fce1e8f
+  THE ESCALATION RULE EARNED ITS KEEP FOR THE THIRD TIME IN THIS RUN, and this was the best catch
+  yet. The executor returned stopped-with-question: my frozen validation sampled the maskable icon's
+  corner with `sharp(f).extract({left:4,top:4,width:8,height:8}).stats()` and asserted rgb(46,24,6);
+  it measured rgb(74,44,17) instead. Rather than "fixing" the padding colour, widening the tolerance,
+  or quietly editing my gate, the worker root-caused it in sharp's native source and reported that
+  `.stats()` re-opens the ORIGINAL input and ignores the chained `.extract()` entirely — so the
+  check was measuring the whole 512x512 image, artwork included, and could NEVER pass for any
+  correct icon.
+  I DID NOT TAKE THAT AT FACE VALUE. I built a synthetic control: a 512x512 pure-red image with a
+  white centre block, where the corner is red (255,0,0) by construction. Chained
+  `.extract().stats()` -> 255,39,39 (contaminated by the centre). Materialize the crop with
+  `.png().toBuffer()` first, then `.stats()` -> 255,0,0, exactly right. On the real file the
+  materialized corner reads exactly rgb(46,24,6). The worker was right and my gate was wrong.
+  FIX: plan.md's frozen validation for 2.6 now materializes the crop before measuring. Logged as an
+  intervention against ME, not the worker. Note what this gate would have cost if the worker had
+  been "helpful": the obvious way to make it go green is to change the padding colour or loosen the
+  assertion, and either would have shipped a wrong icon while printing STEP-2.6-OK.
+  SECOND PLAN AMENDMENT this step (the first was the 1254x1254 dimension): both are mine, both are
+  cases of the plan predicting a fact instead of measuring it.
+  Visual check beyond the gate: rendered the shipped 192 next to the maskable 512 under a real
+  circle crop — the subject sits fully inside the circle, her head is not clipped, and the safe-zone
+  padding does its job.
