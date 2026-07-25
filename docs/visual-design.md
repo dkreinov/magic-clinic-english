@@ -192,6 +192,7 @@ derivatives are generated later (a later phase) as `public/assets/*.webp`.
 | `heroine.png` | square | 1254×1254 | home welcome / onboarding |
 | `placement-friend.png` | square | 1254×1254 | placement intro |
 | `words-treasure.png` | square | 1254×1254 | words empty state + collection header |
+| `app-icon.png` | square | 1254×1254 | PWA install icon + Android splash; derived to `public/icons/icon-192.png`, `icon-512.png`, `icon-maskable-512.png` by `scripts/build-icons.js` |
 
 ### FROZEN STYLE SUFFIX
 
@@ -244,6 +245,17 @@ Each prompt below is sent with the FROZEN STYLE SUFFIX appended.
 - **words-treasure**: "Square image (1:1): an open rounded glass jar on a wooden table
   overflowing with glowing gem-like crystals in violet, teal and amber, sparkles rising from it
   like a treasure reward in a game, cozy warm background." + SUFFIX
+
+- **app-icon**: "Square image (1:1) designed as a mobile app icon: a tight centered
+  head-and-shoulders portrait of the same brown-haired girl vet apprentice from this chat
+  (messy bun, teal apron with paw-print patch) cheek to cheek with the same small teal baby
+  dragon, the pair filling only the middle of the frame with generous empty margin on all four
+  sides, simple deep warm-brown background with a soft golden glow behind them, no props and no
+  clutter, bold clear shapes that stay readable when shrunk very small." + SUFFIX
+
+  Approved by the owner at the GC-D8 gate (`ICON-ART: APPROVED`, 2026-07-25). The maskable
+  variant pads the artwork into the central 80% safe zone on `#2e1806` so an OS circle crop
+  cannot clip the character's head.
 
 ## 7. Generation pipeline
 
