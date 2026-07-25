@@ -4,6 +4,7 @@ import { defaultProfile } from '../lib/profile.js';
 import { generateChapter } from '../lib/story.js';
 import { chatJSON } from '../lib/openai.js';
 import band1 from '../data/band1.json' with { type: 'json' };
+import band2 from '../data/band2.json' with { type: 'json' };
 import { isAuthorized, rejectUnauthorized } from '../lib/auth.js';
 
 export default async function handler(req, res) {
@@ -43,7 +44,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const r = await generateChapter({ profile: p, band1, chat: chatJSON });
+  const r = await generateChapter({ profile: p, band1, band2, chat: chatJSON });
   if (!r.ok) {
     sendJson(res, 502, { ok: false, error: 'chapter generation failed' });
     return;
