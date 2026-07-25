@@ -57,7 +57,7 @@ OpenAI for chapter generation and translation · `sharp` for image optimisation 
 ```bash
 npm install
 npm run dev      # http://localhost:3000  (override with PORT)
-npm test         # 157 tests, node:test, no framework
+npm test         # 172 tests, node:test, no framework
 ```
 
 Optimise generated artwork into web derivatives:
