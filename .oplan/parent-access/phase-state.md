@@ -39,3 +39,14 @@ ACCEPTED: (none yet)
 OPEN QUESTIONS: none. The three that existed (entry point, which password, how often to ask) were
   put to the owner and answered as OD-1/OD-2/OD-3 above.
 BLOCKED: no
+
+DEPLOYMENT LEDGER (this run). Re-established by `vercel inspect`, NOT inherited:
+  ROLLBACK TARGET (recorded BEFORE the deploy call — field-guide lesson 13 / DP-4)
+    outgoing id = dpl_6tEUHF6T7f5pxVFwfgFxepFdtR1V
+    outgoing url = https://english-18gugvohx-dkreinovs-projects.vercel.app
+    outgoing serves = magic-vet-v8
+    outgoing created = Sun Jul 26 2026 09:46:36 GMT+0300 (55m before this deploy)
+    incoming commit = c7feba2d41c9d40c909efff44b2aa91af477866e
+    rollback command = "$(npm prefix -g)/vercel" rollback https://english-18gugvohx-dkreinovs-projects.vercel.app --yes
+  Live /sw.js answered magic-vet-v8 before the deploy, so the premise check (production is not
+  already serving v9) passed.
