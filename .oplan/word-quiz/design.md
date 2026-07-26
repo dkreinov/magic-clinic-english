@@ -58,6 +58,23 @@ defensible than it was. The guessing arithmetic is unchanged: 6 options = 17% pe
 surviving three strikes, 8 options = 12.5% and 0.2%. The owner chose 6 and 6 stands unless they say
 otherwise.
 
+## D20 — 37 words are excluded from the quiz entirely (owner, 2026-07-26)
+
+Asked how ~50 sensitive words should be handled, the owner answered: *"dont need these words there
+are enough other words."* So they get no quiz file and no item. At 37 of 2254 that is 1.6% of the
+bank, frozen as QZ-8 in plan.md.
+
+I deliberately did NOT apply this as broadly as my own scan suggested. The scan cast a wide net to
+find candidates and swept up ordinary vocabulary an 11-year-old needs — `love`, `kiss`, `marry`,
+`hospital`, `sick`, `doctor`, `police`, `body`, `poor`, `pain`, `hurt`, `fight`, `danger`, `afraid`.
+Those are kept. Excluding them would have been me over-reading a broad instruction, and the list is
+written out in full in QZ-8 precisely so the owner can see exactly which 37 and trim or extend it.
+
+**Scope: the QUIZ only.** These words are still in `buildAllowedSet`, so a generated chapter may
+still use them, and their audio clips still exist. Removing them from the STORY is a separate and
+much larger decision — it would mean filtering the allowed set — and the owner has not been asked
+for it. Flagged, not assumed.
+
 ## Decisions taken by the orchestrator at plan time (Rule 2: nothing deferred to execution)
 
 The grill left five items "still open". They are decided here, because a step containing an open

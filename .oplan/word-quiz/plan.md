@@ -115,8 +115,9 @@ own siblings or compare their senses.
   substituted and confirm it does not work. A distractor that also fits marks her wrong for being
   right — the worst failure this feature has (design.md).
 - Age-appropriate for an 11-year-old girl. **If a word cannot be given an age-appropriate sentence,
-  STOP and return the question. Do not guess.** (The A2 set contains e.g. `gay`; that is an
-  editorial decision for the owner, not a worker.)
+  STOP and return the question. Do not guess.** The 37 words the owner ruled out are already gone
+  (QZ-8), so this should not fire — but it stays as the backstop, because a list written in advance
+  cannot anticipate every word.
 - No proper nouns. No contractions (matches `lib/story.js`'s own rule).
 - **THE ALLOWED VOCABULARY IS NOT ORDINARY ENGLISH — this will bite you.** MEASURED against the
   real manifest: `after`, `children`, `men`, `women`, `feet` are all **ABSENT**, while `before`,
@@ -161,11 +162,36 @@ to exercise D9, plus a fixed stride through each band section.
 run light like play back watch right kind fair well
 add boy fact hat job net rest ten
 about body country ever goal itself million online question since sweet vegetable
-abroad battle chef dentist euro grammar introduce maximum pattern reasonable sir timetable
-ability beyond complex drama gay method reality suffer
+abroad bear chef dentist euro grammar introduce maximum pattern reasonable sir timetable
+ability beyond complex drama gentle method reality suffer
 ```
 
+`battle` and `gay` were in the original stride and are now excluded by QZ-8. Replaced
+deterministically by the next word in the same band section that is neither excluded nor already in
+the list: `battle` -> `bear`, `gay` -> `gentle`. Both are useful: `bear` is polysemous (the animal /
+to carry / to endure) and `gentle` carries a malformed `pos` of `"adj gently adv"`, which exercises
+rule 8's first-whitespace-token reduction.
+
 **QZ-6 — the test ledger.** 208 today. 1.1 +6 -> 214. 1.2 +4 -> 218. 1.3 +0 -> 218.
+
+**QZ-8 — the excluded words (owner decision, 2026-07-26).** These 37 words get **no quiz file and
+no quiz item, ever**. The owner's reasoning: "dont need these words there are enough other words" —
+and at 37 of 2254 the cost is 1.6% of the bank.
+
+```
+alcohol arrest army attack battle beer blood bomb boyfriend cancer christian church crime dead
+death die disease drug enemy gay girlfriend god guilty gun jail kill murder prison race religion
+sex shoot smoke soldier steal war wine
+```
+
+DELIBERATELY KEPT, because a wide net swept them up and they are ordinary vocabulary an 11-year-old
+needs: `love kiss marry married wedding hospital sick ill doctor nurse medicine police body poor
+pain hurt fight danger lie afraid`. If the owner wants any of these cut too, that is a one-line
+change to the list above and must happen BEFORE phase 2 generates the bank.
+
+The exclusion applies to the QUIZ ONLY. These words remain in `buildAllowedSet`, so the story
+generator may still use them and their audio clips still exist — removing them from the story is a
+separate, larger decision the owner has not been asked for.
 
 **QZ-7 — inherited and still binding.** `PRECACHE` may gain first-party JS a precached file
 statically imports, and NOTHING else (`docs/visual-design.md`, as amended by word-audio A11) —
@@ -230,13 +256,13 @@ is never contacted. Never open a browser on production. Never run `vercel env`. 
   - batch 1 (10): `run light like play back watch right kind fair well`
   - batch 2 (8):  `add boy fact hat job net rest ten`
   - batch 3 (12): `about body country ever goal itself million online question since sweet vegetable`
-  - batch 4 (12): `abroad battle chef dentist euro grammar introduce maximum pattern reasonable sir timetable`
-  - batch 5 (8):  `ability beyond complex drama gay method reality suffer`
+  - batch 4 (12): `abroad bear chef dentist euro grammar introduce maximum pattern reasonable sir timetable`
+  - batch 5 (8):  `ability beyond complex drama gentle method reality suffer`
 - each batch is validated and accepted separately by the orchestrator (gate green + its files
   present) before the next is dispatched; the step is accepted only when all 50 files exist, the
   gate is green, and criterion 5's frozen command exits 0.
-- **`gay` is in batch 5 by the frozen list.** QZ-2 requires the worker to STOP and ask rather than
-  guess at an age-appropriate sentence. Expect that escalation and answer it as the owner's call.
+- No escalation on sensitive words is expected any more: QZ-8 removes them from the bank entirely,
+  and the pilot list no longer contains any. QZ-2's stop-and-ask rule remains as a backstop.
 - validation (frozen): `node scripts/check-quiz-bank.mjs && [ "$(ls public/quiz/*.json | wc -l)"
   = "50" ] && echo STEP-1.3-OK`
 - tier: WORKER · depends on: 1.2 COMMITTED.
@@ -247,8 +273,10 @@ is never contacted. Never open a browser on production. Never run `vercel env`. 
 
 2254 words, ~5000 items, batched worker packets, same QZ-1/QZ-2/QZ-3 contracts. Adds the
 **completeness** criterion — and it must ask the RIGHT question this time: *every word she can be
-quizzed on has an item*, i.e. every word in `public/audio/words/index.json` has a
-`public/quiz/<lemma>.json`. (The word-audio run's criterion 6 pinned a true-but-irrelevant
+quizzed on has an item*, i.e. every word in `public/audio/words/index.json` **minus QZ-8's 37
+exclusions** has a `public/quiz/<lemma>.json`, and **no excluded word has one**. Both directions:
+a missing file is a word she can claim but never be checked on, and a present file for an excluded
+word is the owner's decision quietly reversed. Expected count: 2254 - 37 = **2217**. (The word-audio run's criterion 6 pinned a true-but-irrelevant
 invariant and made a real defect look verified; see that run's journal.) Ends with a second owner
 sample review.
 

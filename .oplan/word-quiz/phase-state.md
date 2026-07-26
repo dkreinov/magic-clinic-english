@@ -31,7 +31,9 @@ THE THREE THINGS MOST LIKELY TO BITE:
 
 OPEN QUESTIONS: none. All 13 grill questions were answered by the owner; the 5 the grill left open
   were decided by the orchestrator at plan time as D15-D19 and written into design.md.
-  ONE ESCALATION IS EXPECTED, NOT A SURPRISE: batch 5 contains `gay`. QZ-2 requires the worker to
-  STOP and ask rather than invent an age-appropriate sentence. That is the owner's call to make.
+  NO sensitive-word escalation is expected any more: QZ-8 (owner, D20) removes 37 words from the
+  quiz entirely and the pilot list no longer contains any of them. QZ-2's stop-and-ask rule stays as
+  a backstop. NOTE the exclusion is QUIZ-ONLY — those words are still in buildAllowedSet and the
+  story may still use them; that is flagged in design.md D20 and NOT decided.
 
 BLOCKED: no

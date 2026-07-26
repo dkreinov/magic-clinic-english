@@ -73,3 +73,33 @@ Flagged to the owner rather than decided: D4 (six options) was argued partly on 
 child who cannot read the distractors, which is a weaker argument at eleven. Eight options is now
 more defensible. Left at six — the owner chose it and changing a locked decision on my own initiative
 because a premise shifted slightly is exactly the "work redefines done" hazard.
+
+## D20 — the owner cut 37 words from the quiz
+
+Asked how ~50 sensitive words should be handled, the owner answered "dont need these words there
+are enough other words". Frozen as QZ-8: 37 words, no quiz file, ever. 1.6% of the bank.
+
+Two things I did NOT do, both deliberately:
+
+- **I did not apply it as broadly as my own scan.** The scan cast a wide net to FIND candidates and
+  swept up ordinary vocabulary — `love`, `kiss`, `marry`, `hospital`, `sick`, `doctor`, `police`,
+  `body`, `poor`, `pain`, `hurt`, `fight`, `danger`, `afraid`. Cutting those on a broad instruction
+  would have been me over-reading it. The 37 are written out in full in QZ-8 so the owner can see
+  exactly which words and trim or extend the list before phase 2 generates anything.
+- **I did not extend it to the story.** These words are still in `buildAllowedSet`, so a generated
+  chapter may still use them, and their audio clips still exist. Removing them from the STORY means
+  filtering the allowed set, which is a different and much larger change. Flagged in D20, not
+  assumed.
+
+The frozen pilot list contained two of the excluded words, `battle` and `gay`. Replaced
+deterministically by the next word in the same band section that is neither excluded nor already in
+the list: `battle` -> `bear`, `gay` -> `gentle`. Both turn out to be better test material than what
+they replaced — `bear` is polysemous (animal / carry / endure), and `gentle` carries a malformed
+`pos` of `"adj gently adv"`, which exercises rule 8's first-whitespace-token reduction.
+
+Phase 2's completeness criterion was corrected in the same pass, because it would otherwise have
+demanded a file for every one of the 2254 manifest words and failed on the 37 that must not have
+one. It now checks BOTH directions against 2217: no excluded word has a file, and nothing else is
+missing. That is the same class of error as the word-audio run's criterion 6 — a completeness rule
+that does not know about a deliberate exception is a rule that will be "fixed" by undoing the
+decision.
