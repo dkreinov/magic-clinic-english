@@ -306,3 +306,75 @@ recorded rather than assumed: the bound was only ever a proxy for "do not bloat 
 half of what mp3 would have cost (~52 MB), there is no ffmpeg here to re-encode, and opus measured
 LARGER than aac per word. No decision anywhere in this run changes at 26 MB versus 20 MB. If a future
 run gets ffmpeg, re-encoding this directory at 64 kbps mono is the obvious win.
+
+---
+
+# PHASE 3 — the word she taps is the word she hears
+
+Opened after phase 2 deployed. Mika reported "some words work and some don't", naming `feels` and
+`suddenly`. Diagnosed: not the clips and not the MIME type. I generated one clip per **lemma**, while
+the reader plays the **surface form on screen**. `feel.aac` exists, `feels.aac` never will.
+`lib/story.js`'s own prompt says `- Use ONLY words from the ALLOWED WORD LIST (inflected forms are
+allowed).` — I read that line and built for lemmas anyway, and **acceptance criterion 6 then froze the
+mismatch in place by asserting filenames == allowed set exactly.** A gate that pins the wrong
+invariant is worse than no gate: it made the defect look verified.
+
+Owner decisions taken (answered, do not re-ask):
+- **OD-D — ship a word manifest.** Resolve client-side against a shipped list, not by probing URLs and
+  catching 404s. Deterministic, one request, and it lets the UI tell "no clip exists" apart from
+  "network failed" — so the button can be hidden rather than dead.
+- **OD-E — the collection stores the lemma.** Tapping `feels` saves `feel`. One entry per real word.
+  Existing surface-form entries are merged, not left as duplicates.
+
+No new TTS spend: every lemma clip is already correct.
+
+FROZEN CONTRACTS
+
+**WB-1 — the manifest.** `public/audio/words/index.json`: a JSON array of the allowed lemmas, sorted,
+written by `scripts/build-word-audio.js` from the SAME `deriveWordList()` the clips come from, so it
+cannot drift. A test asserts manifest === the `.aac` filename set === `deriveWordList()`. It is NOT
+added to `PRECACHE`.
+
+**WB-2 — one resolver, not two.** `public/lemma.js`, pure and dependency-free, exporting
+`resolveLemma(word, allowedSet)`. Candidates in order, first one present in the set wins; returns
+`null` if none: exact · `-ies`->`y` · `-es` · `-s` · `-ed`->(-2,-1) · `-ing`->(-3, -3+`e`) ·
+doubled-consonant+`ing`/`ed` -> single · `-ily`->`y` · `-ly` · `-er`/`-est`->(-2,-3).
+**Exact match is tried FIRST**, which is what stops `bus`->`bu`, `this`->`thi`, `glass`, `across`,
+`carpet`, `sunday` from being mangled — all verified. A naive longest-prefix rule (what
+`findInGlossary` uses for translations) fails `stories` and `making` and is NOT used.
+This module lives under `public/` but is imported by `api/` as well. There is no precedent for that in
+this repo and it is deliberate: **one tested implementation beats the directory convention**, because
+the alternative is verifying code against a re-implementation of itself (field-guide 6).
+
+**WB-3 — the reader.** The popup resolves the tapped word once. It DISPLAYS, SPEAKS and SAVES the
+resolved lemma. When resolution returns `null` the play button is **not rendered at all** — this
+supersedes WA-3's "silently does nothing", which was only ever a way to make a missing clip safe, and
+a hidden button is honest where a dead one is not. The Hebrew still comes from the glossary lookup on
+the surface form, which already prefix-matches.
+
+**WB-4 — the dictionary.** Each row resolves its lemma the same way; no `.btn-say` on a row that
+cannot resolve. Entries are already lemmas after WB-5.
+
+**WB-5 — the migration, idempotent.** `migrateWordKeys(profile, allowedSet)` in `lib/profile.js`
+rewrites each `words` key to its resolved lemma and MERGES collisions: `taps` summed, earliest
+`firstSeen`, latest `lastSeen`, `known` beats `learning`, first non-null `he` kept, first non-empty
+`context` kept. Unresolvable keys are left exactly as they are — never dropped. Applied server-side in
+`api/profile.js` on load. **Running it twice must change nothing**, and a profile that is already all
+lemmas must come out byte-identical.
+
+**WB-6 — one cache bump.** `magic-vet-v11` -> `magic-vet-v12`, `PRECACHE` byte-identical, and neither
+`index.json` nor any audio added to it.
+
+ACCEPTANCE CRITERIA
+1. `feels`, `suddenly`, `walked`, `running`, `stopped`, `stories`, `making`, `bigger`, `cats`,
+   `happily` all resolve to a lemma that HAS a clip on disk.
+2. `bus`, `this`, `was`, `his`, `glass`, `dress`, `less`, `across`, `always`, `carpet`, `sunday`,
+   `carrot` each resolve to THEMSELVES. This is the regression that matters most: a resolver that
+   helps inflections but corrupts ordinary words is a net loss.
+3. `migrateWordKeys` is idempotent, proven by applying it twice.
+4. `public/audio/words/index.json` === the `.aac` filename set === `deriveWordList()`, by test.
+5. `node scripts/check-contrast.mjs` exits 0, `ALL PASS`, exactly 52 lines.
+6. `public/sw.js` shows exactly 2 changed lines vs phase 2; `PRECACHE` md5 unchanged; no `index.json`
+   and no audio in it.
+7. `npm test` `# fail 0`. Ledger set at the end of the phase, not guessed now.
+8. `.data/profile.json` still does not exist locally.
