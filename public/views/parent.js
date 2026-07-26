@@ -170,6 +170,21 @@ function storedCode() {
   }
 }
 
+function rememberCode(code) {
+  try {
+    localStorage.setItem(CODE_KEY, code);
+  } catch {
+    /* private mode — the code just will not persist */
+  }
+}
+
+export function codeAccepted(typed, stored) {
+  const value = String(typed ?? "").trim();
+  if (!value) return false;
+  if (!stored) return true;
+  return value === stored;
+}
+
 function lockMarkup(showError) {
   return `
     ${styleTag()}
@@ -204,8 +219,8 @@ function unlock(container) {
         event.preventDefault();
         const value = input.value.trim();
         if (!value) return;
-        const expected = storedCode();
-        if (expected && value === expected) {
+        if (codeAccepted(value, storedCode())) {
+          rememberCode(value);
           resolve();
           return;
         }

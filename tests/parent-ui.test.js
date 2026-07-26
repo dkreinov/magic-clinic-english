@@ -99,10 +99,10 @@ test('parent.js does not fetch the profile before unlocking', () => {
   assert.ok(unlockIndex < profileIndex);
 });
 
-test('the parent lock fails closed when no code is stored', () => {
+test('the parent lock delegates to the server when no code is stored', () => {
   const src = readFileSync(viewPath, 'utf8');
-  assert.ok(src.includes('if (expected && value === expected)'));
-  assert.ok(src.includes('return localStorage.getItem(CODE_KEY) || "";'));
+  assert.ok(src.includes('export function codeAccepted(typed, stored)'));
+  assert.ok(src.includes('rememberCode(value);'));
 });
 
 test('the parent lock adds no styling of its own', () => {
