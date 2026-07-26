@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "ever",
+    "sense": "at any time up to now",
+    "sentence": "Nobody has ___ climbed that mountain, so nobody knows what is at the top.",
+    "answer": "ever",
+    "distractors": ["never", "always", "often", "sometimes", "usually", "twice", "soon", "tomorrow"]
+  }
+]

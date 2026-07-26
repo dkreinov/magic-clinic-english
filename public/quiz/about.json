@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "about",
+    "sense": "having something as its subject or story",
+    "sentence": "This book is ___ a young girl who learns to fly.",
+    "answer": "about",
+    "distractors": ["against", "among", "at", "despite", "except", "into", "inside", "toward"]
+  }
+]

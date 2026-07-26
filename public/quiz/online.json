@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "online",
+    "sense": "using a computer that is joined to the internet",
+    "sentence": "I do my homework ___, so I need a computer and the internet.",
+    "answer": "online",
+    "distractors": ["outside", "upstairs", "downstairs", "alone", "quietly", "slowly", "early", "together"]
+  }
+]

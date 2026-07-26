@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "million",
+    "sense": "the number 1000000",
+    "sentence": "One ___ is a very big number with six zeros in it.",
+    "answer": "million",
+    "distractors": ["zero", "half", "pair", "couple", "sum", "total", "figure", "piece"]
+  }
+]

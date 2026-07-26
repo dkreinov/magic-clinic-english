@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "country",
+    "sense": "a nation with its own land, flag and people",
+    "sentence": "A ___ is much bigger than a city or a town.",
+    "answer": "country",
+    "distractors": ["village", "street", "garden", "shop", "school", "house", "market", "room"]
+  },
+  {
+    "lemma": "country",
+    "sense": "land with fields and farms, away from towns",
+    "sentence": "My grandmother lives in the ___, so she sees cows every morning.",
+    "answer": "country",
+    "distractors": ["city", "town", "station", "park", "shop", "room", "market", "street"]
+  }
+]

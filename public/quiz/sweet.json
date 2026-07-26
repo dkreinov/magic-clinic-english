@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "sweet",
+    "sense": "tasting of sugar",
+    "sentence": "This cake has too much sugar in it, so it is very ___.",
+    "answer": "sweet",
+    "distractors": ["salty", "hot", "cold", "dry", "fresh", "soft", "thin", "wet"]
+  },
+  {
+    "lemma": "sweet",
+    "sense": "gentle and lovely, in a way that makes people happy",
+    "sentence": "That was a ___ thing to do, because it made my sad friend smile.",
+    "answer": "sweet",
+    "distractors": ["mean", "unkind", "cruel", "terrible", "awful", "horrible", "lazy", "bad"]
+  }
+]

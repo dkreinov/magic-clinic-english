@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "body",
+    "sense": "the whole of a person or animal, with all its parts",
+    "sentence": "Your arms and legs are all parts of your ___.",
+    "answer": "body",
+    "distractors": ["head", "hand", "face", "foot", "finger", "hair", "neck", "back"]
+  }
+]

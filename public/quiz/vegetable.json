@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "vegetable",
+    "sense": "a plant such as a carrot or a bean that you eat with dinner",
+    "sentence": "A potato is a ___ that grows under the ground.",
+    "answer": "vegetable",
+    "distractors": ["fruit", "flower", "tree", "leaf", "grass", "fish", "cake", "drink"]
+  }
+]

@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "itself",
+    "sense": "the same thing or animal that the sentence is about",
+    "sentence": "The old gate opens and shuts all by ___ when the wind blows.",
+    "answer": "itself",
+    "distractors": ["himself", "herself", "myself", "yourself", "yourselves", "ourselves", "themselves", "hers"]
+  }
+]

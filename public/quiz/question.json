@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "question",
+    "sense": "what you ask when you want to know something",
+    "sentence": "The teacher asked such a hard ___ that nobody in the class knew.",
+    "answer": "question",
+    "distractors": ["answer", "story", "joke", "lesson", "song", "poem", "secret", "test"]
+  },
+  {
+    "lemma": "question",
+    "sense": "one thing on a test paper that you must answer",
+    "sentence": "I could not answer the last ___ on the test paper.",
+    "answer": "question",
+    "distractors": ["page", "line", "word", "letter", "box", "note", "picture", "title"]
+  }
+]

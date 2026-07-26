@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "goal",
+    "sense": "a score you get by putting the ball in the net",
+    "sentence": "She kicked the ball into the net, so her team scored a ___.",
+    "answer": "goal",
+    "distractors": ["race", "match", "prize", "cup", "medal", "player", "star", "game"]
+  },
+  {
+    "lemma": "goal",
+    "sense": "something you want to do and work hard for",
+    "sentence": "A ___ is what you work toward for months before you reach it.",
+    "answer": "goal",
+    "distractors": ["secret", "memory", "story", "joke", "mistake", "question", "reason", "lesson"]
+  }
+]
