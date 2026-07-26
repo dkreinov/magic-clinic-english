@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "rest",
+    "sense": "the part that is left over",
+    "sentence": "If I take three apples from ten, the ___ is seven.",
+    "answer": "rest",
+    "distractors": ["half", "part", "piece", "bit", "sum", "total", "end", "top"]
+  },
+  {
+    "lemma": "rest",
+    "sense": "to stop moving and relax for a while",
+    "sentence": "Sit down and ___ for ten minutes because you are so tired.",
+    "answer": "rest",
+    "distractors": ["run", "jump", "walk", "dance", "climb", "swim", "play", "work"]
+  }
+]

@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "job",
+    "sense": "the work a person does to earn money",
+    "sentence": "My sister found a new ___, so she gets money every week.",
+    "answer": "job",
+    "distractors": ["hobby", "game", "class", "sport", "club", "dance", "race", "party"]
+  }
+]

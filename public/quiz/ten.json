@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "ten",
+    "sense": "the number 10",
+    "sentence": "I have ___ fingers, five on each hand.",
+    "answer": "ten",
+    "distractors": ["two", "three", "four", "six", "seven", "nine", "twelve", "twenty"]
+  }
+]

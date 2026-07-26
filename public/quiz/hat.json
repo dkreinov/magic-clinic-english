@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "hat",
+    "sense": "something you wear on your head",
+    "sentence": "Put on your ___ so that the sun does not burn your head.",
+    "answer": "hat",
+    "distractors": ["coat", "shoe", "sock", "dress", "shirt", "glove", "boot", "skirt"]
+  }
+]

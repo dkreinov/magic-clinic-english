@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "net",
+    "sense": "a thing full of holes, used for catching fish",
+    "sentence": "The little fish stay inside the ___ because the holes are too small.",
+    "answer": "net",
+    "distractors": ["box", "bag", "bowl", "cup", "bottle", "pot", "boat", "plate"]
+  },
+  {
+    "lemma": "net",
+    "sense": "the internet, which you reach with a computer",
+    "sentence": "My school work is on the ___, so I need a computer.",
+    "answer": "net",
+    "distractors": ["paper", "page", "book", "table", "desk", "wall", "shelf", "board"]
+  }
+]

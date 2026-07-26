@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "boy",
+    "sense": "a young male child",
+    "sentence": "That ___ is ten years old, so he is too young to drive.",
+    "answer": "boy",
+    "distractors": ["man", "father", "uncle", "grandfather", "husband", "girl", "daughter", "sister"]
+  }
+]

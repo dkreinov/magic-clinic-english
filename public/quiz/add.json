@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "add",
+    "sense": "to put numbers together to find how much they make",
+    "sentence": "If you ___ four and five, the answer is nine.",
+    "answer": "add",
+    "distractors": ["write", "say", "read", "check", "spell", "guess", "copy", "share"]
+  },
+  {
+    "lemma": "add",
+    "sense": "to put one more thing into something",
+    "sentence": "Please ___ more sugar to my tea because it is not sweet enough.",
+    "answer": "add",
+    "distractors": ["pour", "bring", "carry", "throw", "take", "give", "send", "show"]
+  }
+]
