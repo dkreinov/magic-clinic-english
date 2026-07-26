@@ -149,6 +149,19 @@ test('rule 8: pos is a SET unioned across both bands, and empty means exempt', (
   const shared = validateItem(kind, ctx);
   assert.deepEqual(shared.errors, [], why(shared));
 
+  // Numerals are folded to one value. The bands tag "ten" as `cardinal`, "four"
+  // as `number` and "second" as `ordinal`; untouched, rule 8 left `ten` with
+  // only three legal same-class distractors (six, three, thousand) when rule 7
+  // demands eight, so no legal item could exist for it.
+  for (const n of ['ten', 'four', 'second', 'three', 'twelve', 'hundred']) {
+    assert.ok(posIndex.get(n).has('num'), `${n} must carry the folded numeral pos`);
+  }
+  assert.ok(!posIndex.get('ten').has('cardinal'), 'raw "cardinal" must not survive folding');
+  const tenPool = [...allowed].filter((w) => w !== 'ten' && (posIndex.get(w) || new Set()).has('num'));
+  assert.ok(tenPool.length >= 8, `"ten" needs >=8 same-class distractors, found ${tenPool.length}`);
+  // ...and folding must not reach past numerals into ordinary parts of speech.
+  assert.deepEqual([...posIndex.get('kind')].sort(), ['adj', 'n']);
+
   // "gave" carries no pos in either band, so it is exempt rather than rejected.
   assert.equal((posIndex.get('gave') || new Set()).size, 0);
   const exempt = validateItem(

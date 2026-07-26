@@ -86,6 +86,17 @@ own siblings or compare their senses.
    without it a null `pos` yields the set `{"null"}` instead of an empty one, the word stops being
    exempt, and rule 8 then wrongly rejects every real distractor against it. Caught while checking
    the frozen expression actually runs; it changes the exempt count from 50 to 63.
+   **NUMERALS ARE FOLDED (AMENDED AT EXECUTION TIME, A3, step 1.3 batch 2).** `cardinal`, `number`
+   and `ordinal` all map to the single value `num`. The bands tag one category three ways —
+   `three six ten thousand` are `cardinal`, `two four five seven nine twelve twenty hundred third`
+   are `number`, `second` is `ordinal`, and `eight eleven million billion` are plain `n`. That is a
+   transcription inconsistency in the source, not a fact about English. Unfolded, rule 8 rejects
+   `four` as a distractor for `ten` and leaves `ten` with exactly THREE legal same-class distractors
+   (`six`, `three`, `thousand`) while rule 7 demands eight — **no legal item for `ten` could exist at
+   all**, and every number word in the 2217-word bank hits the same wall. Folded, `ten` has 30.
+   MEASURED after the fold: the exempt count is still **63** and the >1-pos count still **336**, so
+   the two invariants this plan is pinned to are undisturbed, and batch 1 re-gates green unchanged.
+   Nothing other than numerals is normalised.
    **Rule: when `posSetFor(answer)` and `posSetFor(distractor)` are both non-empty they must share
    at least one value.** Empty set = exempt: **63** of 2254, MEASURED under this rule.
    My original "the first comma-separated token of the band entry's pos" was a fiction — a plan

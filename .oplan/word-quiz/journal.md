@@ -199,6 +199,31 @@ items had an `and` or a `but` as their only pin and every one of them leaked.
 Frozen into QZ-2 as the pin test. Final batch 1: 23 items, gate green, 10 of 10 words multi-sense,
 zero irregular give-aways, and no distractor I can find that fits its blank.
 
+### A3 — `ten` had no legal item, and it was rule 8's fault (step 1.3, before batch 2)
+
+Before dispatching batch 2 I measured the distractor pool for all 40 remaining pilot words rather
+than discovering the tight ones the way the worker would have — one at a time, mid-batch. One word
+came back at **3**: `ten`. Rule 7 demands exactly eight distractors and rule 8 demands they share a
+part of speech, so `ten` was unsatisfiable. No legal item for it existed.
+
+The cause is a data defect, not a language fact. The bands tag numerals three different ways:
+`three six ten thousand` are `cardinal`, `two four five seven nine twelve twenty thirty forty fifty
+hundred third` are `number`, `second` is `ordinal`, and `eight eleven million billion` are plain
+`n`. So rule 8 held that `ten` and `four` share no part of speech. Folding `cardinal`/`number`/
+`ordinal` to one value takes `ten` from 3 legal distractors to 30, all of them actual numbers.
+
+Checked for collateral damage before accepting it: the exempt count is still 63, the >1-pos count is
+still 336 — the two numbers this plan is pinned to and that three review rounds argued over — batch
+1 re-gates green with no item changed, and `kind` is still `{adj,n}`, so the fold does not reach
+past numerals. Nothing else is normalised; `unfriendly` is still mis-tagged `{adv}` and the
+prepositions still lack `prep`, both reported by the batch-1 worker. Those constrain item quality
+but block nothing, so they stay as they are.
+
+Worth noting what found this: measuring the pool for all 40 words up front cost one command. Had I
+dispatched batch 2 blind, the worker would have burned a long context discovering that eight legal
+distractors for `ten` do not exist, and the likeliest failure mode is that it would have padded the
+set with exempt words like `dragon` and `witch` to get past the gate — green, and absurd.
+
 ### A known contract gap, deliberately NOT closed: rule 10 and irregular forms
 
 The same worker reported that rule 10 is blind to irregular inflections. Verified: `resolveLemma`
