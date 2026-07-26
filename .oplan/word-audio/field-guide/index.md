@@ -1,0 +1,50 @@
+# Field guide — poc-basics (inherited from band2-and-polish) (budget: 40 lines)
+
+1. Git Bash on Windows: forward slashes, `/dev/null`, CRLF warnings are noise. `curl` needs
+   `--ssl-no-revoke`. npm global bin is off PATH — `"$(npm prefix -g)/<tool>"`. Git Bash's `/tmp` is
+   NOT node's — write temp files to the scratchpad, NEVER the repo root (it dirties your own gate).
+2. Secrets in `.env`, gitignored; never commit or echo them. `APP_CODE` gates the prod API: every
+   `/api/*` except `/api/health` answers 401 without the header. Never run `vercel env`.
+3. `npm test` = bare `node --test` over `tests/*.test.js`, run under cmd.exe not Git Bash, so always
+   validate with `npm test` itself. It now also runs the contrast gate. Invariant: ZERO FAILURES.
+4. Before touching any view/style/data, grep tests/ for exact-shape assertions: `shell.test.js`
+   freezes `manifest.icons[0].src`, manifest colors, the sw CACHE string and PRECACHE; view tests
+   freeze class names and Hebrew strings — append beside a frozen thing, never replace it.
+4a. A SOURCE-GREP TEST CATCHES A MISSING DECISION, NEVER A WRONG ONE. A test asserting the source
+   contains `if (expected && value === expected)` shipped a dead end and CALLED IT "fails closed";
+   reviewer and auditor both confirmed it matched the spec, and the spec was wrong. If a decision
+   matters, extract a PURE EXPORTED function and CALL it from a test — views import fine in Node
+   (no DOM at module scope). And run any new regression test against the UNFIXED code first: a test
+   never seen to fail is not evidence.
+5. Any change to a precached file REQUIRES bumping `CACHE` in `public/sw.js` (+ its assertion) in
+   the SAME phase — the ONLY sanctioned exception to "sw.js is untouchable". PRECACHE stays
+   byte-identical; ONE bump covers every `public/` change in the phase. Now at `magic-vet-v10`.
+6. Validation chains: always `set -o pipefail`; a stray `;` DETACHES the rest so `…-OK` prints over
+   a broken build; `grep -qF --` before `--patterns`; never `! grep -q '<bare number>'`. Gate a DOC
+   edit on a substring of EVERY new line plus `wc -l`, or a silent reflow passes every content grep.
+   NEVER verify a claim about the code against your own RE-IMPLEMENTATION of it: `^[a-z]+$` is not
+   `tokenize`'s `[a-z]+(?:'[a-z]+)?`, and that proxy put a wrong number in all three bands.
+7. The learner profile is LIVE. `GET /api/profile` CREATES one when absent — a read that writes, so
+   merely loading the app writes. Point `DATA_DIR` at scratch, then VERIFY real `.data/` stayed
+   empty. This is also why production can never be browser-verified: the views fetch it on load.
+8. THE CONTRAST GATE ONLY SEES `:root` TOKENS. A raw hex painted in a background is invisible to it —
+   that is how `--color-border` shipped at 2.92:1 against a binding 3:1 while the gate printed ALL
+   PASS. Every colour in `body` must be a token with its own six pairs (VP-1). Also blind to
+   `<button>` not inheriting `color` (UA sets `buttontext`), and to `color-mix()` — it resolves as
+   `color(srgb …)`, which an `rgb()` regex reads as black and FABRICATES a pass for.
+9. Browser checks: a plain reload LIES — unregister the SW, `caches.delete(...)`, ctrl+shift+R, then
+   confirm from the DOM. Restart dev servers after editing `data/*.json` (JSON imports are cached).
+   A view's `<style>` lives inside `#app`, so overwriting `innerHTML` deletes its CSS.
+10. A STATUS CODE IS EVIDENCE ONLY NEXT TO A CONTROL: `cleanUrls` 308s EVERY `*.html`, present or
+    not. Probe the extensionless path, follow `-L` to the terminus, and grep the BODY for the secret.
+11. HEBREW IS BIDI: never anchor a patch, a grep or a heredoc on a Hebrew string copied out of
+    TERMINAL OUTPUT — display reordering makes a wrong byte order look identical. Extract the frozen
+    text to a FILE and copy from the file; hand workers their validation as a script file too.
+12. A worker packet that NAMES a frozen contract without QUOTING it is a hole: the worker will read
+    `plan.md` and fill it in rather than stop and ask. Build every spec file as `contracts + step`,
+    and make the report format ask whether it read anything outside the packet.
+13. DEPLOY = `"$(npm prefix -g)/vercel" deploy --prod --yes`. Record the outgoing deployment
+    id+url+commit via `vercel inspect <canonical-url>` BEFORE deploying — the only rollback target,
+    and `vercel rollback <prev-url> --yes` needs it. Verify live by md5 against the WORKTREE, never
+    a git blob (index.html is CRLF on disk, LF in git). `cleanUrls` makes `/index.html` a 308 — fetch
+    the shell as `/`. A 401 reject-path probe proves a function + its bundled JSON loaded, free.
