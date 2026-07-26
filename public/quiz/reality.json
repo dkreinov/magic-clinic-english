@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "reality",
+    "sense": "what is really true, not a dream",
+    "sentence": "She works so hard every day that her dream can become ___.",
+    "answer": "reality",
+    "distractors": ["magic", "gold", "luck", "danger", "art", "music", "hope", "silence"]
+  }
+]

@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "beyond",
+    "sense": "on the far side of something",
+    "sentence": "The farm is ___ the river, so we cross the bridge to reach it.",
+    "answer": "beyond",
+    "distractors": ["below", "beneath", "inside", "outside", "off", "between", "down", "in"]
+  }
+]

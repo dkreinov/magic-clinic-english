@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "suffer",
+    "sense": "to feel ill or in pain because of something",
+    "sentence": "I often ___ from a bad cold, so I stay at home.",
+    "answer": "suffer",
+    "distractors": ["come", "hear", "fall", "borrow", "return", "climb", "grow", "drink"]
+  }
+]

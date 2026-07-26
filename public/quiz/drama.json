@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "drama",
+    "sense": "acting stories for people to watch",
+    "sentence": "Our school has a ___ club, so we act on the stage every year.",
+    "answer": "drama",
+    "distractors": ["music", "dance", "sport", "book", "science", "garden", "computer", "cooking"]
+  }
+]

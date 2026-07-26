@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "ability",
+    "sense": "the power or skill to do something",
+    "sentence": "She has enough ___ to play the piano without any lessons.",
+    "answer": "ability",
+    "distractors": ["luck", "energy", "strength", "health", "hope", "money", "happiness", "sleep"]
+  }
+]

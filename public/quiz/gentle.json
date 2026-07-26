@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "gentle",
+    "sense": "soft and careful, not rough",
+    "sentence": "Her hands were so ___ that she could hold the bird without hurting it.",
+    "answer": "gentle",
+    "distractors": ["rough", "hard", "cold", "clean", "wet", "heavy", "quick", "busy"]
+  }
+]

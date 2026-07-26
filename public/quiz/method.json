@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "method",
+    "sense": "a way of doing something",
+    "sentence": "She asked about my ___ of learning words, so I showed her how.",
+    "answer": "method",
+    "distractors": ["reason", "dream", "hope", "fear", "love", "joy", "wish", "thought"]
+  }
+]

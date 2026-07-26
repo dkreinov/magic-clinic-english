@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "complex",
+    "sense": "made of many parts and not easy to understand",
+    "sentence": "This puzzle has so many parts that it is too ___ for my brother.",
+    "answer": "complex",
+    "distractors": ["easy", "short", "new", "old", "popular", "noisy", "funny", "cheap"]
+  }
+]
