@@ -1,4 +1,26 @@
-CURRENT: phase 2 "deploy", phase 1 CLOSED AND ACCEPTED
+CURRENT: RUN COMPLETE — phase 1 ACCEPTED, phase 2 DEPLOYED AND VERIFIED.
+
+LIVE NOW: deployment dpl_94Qv4mCDKrwRcvLEd7AH6CqV1syS at commit 44e10e3, url
+  https://english-ep7nxbemg-dkreinovs-projects.vercel.app, aliased to
+  https://english-app-three-tan.vercel.app. magic-vet-v11 confirmed live.
+ROLLBACK TARGET (the deployment this replaced): dpl_h19vJfyq68GTanJMxhVUX7g8Z25p at commit 2c2f50a,
+  https://english-di7kd0n2k-dkreinovs-projects.vercel.app — `vercel rollback <that-url> --yes`.
+DEPLOY VERIFIED: md5 live==WORKTREE for all four changed public/ files (sw.js, styles.css,
+  views/reader.js, views/words.js) and for the shell fetched as `/` · live /sw.js says magic-vet-v11 ·
+  /api/health exact payload · /api/chapter 401 · nine spot-checked clips 200 with md5 matching disk,
+  including the three regenerated ones (car, check, chain) · `let%27s.aac` 200 · NEGATIVE CONTROL
+  /audio/words/zzzznotaword.aac 404, so those 200s mean something · the six exam mp3s still 200.
+  /api/profile was never requested.
+
+ONE DEVIATION FROM THE PHASE 2 RECIPE, UNRESOLVED: the recipe expected
+  `content-type: audio/aac`; Vercel actually serves **`audio/x-aac`** for .aac. Everything else
+  matched. This is not known to be broken — it is UNVERIFIED, and it lands exactly on the plan's own
+  stated risk ("AAC might not play on her phone … the one thing no local gate can prove — it needs
+  her device", and the failure mode is silent by WA-3's design). If it turns out not to play, the fix
+  is a `headers` entry in vercel.json forcing `audio/aac` plus a re-deploy; no clip needs
+  regenerating. VERIFY ON HER PHONE BEFORE ASSUMING W1 IS DELIVERED.
+
+PHASE 1 (kept for the record):
 PLAN: .oplan/word-audio/plan.md — READ ITS "ORCHESTRATOR AMENDMENTS" SECTION AT THE END FIRST.
   A1-A10 OVERRIDE anything earlier in the file that contradicts them. Reading the top alone misleads.
 JOURNAL: .oplan/word-audio/journal.md — read it before phase 2. It records the truncated-clip defect,
