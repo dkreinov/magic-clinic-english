@@ -90,8 +90,12 @@ run exists to close.
 
 **PA-2 — what it checks.** `const CODE_KEY = "appCode";` at module scope in `parent.js` — the same
 key `public/api.js` already writes. The trimmed input is compared with `===` to the stored value.
-**Fail closed:** if `localStorage` throws, or the stored value is missing or empty, EVERY attempt
-shows the error. Empty/whitespace input does nothing. Retries are unlimited; each needs a human tap,
+**SUPERSEDED BY PC-1 (Phase 3) — the "fail closed" clause below was a DEFECT and the owner hit it.**
+It made the parent screen an unreachable dead end on any device that had never unlocked the app. Read
+PC-1 for the semantics actually in force; this paragraph is kept, struck through in intent, because
+deleting it would hide that the original spec was wrong rather than the implementation.
+**Fail closed (WRONG, superseded):** if `localStorage` throws, or the stored value is missing or
+empty, EVERY attempt shows the error. Empty/whitespace input does nothing. Retries are unlimited; each needs a human tap,
 so it cannot become a hot loop. This is a client-side check by design — the threat is a person
 holding an already-unlocked phone, not an attacker with developer tools, and OD-2 sets the bar at
 "not the child" anyway.
@@ -473,3 +477,210 @@ RISKS:
   step 1.4 rather than fixed by breaking a frozen document.
 - **A cache bump means the PWA serves the old shell until the service worker updates.** Same as
   every previous deploy; the bump is what forces it.
+---
+
+# PHASE 3: make the lock reachable on a device with no stored code, and test it for real
+
+Base commit: `b136459` (tree clean; 179 tests / 0 fail; LIVE at magic-vet-v9).
+
+THE DEFECT, REPORTED BY THE OWNER. She opened the parent screen and it said her code was wrong. It
+was not her code: `storedCode()` returns `""` on any device that has never unlocked the app, and
+`if (expected && value === expected)` is then false for EVERY input. The parent screen was a dead
+end on such a device — no code could ever work. Worse, the home screen makes no API call, so merely
+opening the app never prompts for the code either; only `placement` / `reader` / `words` do.
+
+WHY EVERY GATE MISSED IT — the phase's real lesson. `tests/parent-ui.test.js` asserts the source
+*contains* `if (expected && value === expected)`, under the name "the parent lock fails closed when
+no code is stored". That test asserted THE BUG and called it a feature. The plan reviewer and the
+auditor both confirmed fail-closed was implemented *as specified* — they were right, and the SPEC
+was wrong. **No source-grep test can catch a wrong decision, only a missing one.**
+
+THE DECISION (mine, frozen): the local comparison is a FAST PATH, not the authority. The server has
+always been the authority — every `/api/*` call is gated by `APP_CODE`. So:
+- a code IS stored -> compare strictly, offline and instant (unchanged behaviour)
+- NO code is stored -> accept the typed code, WRITE IT, and let the API's own 401 plus the existing
+  entry-code screen in `public/api.js` be the verifier
+
+This is strictly better than fail-closed, not weaker: on a device with no stored code the API refuses
+anyway, so nothing is revealed by letting the typed value through — and it removes the dead end.
+
+ACCEPTANCE CRITERIA (frozen before execution)
+1. `STEP-3.1-OK` .. `STEP-3.3-OK` all print, each re-run by me.
+2. `npm test` prints `# fail 0` and `# pass 184` (179 + 5 new behavioural tests; the misleading
+   existing test is REWRITTEN, not added, so it does not change the count).
+3. `node scripts/check-contrast.mjs` exits 0, `ALL PASS`, 52 pairs; `public/styles.css` byte-unchanged.
+4. `grep -qF -- 'const CACHE = "magic-vet-v10";' public/sw.js`; no `magic-vet-v9` under `public/ tests/`;
+   `git diff b136459..HEAD -- public/sw.js | grep -c '^[+-][^+-]'` is exactly `2`.
+5. `git diff --name-only b136459..HEAD -- . ':!.oplan'` lists exactly these 4 paths:
+   `public/sw.js`, `public/views/parent.js`, `tests/parent-lock.test.js`, `tests/parent-ui.test.js`.
+6. Nothing under `api/`, `lib/`, `data/`, `assets/`, `scripts/` changed; `public/api.js`,
+   `public/app.js`, `public/index.html`, `public/views/home.js` byte-unchanged.
+7. **The regression is provably fixed AND the lock still locks** — proven by EXECUTED behaviour, not
+   by grep: `codeAccepted("1234","1234")` true, `codeAccepted("9999","1234")` FALSE,
+   `codeAccepted("","1234")` false, `codeAccepted("   ","1234")` false, `codeAccepted("x","")` true.
+8. `.data/profile.json` does not exist and no step runs a server.
+
+## FROZEN CONTRACTS FOR THIS PHASE
+
+**PC-1 — the decision becomes a pure, exported, unit-testable function.** `public/views/parent.js`
+exports `codeAccepted(typed, stored)`. It is the ONLY place the accept/reject decision is made:
+```js
+export function codeAccepted(typed, stored) {
+  const value = String(typed ?? "").trim();
+  if (!value) return false;
+  if (!stored) return true;
+  return value === stored;
+}
+```
+`parent.js` was verified to import cleanly in Node (no DOM at module scope), which is what makes a
+real behavioural test possible at all. Exporting it is deliberate: a decision that cannot be CALLED
+from a test can only ever be grep-tested, which is exactly how this defect shipped.
+
+**PC-2 — on accept, remember the code.** `rememberCode(code)` does
+`localStorage.setItem(CODE_KEY, code)` inside `try/catch` (private mode degrades silently), called
+immediately before `resolve()`. Without it the permissive path would send an empty `x-app-code`
+header and the owner would face TWO prompts instead of one.
+
+**PC-3 — nothing else about the lock changes.** It still runs at the top of `render()` before any
+network call (PA-1), still asks on every render (PA-3), still reuses the entry-gate CSS classes with
+zero new CSS (PA-5), and PA-6's frozen Hebrew is untouched.
+
+**PC-4 — the misleading test is REWRITTEN, not deleted.** The test named `'the parent lock fails
+closed when no code is stored'` is renamed `'the parent lock delegates to the server when no code is
+stored'`, asserting the source contains `export function codeAccepted(typed, stored)` and
+`rememberCode(value);`. Deleting it would hide that the semantics changed.
+
+**PC-5 — one cache bump, v9 -> v10.** PRECACHE byte-identical; `/views/parent.js` still NOT added.
+
+---
+
+STEP 3.1: extract the decision, fix its semantics, and test it by executing it
+  goal: `codeAccepted` is a pure exported function with PC-1's semantics, `unlock()` uses it and
+    remembers the code on accept, and a new test file proves the truth table BY CALLING IT.
+  files: `public/views/parent.js`, `tests/parent-ui.test.js`, `tests/parent-lock.test.js` (NEW).
+  commands: none — direct file edits.
+  validation:
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && grep -qF -- 'export function codeAccepted(typed, stored) {' public/views/parent.js \
+  && grep -qF -- 'if (!stored) return true;' public/views/parent.js \
+  && grep -qF -- 'return value === stored;' public/views/parent.js \
+  && grep -qF -- 'function rememberCode(code)' public/views/parent.js \
+  && grep -qF -- 'rememberCode(value);' public/views/parent.js \
+  && grep -qF -- 'codeAccepted(value, storedCode())' public/views/parent.js \
+  && ! grep -qF -- 'if (expected && value === expected)' public/views/parent.js \
+  && grep -qF -- 'await unlock(container);' public/views/parent.js \
+  && node --check public/views/parent.js \
+  && node "$SCRATCH/truth-table.mjs" \
+  && T="$(npm test 2>&1)" \
+  && printf '%s\n' "$T" | grep -qx '# fail 0' \
+  && printf '%s\n' "$T" | grep -qx '# pass 184' \
+  && C="$(node scripts/check-contrast.mjs)" \
+  && printf '%s\n' "$C" | tail -1 | grep -qx 'ALL PASS' \
+  && [ "$(printf '%s\n' "$C" | grep -c '^PASS')" = "52" ] \
+  && [ "$(git status --porcelain -- public/styles.css | grep -c '')" = "0" ] \
+  && [ "$(git status --porcelain -- . ':!.oplan' | grep -c '')" = "3" ] \
+  && echo STEP-3.1-OK
+```
+  where `$SCRATCH/truth-table.mjs` imports the real module and asserts the eight-case truth table
+  (correct / wrong / empty / blank / no-stored / both-empty / trimmed / mismatch). It lives in the
+  scratchpad, never the repo root (field-guide lesson 1).
+
+  contracts: PC-1, PC-2, PC-3, PC-4.
+    - **Edit 1** — the `form.addEventListener("submit", ...)` body inside `unlock()` becomes exactly:
+```js
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const value = input.value.trim();
+        if (!value) return;
+        if (codeAccepted(value, storedCode())) {
+          rememberCode(value);
+          resolve();
+          return;
+        }
+        paint(true);
+      });
+```
+    - **Edit 2** — immediately after `storedCode()`, add:
+```js
+function rememberCode(code) {
+  try {
+    localStorage.setItem(CODE_KEY, code);
+  } catch {
+    /* private mode — the code just will not persist */
+  }
+}
+
+export function codeAccepted(typed, stored) {
+  const value = String(typed ?? "").trim();
+  if (!value) return false;
+  if (!stored) return true;
+  return value === stored;
+}
+```
+    - **Edit 3** — in `tests/parent-ui.test.js`, the test named `'the parent lock fails closed when no
+      code is stored'` is RENAMED to `'the parent lock delegates to the server when no code is
+      stored'` and its two assertions become
+      `assert.ok(src.includes('export function codeAccepted(typed, stored)'))` and
+      `assert.ok(src.includes('rememberCode(value);'))`. No other test in that file changes.
+    - **Edit 4** — `tests/parent-lock.test.js` (NEW): `node:test` + `node:assert`, importing the real
+      function at module scope with
+      `const { codeAccepted } = await import('../public/views/parent.js');`. Exactly **five** tests,
+      each CALLING the function:
+      1. `'a stored code must match exactly'` — `('1234','1234')` true; `('9999','1234')` false;
+         `('1234','9999')` false.
+      2. `'an empty or blank code is always rejected'` — `''`, `'   '`, `undefined`, `null` against
+         stored `'1234'` all false; and `('','')` false.
+      3. `'the typed code is trimmed before comparison'` — `('  1234  ','1234')` true.
+      4. `'with no stored code the typed code is accepted so the server can verify it'` — THE
+         REGRESSION TEST for the reported defect: `('anything','')` true and
+         `('anything', undefined)` true.
+      5. `'a wrong code is still refused whenever a code is stored'` — a loop over
+         `['0000','abcd','1235',' 1234x']` against stored `'1234'`, each false.
+  non-goals: do not touch `public/styles.css`, `public/api.js`, `public/app.js`,
+    `public/index.html`, `public/views/home.js`; do not touch `public/sw.js` (step 3.2 owns the bump);
+    do not change the frozen Hebrew, the four cards, the re-take flag, or the fact that the lock runs
+    at the top of `render()` on every call; do not remove or weaken any other assertion in
+    `tests/parent-ui.test.js`; do not add a "remember me" / session bypass; do not make the lock
+    verify against the network itself (the existing 401 path already does that); do not reformat.
+  tier: WORKER
+  depends on: nothing (baseline `b136459`).
+
+STEP 3.2: cache bump v9 -> v10 (ORCHESTRATOR-RUN — two lines, fully gated)
+  files: `public/sw.js`, `tests/shell.test.js`.
+  validation:
+```
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail \
+  && grep -qF -- 'const CACHE = "magic-vet-v10";' public/sw.js \
+  && grep -qF -- "assert.ok(sw.includes('magic-vet-v10'));" tests/shell.test.js \
+  && ! grep -rq 'magic-vet-v9' public/ tests/ \
+  && [ "$(git diff b136459 -- public/sw.js | grep -c '^[+-][^+-]')" = "2" ] \
+  && ! grep -qF -- 'views/parent.js' public/sw.js \
+  && T="$(npm test 2>&1)" \
+  && printf '%s\n' "$T" | grep -qx '# fail 0' \
+  && printf '%s\n' "$T" | grep -qx '# pass 184' \
+  && echo STEP-3.2-OK
+```
+  contracts: PC-5. non-goals: PRECACHE untouched, no v11, no other assertion added to shell.test.js.
+  depends on: 3.1 COMMITTED.
+
+STEP 3.3: deploy and verify live (ORCHESTRATOR-RUN)
+  Record the rollback target with `vercel inspect` BEFORE the call; deploy with
+  `"$(npm prefix -g)/vercel" deploy --prod --yes`; verify md5 against the WORKTREE for `sw.js`,
+  `api.js`, `app.js`, `styles.css`, `views/home.js`, `views/parent.js`, `manifest.webmanifest`; live
+  `/sw.js` contains `magic-vet-v10`; `/` 200 and `/index.html` 308; live `/views/parent.js` contains
+  `export function codeAccepted`; `/api/health` exact payload; `/api/chapter` ping -> 401.
+  Never request `/api/profile`, never open a browser on production, never run `vercel env`.
+  depends on: 3.2 COMMITTED.
+
+RISKS:
+- **The permissive path could be read as "the lock got weaker".** It is not: it only triggers when
+  there is NO stored code, i.e. on a device that cannot read her data anyway because the API 401s.
+  The auditor is asked to attack exactly this.
+- **A wrong code now gets written to localStorage** on the permissive path. Harmless: the API 401s,
+  the existing entry screen appears, and typing the right code overwrites it.
+- **The rewritten test could be weakened rather than corrected.** PC-4 names its new assertions
+  exactly, and the phase gate re-counts the suite at 184.
+- **A behavioural test that imports a browser module is new for this repo.** Verified feasible before
+  planning: `await import('./public/views/parent.js')` succeeds in Node and exposes `render`. If a
+  future edit adds module-scope DOM access, this test file is what will fail — loudly, which is right.
