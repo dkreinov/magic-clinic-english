@@ -100,7 +100,17 @@ own siblings or compare their senses.
 9. `sense` is a non-empty string ≤ 80 characters; when a file holds >1 item all `sense` values are
    distinct.
 10. the answer word does **not** appear anywhere else in the sentence (it would give the answer
-    away). Checked on the filled sentence, whole-word, case-insensitive.
+    away). Checked on the filled sentence, whole-word, case-insensitive, **by RESOLVED LEMMA**:
+    every token is passed through `resolveLemma` and compared against the resolved answer, so an
+    INFLECTION counts as giving it away too.
+    **AMENDED AT EXECUTION TIME (A1, step 1.1)** — as originally frozen this compared surface forms,
+    and `"I ___ happy when the cat feels warm."` with answer `feel` passed the gate completely clean
+    while `feels` sat in the sentence handing her the answer. The rule did not achieve its own
+    stated purpose. Tightening is safe and cannot over-fire: rule 4 already requires every token to
+    resolve into the manifest, and `resolveLemma` is exact-match-first, so any token that
+    de-inflects to the answer *is* an inflection of the answer — `carpet` stays `carpet` and never
+    collapses into `car`. Verified against the unfixed code first (it passed, which is the evidence
+    the hole was real), then against the fixed code.
 
 **QZ-2 — the generation rules** (binding on every worker that writes items):
 
@@ -119,6 +129,16 @@ own siblings or compare their senses.
   (QZ-8), so this should not fire — but it stays as the backstop, because a list written in advance
   cannot anticipate every word.
 - No proper nouns. No contractions (matches `lib/story.js`'s own rule).
+- **THE BLANK CAN NEVER BE THE FIRST WORD OF THE SENTENCE.** Surfaced at step 1.1. Rule 6 requires
+  the sentence to start with an uppercase letter and it is applied to the TEMPLATE, so a sentence
+  beginning `___` starts with `_` and fails. Applying rule 6 to the filled sentence instead would be
+  worse — it would demand a capitalised answer and contradict rule 1 (`answer === lemma`, lowercase)
+  — so the constraint is real under either reading. Write `The ___ girl smiled.`, never `___ girls
+  smile.`
+- **Rule 7 is DIRECT manifest membership; rule 4 de-inflects. This asymmetry is deliberate.** A
+  distractor must be in `public/audio/words/index.json` *exactly* — the options she sees are lemmas
+  (D5), so `cats` is not a legal distractor even though `cats` is legal inside a sentence. Sentence
+  words may be inflected; distractors may not.
 - **THE ALLOWED VOCABULARY IS NOT ORDINARY ENGLISH — this will bite you.** MEASURED against the
   real manifest: `after`, `children`, `men`, `women`, `feet` are all **ABSENT**, while `before`,
   `went` and `gone` are present. Irregular plurals and many everyday words simply are not in the

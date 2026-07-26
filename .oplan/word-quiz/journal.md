@@ -97,6 +97,42 @@ the list: `battle` -> `bear`, `gay` -> `gentle`. Both turn out to be better test
 they replaced — `bear` is polysemous (animal / carry / endure), and `gentle` carries a malformed
 `pos` of `"adj gently adv"`, which exercises rule 8's first-whitespace-token reduction.
 
+## Execution — phase 1
+
+### A1 — rule 10 was frozen with a hole in it (step 1.1)
+
+The step-1.1 worker was asked what in the contract it believed was wrong. It answered that rule 10
+compares the answer's SURFACE FORM, so with answer `feel` the sentence
+`"I ___ happy when the cat feels warm."` passes clean — while `feels` sits there handing an
+eleven-year-old the answer. I reproduced it against the unfixed code before changing anything (it
+returned `[]`, which is the evidence the hole was real), then amended rule 10 to compare RESOLVED
+LEMMAS.
+
+I amended a frozen contract rather than deferring it, for three reasons. The rule failed *its own
+stated purpose* — "it would give the answer away" — so this is a defect, not a preference. QZ-1 is
+an orchestrator contract, not one of the owner's D1-D14/D20 decisions, and this run has already
+rewritten rule 8 in place twice on the same grounds; the journal's own line is "executing a frozen
+expression is cheap; believing it is not". And step 1.1 is the cheapest moment it will ever be: the
+gate did not exist yet and not one item had been written. Deferring to the criterion-9 human gate
+would have meant generating 50 items under the loose rule and regenerating some of them after.
+
+Tightening cannot over-fire, and that is structural rather than lucky: rule 4 already requires every
+token of the filled sentence to resolve into the manifest, and `resolveLemma` tries an exact match
+first, so any token that de-inflects into the answer *is* an inflection of the answer. `carpet`
+stays `carpet` and never collapses into `car`; verified explicitly.
+
+Two more constraints the same worker surfaced, both now written into QZ-2 because the phase-1.3
+generation batches would otherwise have hit them blind: **the blank can never be the first word of a
+sentence** (rule 6 tests the template, so a leading `___` starts with `_`), and **rule 7 is direct
+manifest membership while rule 4 de-inflects** — `cats` is legal inside a sentence and illegal as a
+distractor.
+
+One claim from the same report did NOT hold up: it reported that `npm test` does not run the
+contrast gate, having checked only `package.json`. `tests/background.test.js`, `reader-ui.test.js`
+and `words-ui.test.js` all spawn `check-contrast.mjs`. The field guide was right. Worth recording
+because the packet-hole question is valuable precisely when its answers are checked rather than
+believed.
+
 Phase 2's completeness criterion was corrected in the same pass, because it would otherwise have
 demanded a file for every one of the 2254 manifest words and failed on the 37 that must not have
 one. It now checks BOTH directions against 2217: no excluded word has a file, and nothing else is

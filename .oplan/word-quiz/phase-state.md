@@ -1,4 +1,4 @@
-CURRENT: phase 1 "the item contract, the mechanical gate, and a pilot the owner reviews", next step 1.1
+CURRENT: phase 1 "the item contract, the mechanical gate, and a pilot the owner reviews", next step 1.2
 PLAN: .oplan/word-quiz/plan.md — fixed in place through THREE review rounds, so there is no
   amendments appendix to read separately. Read it top to bottom.
 DESIGN: .oplan/word-quiz/design.md — FROZEN. 14 owner decisions (D1-D14) from a grill-me pass plus
@@ -9,7 +9,11 @@ PREDECESSOR: .oplan/word-audio/ — closed and deployed. Its journal holds the d
 
 BASE: commit ceca519 · 208 tests / 0 fail · contrast 52 ALL PASS · LIVE at magic-vet-v12.
 
-ACCEPTED: (none yet — no step has been executed)
+ACCEPTED: 1.1 (lib/quiz-item.js + tests/quiz-item.test.js; STEP-1.1-OK re-run by the orchestrator in
+  a clean tree; 214 pass / 0 fail). Carries AMENDMENT A1: rule 10 now compares RESOLVED LEMMAS, not
+  surface forms — as frozen it let an inflection give the answer away. See journal "Execution —
+  phase 1". QZ-2 also gained two constraints the 1.3 packets must quote: the blank is never the
+  first word, and rule 7 is direct manifest membership while rule 4 de-inflects.
 
 FROZEN CONTRACTS IN FORCE: QZ-1 (the item file, ten rules — 1/2/9 FILE-level, 3-8/10 ITEM-level)
   · QZ-2 (the generation rules, including the vocabulary warning and the duty to self-run the gate)
