@@ -26,6 +26,7 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const BAND1_PATH = path.join(REPO_ROOT, 'data', 'band1.json');
 const BAND2_PATH = path.join(REPO_ROOT, 'data', 'band2.json');
 const WORDS_DIR = path.join(REPO_ROOT, 'public', 'audio', 'words');
+const MANIFEST_PATH = path.join(WORDS_DIR, 'index.json');
 
 const MODEL = 'gpt-4o-mini-tts';
 const VOICE = 'nova';
@@ -89,6 +90,14 @@ async function synthesizeWithRetry(apiKey, lemma) {
   throw lastErr;
 }
 
+// The manifest the browser resolves against. Written from the SAME derived list
+// the clips come from, so it cannot drift from what is actually on disk.
+export function writeManifest(words) {
+  mkdirSync(WORDS_DIR, { recursive: true });
+  writeFileSync(MANIFEST_PATH, JSON.stringify(words) + '\n');
+  return MANIFEST_PATH;
+}
+
 async function main() {
   const words = deriveWordList();
 
@@ -96,6 +105,9 @@ async function main() {
     console.log(`words: ${words.length}`);
     return;
   }
+
+  writeManifest(words);
+  console.log(`manifest: ${words.length} words -> ${MANIFEST_PATH}`);
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
