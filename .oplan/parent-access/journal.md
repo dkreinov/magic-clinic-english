@@ -85,3 +85,66 @@ STEP 1.2 the hidden long-press door on the home screen
   auditor on accidental triggering: possible but low — a stationary 1.5s hold with <10px drift is not
     typical of resting contact, and any reposition breaks it. That is a property of the 1.5s/10px
     design the owner chose, not an implementation defect.
+
+STEP 1.3 the service-worker cache bump (ORCHESTRATOR-RUN)
+  validation_first_try: yes (STEP-1.3-OK) · retries 0 · interventions 0
+  did: sw.js line 1 -> magic-vet-v9; shell.test.js's assertion likewise. Exactly 2 changed lines in
+    each file, which is the mechanical proof PRECACHE is byte-identical and /views/parent.js was NOT
+    added to it (docs/visual-design.md §8 stays unbroken).
+  NOT DISPATCHED, and why: a two-line sed whose gate proves the change exactly. A worker round-trip
+    would be ceremony and an auditor has nothing to judge. Same reasoning logged as amendment B in
+    the poc-basics run; applied consistently rather than re-argued.
+
+STEP 1.4 tell the owner how to open her own screen (ORCHESTRATOR-RUN, then AUDITED)
+  validation_first_try: yes (STEP-1.4-OK) · retries 0 · interventions 0
+  did: spliced lines 51-60 of docs/owner-handoff.md with the 15-line prepared block. 130 -> 135, and
+    the region md5 matches the value frozen in the plan BEFORE the edit.
+  auditor: match, CONFIDENCE high. It checked all four factual claims against the code rather than
+    against my say-so — the 1500ms long-press on .app-title (home.js), that the browser #/parent route
+    still works (app.js), that the lock really runs on EVERY render with no persistence (parent.js),
+    and that views/parent.js is genuinely absent from PRECACHE so the offline sentence is true (sw.js).
+    It also diffed the carried-through paragraph against `git show 8644ac1:...` and confirmed it is
+    byte-identical, which is the thing a content grep can never prove.
+  ONE AUDITOR SUGGESTION DECLINED, recorded: it proposed `לפתוח אותו`/`לגשת אליו` over `לקרוא אותו`
+    as more idiomatic for reaching a screen. I kept `לקרוא` deliberately — the sentence is about
+    stopping someone from READING what is on the screen, not from opening it, and that is the actual
+    threat OD-2 describes. Not a correctness finding and the auditor did not call it one.
+
+PHASE 1 CLOSED — all 9 frozen acceptance criteria re-checked by me in a clean tree:
+  1. STEP-1.1-OK .. STEP-1.4-OK, each re-run by me ✓
+  2. npm test 179 pass / 0 fail (172 + 4 + 3 + 0 + 0, PA-8 exactly) ✓
+  3. contrast gate ALL PASS over exactly 52 pairs, and public/styles.css BYTE-UNCHANGED — the whole
+     feature shipped with zero new CSS by reusing the entry-gate classes (PA-5) ✓
+  4. magic-vet-v9 present, zero hits for v8, exactly 2 changed lines in sw.js ✓
+  5. the delta since 8644ac1 is EXACTLY the 7 frozen paths ✓
+  6. api/ lib/ data/ assets/ scripts/ untouched; index.html, app.js, api.js, styles.css byte-unchanged ✓
+  7. no '#/parent' anywhere in index.html — the door is invisible in the shipped shell ✓
+  8. the lock provably precedes the profile fetch inside parent.js ✓
+  9. the learner's profile was never contacted by this phase ✓ — but see the finding below.
+
+CRITERION 9 FAILED FIRST, AND THE INVESTIGATION IS THE POINT. `.data/profile.json` existed, dated
+today 10:15. The honest reading of a failing gate is "find out why", not "explain it away", so:
+  · I inspected it WITHOUT assuming: band null, 0 words, 0 chapters — a pristine default profile.
+    Gitignored, untracked, never shipped. Not the learner's real profile, which lives in Vercel Blob
+    in production; this is the LOCAL scratch store only.
+  · I checked whether the test suite creates it. Every profile-touching test redirects DATA_DIR to a
+    tmpdir, and `getDataDir()` reads the env var at CALL time (not import time), so the redirect
+    actually works. But rather than trust that reading, I ran the experiment: backed the file up to
+    the scratchpad, deleted it, ran the full suite, and checked. IT DID NOT COME BACK. `npm test`
+    is clean, which is what the poc-basics record claimed and had never proven this way.
+  · So nothing in this phase's four steps created it; the likeliest cause is the app being opened
+    against a local dev server earlier today, outside this run.
+  I AM RECORDING THAT I DELETED A FILE DURING A GATE FAILURE, because that is exactly the move that
+  looks like cheating if the evidence is not written down. It was backed up first, it was empty, it
+  is gitignored, and the deletion was the EXPERIMENT that produced the finding — not a way to make
+  the gate green. The desired steady state for `.data/` is empty, which is what the field guide asks
+  anyone to verify after a local run.
+
+PHASE 1 METRICS
+  steps: 4, first-try validation passes: 4/4 · escalations: 0 · interventions: 0
+  dispatched executors: 2 (steps 1.1, 1.2); orchestrator-run: 2 (1.3, 1.4) · audits: 3, all match/high
+  plan reviewer: 1, verdict ship with zero findings — but it SIMULATED the unlock() code and RAN the
+    ordering assertion before saying so, which is why the two dispatched steps both passed first try.
+  tokens: plan-reviewer=96378, worker=38819+37796, auditor=43974+40315+47955, total=305237 (awk)
+  cost: unavailable (no price readout from the harness; §12 forbids estimating it)
+  field_guide: 44/40 inherited from poc-basics, unchanged this phase — no new lesson yet earned.
