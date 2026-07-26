@@ -1,4 +1,7 @@
-CURRENT: phase 1 "the item contract, the mechanical gate, and a pilot the owner reviews", next step 1.3
+CURRENT: phase 1 — steps 1.1, 1.2, 1.3 ALL COMPLETE. Criteria 1-8 all verified green by the
+  orchestrator. **BLOCKED ON CRITERION 9, the HUMAN GATE** — the owner must review
+  `node scripts/check-quiz-bank.mjs --sample 50` and explicitly approve. Phase 2 must NOT open
+  without it. A green criterion 3 does not satisfy it.
 PLAN: .oplan/word-quiz/plan.md — fixed in place through THREE review rounds, so there is no
   amendments appendix to read separately. Read it top to bottom.
 DESIGN: .oplan/word-quiz/design.md — FROZEN. 14 owner decisions (D1-D14) from a grill-me pass plus
