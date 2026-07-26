@@ -1,6 +1,8 @@
 # Item Bank Review — Placement Test
 
-**STATUS: REQUIRED-BEFORE-CHILD-USE**
+**STATUS: SIGNED OFF — 26.07.2026, Dennis. The gate is satisfied; the test may be given to the
+child.** (This document was `REQUIRED-BEFORE-CHILD-USE`. See section 6 for the sign-off and the one
+defect it caught.)
 
 > **הדרך המהירה:** פתחי את `docs/item-bank-review.html` בדפדפן (לחיצה כפולה על
 > הקובץ). הכלי מנגן כל הקלטה ומציג כל תמונה ואת כל האפשרויות, עם תיבת סימון לכל
@@ -89,8 +91,13 @@ Task 2 items are drawn from `data/placement-items.json` → `task2`. Each text h
 
 ## 6. Sign-off (אישור)
 
-Date: ______________
+Date: ___26.07.2026___________
 
-☐ Reviewed and approved — I have gone through every item above and the placement test is ready for my child to use.
+☑ Reviewed and approved — I have gone through every item above and the placement test is ready for my child to use.
 
-Signed: ______________
+Reviewer's finding, fixed before signing: `t1-04` ("fan") offered **singer** as one of the four
+pictures. Because "fan" also means an admirer, the singer was a defensible second correct answer.
+Replaced with **camp** and redeployed (commit `9a7c790`). No automated check could have caught this:
+they all verify that the marked answer is correct, not that no *other* option is also correct.
+
+Signed: _____Dennis_________
