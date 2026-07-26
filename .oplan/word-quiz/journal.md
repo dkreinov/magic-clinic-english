@@ -157,6 +157,42 @@ Frozen as `Math.floor(i * total / n)`: 98-100% coverage at every total in range,
 deterministic, still strictly increasing. The regression test was run against the unfixed stride
 first and failed on `got: aaa.json[0]`, which is the evidence that it tests anything at all.
 
+### Batch 1 of step 1.3 — green, clean, and weaker than it should be
+
+10 files, 22 items, gate green, all 10 of 10 words multi-sense (the batch required 6). I read all
+22 items myself rather than trusting the green gate, and checked every distractor against every
+blank: **no item marks her wrong for being right.** That is the property that matters most and it
+holds.
+
+The batch worker then volunteered the real problem, unprompted, when asked which items it least
+trusted: its distractor strategy is *impossible in the slot* rather than *plausible but wrong in
+context*. `light` "not heavy" is tested against `happy angry hungry thirsty sad tired noisy lazy`
+— eight person-adjectives against a box. Nothing there can mark her wrong, and nothing there
+requires her to know what `light` means either; she can solve it by asking which word can describe
+a box at all. Safe and weak. That trade was deliberate and defensible — the contract names "a
+distractor that also fits" as the worst failure — but it is a trade, it affects all 22 items, and
+it would affect the remaining 40 identically. Escalated to the owner before batch 2 rather than
+after all 50 exist, which is exactly why the plan put the polysemous batch first.
+
+### A known contract gap, deliberately NOT closed: rule 10 and irregular forms
+
+The same worker reported that rule 10 is blind to irregular inflections. Verified: `resolveLemma`
+tries an exact manifest match first, so `ran` resolves to `ran`, never to `run`. MEASURED, the
+blind spot is **29 manifest lemmas carrying 42 such forms**, and they are the highest-frequency
+verbs in the language — `be do go have get make take see say think find know leave run come`.
+
+I did not close it mechanically, and the reason is worth recording because the obvious fix is
+wrong. An irregular-form table would map `left`->`leave` and `rose`->`rise` — but MEASURED, `left`
+carries pos `{adj,adv,n}` in the bands and `rose` carries `{n}`. They are ordinary homographs, so
+the table would wrongly reject `"I ___ my bag on the left side."` Disambiguating needs
+part-of-speech-in-context, which is real NLP and far outside this phase. Trading a rare give-away
+for a class of false rejections is the wrong direction for this project, where the worst failure is
+rejecting something correct.
+
+So it is handled by hand instead: QZ-2 now lists all 29 base/form pairs explicitly, and batch 1 was
+scanned against that list and is clean. Phase 2 must decide whether ~5000 items can rely on a
+by-hand rule; it is flagged there, not assumed.
+
 Phase 2's completeness criterion was corrected in the same pass, because it would otherwise have
 demanded a file for every one of the 2254 manifest words and failed on the 37 that must not have
 one. It now checks BOTH directions against 2217: no excluded word has a file, and nothing else is

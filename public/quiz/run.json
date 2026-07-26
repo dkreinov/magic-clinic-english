@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "run",
+    "sense": "to move very fast on your legs",
+    "sentence": "The dog will ___ fast to catch the ball.",
+    "answer": "run",
+    "distractors": ["sing", "wash", "count", "paint", "cook", "spell", "drink", "sleep"]
+  },
+  {
+    "lemma": "run",
+    "sense": "to be in charge of a shop or a business",
+    "sentence": "My uncle and my mom ___ a busy little shop.",
+    "answer": "run",
+    "distractors": ["eat", "sing", "drink", "sleep", "swim", "laugh", "jump", "climb"]
+  }
+]

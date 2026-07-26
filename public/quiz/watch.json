@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "watch",
+    "sense": "to look at something for some time",
+    "sentence": "We will ___ a movie about a dragon tonight.",
+    "answer": "watch",
+    "distractors": ["eat", "sing", "wash", "climb", "spell", "count", "drink", "cook"]
+  },
+  {
+    "lemma": "watch",
+    "sense": "a small clock that you wear on your arm",
+    "sentence": "I look at my ___ to know the time.",
+    "answer": "watch",
+    "distractors": ["chair", "garden", "river", "spoon", "apple", "bottle", "shoe", "rabbit"]
+  }
+]

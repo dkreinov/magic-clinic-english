@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "light",
+    "sense": "not heavy and easy to lift",
+    "sentence": "The box was so ___ that the little girl could lift it.",
+    "answer": "light",
+    "distractors": ["happy", "angry", "hungry", "thirsty", "sad", "tired", "noisy", "lazy"]
+  },
+  {
+    "lemma": "light",
+    "sense": "the brightness that lets you see in a dark room",
+    "sentence": "Please turn on the ___ because the room is dark.",
+    "answer": "light",
+    "distractors": ["bread", "chair", "garden", "river", "pencil", "apple", "shoe", "mirror"]
+  }
+]

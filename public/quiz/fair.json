@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "fair",
+    "sense": "treating everyone in the same way",
+    "sentence": "It is not ___ that he always goes first.",
+    "answer": "fair",
+    "distractors": ["hungry", "thirsty", "tired", "wet", "windy", "sunny", "salty", "heavy"]
+  },
+  {
+    "lemma": "fair",
+    "sense": "an event where people show and sell things",
+    "sentence": "Our school will have a big book ___ next week.",
+    "answer": "fair",
+    "distractors": ["chair", "garden", "river", "spoon", "apple", "bottle", "pillow", "mirror"]
+  }
+]

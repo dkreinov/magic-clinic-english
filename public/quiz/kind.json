@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "kind",
+    "sense": "nice and helpful to other people",
+    "sentence": "She was very ___ to the new girl at school.",
+    "answer": "kind",
+    "distractors": ["hungry", "thirsty", "tired", "wet", "windy", "sunny", "salty", "noisy"]
+  },
+  {
+    "lemma": "kind",
+    "sense": "a sort or type of thing",
+    "sentence": "What ___ of music do you like best?",
+    "answer": "kind",
+    "distractors": ["chair", "garden", "river", "spoon", "apple", "bottle", "ladder", "mirror"]
+  }
+]

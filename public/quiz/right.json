@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "right",
+    "sense": "correct and not wrong",
+    "sentence": "Her answer was ___ so the teacher was happy.",
+    "answer": "right",
+    "distractors": ["hungry", "thirsty", "tired", "wet", "windy", "sunny", "salty", "rainy"]
+  },
+  {
+    "lemma": "right",
+    "sense": "the side that is not the left",
+    "sentence": "I hold the pen in my ___ hand, not my left.",
+    "answer": "right",
+    "distractors": ["hungry", "thirsty", "sunny", "windy", "funny", "silly", "salty", "lazy"]
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "lemma": "back",
+    "sense": "the part of your body behind you",
+    "sentence": "The heavy bag made my ___ hurt very badly.",
+    "answer": "back",
+    "distractors": ["chair", "garden", "river", "spoon", "pencil", "apple", "bottle", "curtain"]
+  },
+  {
+    "lemma": "back",
+    "sense": "to the place where something was before",
+    "sentence": "I will bring the toy ___ to the store tomorrow.",
+    "answer": "back",
+    "distractors": ["happy", "sad", "wet", "heavy", "hungry", "angry", "sunny", "windy"]
+  },
+  {
+    "lemma": "back",
+    "sense": "the part of something that is behind the front",
+    "sentence": "We always sit at the ___ of the bus, not the front.",
+    "answer": "back",
+    "distractors": ["bread", "garden", "river", "spoon", "apple", "bottle", "pencil", "mirror"]
+  }
+]

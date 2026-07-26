@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "like",
+    "sense": "to enjoy something",
+    "sentence": "I ___ the taste of fresh bread very much.",
+    "answer": "like",
+    "distractors": ["count", "wash", "paint", "climb", "spell", "throw", "build", "carry"]
+  },
+  {
+    "lemma": "like",
+    "sense": "similar to, the same as",
+    "sentence": "That big gray cloud looks ___ a huge elephant.",
+    "answer": "like",
+    "distractors": ["eat", "sing", "count", "wash", "climb", "spell", "build", "throw"]
+  }
+]

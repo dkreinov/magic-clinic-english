@@ -135,6 +135,15 @@ own siblings or compare their senses.
   worse — it would demand a capitalised answer and contradict rule 1 (`answer === lemma`, lowercase)
   — so the constraint is real under either reading. Write `The ___ girl smiled.`, never `___ girls
   smile.`
+- **NEVER put ANY form of the answer in the sentence, including IRREGULAR ones.** Rule 10 catches
+  regular inflections (`feels`, `running`) but is structurally blind to irregular forms that are
+  themselves manifest entries: MEASURED, **29 manifest lemmas have 42 such forms** — `run/ran`,
+  `go/went`, `go/gone`, `see/saw`, `take/took`, `make/made`, `come/came`, `eat/ate`, `give/gave`,
+  `know/knew`, `do/did`, `be/was`, `have/had`, `get/got`, `find/found`, `leave/left`, `say/said`,
+  `think/thought`, `lose/lost`, `rise/rose`, `read/read`, `put/put`, `cut/cut`, `let/let`,
+  `hit/hit`, `hurt/hurt`, `shut/shut`, `cost/cost`, `write/written`, `break/broken`. `resolveLemma`
+  tries an exact manifest match FIRST, so `ran` resolves to `ran` and never to `run`. The gate will
+  NOT stop you. Check by hand. (Batch 1 was scanned against this list and is clean.)
 - **Rule 7 is DIRECT manifest membership; rule 4 de-inflects. This asymmetry is deliberate.** A
   distractor must be in `public/audio/words/index.json` *exactly* — the options she sees are lemmas
   (D5), so `cats` is not a legal distractor even though `cats` is legal inside a sentence. Sentence

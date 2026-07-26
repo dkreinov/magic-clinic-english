@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "well",
+    "sense": "in a good way",
+    "sentence": "She sings very ___ in the school show.",
+    "answer": "well",
+    "distractors": ["hungry", "thirsty", "wet", "windy", "sunny", "salty", "rainy", "heavy"]
+  },
+  {
+    "lemma": "well",
+    "sense": "not sick, in good health again",
+    "sentence": "I was sick last week but now I am ___.",
+    "answer": "well",
+    "distractors": ["salty", "sunny", "windy", "rainy", "musical", "digital", "medical", "electric"]
+  }
+]
