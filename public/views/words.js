@@ -1,4 +1,4 @@
-import { getJson } from "../api.js";
+import { getJson, postJson } from "../api.js";
 
 const VIEW_STYLE = `
   .words-count {
@@ -39,6 +39,19 @@ const VIEW_STYLE = `
   .word-card-he {
     color: var(--color-muted);
     font-size: 0.95rem;
+  }
+
+  .word-context {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin: 0;
+  }
+
+  .word-card-actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .word-badge {
@@ -104,7 +117,11 @@ function statusBadge(status) {
   return `<span class="word-badge learning">לומדת</span>`;
 }
 
-function renderList(words) {
+export function markKnownBody(lemma) {
+  return { action: "mark-known", lemma, source: "tap" };
+}
+
+export function renderList(words) {
   const entries = Object.entries(words).sort((a, b) => {
     const aTime = Date.parse(a[1].lastSeen) || 0;
     const bTime = Date.parse(b[1].lastSeen) || 0;
@@ -114,13 +131,26 @@ function renderList(words) {
   const cardsHtml = entries
     .map(([lemma, entry]) => {
       const he = entry.he ? escapeHtml(entry.he) : "—";
+      const contextHtml =
+        typeof entry.context === "string" && entry.context.length > 0
+          ? `<p class="word-context" dir="ltr">${escapeHtml(entry.context)}</p>`
+          : "";
+      const knowHtml =
+        entry.status === "learning"
+          ? `<button class="btn-know" type="button" data-action="know" data-lemma="${escapeHtml(lemma)}">יודעת את זה</button>`
+          : "";
       return `
         <div class="word-card">
           <div class="word-card-text">
             <span class="word-card-lemma" dir="ltr">${escapeHtml(lemma)}</span>
             <span class="word-card-he">${he}</span>
+            ${contextHtml}
           </div>
-          ${statusBadge(entry.status)}
+          <div class="word-card-actions">
+            <button class="btn-say" type="button" data-say="${escapeHtml(lemma)}" aria-label="הקשיבי למילה">🔊</button>
+            ${knowHtml}
+            ${statusBadge(entry.status)}
+          </div>
         </div>
       `;
     })
@@ -138,23 +168,65 @@ function renderList(words) {
 export async function render(container, ctx) {
   container.innerHTML = `${styleTag()}${header("האוסף שלי", "המילים שלי")}<p class="card-subtitle">טוען...</p>`;
 
-  let profile;
-  try {
-    profile = await getJson("/api/profile");
-  } catch (err) {
-    container.innerHTML = `
-      ${styleTag()}
-      ${header("האוסף שלי", "המילים שלי")}
-      <p class="card-subtitle">משהו השתבש, נסי שוב.</p>
-    `;
-    return;
+  let words = {};
+
+  function draw() {
+    if (Object.keys(words).length === 0) {
+      container.innerHTML = renderEmpty();
+      return;
+    }
+    container.innerHTML = renderList(words);
+    bindEvents();
   }
 
-  const words = profile.words || {};
-  if (Object.keys(words).length === 0) {
-    container.innerHTML = renderEmpty();
-    return;
+  function bindEvents() {
+    container.querySelectorAll("[data-say]").forEach((btn) => {
+      btn.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        const lemma = btn.getAttribute("data-say");
+        if (!lemma) return;
+        try {
+          const audio = new Audio(`/audio/words/${encodeURIComponent(lemma)}.aac`);
+          const p = audio.play();
+          if (p && typeof p.catch === "function") p.catch(() => {});
+        } catch (err) {
+          /* a missing clip must never break the dictionary */
+        }
+      });
+    });
+
+    container.querySelectorAll('[data-action="know"]').forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const lemma = btn.getAttribute("data-lemma");
+        if (!lemma) return;
+        let profile;
+        try {
+          profile = await postJson("/api/profile", markKnownBody(lemma));
+        } catch (err) {
+          return;
+        }
+        words = profile.words || {};
+        draw();
+      });
+    });
   }
 
-  container.innerHTML = renderList(words);
+  async function boot() {
+    let profile;
+    try {
+      profile = await getJson("/api/profile");
+    } catch (err) {
+      container.innerHTML = `
+        ${styleTag()}
+        ${header("האוסף שלי", "המילים שלי")}
+        <p class="card-subtitle">משהו השתבש, נסי שוב.</p>
+      `;
+      return;
+    }
+
+    words = profile.words || {};
+    draw();
+  }
+
+  await boot();
 }
