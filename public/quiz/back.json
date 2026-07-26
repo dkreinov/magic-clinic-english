@@ -2,22 +2,22 @@
   {
     "lemma": "back",
     "sense": "the part of your body behind you",
-    "sentence": "The heavy bag made my ___ hurt very badly.",
+    "sentence": "She could not see the spot on her ___ without a mirror.",
     "answer": "back",
-    "distractors": ["chair", "garden", "river", "spoon", "pencil", "apple", "bottle", "curtain"]
+    "distractors": ["arm", "leg", "hand", "knee", "stomach", "thumb", "toe", "finger"]
   },
   {
     "lemma": "back",
-    "sense": "to the place where something was before",
-    "sentence": "I will bring the toy ___ to the store tomorrow.",
+    "sense": "to the person or place it came from before",
+    "sentence": "She borrowed my pen and then gave it ___ to me.",
     "answer": "back",
-    "distractors": ["happy", "sad", "wet", "heavy", "hungry", "angry", "sunny", "windy"]
+    "distractors": ["away", "out", "up", "down", "here", "there", "inside", "outside"]
   },
   {
     "lemma": "back",
     "sense": "the part of something that is behind the front",
-    "sentence": "We always sit at the ___ of the bus, not the front.",
+    "sentence": "We sit at the ___ of the bus, behind all the other kids.",
     "answer": "back",
-    "distractors": ["bread", "garden", "river", "spoon", "apple", "bottle", "pencil", "mirror"]
+    "distractors": ["front", "middle", "center", "top", "bottom", "corner", "edge", "start"]
   }
 ]

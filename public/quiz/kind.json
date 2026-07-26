@@ -2,15 +2,15 @@
   {
     "lemma": "kind",
     "sense": "nice and helpful to other people",
-    "sentence": "She was very ___ to the new girl at school.",
+    "sentence": "She was so ___ to me that she gave me some of her cake.",
     "answer": "kind",
-    "distractors": ["hungry", "thirsty", "tired", "wet", "windy", "sunny", "salty", "noisy"]
+    "distractors": ["unpleasant", "bad", "horrible", "awful", "angry", "cold", "hard", "terrible"]
   },
   {
     "lemma": "kind",
     "sense": "a sort or type of thing",
-    "sentence": "What ___ of music do you like best?",
+    "sentence": "What ___ of music do you like, pop or jazz?",
     "answer": "kind",
-    "distractors": ["chair", "garden", "river", "spoon", "apple", "bottle", "ladder", "mirror"]
+    "distractors": ["piece", "part", "group", "list", "page", "box", "bit", "half"]
   }
 ]

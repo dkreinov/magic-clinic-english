@@ -2,15 +2,15 @@
   {
     "lemma": "like",
     "sense": "to enjoy something",
-    "sentence": "I ___ the taste of fresh bread very much.",
+    "sentence": "I ___ the taste of fresh bread, so I eat it every day.",
     "answer": "like",
-    "distractors": ["count", "wash", "paint", "climb", "spell", "throw", "build", "carry"]
+    "distractors": ["hate", "fear", "miss", "forget", "believe", "ignore", "imagine", "describe"]
   },
   {
     "lemma": "like",
     "sense": "similar to, the same as",
-    "sentence": "That big gray cloud looks ___ a huge elephant.",
+    "sentence": "That big gray cloud looks ___ a huge elephant with a long nose.",
     "answer": "like",
-    "distractors": ["eat", "sing", "count", "wash", "climb", "spell", "build", "throw"]
+    "distractors": ["at", "into", "over", "under", "toward", "through", "beside", "from"]
   }
 ]

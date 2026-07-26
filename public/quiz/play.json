@@ -1,23 +1,23 @@
 [
   {
     "lemma": "play",
-    "sense": "to have fun with a game or a toy",
-    "sentence": "I want to ___ a fun game with my friend.",
+    "sense": "to take part in a game for fun",
+    "sentence": "We ___ this game so often that we always win.",
     "answer": "play",
-    "distractors": ["eat", "sing", "wash", "paint", "climb", "spell", "drink", "sleep"]
+    "distractors": ["watch", "lose", "buy", "start", "make", "sell", "break", "count"]
   },
   {
     "lemma": "play",
     "sense": "to make music with an instrument",
-    "sentence": "She can ___ the piano and the guitar.",
+    "sentence": "My sister can ___ the piano so well that people stop to listen.",
     "answer": "play",
-    "distractors": ["eat", "count", "spell", "drink", "sleep", "swim", "laugh", "jump"]
+    "distractors": ["hear", "clean", "carry", "buy", "open", "paint", "sell", "lift"]
   },
   {
     "lemma": "play",
     "sense": "a story that people act on a stage",
-    "sentence": "We watched a funny ___ on the school stage.",
+    "sentence": "My class acted a funny ___ on the school stage last week.",
     "answer": "play",
-    "distractors": ["chair", "garden", "river", "spoon", "ladder", "apple", "bottle", "pencil"]
+    "distractors": ["movie", "song", "dance", "concert", "game", "film", "poem", "picture"]
   }
 ]

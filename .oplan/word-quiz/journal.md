@@ -174,6 +174,31 @@ distractor that also fits" as the worst failure — but it is a trade, it affect
 it would affect the remaining 40 identically. Escalated to the owner before batch 2 rather than
 after all 50 exist, which is exactly why the plan put the polysemous batch first.
 
+### D21 in practice, and the pin test that came out of it
+
+The owner chose the harder distractors. Batch 1 was regenerated under D21 and came back much
+stronger — `light` "not heavy" now sits against `big small wide round old new tall deep`, pinned by
+`"The HUGE box was so light that the little girl could LIFT IT EASILY."`
+
+Two things worth recording. First, the illustrative distractor set **I** put in front of the owner
+to explain D21 was itself leaky: `big small old new wide round thin` against "the box was so ___
+that the little girl could lift it" — `small` and `thin` both fit. The worker caught it and killed
+`small` by adding `huge` to the sentence. The example used to sell the rule broke the rule, which
+is a fair measure of how easy this failure is to commit.
+
+Second, the audit found the general form of the defect. I checked the regenerated items myself and
+found two where a distractor still fit — `"My mother will ___ the shop and choose what to sell."`
+lets `clean` through, and `"...so her answer is ___."` lets `clear` through. The first generalised:
+**a coordinated clause is not a pin.** `and`/`but` join two independent statements, so they
+constrain the blank not at all; only `so`, `so that`, `so ... that`, `because`, `... enough to`,
+purpose infinitives and verb/argument selection do. Handed back as a test — *does this distractor
+make the sentence FALSE, or merely describe something else that is also possible?* — it found
+three more genuine escapes and four weak pins that neither of us had seen. Five of the original 23
+items had an `and` or a `but` as their only pin and every one of them leaked.
+
+Frozen into QZ-2 as the pin test. Final batch 1: 23 items, gate green, 10 of 10 words multi-sense,
+zero irregular give-aways, and no distractor I can find that fits its blank.
+
 ### A known contract gap, deliberately NOT closed: rule 10 and irregular forms
 
 The same worker reported that rule 10 is blind to irregular inflections. Verified: `resolveLemma`

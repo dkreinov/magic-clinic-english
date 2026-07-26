@@ -2,15 +2,15 @@
   {
     "lemma": "right",
     "sense": "correct and not wrong",
-    "sentence": "Her answer was ___ so the teacher was happy.",
+    "sentence": "Two plus two is four, so her answer is ___.",
     "answer": "right",
-    "distractors": ["hungry", "thirsty", "tired", "wet", "windy", "sunny", "salty", "rainy"]
+    "distractors": ["wrong", "false", "incorrect", "impossible", "strange", "silly", "funny", "terrible"]
   },
   {
     "lemma": "right",
     "sense": "the side that is not the left",
-    "sentence": "I hold the pen in my ___ hand, not my left.",
+    "sentence": "I write with my ___ hand and hold the paper with my left.",
     "answer": "right",
-    "distractors": ["hungry", "thirsty", "sunny", "windy", "funny", "silly", "salty", "lazy"]
+    "distractors": ["upper", "inner", "front", "back", "middle", "central", "top", "inside"]
   }
 ]

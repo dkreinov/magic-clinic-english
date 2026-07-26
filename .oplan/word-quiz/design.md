@@ -75,6 +75,25 @@ still use them, and their audio clips still exist. Removing them from the STORY 
 much larger decision — it would mean filtering the allowed set — and the owner has not been asked
 for it. Flagged, not assumed.
 
+## D21 — distractors must be SAME-CLASS, not merely wrong (owner, 2026-07-26, at the batch-1 gate)
+
+Batch 1 of the pilot came back green and safe, and the batch worker itself flagged why that was not
+enough: every distractor was *impossible in the slot* rather than *plausible but wrong in context*.
+`light` "not heavy" was tested against `happy angry hungry thirsty sad tired noisy lazy` — eight
+feelings against a box. Nothing there can mark her wrong, and nothing there requires her to know
+what `light` means; she solves it by asking which word can describe a box at all.
+
+Shown the trade-off against the safer alternative, the owner chose the harder form: **distractors
+come from the same semantic class as the answer**, so `light` is tested against `big small old new
+wide round thin`. An item must test the MEANING, not the grammar.
+
+**This raises the one risk the design calls worst — a distractor that also fits marks her wrong for
+being right.** The mitigation is that the SENTENCE must now do the disambiguating work: it has to
+carry a clause only the answer satisfies ("the box was so ___ that the little girl could **lift
+it**" is what kills `big`). A same-class distractor set with a loose sentence is the single most
+dangerous thing this run can produce, and it is why the owner's criterion-9 review of all 50 items
+is now load-bearing rather than a formality. Batch 1's 22 items are regenerated under this rule.
+
 ## Decisions taken by the orchestrator at plan time (Rule 2: nothing deferred to execution)
 
 The grill left five items "still open". They are decided here, because a step containing an open

@@ -124,6 +124,26 @@ own siblings or compare their senses.
 - **Every distractor must be genuinely WRONG in that sentence.** Read the sentence with each one
   substituted and confirm it does not work. A distractor that also fits marks her wrong for being
   right — the worst failure this feature has (design.md).
+- **DISTRACTORS MUST BE SAME-CLASS (D21, owner, at the batch-1 gate).** They come from the same
+  semantic class as the answer — same kind of thing, action or quality — so the item tests the
+  MEANING and not the grammar. Test `light` "not heavy" against `big small old new wide round thin`,
+  NOT against `happy angry hungry thirsty`. If seven of your eight options are obviously the wrong
+  *kind* of word, she can solve the item by elimination without knowing the answer, and the item has
+  measured nothing.
+- **Therefore THE SENTENCE must do the disambiguating work.** With same-class options, a loose
+  sentence is what makes a distractor also fit. The sentence needs a clause that only the answer
+  satisfies: `"The box was so ___ that the little girl could lift it."` is what kills `big`; drop
+  "could lift it" and `big` fits and she is marked wrong for being right. **Write the pinning clause
+  first, then choose the distractors it excludes.** This is now the highest-risk instruction in the
+  run — the mechanical gate cannot see any of it.
+- **THE PIN TEST — a coordinated clause is NOT a pin.** For every distractor ask: *does substituting
+  it make the sentence FALSE, or merely make it describe something else that is also possible?* Only
+  the first is a pin. `and` and `but` join two independent statements and therefore pin NOTHING:
+  `"My mother will ___ the shop and choose what to sell."` lets `clean` straight through, because
+  cleaning the shop AND choosing the stock is a perfectly good sentence. Only **`so`, `so that`,
+  `so ... that`, `because`, `... enough to`, purpose infinitives (`to catch the bus`), and
+  verb/argument selection** actually constrain the blank. Discovered at the batch-1 gate: the first
+  pass shipped five items whose pin was an `and` or a `but`, and every one of them leaked.
 - Age-appropriate for an 11-year-old girl. **If a word cannot be given an age-appropriate sentence,
   STOP and return the question. Do not guess.** The 37 words the owner ruled out are already gone
   (QZ-8), so this should not fire — but it stays as the backstop, because a list written in advance

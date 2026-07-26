@@ -2,15 +2,15 @@
   {
     "lemma": "fair",
     "sense": "treating everyone in the same way",
-    "sentence": "It is not ___ that he always goes first.",
+    "sentence": "Each girl gets the same number of sweets, so the game is ___.",
     "answer": "fair",
-    "distractors": ["hungry", "thirsty", "tired", "wet", "windy", "sunny", "salty", "heavy"]
+    "distractors": ["easy", "hard", "funny", "silly", "quick", "slow", "noisy", "safe"]
   },
   {
     "lemma": "fair",
-    "sense": "an event where people show and sell things",
-    "sentence": "Our school will have a big book ___ next week.",
+    "sense": "a fun outdoor event with rides, games and things to buy",
+    "sentence": "We ate popcorn and went on the big wheel at the school ___.",
     "answer": "fair",
-    "distractors": ["chair", "garden", "river", "spoon", "apple", "bottle", "pillow", "mirror"]
+    "distractors": ["party", "concert", "race", "lesson", "meeting", "wedding", "picnic", "game"]
   }
 ]

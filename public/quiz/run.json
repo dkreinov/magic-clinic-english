@@ -2,15 +2,15 @@
   {
     "lemma": "run",
     "sense": "to move very fast on your legs",
-    "sentence": "The dog will ___ fast to catch the ball.",
+    "sentence": "The girl will ___ fast on her legs to catch the bus.",
     "answer": "run",
-    "distractors": ["sing", "wash", "count", "paint", "cook", "spell", "drink", "sleep"]
+    "distractors": ["jump", "swim", "climb", "dance", "skate", "ride", "fly", "sail"]
   },
   {
     "lemma": "run",
     "sense": "to be in charge of a shop or a business",
-    "sentence": "My uncle and my mom ___ a busy little shop.",
+    "sentence": "My mother will ___ the shop, so she must pay all the workers.",
     "answer": "run",
-    "distractors": ["eat", "sing", "drink", "sleep", "swim", "laugh", "jump", "climb"]
+    "distractors": ["obey", "serve", "visit", "clean", "enter", "paint", "wash", "follow"]
   }
 ]

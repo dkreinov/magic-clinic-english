@@ -2,15 +2,15 @@
   {
     "lemma": "well",
     "sense": "in a good way",
-    "sentence": "She sings very ___ in the school show.",
+    "sentence": "She sings so ___ that the whole class stands up and claps.",
     "answer": "well",
-    "distractors": ["hungry", "thirsty", "wet", "windy", "sunny", "salty", "rainy", "heavy"]
+    "distractors": ["badly", "quietly", "slowly", "hardly", "nearly", "exactly", "mostly", "differently"]
   },
   {
     "lemma": "well",
     "sense": "not sick, in good health again",
-    "sentence": "I was sick last week but now I am ___.",
+    "sentence": "I was sick but now I am ___ enough to go to school.",
     "answer": "well",
-    "distractors": ["salty", "sunny", "windy", "rainy", "musical", "digital", "medical", "electric"]
+    "distractors": ["ill", "weak", "tired", "worse", "bad", "awful", "terrible", "unhappy"]
   }
 ]
