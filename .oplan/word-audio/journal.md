@@ -132,4 +132,4 @@ AMENDED to describe the new exception rather than left contradicting the code.
 clips containing no speech — a FORMAT gate is not a CONTENT gate. Phase 3: "filenames == allowed set"
 passed a set that didn't match the words on screen — a CONSISTENCY gate is not a USE gate. Both gates
 were chosen because they were easy to check mechanically, and both measured something adjacent to
-what mattered. **Ask what the child experiences, then gate that.** A nine-year-old found both.
+what mattered. **Ask what the child experiences, then gate that.** An eleven-year-old found both.

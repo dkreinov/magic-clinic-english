@@ -49,7 +49,7 @@ Both defects the predecessor run shipped were passed by a mechanically-green gat
 header" passed 36 clips containing no speech, and "filenames match the allowed set" passed a set
 that did not match the words on screen. Both gates were chosen because they were easy to check.
 
-The quiz has the same shape of risk, worse: a bad item does not fail loudly, it marks a nine-year-old
+The quiz has the same shape of risk, worse: a bad item does not fail loudly, it marks an eleven-year-old
 WRONG FOR A RIGHT ANSWER, in a feature whose whole purpose is confidence. So phase 1 exists only to
 put 50 real items in front of a human before ~45 worker batches are spent, and acceptance criterion
 9 is a HUMAN gate that a green criterion 3 explicitly does not satisfy.
@@ -60,3 +60,16 @@ PLANNING METRICS
   numbers stated then corrected by measurement: 3 (67->69->63 exempt; 406->393; 180->336)
   field guide: 40/40 lines (within budget)
   steps planned: 3 · frozen contracts: 7 · acceptance criteria: 9 (one of them human)
+
+## Correction before execution — the learner is 11, not 9
+
+The owner corrected her age after planning closed and before any code was written. I had written
+"9-year-old" into D9 and into QZ-2, which is a frozen contract every generation batch follows, so
+this was not a cosmetic error: it governs which senses of a polysemous word are worth an item and
+what "age-appropriate" means. Corrected in design.md, plan.md, journal.md and STATUS.md, and in the
+one line of word-audio/journal.md that stated it as a fact.
+
+Flagged to the owner rather than decided: D4 (six options) was argued partly on reading load for a
+child who cannot read the distractors, which is a weaker argument at eleven. Eight options is now
+more defensible. Left at six — the owner chose it and changing a locked decision on my own initiative
+because a premise shifted slightly is exactly the "work redefines done" hazard.

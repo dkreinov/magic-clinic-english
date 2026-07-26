@@ -104,7 +104,7 @@ own siblings or compare their senses.
 
 **QZ-2 — the generation rules** (binding on every worker that writes items):
 
-- **One item per distinct meaning a 9-year-old would actually meet.** `run` (move fast / a run in a
+- **One item per distinct meaning an 11-year-old would actually meet.** `run` (move fast / a run in a
   game), `light` (not heavy / not dark). Abstract words one context cannot pin get 2. Concrete
   single-sense words get 1. **Hard cap 3.** (D9)
 - **The lemma must fit the blank in its BASE form.** Write `I ___ the cat`, never `She ___s the
@@ -114,7 +114,7 @@ own siblings or compare their senses.
 - **Every distractor must be genuinely WRONG in that sentence.** Read the sentence with each one
   substituted and confirm it does not work. A distractor that also fits marks her wrong for being
   right — the worst failure this feature has (design.md).
-- Age-appropriate for a 9-year-old girl. **If a word cannot be given an age-appropriate sentence,
+- Age-appropriate for an 11-year-old girl. **If a word cannot be given an age-appropriate sentence,
   STOP and return the question. Do not guess.** (The A2 set contains e.g. `gay`; that is an
   editorial decision for the owner, not a worker.)
 - No proper nouns. No contractions (matches `lib/story.js`'s own rule).
@@ -224,7 +224,7 @@ is never contacted. Never open a browser on production. Never run `vercel env`. 
 - files: `public/quiz/<lemma>.json` × 50 (NEW), for exactly the QZ-5 list.
 - goal: real items for the pilot list, obeying QZ-2, passing QZ-3.
 - **FROZEN BATCH COMPOSITION.** Batch 1 is the ten polysemous words, deliberately first, and its
-  packet says explicitly: *"every one of these has more than one common meaning a 9-year-old meets;
+  packet says explicitly: *"every one of these has more than one common meaning an 11-year-old meets;
   write >=2 items for at least 6 of them."* Criterion 5 is then checkable after batch 1 instead of
   only after all 50 files exist.
   - batch 1 (10): `run light like play back watch right kind fair well`

@@ -47,4 +47,4 @@ makes sense, or that the six options really have only one right answer. This pro
 shipped two things that passed every automatic check and were still wrong. A person has to look.
 
 Also expect one question: the word list contains **gay**, and how to write a sentence for a
-nine-year-old with that word is your call, not a worker's.
+eleven-year-old with that word is your call, not a worker's.
