@@ -231,7 +231,8 @@ v10 with PRECACHE untouched; the 4-path delta exactly as frozen; truth table 11/
   tokens: worker=37180, auditor=49809, total=86989 (awk)
   field_guide: 44/40 — one new lesson EARNED and promoted, see below.
 
-FIELD GUIDE at 49/40 lines. OVERAGE JUSTIFICATION (§6's price, paid deliberately): the new lesson 4a
+FIELD GUIDE at 50/40 lines (I wrote 49 from a guess in this very entry, then ran wc -l and got 50 — the
+same sin the record has logged three times now, caught only by running the command). OVERAGE JUSTIFICATION (§6's price, paid deliberately): the new lesson 4a
 is the most expensive thing this run learned — a grep-test that asserted a bug and named it a feature,
 past a reviewer and an auditor who were both correct. It cannot be compressed below five lines
 without losing either the concrete example or the two actionable rules (extract a pure function and
