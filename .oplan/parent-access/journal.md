@@ -168,3 +168,65 @@ PHASE 2 — deploy. ORCHESTRATOR-RUN throughout (amendment B: no repo file chang
     returns 308 (so a 308 proves nothing), every terminus is 404 under -L, and no response body
     contains `opt correct`. The item-review tool's answers are still off the internet.
 PHASE 2 CLOSED. RUN COMPLETE.
+
+================ PHASE 3 — the dead-end fix the OWNER found in real use ================
+
+THE OWNER FOUND A DEFECT NO GATE COULD. She opened the parent screen and it said her code was wrong.
+It was not her code: on any device that never unlocked the app, storedCode() is "" and
+`if (expected && value === expected)` is false for EVERY input. The screen was an unreachable dead
+end. Compounded by something I only checked after she reported it: the HOME screen makes no API call,
+so simply opening the app never prompts for the code either — only placement/reader/words do.
+
+WHY THE MACHINERY MISSED IT, and this is the honest lesson of the whole run.
+`tests/parent-ui.test.js` had a test literally named "the parent lock fails closed when no code is
+stored" that asserted the source CONTAINS `if (expected && value === expected)`. It tested the bug
+and called it a feature. The plan reviewer and the auditor both confirmed fail-closed was implemented
+exactly as specified — they were correct, and MY SPEC was wrong. Three layers of verification, all
+functioning, all blind: **no source-grep test can catch a wrong decision, only a missing one.** The
+one thing that would have caught it is the thing this repo had never done for a view — CALL the code.
+
+STEP 3.1 extract the decision, fix its semantics, test it by executing it
+  tier: WORKER (Sonnet) · validation_first_try: yes (worker's run AND my clean re-run) · retries 0
+  did: parent.js gained `export function codeAccepted(typed, stored)` and `rememberCode()`; unlock()
+    now delegates to it. tests/parent-lock.test.js (NEW) — 5 tests that IMPORT AND CALL the real
+    function. The misleading test was RENAMED (not deleted) so the record shows the semantics changed.
+  THE DESIGN: the local compare is a FAST PATH, not the authority. Code stored -> strict compare.
+    No code stored -> accept, write it, and let the server decide, because every /api/* call is gated
+    by APP_CODE and a wrong code gets a 401 that opens the pre-existing entry screen. Strictly better
+    than fail-closed: on a device with no stored code nothing is readable anyway.
+  I VERIFIED FEASIBILITY BEFORE PLANNING: `await import('./public/views/parent.js')` succeeds in Node
+    (no DOM at module scope). That single check is what made a behavioural test possible at all, and
+    it is why the fix is shaped as a pure exported function rather than an inline condition.
+  I ALSO WROTE MY OWN 11-CASE TRUTH TABLE (kept at .oplan/parent-access/truth-table.mjs) and RAN IT
+    AGAINST THE UNFIXED CODE FIRST — it failed with "codeAccepted is not a function". A regression
+    test that has never been seen to fail is not evidence; that is the whole point of running it first.
+    After the fix: TRUTH-TABLE-OK, 11/11, including `('9999','1234') -> false`.
+  ADVERSARIAL AUDIT (I charged it to attack the loosening, not just match the spec): match/high.
+    It enumerated all six states by CALLING the function, confirmed no state makes her data newly
+    readable, and — the part I most wanted — it read `lib/auth.js:13-21` and `api/profile.js:9-12`
+    itself to confirm the SERVER is genuinely the authority rather than trusting my claim. It
+    confirmed a wrong code cannot clobber a good stored one (rememberCode only fires on the
+    permissive or exact-match branch) and that the virgin-device case self-heals in one extra prompt.
+  TWO AUDITOR FINDINGS, both low severity, both recorded rather than churned:
+    1. the RENAMED test is still a source grep and could not catch wrong logic. True by design — PC-4
+       specified it as a marker that the semantics changed; the real coverage is parent-lock.test.js.
+    2. a whitespace-only STORED value would lock a device out, because `typed` is trimmed and `stored`
+       is not, so nothing can ever equal " ". Unreachable through the app: api.js only ever stores a
+       trimmed non-empty value. Fails CLOSED, not open. Added to DEFERRED rather than re-opening a
+       frozen contract for an unreachable case.
+
+STEP 3.2 cache bump v9 -> v10 (ORCHESTRATOR-RUN, two lines, fully gated) — STEP-3.2-OK, first try.
+
+STEP 3.3 deploy and verify (ORCHESTRATOR-RUN) — STEP-3.3-OK, first try.
+  ROLLBACK TARGET RECORDED BEFORE THE CALL: dpl_8UrYSgy7HBssw8AmxNh35Qg8fNUM /
+    https://english-2suyim007-dkreinovs-projects.vercel.app, serving magic-vet-v9 (measured).
+  DEPLOYED: dpl_h19vJfyq68GTanJMxhVUX7g8Z25p at commit 2c2f50a, aliased to the canonical URL.
+  LIVE: v10 serving; seven files md5-identical to the WORKTREE including styles.css (zero CSS change
+    across all three phases); live /views/parent.js contains `export function codeAccepted` — the fix
+    provably shipped; / 200, /index.html 308; /api/health exact; /api/chapter ping -> 401.
+
+PHASE 3 CLOSED. Acceptance: 184 tests / 0 fail; contrast 52 ALL PASS; styles.css byte-unchanged;
+v10 with PRECACHE untouched; the 4-path delta exactly as frozen; truth table 11/11; no .data/profile.json.
+  steps: 3 · first-try: 3/3 · escalations: 0 · interventions: 0 · audits: 1 (adversarial, match/high)
+  tokens: worker=37180, auditor=49809, total=86989 (awk)
+  field_guide: 44/40 — one new lesson EARNED and promoted, see below.
