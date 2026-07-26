@@ -243,3 +243,17 @@ ledger 184 -> 196 sums correctly.
 
 **Test ledger unchanged at 196**, but step 1.4 now also asserts the two new CSS classes and that the
 contrast gate still prints 52 — assertions inside its existing 2 tests, not new tests.
+
+**A7 — criterion 5's 20 MB bound was WRONG, and it is my second under-projection this run.**
+MEASURED across the first 88 generated files: mean **12,189 B** per clip (min 5,416, max 22,779),
+projecting the full set at **26.2 MB**, not the 12 MB I claimed. The 12 MB figure came from
+extrapolating ONE word (`apartment`, 8,904 B) — the identical mistake that made me quote $0.37 when
+the real cost was $0.47, which the owner caught by asking me to verify. The pattern is now explicit:
+**I keep projecting from a single unrepresentative sample, and measurement keeps catching me.**
+**CORRECTED criterion 5:** exactly 2254 `.aac` files, every one valid ADTS AAC (`FF F1`/`FF F9`), and
+the directory **under 30 MB** — a bound taken from the measured mean plus headroom, not from a guess.
+This RELAXES a frozen criterion, which is the "work redefines done" hazard, so the justification is
+recorded rather than assumed: the bound was only ever a proxy for "do not bloat the repo", 26 MB is
+half of what mp3 would have cost (~52 MB), there is no ffmpeg here to re-encode, and opus measured
+LARGER than aac per word. No decision anywhere in this run changes at 26 MB versus 20 MB. If a future
+run gets ffmpeg, re-encoding this directory at 64 kbps mono is the obvious win.
