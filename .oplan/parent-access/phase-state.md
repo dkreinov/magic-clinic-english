@@ -50,3 +50,10 @@ DEPLOYMENT LEDGER (this run). Re-established by `vercel inspect`, NOT inherited:
     rollback command = "$(npm prefix -g)/vercel" rollback https://english-18gugvohx-dkreinovs-projects.vercel.app --yes
   Live /sw.js answered magic-vet-v8 before the deploy, so the premise check (production is not
   already serving v9) passed.
+  DEPLOYED (parent-access, phase 2)
+    incoming id = dpl_8UrYSgy7HBssw8AmxNh35Qg8fNUM
+    incoming url = https://english-2suyim007-dkreinovs-projects.vercel.app
+    incoming alias = https://english-app-three-tan.vercel.app
+    incoming commit = c7feba2d41c9d40c909efff44b2aa91af477866e
+    serves = magic-vet-v9
+RUN COMPLETE: phase 1 CLOSED (4/4 steps, 9/9 criteria), phase 2 CLOSED (deployed and verified).

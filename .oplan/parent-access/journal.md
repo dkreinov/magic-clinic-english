@@ -148,3 +148,23 @@ PHASE 1 METRICS
   tokens: plan-reviewer=96378, worker=38819+37796, auditor=43974+40315+47955, total=305237 (awk)
   cost: unavailable (no price readout from the harness; §12 forbids estimating it)
   field_guide: 44/40 inherited from poc-basics, unchanged this phase — no new lesson yet earned.
+
+PHASE 2 — deploy. ORCHESTRATOR-RUN throughout (amendment B: no repo file changes, live target).
+  ROLLBACK TARGET RECORDED BEFORE THE CALL: dpl_6tEUHF6T7f5pxVFwfgFxepFdtR1V /
+    https://english-18gugvohx-dkreinovs-projects.vercel.app, serving magic-vet-v8 (MEASURED from
+    live /sw.js, not inferred). Premise check passed: production was not already on v9.
+  DEPLOYED: dpl_8UrYSgy7HBssw8AmxNh35Qg8fNUM at commit c7feba2, aliased to the canonical URL.
+  LIVE VERIFICATION, all first try:
+    · seven files md5-identical to the WORKTREE: sw.js, app.js, api.js, styles.css, views/home.js,
+      views/parent.js, manifest.webmanifest. styles.css matching is the proof PA-5 held end to end —
+      the whole feature shipped with ZERO CSS change.
+    · live /sw.js carries magic-vet-v9; `/` 200 and /index.html 308 (cleanUrls unchanged).
+    · live /views/parent.js contains אזור הורים — the LOCK really shipped.
+    · live /views/home.js contains location.hash = "#/parent"; — the GESTURE really shipped.
+    · the live shell at `/` contains NO '#/parent' — the door is invisible in what the browser loads.
+    · /api/health exact payload; /api/chapter ping -> 401; /api/placement -> 401. Gate still closed,
+      zero OpenAI credit spent, /api/profile never requested.
+  D4 RE-PROVEN after the deploy, with the CORRECTED probe from the previous run: known-absent control
+    returns 308 (so a 308 proves nothing), every terminus is 404 under -L, and no response body
+    contains `opt correct`. The item-review tool's answers are still off the internet.
+PHASE 2 CLOSED. RUN COMPLETE.
