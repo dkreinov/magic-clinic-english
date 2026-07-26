@@ -18,9 +18,10 @@ DEPLOY VERIFIED: /api/profile returns 401 not 500, which is the proof that the f
   before any store access, so her profile was never touched) · md5 live==WORKTREE for sw.js, lemma.js,
   words-index.js, both views, styles.css, app.js and index.json · /api/health exact payload · v12 live.
 
-STILL UNVERIFIED, NEEDS HER PHONE: whether AAC actually plays. Vercel serves `audio/x-aac`, not the
-  `audio/aac` the phase 2 recipe expected. Mika's report ("SOME words work") is strong evidence the
-  format is fine — a MIME problem would silence every word — but it has not been confirmed directly.
+RESOLVED ON HER PHONE 2026-07-26: AAC plays. Vercel serves `audio/x-aac` rather than the `audio/aac`
+  the phase 2 recipe expected, and it does not matter — confirmed working after the phase 3 fix. The
+  vercel.json header override that was held in reserve is NOT needed. The only defect her testing
+  found was the lemma/surface-form mismatch, which phase 3 fixed.
 
 
 PHASE 1 (kept for the record):
