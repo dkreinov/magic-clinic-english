@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "chef",
+    "sense": "a person whose job is cooking in a restaurant",
+    "sentence": "A ___ must know how to cook hundreds of different dishes.",
+    "answer": "chef",
+    "distractors": ["waiter", "waitress", "doctor", "nurse", "driver", "farmer", "singer", "pilot"]
+  }
+]

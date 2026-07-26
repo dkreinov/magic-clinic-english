@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "timetable",
+    "sense": "a list of the times when buses or lessons happen",
+    "sentence": "Look at the ___ so that you know when the next bus leaves.",
+    "answer": "timetable",
+    "distractors": ["map", "calendar", "dictionary", "recipe", "newspaper", "diary", "clock", "letter"]
+  }
+]

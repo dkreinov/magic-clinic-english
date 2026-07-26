@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "dentist",
+    "sense": "the person whose job is taking care of your teeth",
+    "sentence": "I went to the ___ so that she could fix my broken tooth.",
+    "answer": "dentist",
+    "distractors": ["teacher", "waiter", "waitress", "farmer", "driver", "singer", "pilot", "barber"]
+  }
+]

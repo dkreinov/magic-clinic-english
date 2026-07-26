@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "abroad",
+    "sense": "in or to another country",
+    "sentence": "My uncle lives ___, so he needs a passport to visit our country.",
+    "answer": "abroad",
+    "distractors": ["here", "nearby", "upstairs", "downstairs", "inside", "outdoors", "alone", "below"]
+  }
+]

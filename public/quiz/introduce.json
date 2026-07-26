@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "introduce",
+    "sense": "to tell someone your name when you first meet",
+    "sentence": "You should ___ yourself so that the new girl learns your name.",
+    "answer": "introduce",
+    "distractors": ["wash", "help", "hide", "teach", "enjoy", "prepare", "draw", "move"]
+  }
+]

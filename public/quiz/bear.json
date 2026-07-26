@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "bear",
+    "sense": "a big wild animal with thick fur",
+    "sentence": "A ___ sleeps all winter because it can not find food in the snow.",
+    "answer": "bear",
+    "distractors": ["lion", "monkey", "elephant", "rabbit", "duck", "cow", "horse", "sheep"]
+  },
+  {
+    "lemma": "bear",
+    "sense": "to hold the weight of something very heavy",
+    "sentence": "The strong stone bridge can ___ the weight of a big truck.",
+    "answer": "bear",
+    "distractors": ["push", "pull", "lift", "move", "count", "wash", "throw", "draw"]
+  }
+]

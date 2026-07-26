@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "pattern",
+    "sense": "a design of shapes that repeats again and again",
+    "sentence": "The same three shapes come again and again, so this is a simple ___.",
+    "answer": "pattern",
+    "distractors": ["circle", "square", "line", "dot", "color", "photo", "sign", "spot"]
+  }
+]

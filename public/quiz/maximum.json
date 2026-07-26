@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "maximum",
+    "sense": "the largest number that is allowed",
+    "sentence": "Twenty is the ___ number of people, so no more can come in.",
+    "answer": "maximum",
+    "distractors": ["minimum", "least", "average", "usual", "normal", "main", "real", "common"]
+  }
+]

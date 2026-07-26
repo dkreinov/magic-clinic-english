@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "sir",
+    "sense": "a polite word you use for a man you do not know",
+    "sentence": "A polite girl calls a man ___ when she does not know him.",
+    "answer": "sir",
+    "distractors": ["boy", "guy", "king", "prince", "captain", "master", "doctor", "teacher"]
+  }
+]

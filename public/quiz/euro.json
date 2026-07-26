@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "euro",
+    "sense": "the money that many countries use",
+    "sentence": "This bag of apples costs just one ___ at the market.",
+    "answer": "euro",
+    "distractors": ["meter", "kilometer", "centimeter", "kilogram", "gram", "liter", "mile", "degree"]
+  }
+]
