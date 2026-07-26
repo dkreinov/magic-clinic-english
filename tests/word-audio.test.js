@@ -1,13 +1,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
+import { deriveWordList } from '../scripts/build-word-audio.js';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 const scriptPath = path.join(root, 'scripts', 'build-word-audio.js');
+const wordsDir = path.join(root, 'public', 'audio', 'words');
 
 test('build-word-audio.js passes node --check', () => {
   const result = spawnSync(process.execPath, ['--check', scriptPath]);
@@ -37,4 +40,26 @@ test('dry run reports the derived word count without a network call', () => {
   });
   assert.strictEqual(result.status, 0, `expected exit 0, got stderr: ${result.stderr}`);
   assert.ok(result.stdout.toString().includes('words: 2254'));
+});
+
+// Criterion 6. This calls the generator's OWN deriveWordList rather than
+// re-deriving the allowed set here: verifying code against a re-implementation
+// of itself is how a wrong word-regex once put a wrong count in all three bands.
+// It is a drift alarm as much as a one-off check -- add a word to a band JSON
+// and this fails until the clip exists, instead of shipping a play button that
+// silently does nothing.
+test('every allowed word has a clip, and every clip is an allowed word', () => {
+  const expected = new Set(deriveWordList());
+  const actual = new Set(
+    readdirSync(wordsDir)
+      .filter((f) => f.endsWith('.aac'))
+      .map((f) => f.slice(0, -'.aac'.length))
+  );
+
+  const missing = [...expected].filter((w) => !actual.has(w));
+  const extra = [...actual].filter((w) => !expected.has(w));
+
+  assert.deepStrictEqual(missing, [], `allowed words with no clip: ${missing.slice(0, 20).join(', ')}`);
+  assert.deepStrictEqual(extra, [], `clips that are not allowed words: ${extra.slice(0, 20).join(', ')}`);
+  assert.strictEqual(actual.size, 2254);
 });

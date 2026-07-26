@@ -36,7 +36,7 @@ const WORD_RE = /^[a-z]+(?:'[a-z]+)?$/;
 const MAX_ATTEMPTS = 4;
 const RETRY_BASE_MS = 1500;
 
-function deriveWordList() {
+export function deriveWordList() {
   const band1 = JSON.parse(readFileSync(BAND1_PATH, 'utf8'));
   const band2 = JSON.parse(readFileSync(BAND2_PATH, 'utf8'));
   const profile = { skills: { receptiveVocab: { band: 'A2' } }, words: {}, learner: {} };
@@ -128,7 +128,15 @@ async function main() {
   console.log(`wrote ${wrote}, skipped ${skipped}`);
 }
 
-main().catch((err) => {
-  console.error(err && err.stack ? err.stack : String(err));
-  process.exit(1);
-});
+// Only generate when run as a script. Without this guard, importing the module
+// -- which tests/word-audio.test.js does, so it can check the REAL derived word
+// list rather than a re-implementation of it -- would start spending money.
+const isDirectRun =
+  process.argv[1] !== undefined && path.resolve(process.argv[1]) === __filename;
+
+if (isDirectRun) {
+  main().catch((err) => {
+    console.error(err && err.stack ? err.stack : String(err));
+    process.exit(1);
+  });
+}

@@ -244,6 +244,35 @@ ledger 184 -> 196 sums correctly.
 **Test ledger unchanged at 196**, but step 1.4 now also asserts the two new CSS classes and that the
 contrast gate still prints 52 — assertions inside its existing 2 tests, not new tests.
 
+**A10 — criterion 6 demands a test that the frozen ledger forbids, and the test it demands cannot be
+written the obvious way.** Criterion 6: *"every A2 allowed word has a file — proven by a test that
+re-derives the set from `lib/story.js` + the band JSONs, not from a hardcoded list."* But step 1.1's
+four tests only read `build-word-audio.js` as text and run its dry run; **none of them looks at
+`public/audio/words/` at all**, and WA-7 gives step 1.2 **+0 tests**. So as frozen, criterion 6 is
+unprovable: it names an artifact that does not exist and forbids creating it.
+
+A one-off check by me would prove the sets match *today*. It would not stop them drifting: add a word
+to `data/band2.json` in some later run and the dictionary silently gains a word with no clip, whose
+play button does nothing — the exact silent failure WA-3 makes safe but never detects. The plan's own
+RISKS section says the 2254 files are *"reviewable only in aggregate; that is what criteria 5 and 6
+are for"*, so a durable gate is plainly what criterion 6 was for.
+
+**DECISION: step 1.2 adds exactly ONE test, and the ledger moves 196 -> 197.** Criterion 2 is
+corrected to `# pass 197`. This is a frozen criterion changing during execution — the "work redefines
+done" hazard — so, as with A7, the justification is recorded rather than assumed: the change makes
+the gate STRICTER, not looser, and it is the criterion's own stated intent.
+
+**Second finding, and the reason this is not a one-line test:** the obvious test would re-derive the
+allowed set itself. Field-guide 6 forbids exactly that — *"NEVER verify a claim about the code against
+your own RE-IMPLEMENTATION of it"* — and that lesson was learned on this very regex (`^[a-z]+$` is not
+`[a-z]+(?:'[a-z]+)?`, and the proxy put a wrong number in all three bands). The test must call the
+generator's OWN `deriveWordList`. But `scripts/build-word-audio.js` ends in a bare `main()` at module
+scope, **so importing it starts generating audio** — a test that spends money.
+
+**DECISION: step 1.2 also edits `scripts/build-word-audio.js` to (a) export `deriveWordList` and
+(b) guard `main()` behind a direct-execution check**, so the module is safe to import. The generator's
+behaviour when run as a script is unchanged, which the existing dry-run test still pins.
+
 **A8 — step 1.3's file list left the `api/profile.js` wiring with NO test.** WA-4 requires the
 handler to forward `context` to `applyWordTap`, but 1.3's files were `lib/profile.js`,
 `api/profile.js`, `tests/profile-mutations.test.js` — and `profile-mutations.test.js` imports
