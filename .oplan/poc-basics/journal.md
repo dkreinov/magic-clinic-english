@@ -643,3 +643,48 @@ enough that it was never the bottleneck.
 TWO FROZEN GATES WERE AMENDED MID-RUN (2.8 and 3.1), both because a premise of MINE was false, and
 both logged with the experiment that disproved it. That is the one habit a future run should watch
 hardest, because it is indistinguishable from cheating unless the evidence is written down.
+
+================ POST-RUN: the owner's item-bank review found a real defect ================
+
+2026-07-26. THE GATE DID ITS JOB, AND IT CAUGHT SOMETHING NO AGENT IN THIS RUN DID.
+Working through step 1 (the REQUIRED-BEFORE-CHILD-USE review), the owner rejected `t1-04`.
+  THE DEFECT: `t1-04` is audio-to-picture — the child HEARS "fan" and picks a picture. Its four
+[REDACTED: her vocabulary -- D27/R-F3-5, counts only]
+  was a defensible second correct answer. A child who picked it would have been marked wrong and
+  could have been placed a whole band lower (10/12 = A2, 9/12 = A1 — a 1593-word difference).
+  WHAT EVERY AUTOMATED CHECK MISSED. `npm test` lints the bank mechanically — ids, four distinct
+  options, correctIndex in range — and passed. The review tool marks exactly one option ✓ and my own
+  Phase 1 cross-check confirmed that ✓ matches `correctIndex` for all 18 items; it did, and that was
+  never the question. Both were asking "is the marked answer THE answer?" and neither could ask "is
+  a DIFFERENT option also right?" That question needs a human who knows the word has two senses.
+  The `docs/item-bank-review.md` weak-spot note for `t1-04` had been warning about the wrong thing
+  entirely — that the old cyclone EMOJI might read as a storm. I looked at the shipped illustration:
+  it is an unmistakable ornate desk fan with motion blur. The stale warning pointed at a non-issue
+  while the real ambiguity sat one option away, unmentioned, through five runs.
+  THE FIX: option 3 `🎤` (singer) -> `🏕️` (camp). Chosen by the owner from the 12 available images.
+  Constraint that shaped the choice: option art is a CLOSED SET of 12 (`OPT_ART`,
+  `public/views/placement.js:183`), one per bank item, so "a car or the sea" would have required new
+  artwork, a new OPT_ART entry, a `public/` change, a forced v8->v9 cache bump and a widening of the
+  review tool's picture derivation. Swapping to an existing image cost one line and no `public/`
+  change, so `magic-vet-v8` still stands — the frozen bump rule binds `public/` only.
+  HOW THE EMOJI WAS WRITTEN: copied FROM the file (`t1-03`'s own `emoji` field), never retyped. The
+  camp emoji is `U+1F3D5 U+FE0F` — the variation selector is load-bearing, and a retyped bare
+  `U+1F3D5` would have missed the `OPT_ART` key and silently rendered a raw emoji instead of the
+  illustration. Verified the codepoints and that all six audio items' options still resolve to art.
+  MY CROSS-CHECK SCRIPT CRIED WOLF FIRST, exactly as it did in step 1.5. It reported 24 options with
+  no image — all of them from `t1-07`..`t1-12`, which are picture-to-word items whose options are
+  English WORDS rendered as text and were never meant to hit OPT_ART. The bug was mine (no filter on
+  `direction`), not the data's. Same trap, same run, second time: when a check fails wholesale,
+  suspect the checker.
+  VALIDATION: 172 pass / 0 fail (unchanged — no test asserts t1-04's contents); review tool
+  regenerated and re-verified (singer gone, camp present, exactly one ✓ in the t1-04 block).
+  DEPLOYED: rollback target recorded first (dpl_C6BiC8gVhuWEtQFPoW4XTsz94Edi), then
+  dpl_6tEUHF6T7f5pxVFwfgFxepFdtR1V at commit 9a7c790, aliased to the canonical URL. Live checks:
+  shell 200, sw still v8, /api/health exact, /api/placement still 401, views/placement.js md5
+  identical to the worktree. The 401 is the proof the new bank SHIPPED: `api/placement.js:5`
+  statically imports `data/placement-items.json`, so a malformed or missing bank would 5xx rather
+  than cleanly reject — the free reject-path probe, again, and it never touches her profile.
+  STILL OPEN, deliberately not changed while the owner is mid-review: the `t1-04` weak-spot warning
+  in `docs/item-bank-review.md` §3 and in the generated tool still describes the retired storm/emoji
+  concern, which I have now verified is a non-issue. Offered to the owner rather than silently
+  rewritten — churning the artifact someone is actively reviewing is its own defect.
