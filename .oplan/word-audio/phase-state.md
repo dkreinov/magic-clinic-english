@@ -1,24 +1,27 @@
-CURRENT: RUN COMPLETE — phase 1 ACCEPTED, phase 2 DEPLOYED AND VERIFIED.
+CURRENT: RUN COMPLETE — phases 1, 2 and 3 all ACCEPTED, DEPLOYED AND VERIFIED.
 
-LIVE NOW: deployment dpl_94Qv4mCDKrwRcvLEd7AH6CqV1syS at commit 44e10e3, url
-  https://english-ep7nxbemg-dkreinovs-projects.vercel.app, aliased to
-  https://english-app-three-tan.vercel.app. magic-vet-v11 confirmed live.
-ROLLBACK TARGET (the deployment this replaced): dpl_h19vJfyq68GTanJMxhVUX7g8Z25p at commit 2c2f50a,
-  https://english-di7kd0n2k-dkreinovs-projects.vercel.app — `vercel rollback <that-url> --yes`.
-DEPLOY VERIFIED: md5 live==WORKTREE for all four changed public/ files (sw.js, styles.css,
-  views/reader.js, views/words.js) and for the shell fetched as `/` · live /sw.js says magic-vet-v11 ·
-  /api/health exact payload · /api/chapter 401 · nine spot-checked clips 200 with md5 matching disk,
-  including the three regenerated ones (car, check, chain) · `let%27s.aac` 200 · NEGATIVE CONTROL
-  /audio/words/zzzznotaword.aac 404, so those 200s mean something · the six exam mp3s still 200.
-  /api/profile was never requested.
+LIVE NOW: deployment dpl for english-d0roovfpq-dkreinovs-projects.vercel.app at commit 3a88e71,
+  aliased to https://english-app-three-tan.vercel.app. magic-vet-v12 confirmed live.
+ROLLBACK TARGET: dpl_94Qv4mCDKrwRcvLEd7AH6CqV1syS,
+  https://english-ep7nxbemg-dkreinovs-projects.vercel.app — `vercel rollback <that-url> --yes`.
 
-ONE DEVIATION FROM THE PHASE 2 RECIPE, UNRESOLVED: the recipe expected
-  `content-type: audio/aac`; Vercel actually serves **`audio/x-aac`** for .aac. Everything else
-  matched. This is not known to be broken — it is UNVERIFIED, and it lands exactly on the plan's own
-  stated risk ("AAC might not play on her phone … the one thing no local gate can prove — it needs
-  her device", and the failure mode is silent by WA-3's design). If it turns out not to play, the fix
-  is a `headers` entry in vercel.json forcing `audio/aac` plus a re-deploy; no clip needs
-  regenerating. VERIFY ON HER PHONE BEFORE ASSUMING W1 IS DELIVERED.
+PHASE 3 RESULT: ACCEPTED. 208 pass / 0 fail · contrast 52 ALL PASS · all 8 phase-3 criteria met
+  (criterion 6 superseded by A11). Commits 9d4954d (resolver + manifest), 3a88e71 (views, migration,
+  PRECACHE, cache bump).
+  WHY PHASE 3 EXISTED: Mika reported "some words work and some don't" (feels, suddenly). I had
+  generated one clip per LEMMA while the reader plays the SURFACE FORM, and lib/story.js's own prompt
+  says "inflected forms are allowed". **Acceptance criterion 6 then froze the mismatch in place by
+  asserting filenames == allowed set exactly.** A gate that pins the wrong invariant is worse than no
+  gate: it made the defect look verified. Cost nothing to fix — no new TTS.
+DEPLOY VERIFIED: /api/profile returns 401 not 500, which is the proof that the function bundled with
+  its new `../public/lemma.js` and `../public/audio/words/index.json` imports (401 short-circuits
+  before any store access, so her profile was never touched) · md5 live==WORKTREE for sw.js, lemma.js,
+  words-index.js, both views, styles.css, app.js and index.json · /api/health exact payload · v12 live.
+
+STILL UNVERIFIED, NEEDS HER PHONE: whether AAC actually plays. Vercel serves `audio/x-aac`, not the
+  `audio/aac` the phase 2 recipe expected. Mika's report ("SOME words work") is strong evidence the
+  format is fine — a MIME problem would silence every word — but it has not been confirmed directly.
+
 
 PHASE 1 (kept for the record):
 PLAN: .oplan/word-audio/plan.md — READ ITS "ORCHESTRATOR AMENDMENTS" SECTION AT THE END FIRST.

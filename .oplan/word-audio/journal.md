@@ -92,3 +92,44 @@ confirmed the test fails as an assertion (192 / `fail 1`). Hebrew was never anch
 output: the frozen strings live in a scratchpad file, workers copied from the file, and I verified
 byte-equality with `grep -F -f` plus a `comm` of every non-ASCII run before and after — nothing
 removed or altered, additions exactly the frozen tokens.
+
+## Phase 3 — "the word she taps is the word she hears" — ACCEPTED
+
+Opened by Mika's own testing, which found in minutes what none of my gates found: `feels` and
+`suddenly` were silent. Root cause was mine, and so was the gate that hid it.
+
+**I generated one clip per LEMMA and the reader plays the SURFACE FORM.** `lib/story.js`'s prompt
+says, in the file I read while planning, `- Use ONLY words from the ALLOWED WORD LIST (inflected
+forms are allowed).` Every plural, past tense, `-ing` and `-ly` form in the story had no clip.
+
+**The worse half: criterion 6 froze the mismatch.** It asserted "every filename is an allowed word
+and every allowed word has a file" — which was true, and irrelevant, because it never asked the
+question that mattered: *does the word on screen have a clip?* A gate that pins the wrong invariant
+is worse than no gate at all, because it makes the defect look verified. I wrote that criterion,
+amended it twice (A10) to make it stricter, and never noticed it was measuring the wrong thing.
+
+Fixed with a resolver whose safety property is that **exact match is tried first**: only a word that
+is NOT in the set is ever de-inflected, and only into a candidate that IS. That is what keeps `bus`,
+`this`, `glass`, `across`, `carpet`, `sunday` and `carrot` intact, verified over all 2254 set words.
+The naive longest-prefix rule `findInGlossary` already uses for translations was rejected — it fails
+`stories` and `making`, and turns `carpet` into `car`. Cost nothing: no new TTS.
+
+Two things I nearly got wrong and a test now pins:
+- **Save the lemma, search the sentence by the surface form.** The chapter says "feels"; searching it
+  for "feel" finds nothing, so swapping them makes `context` silently empty forever. `wordTapBody` is
+  exported so the pair is tested by calling it, and it was seen to fail when swapped.
+- **The migration must never drop a key it cannot resolve.** Losing a word she collected would be far
+  worse than a silent button.
+
+**A11 — I had to stop and ask.** `public/lemma.js` and `public/words-index.js` are imported by the
+precached views, `app.js` imports the views statically, and `sw.js` never calls `cache.put` — so two
+un-precached modules would have turned the offline shell from an error card into a blank page. But
+`docs/visual-design.md:301` froze `PRECACHE` absolutely and is signed off, so it was not mine to
+override. Put to the owner with the alternatives; they chose to add the two modules. The doc was
+AMENDED to describe the new exception rather than left contradicting the code.
+
+**The lesson that generalises, and it is the same one twice.** Phase 1: "valid ADTS header" passed 36
+clips containing no speech — a FORMAT gate is not a CONTENT gate. Phase 3: "filenames == allowed set"
+passed a set that didn't match the words on screen — a CONSISTENCY gate is not a USE gate. Both gates
+were chosen because they were easy to check mechanically, and both measured something adjacent to
+what mattered. **Ask what the child experiences, then gate that.** A nine-year-old found both.
