@@ -230,3 +230,12 @@ v10 with PRECACHE untouched; the 4-path delta exactly as frozen; truth table 11/
   steps: 3 · first-try: 3/3 · escalations: 0 · interventions: 0 · audits: 1 (adversarial, match/high)
   tokens: worker=37180, auditor=49809, total=86989 (awk)
   field_guide: 44/40 — one new lesson EARNED and promoted, see below.
+
+FIELD GUIDE at 49/40 lines. OVERAGE JUSTIFICATION (§6's price, paid deliberately): the new lesson 4a
+is the most expensive thing this run learned — a grep-test that asserted a bug and named it a feature,
+past a reviewer and an auditor who were both correct. It cannot be compressed below five lines
+without losing either the concrete example or the two actionable rules (extract a pure function and
+CALL it; run a new regression test against the unfixed code first). I also updated lesson 5's stale
+`magic-vet-v8` to `v10`. I am not deleting a real lesson to hit a round number.
+DEFERRED from this run: a whitespace-only stored appCode would lock a device out (typed is trimmed,
+stored is not) — unreachable via the app, fails closed, recorded by the adversarial auditor.

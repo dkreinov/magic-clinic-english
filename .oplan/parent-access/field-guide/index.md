@@ -9,10 +9,16 @@
    validate with `npm test` itself. It now also runs the contrast gate. Invariant: ZERO FAILURES.
 4. Before touching any view/style/data, grep tests/ for exact-shape assertions: `shell.test.js`
    freezes `manifest.icons[0].src`, manifest colors, the sw CACHE string and PRECACHE; view tests
-   freeze class names and Hebrew strings — so you append beside a frozen thing, never replace it.
+   freeze class names and Hebrew strings — append beside a frozen thing, never replace it.
+4a. A SOURCE-GREP TEST CATCHES A MISSING DECISION, NEVER A WRONG ONE. A test asserting the source
+   contains `if (expected && value === expected)` shipped a dead end and CALLED IT "fails closed";
+   reviewer and auditor both confirmed it matched the spec, and the spec was wrong. If a decision
+   matters, extract a PURE EXPORTED function and CALL it from a test — views import fine in Node
+   (no DOM at module scope). And run any new regression test against the UNFIXED code first: a test
+   never seen to fail is not evidence.
 5. Any change to a precached file REQUIRES bumping `CACHE` in `public/sw.js` (+ its assertion) in
    the SAME phase — the ONLY sanctioned exception to "sw.js is untouchable". PRECACHE stays
-   byte-identical; ONE bump covers every `public/` change in the phase. Now at `magic-vet-v8`.
+   byte-identical; ONE bump covers every `public/` change in the phase. Now at `magic-vet-v10`.
 6. Validation chains: always `set -o pipefail`; a stray `;` DETACHES the rest so `…-OK` prints over
    a broken build; `grep -qF --` before `--patterns`; never `! grep -q '<bare number>'`. Gate a DOC
    edit on a substring of EVERY new line plus `wc -l`, or a silent reflow passes every content grep.
