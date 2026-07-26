@@ -80,3 +80,36 @@ test('#/parent is routed lazily and is not in the tab bar', () => {
   assert.ok(!appSrc.includes('from "./views/parent.js"'));
   assert.ok(!indexSrc.includes('#/parent'));
 });
+
+test('parent.js locks the view behind the entry code', () => {
+  const src = readFileSync(viewPath, 'utf8');
+  assert.ok(src.includes('const CODE_KEY = "appCode";'));
+  assert.ok(src.includes('function storedCode()'));
+  assert.ok(src.includes('function unlock(container)'));
+  assert.ok(src.includes('await unlock(container);'));
+  assert.ok(src.includes('אזור הורים'));
+});
+
+test('parent.js does not fetch the profile before unlocking', () => {
+  const src = readFileSync(viewPath, 'utf8');
+  const unlockIndex = src.indexOf('await unlock(container);');
+  const profileIndex = src.indexOf('getJson("/api/profile")');
+  assert.notStrictEqual(unlockIndex, -1);
+  assert.notStrictEqual(profileIndex, -1);
+  assert.ok(unlockIndex < profileIndex);
+});
+
+test('the parent lock fails closed when no code is stored', () => {
+  const src = readFileSync(viewPath, 'utf8');
+  assert.ok(src.includes('if (expected && value === expected)'));
+  assert.ok(src.includes('return localStorage.getItem(CODE_KEY) || "";'));
+});
+
+test('the parent lock adds no styling of its own', () => {
+  const src = readFileSync(viewPath, 'utf8');
+  assert.ok(src.includes('class="entry-gate-card"'));
+  assert.ok(src.includes('class="entry-gate-input"'));
+  assert.ok(src.includes('class="entry-gate-error"'));
+  assert.ok(!src.includes('color-mix'));
+  assert.ok(!/#[0-9a-fA-F]{3}/.test(src));
+});

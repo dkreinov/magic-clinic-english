@@ -1,6 +1,7 @@
 import { getJson } from "../api.js";
 
 const RETAKE_KEY = "retakePlacement";
+const CODE_KEY = "appCode";
 
 const VIEW_STYLE = `
   .parent-band {
@@ -161,7 +162,62 @@ function bindRetake(container) {
   });
 }
 
+function storedCode() {
+  try {
+    return localStorage.getItem(CODE_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
+function lockMarkup(showError) {
+  return `
+    ${styleTag()}
+    ${header("תצוגת הורים", "מה האפליקציה יודעת עליה")}
+    <form class="entry-gate-card" data-action="unlock">
+      <h2 class="entry-gate-title">אזור הורים</h2>
+      <p class="entry-gate-text">הקלידי את קוד הכניסה כדי לראות את המסך הזה.</p>
+      <input
+        class="entry-gate-input"
+        type="text"
+        dir="ltr"
+        placeholder="קוד כניסה"
+        autocomplete="off"
+        autocapitalize="off"
+        autocorrect="off"
+        spellcheck="false"
+      />
+      <p class="entry-gate-error" role="alert">${showError ? "הקוד לא נכון. נסי שוב." : ""}</p>
+      <button class="btn btn-primary" type="submit">כניסה</button>
+    </form>
+  `;
+}
+
+function unlock(container) {
+  return new Promise((resolve) => {
+    const paint = (showError) => {
+      container.innerHTML = lockMarkup(showError);
+      const form = container.querySelector('[data-action="unlock"]');
+      const input = container.querySelector(".entry-gate-input");
+      input.focus();
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const value = input.value.trim();
+        if (!value) return;
+        const expected = storedCode();
+        if (expected && value === expected) {
+          resolve();
+          return;
+        }
+        paint(true);
+      });
+    };
+    paint(false);
+  });
+}
+
 export async function render(container, ctx) {
+  await unlock(container);
   container.innerHTML = `${styleTag()}${header("תצוגת הורים", "מה האפליקציה יודעת עליה")}<p class="card-subtitle">טוען...</p>`;
 
   let profile;
