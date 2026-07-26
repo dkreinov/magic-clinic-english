@@ -62,3 +62,26 @@ STEP 1.1 lock the parent view behind the entry code
     It also flagged, fairly, that tests 3 and 4 are exact-substring assertions on implementation text
     rather than behaviour — brittle but not vacuous, and consistent with this repo's existing style.
   commit: (below)
+
+STEP 1.2 the hidden long-press door on the home screen
+  tier: WORKER (Sonnet) · validation_first_try: yes (worker's run AND my clean re-run) · retries 0
+  escalations 0 · interventions 0
+  did: home.js gained LONG_PRESS_MS/MOVE_TOLERANCE and bindOwnerGesture(), plus ONE new statement
+    `bindOwnerGesture(container);` at the end of render(). tests/parent-access.test.js (NEW), 3 tests.
+  surprises: none · deviations: none
+  I ALSO CHECKED THE MARKUP MYSELF: `git diff | grep '^[+-][^+-]' | grep -c 'card|hero|spot-image|svg|path|btn'`
+    returns 0 — not one line of the home screen's markup moved. The requirement was "pixel-identical
+    for the child", so I wanted a mechanical answer, not the worker's assurance.
+  auditor: match, CONFIDENCE high, and it went past the diff into real-device behaviour: it traced
+    the Android event sequence and confirmed a normal tap cannot leave a stale timer (single-threaded
+    clearTimeout), that a real scroll aborts via pointermove-past-tolerance or the browser's
+    pointercancel, that pointerleave will not spuriously fire on a still finger, and that there is NO
+    listener leak because render() replaces innerHTML wholesale so .app-title is a fresh element each
+    time. It also grepped all of public/ for cursor/aria-label/title/tabindex leaks on .app-title and
+    found none — the door is genuinely invisible.
+  auditor's fair nit, recorded not fixed: test 2 asserts pointerdown/pointercancel/contextmenu but not
+    pointerup/pointermove/pointerleave/MOVE_TOLERANCE. A thoroughness gap, not vacuousness; the frozen
+    gate covers MOVE_TOLERANCE separately and the spec froze the test list at exactly three.
+  auditor on accidental triggering: possible but low — a stationary 1.5s hold with <10px drift is not
+    typical of resting contact, and any reposition breaks it. That is a property of the 1.5s/10px
+    design the owner chose, not an implementation defect.
