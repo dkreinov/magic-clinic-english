@@ -43,7 +43,7 @@ export default async function handler(req, res) {
       return;
     }
     try {
-      applyWordTap(p, { lemma: body.lemma, he: body.he ?? null });
+      applyWordTap(p, { lemma: body.lemma, he: body.he ?? null, context: body.context });
     } catch (err) {
       sendJson(res, 400, { ok: false, error: err.message });
       return;

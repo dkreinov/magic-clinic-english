@@ -244,6 +244,26 @@ ledger 184 -> 196 sums correctly.
 **Test ledger unchanged at 196**, but step 1.4 now also asserts the two new CSS classes and that the
 contrast gate still prints 52 — assertions inside its existing 2 tests, not new tests.
 
+**A8 — step 1.3's file list left the `api/profile.js` wiring with NO test.** WA-4 requires the
+handler to forward `context` to `applyWordTap`, but 1.3's files were `lib/profile.js`,
+`api/profile.js`, `tests/profile-mutations.test.js` — and `profile-mutations.test.js` imports
+`lib/profile.js` directly, never the handler. The one line `context: body.context` in `api/profile.js`
+would ship with zero coverage; the natural patch is a source-grep, which field-guide 4a says catches a
+missing decision and never a wrong one. **DECISION: step 1.3 also edits `tests/api-profile-post.test.js`,
+adding `context` to the POST body of the EXISTING test `'word-tap POST creates a learning word with
+taps=1'` (line 63) and asserting the stored entry carries it.** That file already drives the real
+handler through a mock req/res with `DATA_DIR` pointed at a temp dir, so this is a behavioural test,
+not a grep. It is an assertion inside an existing test, so **the ledger is unchanged: 1.3 is still
++3 -> 191.**
+
+**A9 — steps 1.3-1.5 run WHILE step 1.2 is still generating.** On resume, 1.2 was NOT complete: a
+generator from the previous session was still running (511/2254 files, ~54/min). The plan makes 1.3
+"depend on 1.2", but states the reason as "so the suite total is stable" — and 1.2 adds +0 tests, so
+that reason is vacuous. 1.3-1.5 touch `lib/`, `api/`, `public/views/`, `public/styles.css` and
+`tests/`; 1.2 writes only `public/audio/words/*.aac`. Disjoint. **DECISION: run them concurrently and
+verify 1.2 at the end, before 1.6.** No second generator is started — that would race the running one
+and re-spend. 1.2's own gate (criteria 5 and 6) is unchanged and still runs before the cache bump.
+
 **A7 — criterion 5's 20 MB bound was WRONG, and it is my second under-projection this run.**
 MEASURED across the first 88 generated files: mean **12,189 B** per clip (min 5,416, max 22,779),
 projecting the full set at **26.2 MB**, not the 12 MB I claimed. The 12 MB figure came from

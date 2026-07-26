@@ -62,7 +62,7 @@ function assertEnvelope(parsed) {
 
 test('word-tap POST creates a learning word with taps=1', async () => {
   await withTempDataDir(async () => {
-    const req = createPostReq({ action: 'word-tap', lemma: 'dog', he: 'כלב' });
+    const req = createPostReq({ action: 'word-tap', lemma: 'dog', he: 'כלב', context: 'The dog ran fast.' });
     const res = createMockRes();
     await profileHandler(req, res);
     assert.strictEqual(res.statusCode, 200);
@@ -72,6 +72,7 @@ test('word-tap POST creates a learning word with taps=1', async () => {
     assert.strictEqual(parsed.data.words.dog.status, 'learning');
     assert.strictEqual(parsed.data.words.dog.taps, 1);
     assert.strictEqual(parsed.data.words.dog.he, 'כלב');
+    assert.strictEqual(parsed.data.words.dog.context, 'The dog ran fast.');
   });
 });
 
