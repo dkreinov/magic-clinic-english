@@ -1,3 +1,54 @@
+const LONG_PRESS_MS = 1500;
+const MOVE_TOLERANCE = 10;
+
+function bindOwnerGesture(container) {
+  const title = container.querySelector(".app-title");
+  if (!title) return;
+  title.style.userSelect = "none";
+  title.style.webkitUserSelect = "none";
+
+  let timer = null;
+  let pressing = false;
+  let startX = 0;
+  let startY = 0;
+
+  const cancel = () => {
+    pressing = false;
+    if (timer !== null) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  };
+
+  title.addEventListener("pointerdown", (event) => {
+    pressing = true;
+    startX = event.clientX;
+    startY = event.clientY;
+    timer = setTimeout(() => {
+      timer = null;
+      pressing = false;
+      location.hash = "#/parent";
+    }, LONG_PRESS_MS);
+  });
+
+  title.addEventListener("pointermove", (event) => {
+    if (!pressing) return;
+    if (
+      Math.abs(event.clientX - startX) > MOVE_TOLERANCE ||
+      Math.abs(event.clientY - startY) > MOVE_TOLERANCE
+    ) {
+      cancel();
+    }
+  });
+
+  title.addEventListener("pointerup", cancel);
+  title.addEventListener("pointercancel", cancel);
+  title.addEventListener("pointerleave", cancel);
+  title.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+  });
+}
+
 export function render(container) {
   container.innerHTML = `
     <img class="hero-banner" src="/assets/hero-clinic.webp" alt="" />
@@ -38,4 +89,5 @@ export function render(container) {
       <p class="lock-note">קודם נכיר אותך קצת</p>
     </section>
   `;
+  bindOwnerGesture(container);
 }
