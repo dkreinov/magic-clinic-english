@@ -461,3 +461,41 @@ a {
   font-weight: 600;
   color: var(--color-danger);
 }
+
+.btn-say {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface-2);
+  color: var(--color-ink);
+  font-size: 1.1rem;
+  font-family: inherit;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.btn-say:active {
+  transform: scale(0.92);
+}
+
+.btn-know {
+  min-height: 44px;
+  border-radius: var(--radius);
+  border: 2px solid var(--color-border);
+  background: var(--color-surface-2);
+  color: var(--color-ink);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 8px 14px;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.btn-know:active {
+  transform: scale(0.96);
+}

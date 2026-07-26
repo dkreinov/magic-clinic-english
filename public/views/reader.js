@@ -265,6 +265,14 @@ function renderWords(text) {
     .join("");
 }
 
+export function sentenceFor(text, word) {
+  const target = String(word).toLowerCase();
+  for (const s of String(text).split(/(?<=[.!?])\s+/)) {
+    if (s.toLowerCase().split(/[^a-z']+/).includes(target)) return s.trim().slice(0, 200);
+  }
+  return "";
+}
+
 function findInGlossary(chapter, dataWord) {
   if (!chapter || !Array.isArray(chapter.glossary)) return null;
   for (const g of chapter.glossary) {
@@ -457,6 +465,7 @@ export async function render(container, ctx) {
       <div class="reader-overlay" data-action="popup-close">
         <div class="reader-popup" data-action="popup-stop">
           <p class="reader-popup-word">${escapeHtml(activePopup.word)}</p>
+          <button class="btn-say" type="button" data-say="${escapeHtml(activePopup.word)}" aria-label="הקשיבי למילה">🔊</button>
           <p class="reader-popup-he">${escapeHtml(activePopup.he || "—")}</p>
           ${savedHtml}
         </div>
@@ -608,11 +617,14 @@ export async function render(container, ctx) {
       popupSaveBtn.addEventListener("click", async () => {
         if (!activePopup) return;
         try {
-          await postJson("/api/profile", {
+          const body = {
             action: "word-tap",
             lemma: activePopup.word,
             he: activePopup.he || null,
-          });
+          };
+          const context = sentenceFor(latestChapter().text, activePopup.word);
+          if (context) body.context = context;
+          await postJson("/api/profile", body);
         } catch (err) {
           // ignore
         }
@@ -622,6 +634,21 @@ export async function render(container, ctx) {
         }
       });
     }
+
+    container.querySelectorAll("[data-say]").forEach((btn) => {
+      btn.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        const lemma = btn.getAttribute("data-say");
+        if (!lemma) return;
+        try {
+          const audio = new Audio(`/audio/words/${encodeURIComponent(lemma)}.aac`);
+          const p = audio.play();
+          if (p && typeof p.catch === "function") p.catch(() => {});
+        } catch (err) {
+          /* a missing clip must never break the story */
+        }
+      });
+    });
 
     const overlay = container.querySelector(".reader-overlay");
     if (overlay) {
