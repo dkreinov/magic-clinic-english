@@ -133,6 +133,30 @@ and `words-ui.test.js` all spawn `check-contrast.mjs`. The field guide was right
 because the packet-hole question is valuable precisely when its answers are checked rather than
 believed.
 
+### A2 — the sampler would have shown the owner only the front of the bank (step 1.2)
+
+The step-1.2 worker implemented the stride as `i * floor(total/n)`, which is the obvious reading of
+"walk it with a fixed stride", and then flagged in its own report that such a walk ends at
+`(n-1)*floor(total/n)` and never reaches the tail. It declined to choose and asked. That was the
+right call, and the number it exposed is worse than it looks.
+
+I measured it at the exact invocation acceptance criterion 9 mandates, `--sample 50`, across the
+range criterion 5 permits (50-150 items). At 80 items — the most likely pilot total, 50 words at
+1-3 items each — the sample was the alphabetically-FIRST 50 items, 63% of the bank. At 99 items it
+was 51%. The owner would have read fifty real items, seen nothing wrong, and approved a bank whose
+last third they never saw. The gate would have been green and the human gate would have been
+green, and neither would have looked at `sweet`, `ten`, `timetable` or `vegetable`.
+
+This is the third instance of this project's signature defect and the most dangerous one yet,
+because the previous two were mechanical gates measuring something adjacent to what mattered —
+here it is the HUMAN gate being fed a biased sample while presented as a sample of the whole.
+Criterion 9 exists precisely because the machine cannot see meaning; a sampler that hides a third
+of the bank quietly converts the one gate that can see meaning into another one that cannot.
+
+Frozen as `Math.floor(i * total / n)`: 98-100% coverage at every total in range, still
+deterministic, still strictly increasing. The regression test was run against the unfixed stride
+first and failed on `got: aaa.json[0]`, which is the evidence that it tests anything at all.
+
 Phase 2's completeness criterion was corrected in the same pass, because it would otherwise have
 demanded a file for every one of the 2254 manifest words and failed on the 37 that must not have
 one. It now checks BOTH directions against 2217: no excluded word has a file, and nothing else is

@@ -1,4 +1,4 @@
-CURRENT: phase 1 "the item contract, the mechanical gate, and a pilot the owner reviews", next step 1.2
+CURRENT: phase 1 "the item contract, the mechanical gate, and a pilot the owner reviews", next step 1.3
 PLAN: .oplan/word-quiz/plan.md — fixed in place through THREE review rounds, so there is no
   amendments appendix to read separately. Read it top to bottom.
 DESIGN: .oplan/word-quiz/design.md — FROZEN. 14 owner decisions (D1-D14) from a grill-me pass plus
@@ -14,6 +14,12 @@ ACCEPTED: 1.1 (lib/quiz-item.js + tests/quiz-item.test.js; STEP-1.1-OK re-run by
   surface forms — as frozen it let an inflection give the answer away. See journal "Execution —
   phase 1". QZ-2 also gained two constraints the 1.3 packets must quote: the blank is never the
   first word, and rule 7 is direct manifest membership while rule 4 de-inflects.
+  · 1.2 (scripts/check-quiz-bank.mjs + tests/quiz-bank.test.js; STEP-1.2-OK re-run by the
+  orchestrator; 218 pass / 0 fail; empty-bank case green with public/quiz/ still absent). Carries
+  AMENDMENT A2: the sampler stride is frozen as `Math.floor(i * total / n)`. As first written it
+  ended short of the bank's tail and `--sample 50` over 80 items showed the alphabetically-first
+  63% — it would have fed criterion 9's HUMAN gate a front-loaded sample presented as a whole-bank
+  one. See journal "Execution — phase 1".
 
 FROZEN CONTRACTS IN FORCE: QZ-1 (the item file, ten rules — 1/2/9 FILE-level, 3-8/10 ITEM-level)
   · QZ-2 (the generation rules, including the vocabulary warning and the duty to self-run the gate)

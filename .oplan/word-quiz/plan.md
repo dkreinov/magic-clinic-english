@@ -167,6 +167,14 @@ It walks every `<dir>/*.json`, applies every rule of QZ-1, and:
   `(filename, index-within-file)` sorted by filename then index, and walk it with a fixed stride.
   Sampling per file and always printing `item[0]` would hide exactly the multi-sense items D9
   exists to produce, which is what criterion 9's human gate is looking for.
+  **The stride is FROZEN as `Math.floor(i * total / n)` for `i` in `0..n-1`, NOT `i * Math.floor(total / n)`
+  (AMENDED AT EXECUTION TIME, A2, step 1.2).** A uniform integer stride from 0 stops at
+  `(n-1)*floor(total/n)` and never reaches the tail of the bank. MEASURED at the exact criterion-9
+  invocation `--sample 50`: at 80 items it showed only the alphabetically-first 50 — 63% of the
+  bank, front-loaded — and across the criterion-5 legal range of 50-150 items its coverage ran as
+  low as **51%**. The owner would have reviewed words beginning a-q and signed off on the whole
+  bank. The frozen form spans 98-100% at every total in that range, stays deterministic, and stays
+  strictly increasing. Caught by the step-1.2 worker, which flagged it rather than choosing.
 - the gate also prints, on success, `MULTI-SENSE: <N> files with >=2 items` — the number
   criterion 5 needs.
 
