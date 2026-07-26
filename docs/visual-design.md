@@ -299,9 +299,19 @@ Source: plan.md GC-D1/GC-D2/GC-D5/GC-D6/GC-D8 + design.md §7.
   character reliably, which is why the app relies on a fixed, pre-generated asset library
   instead.
 - Touch `public/sw.js` or its PRECACHE list; it is untouchable and frozen by a test (GC-D2).
-  The single sanctioned exception is the `CACHE` version string constant, which MUST be bumped
+  The FIRST sanctioned exception is the `CACHE` version string constant, which MUST be bumped
   in the same phase as any change to a precached file, or returning devices serve the old shell
-  forever. Everything else in `sw.js` — above all the `PRECACHE` array — stays frozen.
+  forever. Everything else in `sw.js` stays frozen.
+  The SECOND sanctioned exception, added by the `word-audio` run with the owner's explicit
+  approval: a NEW FIRST-PARTY JS MODULE THAT A PRECACHED FILE STATICALLY IMPORTS must be added to
+  `PRECACHE`. `index.html` loads `/app.js` as `type="module"` and `app.js` statically imports every
+  view, so one un-precached import breaks the WHOLE module graph — offline you get a blank page
+  instead of the shell's error card. The array's job is to list the shell; a module the shell
+  imports IS the shell. This exception covers first-party JS only. It does NOT admit audio, JSON
+  data, images, or anything sized: `/audio/words/index.json` was deliberately left OUT under this
+  same rule, because audio cannot play offline anyway. Adding an entry still requires a `CACHE`
+  bump in the same phase, and still requires updating the exact-array assertion in
+  `tests/shell.test.js`.
 - Reintroduce the superseded light-cream values (§3), or ship a text/background pair that fails the §3 accessibility gate.
 - Pitch anything younger than 11 — the direction must stay charming and adventurous, never
   babyish.

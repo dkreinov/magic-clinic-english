@@ -1,9 +1,15 @@
 import { sendJson, readJsonBody } from '../lib/http.js';
 import { loadProfile, saveProfile } from '../lib/store.js';
-import { defaultProfile, applyWordTap, markWordKnown, setLearner, logCheck } from '../lib/profile.js';
+import { defaultProfile, applyWordTap, markWordKnown, setLearner, logCheck, migrateWordKeys } from '../lib/profile.js';
 import { isAuthorized, rejectUnauthorized } from '../lib/auth.js';
+import { resolveLemma } from '../public/lemma.js';
+import wordManifest from '../public/audio/words/index.json' with { type: 'json' };
 
 const WORD_SOURCES = ['placement', 'tap', 'band'];
+
+// The exact list the browser resolves against -- imported rather than re-derived
+// so the two can never disagree about what "feels" means.
+const ALLOWED_WORDS = new Set(wordManifest);
 
 export default async function handler(req, res) {
   if (!isAuthorized(req)) {
@@ -16,6 +22,13 @@ export default async function handler(req, res) {
     if (p === null) {
       p = defaultProfile();
       await saveProfile(p);
+    } else {
+      // Fold any surface-form keys ("feels") into their lemma ("feel"). Only
+      // write when it actually changed, so a migrated profile stops costing a
+      // write on every load.
+      const before = JSON.stringify(p.words);
+      migrateWordKeys(p, ALLOWED_WORDS);
+      if (JSON.stringify(p.words) !== before) await saveProfile(p);
     }
     sendJson(res, 200, { ok: true, data: p });
     return;
@@ -36,6 +49,7 @@ export default async function handler(req, res) {
 
   let p = await loadProfile();
   if (p === null) p = defaultProfile();
+  else migrateWordKeys(p, ALLOWED_WORDS);
 
   if (body.action === 'word-tap') {
     if (typeof body.lemma !== 'string' || body.lemma.trim() === '') {
@@ -43,7 +57,10 @@ export default async function handler(req, res) {
       return;
     }
     try {
-      applyWordTap(p, { lemma: body.lemma, he: body.he ?? null, context: body.context });
+      // Resolve here too, not only in the browser: the stored key is then a
+      // lemma whatever version of the page made the call.
+      const lemma = resolveLemma(body.lemma, ALLOWED_WORDS) || body.lemma;
+      applyWordTap(p, { lemma, he: body.he ?? null, context: body.context });
     } catch (err) {
       sendJson(res, 400, { ok: false, error: err.message });
       return;
@@ -58,7 +75,8 @@ export default async function handler(req, res) {
       return;
     }
     try {
-      markWordKnown(p, { lemma: body.lemma, source: body.source, he: body.he ?? null });
+      const lemma = resolveLemma(body.lemma, ALLOWED_WORDS) || body.lemma;
+      markWordKnown(p, { lemma, source: body.source, he: body.he ?? null });
     } catch (err) {
       sendJson(res, 400, { ok: false, error: err.message });
       return;

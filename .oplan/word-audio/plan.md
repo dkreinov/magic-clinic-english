@@ -378,3 +378,19 @@ ACCEPTANCE CRITERIA
    and no audio in it.
 7. `npm test` `# fail 0`. Ledger set at the end of the phase, not guessed now.
 8. `.data/profile.json` still does not exist locally.
+
+**A11 — PHASE 3 had to touch the frozen `PRECACHE` array, and the owner approved it explicitly.**
+`public/lemma.js` and `public/words-index.js` are new files that `public/views/reader.js` and
+`public/views/words.js` import. `index.html` loads `/app.js` as `type="module"`, `app.js` STATICALLY
+imports all four views, and `sw.js`'s fetch handler never calls `cache.put` — so only `PRECACHE`
+survives offline. Two un-precached imports would therefore have broken the entire module graph:
+today offline gives a working shell with a "משהו השתבש" card, and it would have become a blank page.
+`docs/visual-design.md:301` froze `PRECACHE` absolutely, with only the `CACHE` string exempt, and it
+is signed off — so this was NOT mine to decide. Put to the owner with the alternatives (three copies
+of the resolver, or accepting the blank page); **owner chose to add the two modules.**
+`/audio/words/index.json` was deliberately NOT added: audio cannot play offline anyway, and
+`words-index.js` already degrades to an empty set, which renders no play buttons — the correct
+offline behaviour. `docs/visual-design.md` has been AMENDED to describe the new exception rather than
+left to contradict the code, and `tests/shell.test.js`'s exact-array assertion moved with it.
+Cache bump `magic-vet-v11` -> `v12`. This makes phase 3's criterion 6 ("PRECACHE md5 unchanged")
+obsolete; the replacement is the exact-array assertion in `tests/shell.test.js`, which is stricter.

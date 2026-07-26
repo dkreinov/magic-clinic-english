@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { defaultProfile, validateProfile, applyWordTap, markWordKnown } from '../lib/profile.js';
+import { defaultProfile, validateProfile, applyWordTap, markWordKnown, migrateWordKeys } from '../lib/profile.js';
 
 test('applyWordTap: new tap normalizes lemma and creates entry', () => {
   const profile = defaultProfile();
@@ -124,4 +124,74 @@ test('all mutations produce a profile that passes validateProfile', () => {
 
   const result = validateProfile(profile);
   assert.equal(result.ok, true);
+});
+
+// Phase 3 / WB-5. This runs on every profile load, against her real collection,
+// so the two things that matter are: it never loses a word, and running it twice
+// changes nothing.
+const ALLOWED = new Set(['feel', 'run', 'cat', 'story', 'happy']);
+
+function wordEntry(over = {}) {
+  return {
+    status: 'learning',
+    source: 'tap',
+    he: null,
+    taps: 1,
+    firstSeen: '2026-01-02T00:00:00.000Z',
+    lastSeen: '2026-01-02T00:00:00.000Z',
+    ...over,
+  };
+}
+
+test('migrateWordKeys folds surface forms into the lemma and merges them', () => {
+  const profile = defaultProfile();
+  profile.words = {
+    feel: wordEntry({ taps: 2, he: 'להרגיש', firstSeen: '2026-01-01T00:00:00.000Z', lastSeen: '2026-01-01T00:00:00.000Z' }),
+    feels: wordEntry({ taps: 3, status: 'known', lastSeen: '2026-01-05T00:00:00.000Z', context: 'She feels happy.' }),
+    running: wordEntry({ taps: 1 }),
+  };
+
+  migrateWordKeys(profile, ALLOWED);
+
+  assert.deepEqual(Object.keys(profile.words).sort(), ['feel', 'run']);
+  const feel = profile.words.feel;
+  assert.equal(feel.taps, 5, 'taps are summed');
+  assert.equal(feel.status, 'known', 'known beats learning');
+  assert.equal(feel.he, 'להרגיש', 'the non-null Hebrew survives');
+  assert.equal(feel.context, 'She feels happy.', 'a context is not lost in the merge');
+  assert.equal(feel.firstSeen, '2026-01-01T00:00:00.000Z', 'earliest firstSeen wins');
+  assert.equal(feel.lastSeen, '2026-01-05T00:00:00.000Z', 'latest lastSeen wins');
+});
+
+test('migrateWordKeys is idempotent and never drops a word it cannot resolve', () => {
+  const profile = defaultProfile();
+  profile.words = {
+    cats: wordEntry({ taps: 2 }),
+    cat: wordEntry({ taps: 1 }),
+    zzzunknown: wordEntry({ taps: 7 }),
+  };
+
+  migrateWordKeys(profile, ALLOWED);
+  const once = JSON.stringify(profile.words);
+  migrateWordKeys(profile, ALLOWED);
+  assert.equal(JSON.stringify(profile.words), once, 'running it twice must change nothing');
+
+  assert.equal(profile.words.cat.taps, 3);
+  assert.ok(profile.words.zzzunknown, 'an unresolvable word is kept, never dropped');
+  assert.equal(profile.words.zzzunknown.taps, 7);
+});
+
+test('migrateWordKeys leaves an already-lemma profile semantically untouched, and it still validates', () => {
+  const profile = defaultProfile();
+  profile.words = { feel: wordEntry(), cat: wordEntry({ status: 'known' }) };
+  const before = structuredClone(profile.words);
+
+  migrateWordKeys(profile, ALLOWED);
+
+  // Key ORDER may change -- the migration iterates sorted so that merges are
+  // deterministic, and the dictionary sorts by lastSeen for display anyway.
+  // Nothing about the content may change.
+  assert.deepEqual(profile.words, before);
+  assert.deepEqual(Object.keys(profile.words).sort(), ['cat', 'feel']);
+  assert.equal(validateProfile(profile).ok, true);
 });

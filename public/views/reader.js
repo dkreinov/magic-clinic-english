@@ -1,4 +1,6 @@
 import { getJson, postJson } from "../api.js";
+import { resolveLemma } from "../lemma.js";
+import { getAllowedSet } from "../words-index.js";
 
 const CHAPTER_BANNERS = { 0: "chapter-night", 1: "chapter-clinic", 2: "chapter-forest" };
 
@@ -265,6 +267,17 @@ function renderWords(text) {
     .join("");
 }
 
+// Exported so a test can pin the two decisions that are easy to get backwards:
+// we SAVE the lemma ("feel") but SEARCH for the sentence by the surface form
+// ("feels"), because the chapter never contains the lemma. Swap them and the
+// context is silently empty forever.
+export function wordTapBody({ lemma, surface, he, text }) {
+  const body = { action: "word-tap", lemma, he: he || null };
+  const context = sentenceFor(text, surface);
+  if (context) body.context = context;
+  return body;
+}
+
 export function sentenceFor(text, word) {
   const target = String(word).toLowerCase();
   for (const s of String(text).split(/(?<=[.!?])\s+/)) {
@@ -290,11 +303,13 @@ export async function render(container, ctx) {
   let stage = "loading";
   let generating = false;
   let genError = false;
-  let activePopup = null; // { word, he, saved }
+  let activePopup = null; // { lemma, surface, he, saved, canSay }
+  let allowedWords = new Set();
 
   async function boot() {
     draw();
     try {
+      allowedWords = await getAllowedSet();
       profile = await getJson("/api/profile");
       decideStage();
     } catch (err) {
@@ -464,8 +479,8 @@ export async function render(container, ctx) {
     return `
       <div class="reader-overlay" data-action="popup-close">
         <div class="reader-popup" data-action="popup-stop">
-          <p class="reader-popup-word">${escapeHtml(activePopup.word)}</p>
-          <button class="btn-say" type="button" data-say="${escapeHtml(activePopup.word)}" aria-label="הקשיבי למילה">🔊</button>
+          <p class="reader-popup-word">${escapeHtml(activePopup.lemma)}</p>
+          ${activePopup.canSay ? `<button class="btn-say" type="button" data-say="${escapeHtml(activePopup.lemma)}" aria-label="הקשיבי למילה">🔊</button>` : ""}
           <p class="reader-popup-he">${escapeHtml(activePopup.he || "—")}</p>
           ${savedHtml}
         </div>
@@ -596,12 +611,22 @@ export async function render(container, ctx) {
         if (!dataWord) return;
         const chapter = latestChapter();
         let he = findInGlossary(chapter, dataWord);
-        activePopup = { word: dataWord, he: he || "", saved: false };
+        // dataWord is what is PRINTED ("feels"); the clip is under the lemma
+        // ("feel"). Keep both: the surface form is what the glossary and the
+        // sentence search need, the lemma is what we speak and save.
+        const lemma = resolveLemma(dataWord, allowedWords);
+        activePopup = {
+          lemma: lemma || dataWord,
+          surface: dataWord,
+          canSay: lemma !== null,
+          he: he || "",
+          saved: false,
+        };
         draw();
         if (he === null) {
           try {
             const r = await postJson("/api/translate", { word: dataWord });
-            if (activePopup && activePopup.word === dataWord) {
+            if (activePopup && activePopup.surface === dataWord) {
               activePopup.he = r.he;
               draw();
             }
@@ -617,13 +642,12 @@ export async function render(container, ctx) {
       popupSaveBtn.addEventListener("click", async () => {
         if (!activePopup) return;
         try {
-          const body = {
-            action: "word-tap",
-            lemma: activePopup.word,
-            he: activePopup.he || null,
-          };
-          const context = sentenceFor(latestChapter().text, activePopup.word);
-          if (context) body.context = context;
+          const body = wordTapBody({
+            lemma: activePopup.lemma,
+            surface: activePopup.surface,
+            he: activePopup.he,
+            text: latestChapter().text,
+          });
           await postJson("/api/profile", body);
         } catch (err) {
           // ignore

@@ -1,4 +1,6 @@
 import { getJson, postJson } from "../api.js";
+import { resolveLemma } from "../lemma.js";
+import { getAllowedSet } from "../words-index.js";
 
 const VIEW_STYLE = `
   .words-count {
@@ -121,7 +123,7 @@ export function markKnownBody(lemma) {
   return { action: "mark-known", lemma, source: "tap" };
 }
 
-export function renderList(words) {
+export function renderList(words, allowedWords = null) {
   const entries = Object.entries(words).sort((a, b) => {
     const aTime = Date.parse(a[1].lastSeen) || 0;
     const bTime = Date.parse(b[1].lastSeen) || 0;
@@ -135,6 +137,13 @@ export function renderList(words) {
         typeof entry.context === "string" && entry.context.length > 0
           ? `<p class="word-context" dir="ltr">${escapeHtml(entry.context)}</p>`
           : "";
+      // A row can only speak if we actually have a clip. When the manifest has
+      // not loaded we fall back to assuming the key is sayable -- it is a lemma
+      // by then, so that is the right guess.
+      const sayLemma = allowedWords ? resolveLemma(lemma, allowedWords) : lemma;
+      const sayHtml = sayLemma
+        ? `<button class="btn-say" type="button" data-say="${escapeHtml(sayLemma)}" aria-label="הקשיבי למילה">🔊</button>`
+        : "";
       const knowHtml =
         entry.status === "learning"
           ? `<button class="btn-know" type="button" data-action="know" data-lemma="${escapeHtml(lemma)}">יודעת את זה</button>`
@@ -147,7 +156,7 @@ export function renderList(words) {
             ${contextHtml}
           </div>
           <div class="word-card-actions">
-            <button class="btn-say" type="button" data-say="${escapeHtml(lemma)}" aria-label="הקשיבי למילה">🔊</button>
+            ${sayHtml}
             ${knowHtml}
             ${statusBadge(entry.status)}
           </div>
@@ -169,13 +178,14 @@ export async function render(container, ctx) {
   container.innerHTML = `${styleTag()}${header("האוסף שלי", "המילים שלי")}<p class="card-subtitle">טוען...</p>`;
 
   let words = {};
+  let allowedWords = null;
 
   function draw() {
     if (Object.keys(words).length === 0) {
       container.innerHTML = renderEmpty();
       return;
     }
-    container.innerHTML = renderList(words);
+    container.innerHTML = renderList(words, allowedWords);
     bindEvents();
   }
 
@@ -214,6 +224,7 @@ export async function render(container, ctx) {
   async function boot() {
     let profile;
     try {
+      allowedWords = await getAllowedSet();
       profile = await getJson("/api/profile");
     } catch (err) {
       container.innerHTML = `

@@ -1,9 +1,11 @@
-const CACHE = "magic-vet-v11";
+const CACHE = "magic-vet-v12";
 const PRECACHE = [
   "/",
   "/styles.css",
   "/app.js",
   "/api.js",
+  "/lemma.js",
+  "/words-index.js",
   "/views/home.js",
   "/views/placement.js",
   "/views/reader.js",

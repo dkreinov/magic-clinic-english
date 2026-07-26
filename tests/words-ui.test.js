@@ -150,3 +150,23 @@ test('words.js wires the play affordance, mark-known, and the token-only contras
   const passLines = stdout.split('\n').filter((l) => l.startsWith('PASS'));
   assert.strictEqual(passLines.length, 52, `expected exactly 52 PASS lines, got ${passLines.length}`);
 });
+
+// Phase 3 / WB-4: a row only offers a play button when a clip really exists.
+test('renderList speaks the resolved lemma and hides the button when there is none', async () => {
+  const { renderList } = await import('../public/views/words.js');
+  const allowed = new Set(['feel', 'cat']);
+  const words = {
+    feels: { status: 'learning', he: 'x', taps: 1, lastSeen: '2026-01-03T00:00:00.000Z' },
+    cat: { status: 'known', he: 'x', taps: 1, lastSeen: '2026-01-02T00:00:00.000Z' },
+    zzzunknown: { status: 'learning', he: 'x', taps: 1, lastSeen: '2026-01-01T00:00:00.000Z' },
+  };
+
+  const html = renderList(words, allowed);
+
+  assert.ok(html.includes('data-say="feel"'), 'an inflected key speaks its lemma');
+  assert.ok(!html.includes('data-say="feels"'), 'never point at a clip that does not exist');
+  assert.ok(html.includes('data-say="cat"'));
+
+  const unknownRow = html.slice(html.indexOf('zzzunknown'));
+  assert.ok(!unknownRow.includes('btn-say'), 'no play button on a row we cannot speak');
+});

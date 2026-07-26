@@ -104,3 +104,32 @@ test('the play affordance: markup, wiring, CSS, and the contrast gate all hold',
   const passLines = out.split('\n').filter((line) => line.startsWith('PASS'));
   assert.strictEqual(passLines.length, 52, 'contrast gate should print exactly 52 PASS lines');
 });
+
+// Phase 3. The two decisions that are easy to get backwards, pinned by calling
+// the real function rather than grepping for it.
+test('wordTapBody saves the lemma but finds the sentence by the printed form', async () => {
+  const { wordTapBody } = await import('../public/views/reader.js');
+  const text = 'The cat sat. She feels happy today. The end.';
+
+  const body = wordTapBody({ lemma: 'feel', surface: 'feels', he: 'להרגיש', text });
+
+  assert.strictEqual(body.action, 'word-tap');
+  assert.strictEqual(body.lemma, 'feel', 'the LEMMA is what gets saved');
+  assert.strictEqual(
+    body.context,
+    'She feels happy today.',
+    'the sentence is found by the SURFACE form; searching for the lemma finds nothing'
+  );
+
+  // Searching by the lemma would have found nothing at all -- this is the bug
+  // the assertion above exists to catch.
+  const wrongWayRound = wordTapBody({ lemma: 'feel', surface: 'feel', he: null, text });
+  assert.ok(!('context' in wrongWayRound), 'the lemma does not appear in the chapter text');
+});
+
+test('reader.js resolves the printed word against the manifest', () => {
+  const src = readFileSync(viewPath, 'utf8');
+  assert.ok(src.includes('resolveLemma'), 'reader must resolve the tapped word');
+  assert.ok(src.includes('getAllowedSet'), 'reader must load the manifest');
+  assert.ok(src.includes('activePopup.canSay'), 'the button is conditional on having a clip');
+});
