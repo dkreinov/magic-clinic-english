@@ -90,3 +90,31 @@ promotion first (phase 5); nothing technical forces the order.
 2026-07-27, later: **you approved the screens** ("yes approve, go ahead") and kept the planned
 order. Phase 4 is closed — all eleven checks. Next: a fresh planner drafts phase 5 (automatic
 promotion) from the written record; you'll see its plan in plain words before anything runs.
+
+2026-07-27, later still: **phase 5 stopped before it started, for a good reason.** The fresh
+planner discovered the automatic-promotion design document was never signed by you, your own
+brief says to rewrite it before signing, and the algorithm it describes was never built. You
+chose to deploy first (D26); automatic promotion waits for a properly signed design.
+
+## Phase 6 briefing — the deploy (2026-07-27)
+
+=== PLAN IN PLAIN WORDS ===
+WHAT WE ARE DOING: getting the quiz onto Mika's phone, safely. Copy her profile out to a dated
+backup file first (twice — once to learn her words, once seconds before shipping), write quiz
+questions for every word she has claimed that lacks one, ship it all in ONE deploy, prove
+nothing of hers was lost, and then YOU look at it on a real phone — the first time any screen of
+this project is seen in a browser.
+THE STEPS: freeze what is live and how to undo it → back up her profile → work out which words
+need questions → loosen one test that pins the bank at exactly 50 files (it would go red) and
+add five honest dated lines to the growth document → write the questions in small checked
+batches → two independent helpers try to break them → YOU read every new question → fresh
+backup, then deploy → machine-check what shipped → read her real profile back and prove nothing
+was lost → YOUR phone check → close, and (your request) delete the backup files.
+WHAT WE ARE NOT DOING: no automatic promotion (deferred), no new features, no restore mechanism
+(you accepted capture-only), no touching her data beyond the two sanctioned reads.
+BIGGEST RISK: a new question where a wrong option also fits — no machine can see it; two
+independent readers plus you are the whole defence, and that is said honestly rather than
+promised away.
+NEEDS YOU AT: reading the new questions (gate A), the go-moment before the deploy, and the
+phone check (gate B).
+=== END ===

@@ -1429,7 +1429,219 @@ with `deepStrictEqual`. `public/quiz/*.json` is DATA and stays OUT (QZ-7).
 `known`; a quiz pass promotes `candidate -> known`, a fail returns it to `learning`. Her own claims
 keep entering as `known` directly (D13, asymmetric trust).
 
-## PHASE 6 SKELETON — deploy
+## PHASE 6 — deploy: the backup, the first top-up, and her first real look (PLANNED IN FULL)
+
+Base: commit `0b47649` (plus the D26/planning commits that follow it), tree clean, 282/0,
+contrast 52, bank 50/71, `.data/` empty, shell `magic-vet-v13` in the worktree, LIVE build
+proven to be `3a88e71` (live `/sw.js` md5 == that blob) at `magic-vet-v12`.
+
+Provenance: drafted by a fresh planner from the record alone, which also MEASURED the live
+system read-only at plan time (vercel inspect; unauthenticated 401 on `/api/profile`; 404s on
+`/quiz/light.json` and the negative control; `/api/health` exact payload). The orchestrator
+independently re-verified the bank-pin test at `tests/quiz-bank.test.js:124`, the broken
+deploy-recipe citation (the recipe lives in `.oplan/word-audio/phase-state.md:55-66`, NOT that
+run's journal), and the live 401/404 baselines.
+
+**OWNER DECISIONS AT PLAN TIME (D27):** the backup destination is
+`C:/Users/dkreinov/english-app-backups/` (outside the repo, durable); the backup is
+CAPTURE-ONLY — there is no restore path, `vercel rollback` restores code only, and restore
+tooling would be its own separately-authorized work; **and the backup files are DELETED at phase
+close (step 6.12), after 6.10's intactness proof and the owner's gate-B yes — the owner's
+privacy rider.** Stated plainly: from that deletion onward the D25 safety net no longer exists;
+it exists exactly for the deploy window, which is when the risk lives.
+
+GOAL: get the correction loop into Mika's hands without risking the one file that holds
+everything she has collected. Capture her live profile (twice — the second seconds before the
+deploy), grow the bank so the quiz is not inert on arrival, ship both in ONE deploy, verify
+against her real data, and put the first-ever real-browser look in front of the owner.
+
+### ACCEPTANCE CRITERIA (frozen before execution)
+
+1. `STEP-6.1-OK` .. `STEP-6.10-OK` all print (6.7 and 6.11 are human gates and print nothing),
+   each re-run by the orchestrator in a clean state.
+2. **The ledger does not move:** `npm test` prints `# fail 0` and `# pass 282` at every step.
+   Phase 6 adds no test; its only test edit changes an assertion INSIDE an existing test.
+3. **THE BACKUP EXISTS AND IS PROVEN, TWICE, BOTH PRE-DEPLOY (D25).** Capture #1 seeds the
+   top-up; capture #2 (step 6.8, seconds before the deploy) is the binding one. Each is proven
+   by the frozen node block (non-empty ≥200 bytes, parseable, carries a non-empty `words` map,
+   `validateProfile(prof).ok`, prints `BACKUP OK bytes=… words=… known=…`). Files live OUTSIDE
+   the repo in the D27 folder; only SHA-256 + counts are recorded in the workspace, never
+   contents.
+4. `node scripts/check-quiz-bank.mjs` exits 0, prints `QUIZ BANK OK: <F> files, <M> items` with
+   `F >= 50`, and prints neither `QUIZ BANK FAILED` nor `RULE-11 PENDING`.
+5. **THE COMPLETENESS CRITERION, INVERTED (D23):** every word in the backup with
+   `status === "known"`, minus the 37 QZ-8 exclusions, minus keys absent from the audio manifest
+   (rule 12 makes an item impossible for them), has a `public/quiz/<lemma>.json`; and NO file
+   exists for any excluded word. Frozen as a node block over `$BK`,
+   `.oplan/word-quiz/qz8-exclusions.txt` (must hold exactly 37), the manifest and the bank;
+   prints `known= need= missing= banned=` and exits 0 iff missing=0 and banned=0. Measured
+   against HER PROFILE, never the manifest — the manifest count is the predecessor's
+   true-but-irrelevant-invariant mistake.
+   **`$BK` IS CAPTURE #1 — frozen (plan review, finding 2).** The criterion checks the list the
+   top-up was SEEDED from, deterministically. Capture #2 is diffed against capture #1 at step
+   6.10 and any word claimed BETWEEN the captures is REPORTED as next-weekly-top-up work (D23's
+   steady state), never a criterion-5 failure — otherwise a claim she makes mid-phase could fail
+   a gate no amount of our work can satisfy. Capture #1 must therefore survive until the 6.12
+   re-run; the D27 deletion happens strictly after it.
+6. **Only the expected files changed across `0b47649..HEAD`, none deleted** (`LC_ALL=C sort`,
+   A9): allowed set = `docs/growth.md`, `tests/quiz-bank.test.js`, `public/quiz/*.json` (new
+   lemmas only). Frozen as the grep -v allowlist form; separate explicit deletion check.
+7. Contrast: exits 0, `ALL PASS`, `grep -c '^PASS'` = 52.
+8. **`.data/profile.json` absent, and no byte of her profile anywhere inside the repo**;
+   `git status --porcelain` empty after every step; the backup path resolves outside the repo.
+9. **THE DEPLOY IS VERIFIED (the predecessor recipe, every clause + controls):** outgoing id+url
+   recorded via `vercel inspect` BEFORE deploying (rollback target
+   `dpl_4b6XjMSa2HRUN4a2s48cdsT6u2Z1` / `https://english-d0roovfpq-dkreinovs-projects.vercel.app`);
+   live `/sw.js` contains `magic-vet-v13` and NOT v12; md5 live == WORKTREE (never a git blob —
+   four changed `public/*.js` files are CRLF on disk, LF in git; the CLI uploads worktree bytes,
+   proven at plan time) for every changed `public/` file over `3a88e71..HEAD`; unauthenticated
+   `GET /api/profile` → 401 (proves the function bundled; 401 short-circuits before store
+   access); `/api/health` returns exactly `{"ok":true,"data":{"status":"up","version":1}}`;
+   **control pair measured pre-deploy:** `/quiz/light.json` 404→200+parseable non-empty array,
+   a new top-up file 200+parseable, `/quiz/zzzznotaword.json` stays 404; upload size recorded
+   vs baseline.
+   **THE FILE ENUMERATION IS FROZEN (plan review, finding 3):**
+   `git diff --name-only --diff-filter=ACMR 3a88e71..HEAD -- public/ | LC_ALL=C sort` —
+   `--diff-filter=ACMR` is load-bearing: the top-up bank files are ADDED, not modified, and a
+   modified-only enumeration would silently skip md5-verifying the actual payload of this
+   deploy. Every enumerated file is md5-compared live-vs-WORKTREE.
+10. **THE ONLY CHECK EVER RUN AGAINST HER REAL DATA:** post-deploy authenticated GET returns
+    200; `validateProfile(data).ok`; live word-key count >= capture #2's; **set difference
+    capture#2\live is EMPTY**; and the status rule, MADE MECHANICAL (plan review, finding 4):
+    for every key in capture #2, `live.status === backup.status` OR at least one of the entry's
+    activity fields (`taps`, `lastSeen`, `lastQuizAt`, `quizRight`, `quizWrong`) differs from
+    the backup's — a status change WITHOUT any accompanying activity change fails the criterion
+    outright; a status change WITH activity evidence is mechanically allowed and REPORTED to the
+    owner in the diff summary. Non-empty key difference or an unexplained status change → STOP,
+    roll back code, owner.
+11. The rollback command is written into `phase-state.md` verbatim BEFORE the deploy and
+    re-confirmed after.
+12. **HUMAN GATE A — the owner reads EVERY new top-up item** (all of them via the frozen sampler
+    at `--sample <total new items>`, not a stride) and explicitly approves. The summary handed
+    over must be true and must state its limits — two adversarial passes, their agreement rate,
+    flags and dispositions, dropped words with reasons, and plainly: a distractor that also fits
+    cannot be detected mechanically.
+13. **HUMAN GATE B — the owner's first real-browser look, against the written checklist in step
+    6.11** (defeat the cache first; launcher; RTL/LTR layout; gloss above sentence; six options
+    with speakers; after-chapter placement; wrong-answer feedback). The run's ONLY CSS/RTL
+    check. A defect found here re-opens the phase. Stated up front: the demotion line CANNOT
+    appear on a first look (three sittings needed) — the hand-derived transcript remains its
+    only evidence.
+
+**WHAT NO MACHINE CAN CHECK HERE:** whether a new item's distractor also fits (two passes + the
+owner are the whole mitigation); whether the card survives a real phone in RTL; whether the
+demotion line reads kindly; whether her profile is damaged in a way that still validates.
+
+### DECIDED AT PLAN TIME (the skeleton left these open)
+
+· **ONE deploy; the top-up runs BEFORE it.** The backup GET is also the only source of her
+  `known` list, so the pre-deploy read happens regardless; gate B must not be spent on an inert
+  quiz (the launcher would not even render); one deploy = one rollback target; combining is free
+  (no quiz manifest exists, by design). Counter-argument (deploy code first to test against her
+  real profile sooner) rejected: D25's protection is additivity-by-construction, which a deploy
+  cannot test better than a fixture; generation work survives a rollback, a wasted first look
+  does not.
+· **`tests/quiz-bank.test.js:124` is relaxed BEFORE any new item lands** (step 6.4): `=== 50`
+  becomes `>= 50` (the bank never shrinks below the pilot), `items >= files`. The
+  anti-vanishing purpose survives and is re-proved by mutation.
+· **N = 2 independent adversarial passes** + orchestrator adjudication of the union + the owner.
+  Measured basis: one pass ≈ half the leaks; two passes agreed 53%; the gloss already kills
+  13/15. The question is asked against BOTH gloss AND sentence, over all 8 distractors.
+· **The top-up list gets two filters beyond QZ-8:** keys absent from the audio manifest are
+  dropped (rule 12 makes their items impossible), and every dropped word is REPORTED with its
+  reason, never silently discarded.
+· **growth.md gets an additive, dated, five-line correction ONLY** (beside line 114): demotion
+  now exists; G1 remains unbuilt and the doc unsigned; G1 must be re-designed against a world
+  with demotion. `STATUS:` and §10 untouched — the wholesale amendment is the future G1 run's
+  entry ticket, per the brief. Gated on per-line greps + `wc -l` (326→331) + `--numstat` `5 0`.
+· **`vercel inspect` runs twice** (pre-flight and immediately pre-deploy) and must agree.
+· **B2 (conditional):** if the local `.env` `APP_CODE` 401s against production, STOP — the owner
+  supplies the production code out of band. Never `vercel env`.
+· **B4 (conditional):** step 6.3 measures N (her claimed-but-missing words); N=0 → skip 6.5-6.7
+  (good outcome, recorded); N>25 → STOP and put the projected cost to the owner (D23 measured
+  ~276k tokens / 25 words).
+
+### STEPS (summary — validations frozen above and in the step scripts)
+
+**6.1 pre-flight** [ORCHESTRATOR]: freeze the outgoing deployment (`vercel inspect` — id, url,
+created), live baselines (`/sw.js` v12 + md5==`3a88e71` blob, health payload, 401, the two
+quiz 404s), local baselines (282/0, contrast 52, bank 50/71, tree clean, `.data/` absent) into
+`.oplan/word-quiz/deploy-baseline.txt`. No authenticated request. → STEP-6.1-OK
+**6.2 THE BACKUP (capture #1)** [ORCHESTRATOR+OWNER, D27]: **THE CAPTURE COMMAND IS FROZEN
+(plan review, finding 1) — this exact form, no improvisation at run time:**
+```bash
+set -o pipefail
+mkdir -p /c/Users/dkreinov/english-app-backups   # Git-Bash path form — a Windows-style path here creates a stray repo file (field guide 4)
+BK="/c/Users/dkreinov/english-app-backups/profile-$(date +%Y%m%d-%H%M%S).json"
+code=$( ( set -a; . ./.env; set +a
+          curl -s --ssl-no-revoke -H "x-app-code: $APP_CODE" \
+               -o "$BK" -w '%{http_code}' \
+               https://english-app-three-tan.vercel.app/api/profile ) )
+case "$code" in 200) ;; 401) echo "FAIL: 401 - local .env APP_CODE != production (B2: stop, owner supplies it out of band)"; exit 1;;
+                *) echo "FAIL: GET -> $code"; exit 1;; esac
+[ -z "${APP_CODE:-}" ] || { echo "FAIL: APP_CODE leaked into this shell"; exit 1; }
+```
+The subshell `( set -a; . ./.env; set +a; curl ... )` is the load-bearing part: `.env` is
+sourced INSIDE the parentheses so `APP_CODE` dies with the subshell — `isAuthorized` is open
+only when it is UNSET, and a leak silently 401s the whole suite for the rest of the phase; the
+post-assertion proves it did not leak. `$APP_CODE` is never echoed, never logged. Then the
+frozen criterion-3 proof block over `$BK`; SHA-256+counts into
+`.oplan/word-quiz/backup-receipt.txt` (never contents). Stated openly: this GET can rewrite her
+file into sorted-key order — byte-identical to what her own app does on every load.
+→ STEP-6.2-OK. (Steps 6.8 and 6.10 reuse this exact command form, capture #2 / read-back.)
+**6.3 derive the top-up list** [ORCHESTRATOR]: from $BK — `known`, minus the 37 (transcribed to
+`qz8-exclusions.txt`, must count 37), minus non-manifest keys, minus words with existing files →
+`topup-1-words.txt` (LC_ALL=C sorted) + `topup-1-dropped.txt` (word + reason). N=0/N>25 gates as
+above. → STEP-6.3-OK
+**6.4 make the bank growable + growth.md truth-fix** [WORKER]: the two-line assertion change
+(quoted verbatim in the packet) + the five dated growth.md lines. Ledger stays 282. Fail-first:
+move a bank file out, watch `>= 50` still fail, restore. Files: exactly
+`tests/quiz-bank.test.js`, `docs/growth.md`. → STEP-6.4-OK
+**6.5 generate the top-up items** [WORKER, batches ≤10, sequential]: one file per lemma in the
+list, under QZ-1 rules 1-13 + QZ-2 + D21 + D22 + the pin test + the irregular-forms list + the
+not-ordinary-English warning, ALL QUOTED VERBATIM in the packet; worker runs the gate until
+green. Only new-lemma files; never an existing one; none for the 37. → STEP-6.5-OK
+**6.6 two adversarial passes + adjudication** [WORKER ×2, fresh, blind to each other]: per item —
+gloss + sentence + answer + ALL EIGHT distractors; frozen question: "does any of these eight
+satisfy BOTH the gloss AND the sentence?"; orchestrator adjudicates the union, re-works flagged
+items under 6.5's contracts, records everything in `topup-1-adversarial.txt`. → STEP-6.6-OK
+**6.7 HUMAN GATE A** [OWNER]: every new item through `--sample <all>`; honest summary
+(method, agreement rate, dispositions, dropped words); explicit approval. No deploy before it.
+**6.8 fresh backup, then THE DEPLOY** [ORCHESTRATOR+OWNER]: `vercel inspect` must equal 6.1's;
+capture #2 (the binding D25 artifact) with the frozen proof; rollback command written into
+phase-state.md; tree clean; `deploy --prod --yes`; record id/url/upload size. → STEP-6.8-OK
+**6.9 post-deploy mechanical verify** [ORCHESTRATOR]: the criterion-9 script (v13 present/v12
+absent; md5 live==worktree per changed public/ file; 401; health; 404→200 control pair +
+parseable arrays; sizes) into `deploy-verify.txt`. → STEP-6.9-OK
+**6.10 the read of her REAL data** [ORCHESTRATOR]: authenticated GET against the NEW deployment
+(subshell); criterion-10's five assertions vs capture #2; diff summary — INCLUDING the
+capture#1-vs-capture#2 diff, whose new `known` words are reported as next-weekly-top-up work
+(criterion 5's routing). Non-empty backup\live → STOP + rollback + owner. → STEP-6.10-OK
+**6.11 HUMAN GATE B** [OWNER]: the written checklist (defeat the cache — close all tabs/PWA,
+reopen twice; launcher present and starts; RTL right, LTR sentence; gloss ABOVE sentence; six
+options, speakers play; after-chapter check before המשך הסיפור and does it feel fair; wrong
+answer shows כמעט + the right word; would she come back tomorrow). Defect → re-open the phase.
+**6.12 close** [ORCHESTRATOR]: re-run every mechanical criterion → `PHASE-6-ALL-CRITERIA-OK`;
+record deployment ids + rollback + backup SHA-256s; fix the broken recipe citation in the
+record; re-curate the field guide; the two phase reports; **then, after the owner's gate-B yes:
+DELETE the backup files (D27) and record the deletion** — stating that the safety net ends
+there. Phase 5 stays deferred; no G1 work.
+
+### RISKS (fuller argument in the planning journal entry)
+· Deploy corrupts her profile; no restore (B3 accepted: capture-only) — guarded by additivity,
+  two captures, 6.10's key-diff with rollback-on-discrepancy.
+· A top-up item marks her wrong for being right — gloss + rule 13 + two passes + gate A;
+  residual small but NOT zero, said to the owner in those words.
+· Quiz ships inert — top-up precedes deploy; criterion 5 measured against her profile.
+· APP_CODE leaks into the shell and silently 401s the suite — subshell + post-assert, every time.
+· Backup somewhere ephemeral / in the repo — D27 folder + criterion 8; deletion only at 6.12.
+· Suite red mid-phase on the first new bank file — 6.4 lands first, mutation-proved.
+· Stale cached shell at gate B — the checklist's close-and-reopen-twice instruction.
+· A frozen comparison that is not frozen — LC_ALL=C everywhere; capture-and-case, never grep -q.
+
+---- the original skeleton, kept for the record ----
+
+### PHASE 6 SKELETON (historical — superseded by the full plan above)
 
 **FIRST CRITERION, BEFORE ANY DEPLOY THAT CAN WRITE THE NEW PROFILE FIELDS (D25): BACK HER PROFILE
 UP.** Capture the live profile to a timestamped file and prove the capture is non-empty, parseable

@@ -1308,3 +1308,42 @@ DEFERRED to its own future run, gated on growth.md being amended (per the brief'
 instruction) and signed. Phase 6 — backup, deploy, first top-up, the owner's first real-browser
 look — is next. The phase-5 planner's conditional plan and its seven blockers stay in this
 journal as the starting record for that future run.
+
+## PHASE 6 PLANNING — fresh planner measured the live system; review round closed 6 gaps (2026-07-27)
+
+A fresh planner (Opus) drafted phase 6 from the record AND measured the live system read-only at
+plan time: production alias `english-app-three-tan.vercel.app`; rollback target
+`dpl_4b6XjMSa2HRUN4a2s48cdsT6u2Z1` / `english-d0roovfpq-dkreinovs-projects.vercel.app`; the live
+build PROVEN to be commit `3a88e71` (live /sw.js md5 == that git blob — chosen because `vercel
+inspect` records no commit for CLI deploys); unauthenticated /api/profile → 401 (gate enforced
+in production); /quiz/light.json → 404 and the negative control 404 (the pre-deploy pair);
+vercel CLI 56.5.0 authenticated; four changed public/*.js files are CRLF on disk / LF in git
+(phase-4 stash residue) so every md5 check is against the WORKTREE.
+
+Its two headline finds, both verified by me: **`tests/quiz-bank.test.js:124` pins the bank at
+EXACTLY 50 files** — the first top-up file would have turned the suite red and taken every later
+step's validation with it (now step 6.4, relaxed to >= 50 BEFORE any item lands, mutation-proved);
+and **the deploy recipe is not where three binding documents say it is** — the phase-6 skeleton,
+both field guides point at the word-audio JOURNAL, which contains no deploy section; the recipe
+lives in `.oplan/word-audio/phase-state.md:55-66` (broken citation; fix at 6.12).
+
+Blockers put to the owner and answered (D27): backup dir `C:/Users/dkreinov/english-app-backups/`
+**with the owner's rider that the backups are DELETED at phase close** — recorded with the
+trade-off stated (the D25 net ends at that deletion; it exists for the deploy window, which is
+where the risk lives); capture-only accepted (no restore path exists — rollback restores CODE
+only; restore tooling would be its own authorized work). B2 (does local .env APP_CODE match
+production) and B4 (top-up size N > 25) stay conditional with frozen stop-rules.
+
+PLAN REVIEW round 1 (Sonnet, fresh): **fix-first, six findings, all real** — the safe-secret
+subshell was asserted three times but never frozen as a command; criterion 5 never bound $BK to
+a capture; criterion 9's file enumeration was unfrozen and would plausibly have skipped the
+ADDED bank files (the deploy's actual payload); criterion 10 hid a judgment clause inside a
+"mechanical" check; the D27 deletion sequencing needed criterion 5's input pinned; nothing
+created the backup dir. ALL FIXED in plan.md: the exact subshell capture command is frozen
+verbatim (`( set -a; . ./.env; set +a; curl ... )` + the `[ -z "${APP_CODE:-}" ]` post-assert);
+$BK = capture #1 with between-captures claims routed to a report; `--diff-filter=ACMR`;
+criterion 10's status rule is a pure boolean over five named activity fields; mkdir -p in
+Git-Bash path form. Round 2: **ship** — all six confirmed closed, one non-blocking thread
+(6.10's summary line now names the between-captures report).
+
+tokens: planner=178411 · reviewer=228397 (both rounds, cumulative).

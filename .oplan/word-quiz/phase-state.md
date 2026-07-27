@@ -5,8 +5,11 @@ CURRENT: **PHASE 4 CLOSED 2026-07-27. ALL ELEVEN CRITERIA MET — the owner read
   gated on growth.md being amended per the brief and SIGNED — the fresh planner found it
   unsigned and G1 unimplemented (verified; see journal "PHASE 5 PLANNING", which also holds the
   conditional plan + 7 blockers for that future run).
-  NEXT ACTION: **plan PHASE 6 (backup + deploy + first top-up) with a fresh planner, review
-  that plan, then execute.** Phase 6 is a skeleton only in plan.md.
+  NEXT ACTION: **execute PHASE 6, starting at step 6.1.** Phase 6 is PLANNED IN FULL in plan.md
+  (13 criteria incl. two human gates; 12 steps; D27 = backup dir + capture-only + delete-at-close
+  rider; frozen capture command; review verdict ship after 6 findings fixed). ROLLBACK TARGET:
+  `"$(npm prefix -g)/vercel" rollback https://english-d0roovfpq-dkreinovs-projects.vercel.app --yes`
+  (id dpl_4b6XjMSa2HRUN4a2s48cdsT6u2Z1) — restores CODE ONLY.
   Six steps accepted: 4.1 1aabd37 · 4.2 2159560 (A7) · 4.3 70ac7c1 (A8) · 4.4 93847b8 ·
   4.5 e4147aa · 4.6 90112d1.
   Ledger 257 -> 264 -> 272 -> 274 -> 277 -> 277 -> **282**, `# fail 0`. Contrast 52 ALL PASS.
