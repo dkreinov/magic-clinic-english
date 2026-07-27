@@ -5,11 +5,18 @@ CURRENT: **PHASE 4 CLOSED 2026-07-27. ALL ELEVEN CRITERIA MET — the owner read
   gated on growth.md being amended per the brief and SIGNED — the fresh planner found it
   unsigned and G1 unimplemented (verified; see journal "PHASE 5 PLANNING", which also holds the
   conditional plan + 7 blockers for that future run).
-  NEXT ACTION: **execute PHASE 6, starting at step 6.1.** Phase 6 is PLANNED IN FULL in plan.md
-  (13 criteria incl. two human gates; 12 steps; D27 = backup dir + capture-only + delete-at-close
-  rider; frozen capture command; review verdict ship after 6 findings fixed). ROLLBACK TARGET:
+  **PHASE 6 IS PAUSED MID-EXECUTION BY OWNER DECISION D28 (2026-07-27, at gate A).** Steps
+  6.1-6.6 are DONE (baseline frozen · capture #1 proven, 12 known words · top-up list derived ·
+  bank pin relaxed + growth.md corrected · 12 files / 14 items generated, gate green · two blind
+  adversarial passes, 2 leaks found and fixed). NOTHING IS DEPLOYED. At gate A the owner
+  reversed D22's presentation: the gloss becomes a HIDDEN HINT (see design.md D28). Gate A's
+  approval was therefore never given in the old form and is superseded.
+  NEXT ACTION: **execute the 6b re-work (planned, under review): hint-button card + a
+  sentence-only re-vet of ALL 85 bank items + re-worked leaky items + a fresh owner gate**, then
+  resume at 6.8 (fresh backup → deploy). ROLLBACK TARGET unchanged:
   `"$(npm prefix -g)/vercel" rollback https://english-d0roovfpq-dkreinovs-projects.vercel.app --yes`
   (id dpl_4b6XjMSa2HRUN4a2s48cdsT6u2Z1) — restores CODE ONLY.
+  CAPTURE #1 sha256 58870a1b… remains valid as the top-up seed; capture #2 still happens at 6.8.
   Six steps accepted: 4.1 1aabd37 · 4.2 2159560 (A7) · 4.3 70ac7c1 (A8) · 4.4 93847b8 ·
   4.5 e4147aa · 4.6 90112d1.
   Ledger 257 -> 264 -> 272 -> 274 -> 277 -> 277 -> **282**, `# fail 0`. Contrast 52 ALL PASS.

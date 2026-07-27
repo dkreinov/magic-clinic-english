@@ -1607,6 +1607,54 @@ satisfy BOTH the gloss AND the sentence?"; orchestrator adjudicates the union, r
 items under 6.5's contracts, records everything in `topup-1-adversarial.txt`. → STEP-6.6-OK
 **6.7 HUMAN GATE A** [OWNER]: every new item through `--sample <all>`; honest summary
 (method, agreement rate, dispositions, dropped words); explicit approval. No deploy before it.
+**SUPERSEDED BY D28 (owner, at this gate, 2026-07-27):** the owner reversed D22's presentation —
+the gloss becomes a HIDDEN HINT. Gate A in its old form was never given; the 6b re-work below
+runs INSTEAD, ending in a fresh owner gate (6b.5), then execution resumes at 6.8.
+
+### THE 6b RE-WORK (D28) — inserted between 6.7 and 6.8, planned before dispatch
+
+**QZ-23 — the hint card (amends QZ-18's text-node order under D28; everything not named here
+stands, including A7).** `renderQuizCard(state)`'s state gains `hintShown` (bool, default
+false). Frozen text-node order becomes:
+  1. `.quiz-progress` — `שאלה <index+1> מתוך <total>`   (unchanged)
+  2. `.quiz-prompt` — `איזו מילה מתאימה?`               (unchanged)
+  3. `.quiz-sentence` dir="ltr" — the sentence verbatim  (moves ABOVE the gloss)
+  4. **the hint slot:** when `hintShown || chosen !== null` →
+     `<p class="quiz-sense">` + escaped gloss (THE GLOSS IS ALWAYS REVEALED ONCE SHE ANSWERS —
+     she learns the meaning either way; that is the teaching half of D22 kept);
+     otherwise → `<button class="quiz-hint-btn" data-action="quiz-hint">רמז</button>`
+  5-8. options / feedback / demotion / הלאה — unchanged from QZ-18 (incl. A7's wrapper).
+  Session API gains `session.hint()` — sets the current question's `hintShown`, re-renders,
+  POSTs NOTHING, records NOTHING (no new profile field; QZ-9 stays frozen; pressing the hint is
+  free). Binding: `container.querySelectorAll('[data-action="quiz-hint"]')` → `session.hint()`,
+  same house pattern. Frozen Hebrew: the button text is `רמז`.
+
+**QZ-24 — the sentence-only re-vet bar.** Because the child who never presses רמז faces the
+sentence bare, the pre-D22 strict bar returns: **every distractor of every item in the whole
+bank must be WRONG in the sentence alone** (the pin test). Frozen question for the sweep:
+*"IGNORING the gloss entirely, does any of the 8 distractors fit the sentence?"* Two
+independent passes over ALL 85 items (71 pilot-era — which D22's shield was protecting — plus
+the 14 top-up), union adjudicated by the orchestrator, flagged items re-worked under QZ-1/QZ-2
+(re-pin the sentence or swap the distractor; gloss rules 11/13 still bind — the gloss is still
+learner-facing, on demand).
+
+**6b steps:**
+- **6b.1** [ORCHESTRATOR]: re-derive `quiz-transcript.mjs` + `quiz-transcript-expected.txt` BY
+  HAND from QZ-23 — now FOUR screens: (1) first shown — hint button, no gloss; (2) after רמז —
+  gloss visible; (3) after a wrong choice — gloss visible (revealed by answering), feedback;
+  (4) demotion. Written BEFORE 6b.2 is dispatched, as always.
+- **6b.2** [WORKER]: `public/quiz.js` (QZ-23) + `tests/quiz-ui.test.js` (assertions inside the
+  existing 8 tests updated: test 2's gloss-above-sentence becomes hint-hidden/revealed-on-רמז/
+  revealed-on-answer; counts DO NOT move — ledger stays 282). Validation: node --check, suite
+  282/0, boundary exactly those two files, contrast 52.
+- **6b.3** [WORKER ×2, blind, parallel]: the QZ-24 sweep over all 85 items; per-item verdicts.
+- **6b.4** [WORKER]: re-work the adjudicated union's flagged items; gate green; boundary = only
+  the flagged `public/quiz/*.json`.
+- **6b.5** [OWNER — replaces gate A]: a rebuilt review page in the HINT style (gloss behind a
+  click, as she will see it) covering every item CHANGED since the owner last looked, plus the
+  sweep summary; explicit approval. Then resume 6.8 (fresh backup → deploy).
+  Phase-6 criterion 6's allowlist grows by `public/quiz.js` and `tests/quiz-ui.test.js`;
+  criterion 2 (ledger 282) unchanged; QZ-21's gate-diff at 6.12 uses the RE-DERIVED pair.
 **6.8 fresh backup, then THE DEPLOY** [ORCHESTRATOR+OWNER]: `vercel inspect` must equal 6.1's;
 capture #2 (the binding D25 artifact) with the frozen proof; rollback command written into
 phase-state.md; tree clean; `deploy --prod --yes`; record id/url/upload size. → STEP-6.8-OK

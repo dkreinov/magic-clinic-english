@@ -128,7 +128,32 @@ READS.** That is a real consequence and it cuts three ways:
    cloze alone, and it removes the one failure that damages her — being marked wrong for a right
    answer.
 
-## D23 — the bank is grown ON DEMAND, not built up front (owner, 2026-07-27). REVERSES D8.
+## D28 — the meaning becomes a HIDDEN HINT, not an always-shown gloss (owner, 2026-07-27, at the phase-6 gate A). SUPERSEDES D22's presentation clause.
+
+At gate A, shown the 14 top-up items in review form, the owner instructed: *"remove the
+distractors and make the explanation a hint that is hidden untill is pressed"* — and, asked
+which of three readings was meant, chose **"Change the app: hint button"** with the cost stated
+in the option itself: wrong options must then be wrong from the sentence ALONE, all bank items
+need re-vetting to that stricter bar, the phase-4 screens and tests get re-worked, and the
+deploy waits.
+
+What stands and what changes:
+- The item FORMAT is unchanged: gloss (`sense`), sentence, answer, 8 distractors. Rules 11 and
+  13 still bind the gloss — it is still learner-facing, just on demand.
+- The PRESENTATION changes: the card shows the sentence without the meaning; a hint button
+  reveals the gloss when pressed. Pressing the hint is free — no strike, no recording, no new
+  profile field (QZ-9 stays frozen).
+- The QUALITY BAR reverts to the pre-D22 strict form: **every distractor must be wrong in the
+  sentence alone** (the pin test), because the child who never presses the hint faces the
+  sentence bare. The gloss remains a second net for the child who does press it.
+- D22's measurement stands as history: the always-shown gloss killed 13 of 15 known leaks. Those
+  13 items and every gloss-leaning item since must now survive without that shield — a full
+  sentence-only re-vet of the whole bank is the price, and the owner accepted it.
+
+On "remove the distractors": the no-options reading ("she types the word — a different
+product") was offered EXPLICITLY as its own choice and the owner did not take it, choosing the
+hint-button reading instead. Multiple choice therefore stays. If the owner meant something
+narrower by those words (e.g. fewer options), that is not in evidence and was not assumed.
 
 D8 said "all 2254 words, ~5000 items, one-and-done". Measured against phase 1's real per-word
 cost, that is **~55M tokens and ~45 hours of agent time** — roughly 40x everything phase 1 spent.
