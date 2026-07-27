@@ -750,3 +750,67 @@ STEP 3.3 D11 — a re-tap flags, it never strikes
   tokens: worker=55576, checker=34023
   commit: 76eb416
   accepted: 2026-07-27
+
+### The load path REWRITES an unsorted profile — found by the 3.4 worker, verified by me
+
+The worker's test 7 ("an old-shape profile survives a real GET with its bytes unchanged") failed on
+its first attempt, and the reason is a genuine production fact nobody had written down:
+**`migrateWordKeys` iterates `Object.keys(profile.words).sort()` and rebuilds the object in that
+order.** So a stored profile whose word keys are not already alphabetical comes back with a
+different `JSON.stringify(p.words)`, the handler's "only write when it changed" test fires, and a
+plain GET REWRITES her file.
+
+I verified it independently rather than taking the report on trust — a throwaway probe under
+`os.tmpdir()`, an old-shape profile stored as `{light, fair}`, one GET: file rewritten, key order
+`light,fair` -> `fair,light`. Repo tree stayed clean.
+
+Two consequences, and the second is the one that matters:
+
+- It is PRE-EXISTING behaviour, not something phase 3 introduced. `migrateWordKeys` has sorted since
+  it was written.
+- **It bounds what test 7 proves.** Test 7 shows an old-shape profile survives a GET byte-identical
+  *when its keys are already sorted*. That is not a cheat: because every GET sorts and saves, her
+  real file was normalised by the first GET after that code shipped and has been sorted ever since.
+  But the honest claim is "an already-normalised old-shape profile is not rewritten", not the
+  broader "her file is never rewritten on load", and the closure summary must say the narrow one.
+  Phase 1 closed once on a summary that was broader than the evidence.
+
+STEP 3.4 the `quiz-answer` action
+  tier: WORKER (Sonnet)
+  did: api/profile.js — imported `applyQuizAnswer`; added a fifth `else if` branch with the four
+       checks written out in the frozen order (lemma -> sessionId -> correct -> existence), each
+       returning before the shared `await saveProfile(p)`; direct `p.words[k]` lookup, no
+       `resolveLemma`, `now` not passed.
+       tests/api-profile-quiz.test.js — NEW, seven flat top-level `test()` calls.
+  surprises: the key-ordering discovery above.
+  deviations: the test-7 fixture must list its word keys alphabetically. Correctly reported as a
+       fixture detail rather than a design choice — and it turned out to be the visible edge of a
+       real behaviour, which is why the SURPRISES/DEVIATIONS split earns its keep.
+  fail_first: tests 1-6 failed against the untouched handler (`unknown action`); test 7 passed, as
+       predicted in the packet — it guards the GET path this step does not touch.
+  mutations: · session fails OPEN (a fresh random `sessionId` forwarded on every call) — caught by
+       tests 1 and 3. Test 3 is the child-experience assertion: three wrong taps in one sitting.
+       · a `saveProfile` added before the `unknown word` 400 — caught by test 5's byte-identity.
+       Neither was a hole. Both restored.
+  validation_first_try: yes (worker), re-run by me in a clean tree: STEP-3.4-OK, 252 pass / 0 fail,
+       and `.data/profile.json` absent.
+  retries: 0
+  escalations: 0
+  interventions: 0
+  audit: match, CONFIDENCE high, having traced the precedence order and every write path by hand.
+  commit: f9760b2
+  accepted: 2026-07-27
+
+### QZ-16 — the transcript agrees with a hand-derivation made before the code existed
+
+I wrote `transcript.mjs` AND `transcript-expected.txt` at commit dd96168, before step 3.4 was
+dispatched. The expected file was derived BY HAND from QZ-12's table, event by event — not by
+running anything, because generating the expectation from the implementation would make the owner's
+gate circular.
+
+Run against the finished handler: **`diff` is empty. Fifteen event lines and the final
+`knownLemmaSet` match exactly.** That is two independent derivations of the same state machine
+agreeing, which is worth considerably more than the green test suite: the tests were written by the
+same agent that wrote the code, the expected transcript was not.
+
+`.data/` verified empty afterwards (criterion 7).
