@@ -1,8 +1,11 @@
-CURRENT: **PHASE 1 CLOSED 2026-07-27 — all 9 criteria met, criterion 9 approved by the owner, who
-  opened phase 2.** Phase 2 is NOT YET PLANNED: plan.md holds only a skeleton for it, and this
-  project's rule is that a step containing an open question must never be dispatched. Phase 2 needs
-  its own frozen acceptance criteria, a batching strategy, and a decision on scale BEFORE any
-  worker runs. Next action: plan phase 2, do not dispatch it.
+CURRENT: **PHASE 1 RE-OPENED BY AUDIT, 2026-07-27. Do not treat it as closed.**
+  It was declared closed and the owner approved criterion 9 — but the owner approved on my written
+  assurance that "no distractor fits its blank", and an independent content audit then found one
+  CERTAIN leak and four PROBABLE ones. **The approval rests on a false premise, so it does not
+  count.** Phase 2 must NOT be dispatched until the leaks are fixed and the owner re-approves.
+  An adversarial audit of the gate separately found 5 HIGH-severity holes that let bad items through
+  (see journal "AUDIT"). The 71 shipped items do not exploit them; phase 2's generator would.
+  Next action: fix the leaks and the gate, then re-run criterion 9. Do not plan phase 2 yet.
 PLAN: .oplan/word-quiz/plan.md — fixed in place through THREE review rounds, so there is no
   amendments appendix to read separately. Read it top to bottom.
 DESIGN: .oplan/word-quiz/design.md — FROZEN. 14 owner decisions (D1-D14) from a grill-me pass plus
