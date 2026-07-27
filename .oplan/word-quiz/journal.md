@@ -1271,3 +1271,34 @@ run now, in this session, on the plan's order.
 
 ALL ELEVEN CRITERIA MET. Phase 4 is closed the way phases 1 and 3 closed: mechanically green,
 then a human yes given on evidence that was derived independently of the code it judges.
+
+## PHASE 5 PLANNING — the fresh planner found the phase is NOT AUTHORIZED (2026-07-27)
+
+A fresh planner (Opus) drafted phase 5 from the record alone, and its first finding outranks its
+plan: **`docs/growth.md` — the document phase 5 implements — was never signed.** VERIFIED BY ME,
+not taken on trust: line 3 reads `STATUS: AWAITING-OWNER-SIGN-OFF`; §10's signature block is
+blank; growth.md's own §1 says nothing is built until it is signed; and the run's governing brief
+(`.oplan/word-learning-brief.md:64`) says "do not sign growth.md as it stands. Amend it with
+W1-W5 first" — an amendment that has never been made. ALSO VERIFIED: G1 is not implemented
+anywhere (`promoteKnownWords`/`promoteToCandidate` appear nowhere in lib/ api/ public/ scripts/;
+`WORD_STATUSES = ['known','learning']` at lib/profile.js:13). The phase-5 skeleton — "G1's
+automatic promotion writes candidate" — presumed a producer that does not exist.
+
+The planner also showed the skeleton DEADLOCKS against three frozen contracts as written:
+`pickQuizWords` filters `status === 'known'` exactly (candidates never asked); the top-up
+operation and the phase-6 first-top-up criterion generate items for `known` words only
+(candidates never get an item); QZ-12 row 1 is frozen as "never promotes" (a pass could not
+promote a candidate). And what she would SEE is undecided: `statusBadge` falls through to
+`לומדת` and the claim button renders only for `status === "learning"` exactly — a candidate
+would look like a learning word she is suddenly not allowed to claim.
+
+It returned a full conditional plan (9 steps, 12 criteria, ledger 282->311) held in its
+transcript, gated on 7 blockers: B1 the unsigned growth.md (OWNER-ONLY, blocks everything),
+B2 one-wrong-or-three-strikes for a failing candidate, B3 comparator position, B4 three-status
+merge precedence, B5 re-nomination of a demoted word, B6 child-facing wording (arguably
+owner-only), B7 top-ups for candidates. Its recommendation, which I endorse: **run phase 6
+first** — everything in phase 6 is decided and valuable (backup, deploy, first top-up, the
+owner's first real-browser look) — and re-open G1 as its own run once growth.md is amended and
+signed and the quiz has been observed on her real data.
+
+Put to the owner as a decision, not proceeded on. tokens: planner=154374.
