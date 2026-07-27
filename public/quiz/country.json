@@ -11,6 +11,6 @@
     "sense": "land with fields and farms, far from where many people live",
     "sentence": "My grandmother lives in the ___, so she sees cows every morning.",
     "answer": "country",
-    "distractors": ["city", "town", "station", "park", "shop", "room", "market", "street"]
+    "distractors": ["city", "kitchen", "station", "park", "shop", "room", "market", "street"]
   }
 ]

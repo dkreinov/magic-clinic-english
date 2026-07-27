@@ -1,0 +1,34 @@
+QZ-24 SENTENCE-ONLY SWEEP — two blind passes over all 85 items (2026-07-27, under D28)
+Frozen question: ignoring the gloss entirely, does the distractor fit the sentence?
+PASS A: 26 flags / 11 items · PASS B: 32 flags / 11 items
+BOTH-PASS ITEMS (real, all re-worked): add[1] pour · back[1] up · country[1] town ·
+[REDACTED: her vocabulary -- D27/R-F3-5, counts only]
+
+DISPOSITIONS:
+  dad[0]  REWORK sentence -> "My ___ is married to my mom." (definitional pin; 'mom' as an
+          option becomes self-marriage, absurd). mom[0] mirror -> "My ___ is married to my dad."
+  fan[1]  DELETED — 7 of 8 options flagged; the supporter sense has no honest sentence-only pin
+          we could find. Phase-1 frozen lesson applied: SHIP FEWER ITEMS RATHER THAN A LEAKY
+          ONE. fan[0] (the machine) remains; the word stays quizzable. Bank 85 -> 84 items.
+  movie[0] REWORK sentence -> "We went to the cinema to watch a funny ___ about a talking dog."
+          (place + content pin); distractor story -> swapped (a story is watchable at a cinema
+          on a loose read).
+  add[1]  SWAP pour, give (both achieve the sweetening on a child's read).
+  back[1] SWAP up, away ("gave it up/away to me" both read as handing over).
+  country[1] SWAP town (small towns border farmland).
+  dark[1] REWORK sentence -> "...afraid of the ___ at night, so they sleep with a small lamp
+          on." (the lamp remedy pins darkness; it does nothing for quiet/warm/cold).
+  rest[0] SWAP part ("the part is seven" is loosely readable as the remainder).
+  timetable[0] SWAP clock (a child conflates "look at the clock" with knowing the bus time).
+  play[2] SWAP movie, film (stage adaptations make them loosely readable; single-pass flag but
+          two options — cheap to remove the doubt).
+  well[0] SWAP differently ("so differently that the class claps" has an impressed reading).
+
+KEPT, with reasons (single-pass flags adjudicated NOT leaks):
+  dark[0]:bright — "a room so bright I could not see my own hand" describes staring into a
+    light source, not a room; pass B did not flag it; bright is the pedagogically load-bearing
+    antonym.
+  question[0]:test — "the teacher ASKED such a hard test" is not an English collocation; the
+    verb selects question.
+  kind[1]:piece — "what piece of music, pop or jazz?" — the apposition names GENRES; a piece
+    cannot be answered with 'pop'.

@@ -2,8 +2,8 @@
   {
     "lemma": "movie",
     "sense": "a long set of moving pictures that you watch, often at a cinema or on a screen",
-    "sentence": "My family and I watched a new ___ together in the living room.",
+    "sentence": "We went to the cinema to watch a funny ___ about a talking dog.",
     "answer": "movie",
-    "distractors": ["song", "game", "match", "concert", "story", "race", "book", "poem"]
+    "distractors": ["song", "game", "match", "concert", "letter", "race", "book", "poem"]
   }
 ]

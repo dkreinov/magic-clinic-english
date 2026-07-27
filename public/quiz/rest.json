@@ -4,7 +4,7 @@
     "sense": "what is left over when some has been taken away",
     "sentence": "If I take three apples from ten, the ___ is seven.",
     "answer": "rest",
-    "distractors": ["half", "part", "piece", "bit", "sum", "total", "end", "top"]
+    "distractors": ["half", "middle", "piece", "bit", "sum", "total", "end", "top"]
   },
   {
     "lemma": "rest",

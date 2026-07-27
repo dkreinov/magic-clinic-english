@@ -4,7 +4,7 @@
     "sense": "in a good way",
     "sentence": "She sings so ___ that the whole class stands up and claps.",
     "answer": "well",
-    "distractors": ["badly", "quietly", "slowly", "hardly", "nearly", "exactly", "mostly", "differently"]
+    "distractors": ["badly", "quietly", "slowly", "hardly", "nearly", "exactly", "mostly", "twice"]
   },
   {
     "lemma": "well",

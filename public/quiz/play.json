@@ -18,6 +18,6 @@
     "sense": "a story that people act on a stage",
     "sentence": "My class acted a funny ___ on the school stage last week.",
     "answer": "play",
-    "distractors": ["movie", "song", "dance", "concert", "game", "film", "poem", "picture"]
+    "distractors": ["letter", "song", "dance", "concert", "game", "sandwich", "poem", "picture"]
   }
 ]

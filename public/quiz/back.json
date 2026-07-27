@@ -11,7 +11,7 @@
     "sense": "to the person or place it came from before",
     "sentence": "She borrowed my pen and then gave it ___ to me.",
     "answer": "back",
-    "distractors": ["away", "out", "up", "down", "here", "there", "inside", "outside"]
+    "distractors": ["soon", "out", "often", "down", "here", "there", "inside", "outside"]
   },
   {
     "lemma": "back",
