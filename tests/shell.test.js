@@ -55,7 +55,7 @@ test('every .js file under public/ passes node --check', () => {
 
 test('sw.js has the expected cache name and precache list resolving to real files', () => {
   const sw = readFileSync(path.join(publicDir, 'sw.js'), 'utf8');
-  assert.ok(sw.includes('magic-vet-v12'));
+  assert.ok(sw.includes('magic-vet-v13'));
 
   const match = sw.match(/PRECACHE\s*=\s*(\[[\s\S]*?\])/);
   assert.ok(match, 'expected to find PRECACHE array literal in sw.js');
@@ -68,6 +68,8 @@ test('sw.js has the expected cache name and precache list resolving to real file
     '/api.js',
     '/lemma.js',
     '/words-index.js',
+    '/quiz-core.js',
+    '/quiz.js',
     '/views/home.js',
     '/views/placement.js',
     '/views/reader.js',
