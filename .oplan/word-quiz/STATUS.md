@@ -1,7 +1,7 @@
 # STATUS — word-quiz (W5b)
 
-**Where we are:** phase 1 is closed and approved by you. Phase 3 is being built now — step 3.1 of 5
-is done. **Nothing Mika can see has changed yet, and nothing is deployed.**
+**Where we are:** phase 3 is built and every automatic check passes. **It is waiting on you** — one
+question, below. Nothing Mika can see has changed, and nothing is deployed.
 
 ## What this run builds
 
@@ -22,40 +22,45 @@ flowchart LR
     E --> A
 ```
 
-Three wrong taps in ONE sitting cost her one strike, not the word. That rule is the single thing
-phase 3 exists to get right.
-
 ## Progress
 
 | Phase | What | State |
 |---|---|---|
 | Planning | design + plan + 3 review rounds | done |
-| 1 | item format, the checker, 50-word pilot | **done — you approved it** |
-| 2 | the full bank | **cancelled as a phase** — the bank now grows weekly, on demand |
-| 3 | profile: strikes and demotion | **in progress — 1 of 5 steps done** |
+| 1 | item format, the checker, 50-word pilot | done — you approved it |
+| 2 | the full bank | cancelled as a phase — the bank now grows weekly, on demand |
+| 3 | profile: strikes and demotion | **built; waiting on your answer** |
 | 4 | the quiz screens | not started |
 | 5 | automatic promotion | not started |
 | 6 | deploy | not started |
 
+## The one thing that needs you
+
+Read the transcript I printed for you and answer one question: **is this what you want her week to
+feel like?**
+
+It is a real run of the real code over one imagined week. What it shows:
+
+- She taps **light** twice to hear it. That costs her nothing — it just flags the word as worth
+  re-asking.
+- On day 1 she gets **light** wrong **three times in a row**. That costs her **one** strike, not
+  three. A bad two minutes is one bad moment, not three failures.
+- On day 3 she gets it **right**, and the slate is wiped completely — back to zero.
+- Only after three separate bad days does **light** go back to "learning".
+- **method** sits at one strike. **fair** is untouched. She still has both.
+
+If you would rather it were two strikes, or four, or that a right answer only removed one strike
+instead of all of them — say so now. It is a small change now and a much bigger one after the
+screens are built on top of it.
+
+## What I could not check, and you should know it
+
+- **Her real saved profile.** It lives in Vercel storage and cannot be read from here, so backward
+  compatibility was proved against a reconstructed copy, not her actual file. Phase 6 takes a
+  backup before deploying anything. This was a deliberate call you made earlier.
+- **Whether the demotion is visible to her.** That is phase 4's job, and phase 4 is not built.
+
 ## What it costs
 
 **No money.** The sentences are written by Claude here, not by a paid API, and there is no live AI
-call in the app. Building all 2217 words up front was measured at roughly 45 agent-hours, so that
-was dropped: words get quiz items as she claims them, in a weekly batch.
-
-## The one thing that needs you
-
-Phase 3 ends with **a printed transcript of one imaginary week of Mika's answers**, and one question
-from me: *is this what you want her week to feel like?* Three strikes, one strike per sitting, one
-right answer wipes the slate — those are policy choices, and no test can tell you they are the right
-ones for your daughter.
-
-It is not a formality. Phase 1 closed once on my written assurance, an audit then found the
-assurance was false, and the whole phase had to be re-opened. So this time you get the machine's
-literal output, not my summary of it.
-
-## Risks I am watching
-
-- **A wrongful demotion** — she is right and the app takes the word away. Guarded three ways.
-- **Her saved profile is the one file holding everything she has collected.** Phase 3 only ever
-  adds optional fields and never rewrites old ones. Phase 6 takes a backup before deploying.
+call in the app.

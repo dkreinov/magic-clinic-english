@@ -5,19 +5,46 @@ CURRENT: **PHASE 1 CLOSED 2026-07-27 (second attempt), owner approved. All 9 cri
   2217 up front was measured at ~55M tokens / ~45 agent-hours against a top-up cost of ~9k tokens
   and ~70 s per word. Top-ups run WEEKLY, not daily.
 
-CURRENT: **PHASE 3 IS EXECUTING. 3.1 (18dbda1), 3.2 (b273c74), 3.3 (76eb416), 3.4 (f9760b2)
-  ACCEPTED. NEXT AND LAST STEP IS 3.5 — the independent child-experience pass.**
-  Ledger 225 -> 231 -> 241 -> 245 -> 252, `# fail 0`.
+CURRENT: **PHASE 3 IS MECHANICALLY CLOSED. CRITERIA 1-8 ALL GREEN. ONLY CRITERION 9 — THE OWNER —
+  IS OUTSTANDING, AND IT IS IN FRONT OF THEM NOW.** Do NOT start phase 4 until they answer.
+  Five steps accepted: 3.1 18dbda1 · 3.2 b273c74 · 3.3 76eb416 · 3.4 f9760b2 · 3.5 521ae9b.
+  Ledger 225 -> 231 -> 241 -> 245 -> 252 -> **257**, `# fail 0`. Contrast 52 ALL PASS.
+  `.data/profile.json` absent. Exactly the 7 expected files changed across `d9e0b9b..HEAD`, none
+  deleted. 5/5 auditor verdicts `match`, all high confidence. 13 mutations run across 3.2-3.5, all
+  13 caught, 0 NOT-CAUGHT. **The independent step-3.5 agent found NO defect.**
   QZ-16 DISCHARGED: `transcript.mjs` + `transcript-expected.txt` were written by the orchestrator at
   dd96168, BEFORE 3.4 was dispatched, with the expected output derived BY HAND from QZ-12's table.
-  Run against the finished handler the diff is EMPTY. Criterion 9 is ready for the owner. Tree clean apart from `.oplan/`. Contrast untouched (phase 3 is
-  QZ-13 no-`public/`, so criterion 8 is re-checked at the phase gate, not per step).
-  Step 3.1 carries **AMENDMENT A3**: `strikes`/`quizRight`/`quizWrong` validate as
-  `Number.isInteger(v) && v >= 0`; "range-lenient" means no UPPER and no POLICY bound, so `99` is
-  valid and `-1` is not. As frozen, the step's non-goal ("no range check on `strikes`") contradicted
-  the step's own assertion list; I decided it before dispatch. See journal "Execution — phase 3".
-  **STILL OWED BEFORE STEP 3.4 IS DISPATCHED (QZ-16):** the orchestrator — not a worker — must write
-  `.oplan/word-quiz/transcript.mjs` AND `.oplan/word-quiz/transcript-expected.txt`.
+  Run against the finished handler the diff is EMPTY — two independent derivations agreeing.
+  Re-check criteria 3/4/5 any time: `node .oplan/word-quiz/phase-3-gate.mjs`.
+
+  THREE AMENDMENTS, all mine, each logged in plan.md beside the thing it amends:
+  **A3** (3.1) — `strikes`/`quizRight`/`quizWrong` validate as `Number.isInteger(v) && v >= 0`.
+  "Range-lenient" means no UPPER and no POLICY bound, so `99` is valid and `-1` is not. As frozen,
+  the step's non-goal contradicted the step's own assertion list.
+  **A4** (3.2) — on a merge, the `lastStrikeSession` of the side with the later `lastQuizAt` wins
+  EVEN WHEN ABSENT, because a pass is what deletes it. Ordering trap, pinned by a mutation-proved
+  test: compute that decision BEFORE overwriting `existing.lastQuizAt`.
+  **A5** (gate) — criterion 6 moved from the working tree to the commit range `d9e0b9b..HEAD`,
+  because oplan commits each step on acceptance so the frozen form compared an EMPTY set. Strictly
+  stronger: the range form sees an edit made and reverted across steps, the tree form could not.
+
+  ONE CLAIM THAT MUST BE STATED NARROWLY: phase 3 proved that an **already-normalised** old-shape
+  profile is not rewritten by a GET. NOT that her file is never rewritten on load — `migrateWordKeys`
+  SORTS word keys, so an unsorted profile IS rewritten (I verified this myself with a probe). Her
+  real file has been sorted since the first GET after that code shipped, so the narrow claim does
+  cover her — but say the narrow one.
+
+  CARRY INTO PHASE 4 — what phase 3 learned that no phase-3 test can enforce:
+  · **QZ-11 pushes a criterion into phase 4 IN ADVANCE: the client must mint a genuinely NEW
+    `sessionId` per sitting.** A constant id makes every word un-strikeable and the correction loop
+    silently never fires. No phase-3 test can see this. It is phase 4's to prove.
+  · A word with `strikes > 0` must be prioritised for re-asking, and so must one with `needsReview` —
+    otherwise a word at 1 or 2 strikes has no ordering key and its third strike never arrives.
+  · Phase 4 must TOLERATE A MISSING quiz item and skip it silently (D23) — she will claim a word
+    days before its item exists.
+  · The demotion must be VISIBLE to her (D1). Phase 3 built the mechanism, not the telling.
+  · Of the 8 test files that copy-paste `withTempDataDir`, only `profile-quiz-scenario.test.js`
+    deletes `APP_CODE`; the other 7 401 on a machine that exports it. Pre-existing, not phase 3's.
 
   ---- how phase 3 was planned, kept for the record ----
   It is planned in full in plan.md
@@ -28,8 +55,8 @@ CURRENT: **PHASE 3 IS EXECUTING. 3.1 (18dbda1), 3.2 (b273c74), 3.3 (76eb416), 3.
   **BEFORE step 3.4 the orchestrator must write `.oplan/word-quiz/transcript.mjs` AND
   `transcript-expected.txt` itself** (QZ-16) — the owner's gate must not rest on a command the
   implementer wrote.
-  Two known chores: the field guide is 54 lines against a 40-line budget, and
-  criterion-9-sample.txt should be regenerated whenever the bank changes.
+  Chores: criterion-9-sample.txt should be regenerated whenever the bank changes. (The field-guide
+  overrun is now 50/40, re-curated at the phase-3 boundary and justified in the journal.)
 
   ---- history of the first, VOIDED closure, kept deliberately ----
   **PHASE 1 WAS RE-OPENED BY AUDIT ONCE, 2026-07-27.**
@@ -66,7 +93,7 @@ PLAN: .oplan/word-quiz/plan.md — fixed in place through THREE review rounds, s
   amendments appendix to read separately. Read it top to bottom.
 DESIGN: .oplan/word-quiz/design.md — FROZEN. 14 owner decisions (D1-D14) from a grill-me pass plus
   5 orchestrator decisions (D15-D19). Do not re-open any of them.
-FIELD GUIDE: .oplan/word-quiz/field-guide/index.md (13 lessons, re-curated from word-audio)
+FIELD GUIDE: .oplan/word-quiz/field-guide/index.md (10 lessons, 50/40, re-curated at the phase-3 -> phase-4 boundary; 12 lessons merged into 10)
 PREDECESSOR: .oplan/word-audio/ — closed and deployed. Its journal holds the deploy recipe, the
   rollback procedure, and the two gate failures this run must not repeat.
 

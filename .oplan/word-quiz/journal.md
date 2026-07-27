@@ -929,3 +929,17 @@ genuinely new `sessionId` per sitting (QZ-11 pushed that into phase 4's criteria
 phase-4 client sends a constant id, every word becomes un-strikeable and NO phase-3 test can see
 it), and whether three-strikes-per-three-sittings is the policy the owner wants. That last one is
 criterion 9, and it is a human's call.
+
+### I did the thing the field guide warns about, again
+
+Writing the phase-state update, I ran a `python -c "..."` inside a DOUBLE-QUOTED bash string whose
+body contained backticks. Bash command-substituted every one of them before python ever saw the
+text, and the result was a mangled phase-state.md plus a stray file literally named `0` in the repo
+root. Restored with `git checkout --`, removed the stray file, and redid the edit with the file
+tools instead of the shell.
+
+This is the second time this run that a shell quoting trap has put junk in the repo (the first swept
+`tests/__probe.test.js` into a commit). Both times the lesson already existed in the field guide.
+The specific rule, stated so it is actionable: **prose containing backticks or `$` belongs in a FILE
+written by the file tool, never in a shell string.** Recorded rather than quietly fixed, because
+what makes it worth writing down is that the guide already said so and I did it anyway.
