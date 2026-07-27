@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>מרפאת הקסמים — Visual Design Options</title>
+<style>
+/* =========================================================================
+   NO external fonts, no CDNs, no network. Everything below is local.
+   The page chrome uses Georgia (ships with every OS) for display type and
+   the local UI sans for prose. The phone mockups use the app's own stack.
+   ========================================================================= */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --page-bg:      #100c18;
+  --page-bg-2:    #171021;
+  --page-ink:     #f3eef7;
+  --page-muted:   #a99fb8;
+  --page-line:    #2c2338;
+  --page-gold:    #e8bd6d;
+  --mono: ui-monospace, "Cascadia Mono", "Consolas", "SFMono-Regular", monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+}
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  background-color: var(--page-bg);
+  background-image:
+    radial-gradient(circle 900px at 12% -6%, #241a38 0%, transparent 62%),
+    radial-gradient(circle 700px at 92% 4%, #1b2436 0%, transparent 64%);
+  background-repeat: no-repeat;
+  color: var(--page-ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ---------- staggered load: the one motion gesture (skill: one wow, then restraint) ---------- */
+.rise { opacity: 0; transform: translateY(14px); animation: rise .8s cubic-bezier(.2,.7,.3,1) forwards; }
+.d1 { animation-delay: .05s } .d2 { animation-delay: .16s } .d3 { animation-delay: .28s }
+.d4 { animation-delay: .40s } .d5 { animation-delay: .52s }
+@keyframes rise { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .rise { animation: none; opacity: 1; transform: none; }
+  .firefly, .float { animation: none !important; }
+}
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+
+/* =============================== MASTHEAD =============================== */
+
+.masthead { padding: 84px 0 56px; position: relative; }
+
+.kicker {
+  font-family: var(--mono);
+  font-size: .74rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--page-gold);
+  margin: 0 0 22px;
+}
+
+.masthead h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 6.4vw, 5rem);
+  line-height: 1.02;
+  letter-spacing: -.02em;
+  margin: 0 0 6px;
+  max-width: 16ch;
+}
+.masthead h1 em {
+  font-style: italic;
+  color: var(--page-gold);
+}
+
+.intro {
+  margin: 30px 0 0;
+  max-width: 92ch;
+  font-size: 1.04rem;
+  color: #ded6e8;
+}
+.intro span { display: block; }
+.intro span + span { margin-top: 2px; }
+.intro b { color: #fff; font-weight: 600; }
+
+.rule {
+  height: 1px; border: 0; margin: 56px 0 0;
+  background: linear-gradient(90deg, var(--page-gold), var(--page-line) 32%, transparent);
+}
+
+/* =============================== COMPARISON STRIP =============================== */
+
+.strip-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap; margin: 54px 0 20px;
+}
+.strip-head h2 {
+  font-family: var(--display); font-weight: 400; font-size: 1.9rem; margin: 0; letter-spacing: -.01em;
+}
+.strip-head p { margin: 0; color: var(--page-muted); font-size: .92rem; max-width: 46ch; }
+
+.strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+@media (max-width: 940px) { .strip { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .strip { grid-template-columns: 1fr; } }
+
+.chip {
+  display: block; text-decoration: none; color: inherit;
+  border: 1px solid var(--page-line);
+  border-radius: 18px;
+  overflow: hidden;
+  background: #150f1f;
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+.chip:hover { transform: translateY(-3px); border-color: #4a3c60; box-shadow: 0 22px 44px rgba(0,0,0,.5); }
+
+.chip-sky { height: 108px; position: relative; }
+.chip-sky .card-ghost {
+  position: absolute; inset: auto 16px 14px 16px; height: 34px; border-radius: 9px;
+  display: flex; align-items: center; gap: 7px; padding: 0 10px;
+}
+.chip-sky .dot { width: 11px; height: 11px; border-radius: 50%; }
+.chip-sky .bar { height: 5px; border-radius: 99px; flex: 1; }
+
+.chip-body { padding: 14px 16px 16px; }
+.chip-num { font-family: var(--mono); font-size: .7rem; color: var(--page-gold); letter-spacing: .16em; }
+.chip-name { font-family: var(--display); font-size: 1.2rem; margin: 3px 0 4px; }
+.chip-he { font-size: .84rem; color: var(--page-muted); direction: rtl; }
+.chip-swatches { display: flex; gap: 5px; margin-top: 12px; }
+.chip-swatches i { width: 100%; height: 16px; border-radius: 5px; display: block; }
+.chip-mood { font-size: .8rem; color: #cfc6dc; margin-top: 11px; }
+
+.legend {
+  font-family: var(--mono); font-size: .7rem; color: #7e738f;
+  letter-spacing: .08em; text-align: right; margin: 0 0 60px;
+}
+
+/* =============================== OPTION SECTIONS =============================== */
+
+/* Full-bleed. Each section paints itself with the SAME background recipe the
+   app's body uses — only the token values differ. */
+.opt {
+  position: relative;
+  padding: 92px 0 96px;
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(circle 520px at 8% 2%,   var(--color-bg-glow-violet) 0%, transparent 70%),
+    radial-gradient(circle 420px at 96% 12%, var(--color-bg-glow-teal)   0%, transparent 70%),
+    radial-gradient(circle 640px at 50% 104%,var(--color-bg-glow-amber)  0%, transparent 72%),
+    linear-gradient(180deg, var(--color-bg-top) 0%, var(--color-bg) 340px);
+  background-repeat: no-repeat;
+  color: var(--color-ink);
+}
+
+.opt-grid {
+  display: grid;
+  grid-template-columns: 390px minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+}
+.opt.flip .opt-grid { grid-template-columns: minmax(0, 1fr) 390px; }
+.opt.flip .opt-phone { order: 2; }
+.opt.flip .opt-notes { order: 1; }
+@media (max-width: 900px) {
+  .opt-grid, .opt.flip .opt-grid { grid-template-columns: 1fr; gap: 40px; }
+  .opt.flip .opt-phone, .opt.flip .opt-notes { order: 0; }
+}
+
+.opt-eyebrow {
+  font-family: var(--mono); font-size: .72rem; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--color-accent); margin: 0 0 12px;
+}
+.opt-title {
+  font-family: var(--display); font-weight: 400;
+  font-size: clamp(2.1rem, 4.2vw, 3.1rem); line-height: 1.05;
+  letter-spacing: -.02em; margin: 0;
+}
+.opt-title small {
+  display: block; font-family: var(--sans); font-size: .95rem;
+  letter-spacing: 0; color: var(--color-muted); margin-top: 8px; font-weight: 500;
+  direction: rtl; unicode-bidi: isolate; text-align: left; max-width: max-content;
+}
+.opt-feel {
+  font-family: var(--display); font-style: italic;
+  font-size: 1.28rem; line-height: 1.5; margin: 22px 0 30px;
+  max-width: 44ch; color: var(--color-ink);
+  border-inline-start: 3px solid var(--color-accent);
+  padding-inline-start: 16px;
+}
+
+/* note panels sit on the option's own card token — proving legibility in situ */
+.panel {
+  background: var(--color-card);
+  border: 1px solid color-mix(in srgb, var(--color-border) 55%, transparent);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-soft);
+}
+.panel h3 {
+  font-family: var(--mono); font-size: .72rem; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--color-muted);
+  margin: 0 0 12px; font-weight: 600;
+}
+
+table.tok { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: .76rem; }
+table.tok td { padding: 4px 0; vertical-align: middle; border-bottom: 1px solid color-mix(in srgb, var(--color-border) 28%, transparent); }
+table.tok tr:last-child td { border-bottom: 0; }
+table.tok td.n { color: var(--color-muted); white-space: nowrap; padding-inline-end: 10px; }
+table.tok td.o { color: color-mix(in srgb, var(--color-muted) 70%, var(--color-card)); text-decoration: line-through; white-space: nowrap; }
+table.tok td.a { color: var(--color-muted); padding: 0 8px; }
+table.tok td.v { color: var(--color-ink); white-space: nowrap; font-weight: 700; }
+table.tok td.s { width: 22px; }
+table.tok i { display: block; width: 18px; height: 18px; border-radius: 5px; border: 1px solid rgba(128,128,128,.35); }
+
+ul.notes { margin: 0; padding: 0; list-style: none; font-size: .9rem; }
+ul.notes li { padding: 5px 0 5px 0; color: var(--color-ink); }
+ul.notes li + li { border-top: 1px solid color-mix(in srgb, var(--color-border) 22%, transparent); }
+ul.notes b { color: var(--color-accent); font-weight: 700; }
+
+.ratios { display: grid; grid-template-columns: 1fr auto; gap: 2px 14px; font-family: var(--mono); font-size: .77rem; }
+.ratios span { color: var(--color-muted); }
+.ratios b { color: var(--color-teal); font-weight: 700; text-align: right; }
+.ratios .warn { color: var(--color-accent); }
+
+.gatebar {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-family: var(--mono); font-size: .74rem; letter-spacing: .06em;
+  color: var(--color-primary-ink); background: var(--color-teal);
+  padding: 6px 13px; border-radius: 999px; font-weight: 700; margin-bottom: 16px;
+}
+
+.code {
+  font-family: var(--mono); font-size: .74rem; line-height: 1.75;
+  color: var(--color-muted); white-space: pre-wrap; margin: 0;
+}
+.code b { color: var(--color-ink); font-weight: 700; }
+
+/* =============================== PHONE MOCKUP =============================== */
+/* Identical markup + identical CSS in all four sections. Only tokens differ. */
+
+.phone {
+  width: 390px; max-width: 100%;
+  border-radius: 38px;
+  padding: 10px;
+  background: color-mix(in srgb, var(--color-nav) 80%, #000);
+  box-shadow: 0 40px 90px rgba(0,0,0,.55), 0 0 0 1px color-mix(in srgb, var(--color-border) 45%, transparent);
+  position: sticky; top: 28px;
+}
+@media (max-width: 900px) { .phone { position: static; } }
+
+.screen {
+  border-radius: 30px;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(circle 300px at 8% 2%,   var(--color-bg-glow-violet) 0%, transparent 70%),
+    radial-gradient(circle 240px at 96% 12%, var(--color-bg-glow-teal)   0%, transparent 70%),
+    radial-gradient(circle 360px at 50% 104%,var(--color-bg-glow-amber)  0%, transparent 72%),
+    linear-gradient(180deg, var(--color-bg-top) 0%, var(--color-bg) 260px);
+  background-repeat: no-repeat;
+  font-family: "Rubik", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--color-ink);
+  direction: rtl;
+}
+
+/* the per-option decorative layer — the ONLY new CSS each option asks for */
+.screen::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image: var(--decor, none);
+  background-size: var(--decor-size, auto);
+  opacity: var(--decor-opacity, 1);
+}
+
+.screen-inner { position: relative; z-index: 1; padding: 18px 16px 0; }
+
+.m-notch { height: 26px; }
+
+.m-header { margin-bottom: 16px; }
+.m-greet { font-size: .93rem; color: var(--color-muted); font-weight: 500; margin: 0; }
+.m-title { font-size: 1.55rem; font-weight: 700; color: var(--color-primary); margin: 2px 0 0; letter-spacing: -.01em; }
+
+.m-chapter { font-size: .84rem; color: var(--color-muted); font-weight: 600; margin: 0 0 9px; }
+
+.m-banner {
+  display: block; width: 100%; aspect-ratio: 3/2; object-fit: cover;
+  border-radius: var(--radius); margin-bottom: 14px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 74%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 0%, #000 74%, transparent 100%);
+}
+
+.m-card {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  padding: 17px 16px;
+  margin-bottom: 13px;
+}
+.m-card-title { font-size: 1.08rem; font-weight: 700; margin: 0 0 6px; }
+.m-text {
+  direction: ltr; text-align: left; font-size: 1.02rem; line-height: 1.85; margin: 0;
+}
+.m-text .w { border-radius: 4px; }
+.m-text .tapped { background: color-mix(in srgb, var(--color-accent) 28%, var(--color-card)); }
+
+.m-prompt { font-weight: 700; font-size: .98rem; margin: 0 0 11px; }
+.m-opts { display: flex; flex-direction: column; gap: 9px; }
+.m-opt {
+  min-height: 46px; border-radius: var(--radius);
+  border: 2px solid var(--color-border);
+  background: var(--color-surface-2);
+  box-shadow: var(--shadow-soft);
+  color: var(--color-ink);
+  font-family: inherit; font-size: .95rem; font-weight: 600;
+  padding: 9px 15px; text-align: right; display: flex; align-items: center;
+}
+.m-opt.correct { border-color: var(--color-teal); background: color-mix(in srgb, var(--color-teal) 16%, var(--color-card)); }
+.m-opt.wrong   { border-color: var(--color-danger); background: color-mix(in srgb, var(--color-danger) 16%, var(--color-card)); opacity: .92; }
+.m-feedback { margin: 10px 0 0; font-weight: 700; font-size: .95rem; color: var(--color-teal); }
+
+.m-celebrate {
+  display: block; width: 100%; aspect-ratio: 3/2; object-fit: cover;
+  border-radius: var(--radius); margin-bottom: 14px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 74%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 0%, #000 74%, transparent 100%);
+}
+
+.m-btn {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 46px; border-radius: var(--radius); border: 0;
+  background: var(--color-primary); color: var(--color-primary-ink);
+  font-family: inherit; font-size: .98rem; font-weight: 700; width: 100%;
+  box-shadow: var(--shadow-soft); margin-bottom: 18px;
+}
+
+.m-nav {
+  display: flex; justify-content: space-around; align-items: stretch;
+  height: 62px; background: var(--color-nav);
+  box-shadow: 0 -1px 0 color-mix(in srgb, var(--color-glow) 14%, transparent);
+  position: relative; z-index: 1;
+}
+.m-tab {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; color: var(--color-muted); font-size: .7rem; font-weight: 500;
+}
+.m-tab.active { color: var(--color-primary); font-weight: 700; }
+.m-tab svg { width: 22px; height: 22px; }
+
+.float { animation: float 5.5s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-5px) } }
+
+/* =============================== FOOTER =============================== */
+
+.footer { padding: 78px 0 96px; }
+.footer h2 { font-family: var(--display); font-weight: 400; font-size: 2rem; margin: 0 0 8px; }
+.footer p { color: var(--page-muted); max-width: 70ch; }
+.keeps { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 30px; }
+.keep {
+  border: 1px solid var(--page-line); border-radius: 14px; padding: 15px 17px;
+  background: #150f1f;
+}
+.keep h4 { margin: 0 0 5px; font-size: .93rem; }
+.keep p { margin: 0; font-size: .85rem; color: var(--page-muted); }
+.sig { margin-top: 40px; font-family: var(--mono); font-size: .72rem; color: #6d6379; letter-spacing: .08em; }
+
+noscript .ns { display: block; padding: 16px; border: 1px solid var(--page-gold); border-radius: 12px; color: var(--page-gold); }
+
+/* =========================================================================
+   THE FOUR PALETTES. Every value below is a drop-in replacement for the
+   matching token in public/styles.css :root — nothing else moves.
+   All four were run through scripts/check-contrast.mjs's own math:
+   52 / 52 pairs pass.
+   ========================================================================= */
+
+.pal-a {                                  /* 1 — TWILIGHT TERRACE */
+  --color-primary:        #cba6ff;
+  --color-teal:           #5fd8c6;
+  --color-accent:         #ffc65c;
+  --color-bg:             #171033;
+  --color-ink:            #f7f0e2;
+  --color-primary-ink:    #1a1038;
+  --color-muted:          #c3b7e6;
+  --color-card:           #221a44;
+  --color-surface-2:      #2e2458;
+  --color-border:         #7d68b8;
+  --color-nav:            #150e2c;
+  --color-danger:         #ff9d8a;
+  --color-glow:           #ffe3a8;
+  --color-bg-top:         #241a4a;
+  --color-bg-glow-violet: #2e1e52;
+  --color-bg-glow-teal:   #152c46;
+  --color-bg-glow-amber:  #3a2440;
+  --radius: 18px;
+  --shadow-soft: 0 0 0 1px rgba(255,227,168,.10), 0 6px 20px rgba(8,4,26,.55);
+  /* decoration: a quiet starfield, matching the telescope-roof art */
+  --decor:
+    radial-gradient(1.4px 1.4px at 22% 14%, #fff, transparent),
+    radial-gradient(1.1px 1.1px at 68% 8%,  #fff, transparent),
+    radial-gradient(1.6px 1.6px at 84% 30%, #ffe3a8, transparent),
+    radial-gradient(1.1px 1.1px at 12% 46%, #fff, transparent),
+    radial-gradient(1.3px 1.3px at 46% 26%, #cba6ff, transparent);
+  --decor-size: 260px 260px;
+  --decor-opacity: .5;
+}
+
+.pal-b {                                  /* 2 — ENCHANTED GROVE */
+  --color-primary:        #e2a0f7;
+  --color-teal:           #61e0c3;
+  --color-accent:         #ffcb63;
+  --color-bg:             #0d2119;
+  --color-ink:            #f2f6e8;
+  --color-primary-ink:    #12241b;
+  --color-muted:          #a8c8ae;
+  --color-card:           #16332a;
+  --color-surface-2:      #1f4536;
+  --color-border:         #4e8a68;
+  --color-nav:            #0a1b14;
+  --color-danger:         #ff9f8f;
+  --color-glow:           #d9ffe8;
+  --color-bg-top:         #143026;
+  --color-bg-glow-violet: #2b1f42;
+  --color-bg-glow-teal:   #0f332e;
+  --color-bg-glow-amber:  #2f2a15;
+  --radius: 20px;
+  --shadow-soft: 0 0 0 1px rgba(217,255,232,.09), 0 6px 22px rgba(2,16,10,.58);
+  /* decoration: three drifting fireflies, from the lantern-lit forest path */
+  --decor:
+    radial-gradient(30px 30px at 16% 22%, rgba(255,203,99,.30), transparent 70%),
+    radial-gradient(22px 22px at 82% 40%, rgba(97,224,195,.24), transparent 70%),
+    radial-gradient(26px 26px at 62% 76%, rgba(226,160,247,.20), transparent 70%);
+  --decor-size: auto;
+  --decor-opacity: 1;
+}
+
+.pal-c {                                  /* 3 — SUNRISE PARCHMENT */
+  --color-primary:        #7b3fb5;
+  --color-teal:           #086055;
+  --color-accent:         #8a5600;
+  --color-bg:             #fff4e2;
+  --color-ink:            #3a2412;
+  --color-primary-ink:    #fff6e8;
+  --color-muted:          #7a5a3c;
+  --color-card:           #fffaf0;
+  --color-surface-2:      #fdeed6;
+  --color-border:         #96682f;
+  --color-nav:            #fff8ec;
+  --color-danger:         #b3341c;
+  --color-glow:           #ffd98a;
+  --color-bg-top:         #ffe9c9;
+  --color-bg-glow-violet: #f3e4fb;
+  --color-bg-glow-teal:   #dff4ee;
+  --color-bg-glow-amber:  #ffe4b5;
+  --radius: 22px;
+  --shadow-soft: 0 0 0 1px rgba(150,104,47,.16), 0 6px 18px rgba(120,78,30,.13);
+  /* decoration: paper grain + a warm corner wash, so white never goes flat */
+  --decor:
+    radial-gradient(circle 340px at 100% 0%, rgba(255,190,90,.18), transparent 70%),
+    radial-gradient(circle 300px at 0% 100%, rgba(190,140,255,.12), transparent 70%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='.30'/></svg>");
+  --decor-size: auto, auto, 120px 120px;
+  --decor-opacity: .85;
+}
+
+.pal-d {                                  /* 4 — CLOUD & CRYSTAL */
+  --color-primary:        #5b3fc4;
+  --color-teal:           #0a6468;
+  --color-accent:         #8a5714;
+  --color-bg:             #eef2fb;
+  --color-ink:            #1e2445;
+  --color-primary-ink:    #f7f9ff;
+  --color-muted:          #5a6285;
+  --color-card:           #fdfdff;
+  --color-surface-2:      #eaeefb;
+  --color-border:         #6f7799;
+  --color-nav:            #f7f9ff;
+  --color-danger:         #b3311f;
+  --color-glow:           #ffffff;
+  --color-bg-top:         #e2e9fa;
+  --color-bg-glow-violet: #ece2fb;
+  --color-bg-glow-teal:   #dff1f4;
+  --color-bg-glow-amber:  #fdeedd;
+  --radius: 24px;
+  --shadow-soft: 0 0 0 1px rgba(111,119,153,.18), 0 8px 22px rgba(52,62,110,.12);
+  /* decoration: two soft cloud banks — depth without darkening anything */
+  --decor:
+    radial-gradient(560px 190px at 78% 6%,  rgba(255,255,255,.95), transparent 72%),
+    radial-gradient(460px 160px at 12% 30%, rgba(255,255,255,.75), transparent 72%),
+    radial-gradient(circle 300px at 50% 108%, rgba(255,214,168,.35), transparent 70%);
+  --decor-size: auto;
+  --decor-opacity: 1;
+}
+</style>
+</head>
+<body>
+
+<!-- ============================== MASTHEAD ============================== -->
+<header class="masthead">
+  <div class="wrap">
+    <p class="kicker rise d1">מרפאת הקסמים · front-end direction · 2026-07</p>
+    <h1 class="rise d2">The art was never the problem.<br /><em>The room around it was.</em></h1>
+    <div class="intro rise d3">
+      <span>The art already glows — lantern gold, dragon teal, crystal violet. The UI answers it with mud.</span>
+      <span>Four directions below. Each is a straight <b>:root</b> token swap plus one decorative rule.</span>
+      <span>All four were run through the project's own contrast script: <b>52 of 52 gated pairs pass</b>.</span>
+      <span>No artwork changes, no markup, no view files, no layout. Hebrew-first RTL stays intact.</span>
+      <span>Scroll — every section repaints the page in its palette, phone at real size.</span>
+    </div>
+    <hr class="rule" />
+  </div>
+</header>
+
+<!-- ============================== COMPARISON STRIP ============================== -->
+<section class="wrap">
+  <div class="strip-head rise d4">
+    <h2>Four rooms, one story</h2>
+    <p>Two keep the night (she reads at bedtime); two open the curtains. Warm on the left of each pair, cool on the right.</p>
+  </div>
+
+  <div class="strip rise d5">
+    <a class="chip" href="#opt-a">
+      <div class="chip-sky pal-a" style="background-color: var(--color-bg); background-image: radial-gradient(circle 180px at 10% 0%, var(--color-bg-glow-violet), transparent 70%), radial-gradient(circle 160px at 95% 20%, var(--color-bg-glow-teal), transparent 70%), linear-gradient(180deg, var(--color-bg-top), var(--color-bg));">
+        <div class="card-ghost" style="background: var(--color-card); box-shadow: var(--shadow-soft);">
+          <span class="dot" style="background: var(--color-primary)"></span>
+          <span class="bar" style="background: color-mix(in srgb, var(--color-ink) 60%, var(--color-card))"></span>
+          <span class="dot" style="background: var(--color-accent)"></span>
+        </div>
+      </div>
+      <div class="chip-body">
+        <div class="chip-num">OPTION 01</div>
+        <div class="chip-name">Twilight Terrace</div>
+        <div class="chip-he">מרפסת הכוכבים</div>
+        <div class="chip-swatches">
+          <i style="background:#171033"></i><i style="background:#221a44"></i><i style="background:#cba6ff"></i><i style="background:#5fd8c6"></i><i style="background:#ffc65c"></i>
+        </div>
+        <div class="chip-mood">Dark · indigo night, lantern gold</div>
+      </div>
+    </a>
+
+    <a class="chip" href="#opt-b">
+      <div class="chip-sky pal-b" style="background-color: var(--color-bg); background-image: radial-gradient(circle 180px at 10% 0%, var(--color-bg-glow-violet), transparent 70%), radial-gradient(circle 160px at 95% 20%, var(--color-bg-glow-teal), transparent 70%), linear-gradient(180deg, var(--color-bg-top), var(--color-bg));">
+        <div class="card-ghost" style="background: var(--color-card); box-shadow: var(--shadow-soft);">
+          <span class="dot" style="background: var(--color-primary)"></span>
+          <span class="bar" style="background: color-mix(in srgb, var(--color-ink) 60%, var(--color-card))"></span>
+          <span class="dot" style="background: var(--color-accent)"></span>
+        </div>
+      </div>
+      <div class="chip-body">
+        <div class="chip-num">OPTION 02</div>
+        <div class="chip-name">Enchanted Grove</div>
+        <div class="chip-he">חורשת הקסם</div>
+        <div class="chip-swatches">
+          <i style="background:#0d2119"></i><i style="background:#16332a"></i><i style="background:#e2a0f7"></i><i style="background:#61e0c3"></i><i style="background:#ffcb63"></i>
+        </div>
+        <div class="chip-mood">Dark · forest jade, crystal orchid</div>
+      </div>
+    </a>
+
+    <a class="chip" href="#opt-c">
+      <div class="chip-sky pal-c" style="background-color: var(--color-bg); background-image: radial-gradient(circle 180px at 10% 0%, var(--color-bg-glow-violet), transparent 70%), radial-gradient(circle 160px at 95% 20%, var(--color-bg-glow-teal), transparent 70%), linear-gradient(180deg, var(--color-bg-top), var(--color-bg));">
+        <div class="card-ghost" style="background: var(--color-card); box-shadow: var(--shadow-soft);">
+          <span class="dot" style="background: var(--color-primary)"></span>
+          <span class="bar" style="background: color-mix(in srgb, var(--color-ink) 60%, var(--color-card))"></span>
+          <span class="dot" style="background: var(--color-accent)"></span>
+        </div>
+      </div>
+      <div class="chip-body">
+        <div class="chip-num">OPTION 03</div>
+        <div class="chip-name">Sunrise Parchment</div>
+        <div class="chip-he">דף הזריחה</div>
+        <div class="chip-swatches">
+          <i style="background:#fff4e2"></i><i style="background:#fffaf0"></i><i style="background:#7b3fb5"></i><i style="background:#086055"></i><i style="background:#8a5600"></i>
+        </div>
+        <div class="chip-mood">Light · a picture book, opened</div>
+      </div>
+    </a>
+
+    <a class="chip" href="#opt-d">
+      <div class="chip-sky pal-d" style="background-color: var(--color-bg); background-image: radial-gradient(circle 180px at 10% 0%, var(--color-bg-glow-violet), transparent 70%), radial-gradient(circle 160px at 95% 20%, var(--color-bg-glow-teal), transparent 70%), linear-gradient(180deg, var(--color-bg-top), var(--color-bg));">
+        <div class="card-ghost" style="background: var(--color-card); box-shadow: var(--shadow-soft);">
+          <span class="dot" style="background: var(--color-primary)"></span>
+          <span class="bar" style="background: color-mix(in srgb, var(--color-ink) 60%, var(--color-card))"></span>
+          <span class="dot" style="background: var(--color-accent)"></span>
+        </div>
+      </div>
+      <div class="chip-body">
+        <div class="chip-num">OPTION 04</div>
+        <div class="chip-name">Cloud &amp; Crystal</div>
+        <div class="chip-he">ענן וקריסטל</div>
+        <div class="chip-swatches">
+          <i style="background:#eef2fb"></i><i style="background:#fdfdff"></i><i style="background:#5b3fc4"></i><i style="background:#0a6468"></i><i style="background:#8a5714"></i>
+        </div>
+        <div class="chip-mood">Light · morning sky, calm and airy</div>
+      </div>
+    </a>
+  </div>
+
+  <p class="legend">SWATCH ORDER — page · card · primary · teal · accent</p>
+</section>
+
+<noscript><div class="wrap"><p class="ns">This page builds the four identical phone mockups with a tiny inline script (no network). Enable JavaScript to see them.</p></div></noscript>
+
+<!-- ==========================================================================
+     THE SCREEN — authored once. Cloned into all four sections so the only
+     difference between them is the palette.
+     ========================================================================== -->
+<template id="screen-tpl">
+  <div class="screen" dir="rtl" lang="he">
+    <div class="screen-inner">
+      <div class="m-notch"></div>
+
+      <header class="m-header">
+        <p class="m-greet">שלום!</p>
+        <h1 class="m-title">מרפאת הקסמים</h1>
+      </header>
+
+      <p class="m-chapter">פרק 3</p>
+      <img class="m-banner" src="../../../public/assets/hero-clinic.webp" alt="" />
+
+      <div class="m-card">
+        <p class="m-card-title">הדרקון שמאחורי הדלת</p>
+        <p class="m-text" dir="ltr">
+          <span class="w">Maya</span> <span class="w">opened</span> <span class="w">the</span> <span class="w">little</span> <span class="w">green</span> <span class="w">door.</span>
+          <span class="w">A</span> <span class="w">tiny</span> <span class="w">dragon</span> <span class="w">was</span> <span class="w tapped">sleeping</span> <span class="w">on</span> <span class="w">a</span> <span class="w">pile</span> <span class="w">of</span> <span class="w">blankets.</span>
+          <span class="w">His</span> <span class="w">wing</span> <span class="w">was</span> <span class="w">hurt.</span>
+        </p>
+      </div>
+
+      <div class="m-card">
+        <p class="m-prompt">מה קרה לדרקון הקטן?</p>
+        <div class="m-opts">
+          <div class="m-opt correct">הכנף שלו נפצעה</div>
+          <div class="m-opt">הוא איבד את הדרך הביתה</div>
+          <div class="m-opt wrong">הוא היה רעב מאוד</div>
+        </div>
+        <p class="m-feedback">כל הכבוד!</p>
+      </div>
+
+      <img class="m-celebrate float" src="../../../public/assets/celebration.webp" alt="" />
+      <div class="m-btn">המשך הסיפור</div>
+    </div>
+
+    <nav class="m-nav">
+      <div class="m-tab">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 5.5C4 4.67 4.67 4 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5v-13Z" fill="currentColor" opacity=".15"/>
+          <path d="M4 5.5C4 4.67 4.67 4 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5v-13Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M20 5.5c0-.83-.67-1.5-1.5-1.5H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5v-13Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+        </svg>
+        <span>הסיפור</span>
+      </div>
+      <div class="m-tab active">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 11.5 12 4l8 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6 10v8a1 1 0 0 0 1 1h3v-5h4v5h3a1 1 0 0 0 1-1v-8" fill="currentColor" fill-opacity=".15" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+        <span>בית</span>
+      </div>
+      <div class="m-tab">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="4.5" y="4" width="15" height="16" rx="2" fill="currentColor" fill-opacity=".15" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M8 8.5h8M8 12h8M8 15.5h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span>המילים שלי</span>
+      </div>
+    </nav>
+  </div>
+</template>
+
+<!-- ============================== OPTION 1 ============================== -->
+<section class="opt pal-a" id="opt-a">
+  <div class="wrap opt-grid">
+    <div class="opt-phone"><div class="phone" data-screen></div></div>
+
+    <div class="opt-notes">
+      <p class="opt-eyebrow">Option 01 · dark</p>
+      <h2 class="opt-title">Twilight Terrace<small>מרפסת הכוכבים</small></h2>
+      <p class="opt-feel">The rooftop from <em>chapter-night</em>, turned into a room: an indigo sky you can actually see into, with the lantern still burning.</p>
+
+      <span class="gatebar">52 / 52 CONTRAST PAIRS PASS</span>
+
+      <div class="panel">
+        <h3>:root token swap — public/styles.css</h3>
+        <table class="tok">
+          <tr><td class="s"><i style="background:#171033"></i></td><td class="n">--color-bg</td><td class="o">#241305</td><td class="a">→</td><td class="v">#171033</td></tr>
+          <tr><td class="s"><i style="background:#221a44"></i></td><td class="n">--color-card</td><td class="o">#3a1d08</td><td class="a">→</td><td class="v">#221a44</td></tr>
+          <tr><td class="s"><i style="background:#2e2458"></i></td><td class="n">--color-surface-2</td><td class="o">#4d2a0e</td><td class="a">→</td><td class="v">#2e2458</td></tr>
+          <tr><td class="s"><i style="background:#150e2c"></i></td><td class="n">--color-nav</td><td class="o">#2e1806</td><td class="a">→</td><td class="v">#150e2c</td></tr>
+          <tr><td class="s"><i style="background:#f7f0e2"></i></td><td class="n">--color-ink</td><td class="o">#fdf1d8</td><td class="a">→</td><td class="v">#f7f0e2</td></tr>
+          <tr><td class="s"><i style="background:#c3b7e6"></i></td><td class="n">--color-muted</td><td class="o">#d9bc92</td><td class="a">→</td><td class="v">#c3b7e6</td></tr>
+          <tr><td class="s"><i style="background:#cba6ff"></i></td><td class="n">--color-primary</td><td class="o">#c39bf0</td><td class="a">→</td><td class="v">#cba6ff</td></tr>
+          <tr><td class="s"><i style="background:#1a1038"></i></td><td class="n">--color-primary-ink</td><td class="o">#2a1606</td><td class="a">→</td><td class="v">#1a1038</td></tr>
+          <tr><td class="s"><i style="background:#5fd8c6"></i></td><td class="n">--color-teal</td><td class="o">#4ecec0</td><td class="a">→</td><td class="v">#5fd8c6</td></tr>
+          <tr><td class="s"><i style="background:#ffc65c"></i></td><td class="n">--color-accent</td><td class="o">#f5c563</td><td class="a">→</td><td class="v">#ffc65c</td></tr>
+          <tr><td class="s"><i style="background:#ff9d8a"></i></td><td class="n">--color-danger</td><td class="o">#ef9a7d</td><td class="a">→</td><td class="v">#ff9d8a</td></tr>
+          <tr><td class="s"><i style="background:#7d68b8"></i></td><td class="n">--color-border</td><td class="o">#a35d22</td><td class="a">→</td><td class="v">#7d68b8</td></tr>
+          <tr><td class="s"><i style="background:#241a4a"></i></td><td class="n">--color-bg-top</td><td class="o">#361d08</td><td class="a">→</td><td class="v">#241a4a</td></tr>
+          <tr><td class="s"><i style="background:#2e1e52"></i></td><td class="n">--color-bg-glow-violet</td><td class="o">#321f1a</td><td class="a">→</td><td class="v">#2e1e52</td></tr>
+          <tr><td class="s"><i style="background:#152c46"></i></td><td class="n">--color-bg-glow-teal</td><td class="o">#282416</td><td class="a">→</td><td class="v">#152c46</td></tr>
+          <tr><td class="s"><i style="background:#3a2440"></i></td><td class="n">--color-bg-glow-amber</td><td class="o">#331f0c</td><td class="a">→</td><td class="v">#3a2440</td></tr>
+          <tr><td class="s"><i style="background:#ffe3a8"></i></td><td class="n">--color-glow</td><td class="o">#fde3a2</td><td class="a">→</td><td class="v">#ffe3a8</td></tr>
+          <tr><td class="s"></td><td class="n">--radius</td><td class="o">16px</td><td class="a">→</td><td class="v">18px</td></tr>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h3>Measured contrast — project's own script</h3>
+        <div class="ratios">
+          <span>ink on card (body text)</span><b>14.25</b>
+          <span>ink on page</span><b>15.99</b>
+          <span>muted on card</span><b>8.65</b>
+          <span>primary on card</span><b>8.03</b>
+          <span>primary-ink on primary (button)</span><b>8.88</b>
+          <span>app title on page (large, min 3)</span><b>9.01</b>
+          <span>teal on card</span><b>9.33</b>
+          <span>accent on card</span><b>10.38</b>
+          <span>border on card (min 3)</span><b>3.50</b>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Decorative CSS — the only addition</h3>
+        <p class="code">/* one new rule; body's background-image stays frozen */
+<b>#app::before</b> { content:""; position:fixed; inset:0;
+  pointer-events:none; opacity:.5;
+  background-image: <b>5 × radial-gradient(1.4px …)</b>;
+  background-size: 260px 260px; }</p>
+      </div>
+
+      <div class="panel">
+        <h3>Notes</h3>
+        <ul class="notes">
+          <li><b>Why it works.</b> The banners and the celebration are lit from inside with gold; against indigo they glow instead of sinking into brown-on-brown.</li>
+          <li><b>Best for.</b> Bedtime reading. Lowest light emission of the four; the screen stays calm in a dark room.</li>
+          <li><b>Trade-off.</b> Still a dark app — if the complaint is "too gloomy" rather than "too dull", look at 03 or 04.</li>
+          <li><b>Cheapest to ship.</b> Same luminance structure as today, so nothing about spacing, masks or shadows needs re-tuning.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== OPTION 2 ============================== -->
+<section class="opt pal-b flip" id="opt-b">
+  <div class="wrap opt-grid">
+    <div class="opt-phone"><div class="phone" data-screen></div></div>
+
+    <div class="opt-notes">
+      <p class="opt-eyebrow">Option 02 · dark</p>
+      <h2 class="opt-title">Enchanted Grove<small>חורשת הקסם</small></h2>
+      <p class="opt-feel">The glowing forest path, indoors: deep jade under everything, with orchid crystals and firefly gold doing all the pointing.</p>
+
+      <span class="gatebar">52 / 52 CONTRAST PAIRS PASS</span>
+
+      <div class="panel">
+        <h3>:root token swap — public/styles.css</h3>
+        <table class="tok">
+          <tr><td class="s"><i style="background:#0d2119"></i></td><td class="n">--color-bg</td><td class="o">#241305</td><td class="a">→</td><td class="v">#0d2119</td></tr>
+          <tr><td class="s"><i style="background:#16332a"></i></td><td class="n">--color-card</td><td class="o">#3a1d08</td><td class="a">→</td><td class="v">#16332a</td></tr>
+          <tr><td class="s"><i style="background:#1f4536"></i></td><td class="n">--color-surface-2</td><td class="o">#4d2a0e</td><td class="a">→</td><td class="v">#1f4536</td></tr>
+          <tr><td class="s"><i style="background:#0a1b14"></i></td><td class="n">--color-nav</td><td class="o">#2e1806</td><td class="a">→</td><td class="v">#0a1b14</td></tr>
+          <tr><td class="s"><i style="background:#f2f6e8"></i></td><td class="n">--color-ink</td><td class="o">#fdf1d8</td><td class="a">→</td><td class="v">#f2f6e8</td></tr>
+          <tr><td class="s"><i style="background:#a8c8ae"></i></td><td class="n">--color-muted</td><td class="o">#d9bc92</td><td class="a">→</td><td class="v">#a8c8ae</td></tr>
+          <tr><td class="s"><i style="background:#e2a0f7"></i></td><td class="n">--color-primary</td><td class="o">#c39bf0</td><td class="a">→</td><td class="v">#e2a0f7</td></tr>
+          <tr><td class="s"><i style="background:#12241b"></i></td><td class="n">--color-primary-ink</td><td class="o">#2a1606</td><td class="a">→</td><td class="v">#12241b</td></tr>
+          <tr><td class="s"><i style="background:#61e0c3"></i></td><td class="n">--color-teal</td><td class="o">#4ecec0</td><td class="a">→</td><td class="v">#61e0c3</td></tr>
+          <tr><td class="s"><i style="background:#ffcb63"></i></td><td class="n">--color-accent</td><td class="o">#f5c563</td><td class="a">→</td><td class="v">#ffcb63</td></tr>
+          <tr><td class="s"><i style="background:#ff9f8f"></i></td><td class="n">--color-danger</td><td class="o">#ef9a7d</td><td class="a">→</td><td class="v">#ff9f8f</td></tr>
+          <tr><td class="s"><i style="background:#4e8a68"></i></td><td class="n">--color-border</td><td class="o">#a35d22</td><td class="a">→</td><td class="v">#4e8a68</td></tr>
+          <tr><td class="s"><i style="background:#143026"></i></td><td class="n">--color-bg-top</td><td class="o">#361d08</td><td class="a">→</td><td class="v">#143026</td></tr>
+          <tr><td class="s"><i style="background:#2b1f42"></i></td><td class="n">--color-bg-glow-violet</td><td class="o">#321f1a</td><td class="a">→</td><td class="v">#2b1f42</td></tr>
+          <tr><td class="s"><i style="background:#0f332e"></i></td><td class="n">--color-bg-glow-teal</td><td class="o">#282416</td><td class="a">→</td><td class="v">#0f332e</td></tr>
+          <tr><td class="s"><i style="background:#2f2a15"></i></td><td class="n">--color-bg-glow-amber</td><td class="o">#331f0c</td><td class="a">→</td><td class="v">#2f2a15</td></tr>
+          <tr><td class="s"><i style="background:#d9ffe8"></i></td><td class="n">--color-glow</td><td class="o">#fde3a2</td><td class="a">→</td><td class="v">#d9ffe8</td></tr>
+          <tr><td class="s"></td><td class="n">--radius</td><td class="o">16px</td><td class="a">→</td><td class="v">20px</td></tr>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h3>Measured contrast — project's own script</h3>
+        <div class="ratios">
+          <span>ink on card (body text)</span><b>12.41</b>
+          <span>ink on page</span><b>15.31</b>
+          <span>muted on card</span><b>7.49</b>
+          <span>primary on card</span><b>6.88</b>
+          <span>primary-ink on primary (button)</span><b>8.20</b>
+          <span>app title on page (large, min 3)</span><b>8.49</b>
+          <span>teal on card</span><b>8.41</b>
+          <span>accent on card</span><b>9.07</b>
+          <span>border on card (min 3)</span><b>3.35</b>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Decorative CSS — the only addition</h3>
+        <p class="code">/* three drifting fireflies, 22–30px blurred dots */
+<b>#app::before</b> { content:""; position:fixed; inset:0;
+  pointer-events:none;
+  background-image: <b>3 × radial-gradient(…, transparent 70%)</b>;
+  animation: drift 14s ease-in-out infinite alternate; }
+<b>@media (prefers-reduced-motion: reduce)</b> { animation: none }</p>
+      </div>
+
+      <div class="panel">
+        <h3>Notes</h3>
+        <ul class="notes">
+          <li><b>Why it works.</b> Green is the one big hue the art owns that the UI never used. The orchid primary now reads as <em>magic</em>, not as the default purple button.</li>
+          <li><b>Best for.</b> The most "storybook adventure" of the four — the one an 11-year-old is most likely to call cool.</li>
+          <li><b>Trade-off.</b> Strongest personality, so it dates fastest; green surfaces slightly flatten the forest banner it resembles.</li>
+          <li><b>Watch.</b> <code>--color-border</code> at 3.35 is the tightest number in this option — do not lighten the card without re-running the gate.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== OPTION 3 ============================== -->
+<section class="opt pal-c" id="opt-c">
+  <div class="wrap opt-grid">
+    <div class="opt-phone"><div class="phone" data-screen></div></div>
+
+    <div class="opt-notes">
+      <p class="opt-eyebrow">Option 03 · light</p>
+      <h2 class="opt-title">Sunrise Parchment<small>דף הזריחה</small></h2>
+      <p class="opt-feel">Stop imitating the night and become the book instead: warm paper, deep cocoa ink, and the illustrations sitting on the page like plates in a real storybook.</p>
+
+      <span class="gatebar">52 / 52 CONTRAST PAIRS PASS</span>
+
+      <div class="panel">
+        <h3>:root token swap — public/styles.css</h3>
+        <table class="tok">
+          <tr><td class="s"><i style="background:#fff4e2"></i></td><td class="n">--color-bg</td><td class="o">#241305</td><td class="a">→</td><td class="v">#fff4e2</td></tr>
+          <tr><td class="s"><i style="background:#fffaf0"></i></td><td class="n">--color-card</td><td class="o">#3a1d08</td><td class="a">→</td><td class="v">#fffaf0</td></tr>
+          <tr><td class="s"><i style="background:#fdeed6"></i></td><td class="n">--color-surface-2</td><td class="o">#4d2a0e</td><td class="a">→</td><td class="v">#fdeed6</td></tr>
+          <tr><td class="s"><i style="background:#fff8ec"></i></td><td class="n">--color-nav</td><td class="o">#2e1806</td><td class="a">→</td><td class="v">#fff8ec</td></tr>
+          <tr><td class="s"><i style="background:#3a2412"></i></td><td class="n">--color-ink</td><td class="o">#fdf1d8</td><td class="a">→</td><td class="v">#3a2412</td></tr>
+          <tr><td class="s"><i style="background:#7a5a3c"></i></td><td class="n">--color-muted</td><td class="o">#d9bc92</td><td class="a">→</td><td class="v">#7a5a3c</td></tr>
+          <tr><td class="s"><i style="background:#7b3fb5"></i></td><td class="n">--color-primary</td><td class="o">#c39bf0</td><td class="a">→</td><td class="v">#7b3fb5</td></tr>
+          <tr><td class="s"><i style="background:#fff6e8"></i></td><td class="n">--color-primary-ink</td><td class="o">#2a1606</td><td class="a">→</td><td class="v">#fff6e8</td></tr>
+          <tr><td class="s"><i style="background:#086055"></i></td><td class="n">--color-teal</td><td class="o">#4ecec0</td><td class="a">→</td><td class="v">#086055</td></tr>
+          <tr><td class="s"><i style="background:#8a5600"></i></td><td class="n">--color-accent</td><td class="o">#f5c563</td><td class="a">→</td><td class="v">#8a5600</td></tr>
+          <tr><td class="s"><i style="background:#b3341c"></i></td><td class="n">--color-danger</td><td class="o">#ef9a7d</td><td class="a">→</td><td class="v">#b3341c</td></tr>
+          <tr><td class="s"><i style="background:#96682f"></i></td><td class="n">--color-border</td><td class="o">#a35d22</td><td class="a">→</td><td class="v">#96682f</td></tr>
+          <tr><td class="s"><i style="background:#ffe9c9"></i></td><td class="n">--color-bg-top</td><td class="o">#361d08</td><td class="a">→</td><td class="v">#ffe9c9</td></tr>
+          <tr><td class="s"><i style="background:#f3e4fb"></i></td><td class="n">--color-bg-glow-violet</td><td class="o">#321f1a</td><td class="a">→</td><td class="v">#f3e4fb</td></tr>
+          <tr><td class="s"><i style="background:#dff4ee"></i></td><td class="n">--color-bg-glow-teal</td><td class="o">#282416</td><td class="a">→</td><td class="v">#dff4ee</td></tr>
+          <tr><td class="s"><i style="background:#ffe4b5"></i></td><td class="n">--color-bg-glow-amber</td><td class="o">#331f0c</td><td class="a">→</td><td class="v">#ffe4b5</td></tr>
+          <tr><td class="s"><i style="background:#ffd98a"></i></td><td class="n">--color-glow</td><td class="o">#fde3a2</td><td class="a">→</td><td class="v">#ffd98a</td></tr>
+          <tr><td class="s"></td><td class="n">--radius</td><td class="o">16px</td><td class="a">→</td><td class="v">22px</td></tr>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h3>Measured contrast — project's own script</h3>
+        <div class="ratios">
+          <span>ink on card (body text)</span><b>14.01</b>
+          <span>ink on page</span><b>13.39</b>
+          <span>muted on card</span><b>6.02</b>
+          <span>primary on card</span><b>6.27</b>
+          <span>primary-ink on primary (button)</span><b>6.09</b>
+          <span>app title on page (large, min 3)</span><b>5.99</b>
+          <span>teal on card</span><b>7.17</b>
+          <span>accent on card</span><b>5.92</b>
+          <span>border on card (min 3)</span><b>4.67</b>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Decorative CSS — the only addition</h3>
+        <p class="code">/* paper grain + two corner washes so cream never goes flat */
+<b>#app::before</b> { content:""; position:fixed; inset:0;
+  pointer-events:none; opacity:.85;
+  background-image:
+    radial-gradient(340px at 100% 0, rgba(255,190,90,.18), transparent 70%),
+    radial-gradient(300px at 0 100%, rgba(190,140,255,.12), transparent 70%),
+    <b>url("data:image/svg+xml,…feTurbulence…")</b>;  /* inline, no CDN */
+  background-size: auto, auto, 120px 120px; }</p>
+      </div>
+
+      <div class="panel">
+        <h3>Notes</h3>
+        <ul class="notes">
+          <li><b>Why it works.</b> Teal, amber and violet flip from pale-on-dark to <em>deep</em>-on-light, so they read as ink colours — closer to how the art's own outlines behave.</li>
+          <li><b>Best for.</b> Daytime use and the loudest possible answer to "dull". It is the only option that changes the app's whole mood, not its hue.</li>
+          <li><b>Trade-off.</b> The artwork's bottom fade-to-transparent mask now dissolves into cream rather than dark. It reads as a watercolour bleed here — pleasant, but look at the phone and judge it yourself.</li>
+          <li><b>Extra work.</b> Needs <code>&lt;meta name="color-scheme"&gt;</code> → <code>light</code> and <code>theme-color</code> → <code>#fff8ec</code> in index.html. Shadows must go low-alpha warm brown (already in the swap) or cards look dirty.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== OPTION 4 ============================== -->
+<section class="opt pal-d flip" id="opt-d">
+  <div class="wrap opt-grid">
+    <div class="opt-phone"><div class="phone" data-screen></div></div>
+
+    <div class="opt-notes">
+      <p class="opt-eyebrow">Option 04 · light</p>
+      <h2 class="opt-title">Cloud &amp; Crystal<small>ענן וקריסטל</small></h2>
+      <p class="opt-feel">Morning sky behind the clinic: cool, airy, quiet — a calm frame that lets the warm illustrations be the only warm thing on the screen.</p>
+
+      <span class="gatebar">52 / 52 CONTRAST PAIRS PASS</span>
+
+      <div class="panel">
+        <h3>:root token swap — public/styles.css</h3>
+        <table class="tok">
+          <tr><td class="s"><i style="background:#eef2fb"></i></td><td class="n">--color-bg</td><td class="o">#241305</td><td class="a">→</td><td class="v">#eef2fb</td></tr>
+          <tr><td class="s"><i style="background:#fdfdff"></i></td><td class="n">--color-card</td><td class="o">#3a1d08</td><td class="a">→</td><td class="v">#fdfdff</td></tr>
+          <tr><td class="s"><i style="background:#eaeefb"></i></td><td class="n">--color-surface-2</td><td class="o">#4d2a0e</td><td class="a">→</td><td class="v">#eaeefb</td></tr>
+          <tr><td class="s"><i style="background:#f7f9ff"></i></td><td class="n">--color-nav</td><td class="o">#2e1806</td><td class="a">→</td><td class="v">#f7f9ff</td></tr>
+          <tr><td class="s"><i style="background:#1e2445"></i></td><td class="n">--color-ink</td><td class="o">#fdf1d8</td><td class="a">→</td><td class="v">#1e2445</td></tr>
+          <tr><td class="s"><i style="background:#5a6285"></i></td><td class="n">--color-muted</td><td class="o">#d9bc92</td><td class="a">→</td><td class="v">#5a6285</td></tr>
+          <tr><td class="s"><i style="background:#5b3fc4"></i></td><td class="n">--color-primary</td><td class="o">#c39bf0</td><td class="a">→</td><td class="v">#5b3fc4</td></tr>
+          <tr><td class="s"><i style="background:#f7f9ff"></i></td><td class="n">--color-primary-ink</td><td class="o">#2a1606</td><td class="a">→</td><td class="v">#f7f9ff</td></tr>
+          <tr><td class="s"><i style="background:#0a6468"></i></td><td class="n">--color-teal</td><td class="o">#4ecec0</td><td class="a">→</td><td class="v">#0a6468</td></tr>
+          <tr><td class="s"><i style="background:#8a5714"></i></td><td class="n">--color-accent</td><td class="o">#f5c563</td><td class="a">→</td><td class="v">#8a5714</td></tr>
+          <tr><td class="s"><i style="background:#b3311f"></i></td><td class="n">--color-danger</td><td class="o">#ef9a7d</td><td class="a">→</td><td class="v">#b3311f</td></tr>
+          <tr><td class="s"><i style="background:#6f7799"></i></td><td class="n">--color-border</td><td class="o">#a35d22</td><td class="a">→</td><td class="v">#6f7799</td></tr>
+          <tr><td class="s"><i style="background:#e2e9fa"></i></td><td class="n">--color-bg-top</td><td class="o">#361d08</td><td class="a">→</td><td class="v">#e2e9fa</td></tr>
+          <tr><td class="s"><i style="background:#ece2fb"></i></td><td class="n">--color-bg-glow-violet</td><td class="o">#321f1a</td><td class="a">→</td><td class="v">#ece2fb</td></tr>
+          <tr><td class="s"><i style="background:#dff1f4"></i></td><td class="n">--color-bg-glow-teal</td><td class="o">#282416</td><td class="a">→</td><td class="v">#dff1f4</td></tr>
+          <tr><td class="s"><i style="background:#fdeedd"></i></td><td class="n">--color-bg-glow-amber</td><td class="o">#331f0c</td><td class="a">→</td><td class="v">#fdeedd</td></tr>
+          <tr><td class="s"><i style="background:#ffffff"></i></td><td class="n">--color-glow</td><td class="o">#fde3a2</td><td class="a">→</td><td class="v">#ffffff</td></tr>
+          <tr><td class="s"></td><td class="n">--radius</td><td class="o">16px</td><td class="a">→</td><td class="v">24px</td></tr>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h3>Measured contrast — project's own script</h3>
+        <div class="ratios">
+          <span>ink on card (body text)</span><b>14.83</b>
+          <span>ink on page</span><b>13.44</b>
+          <span>muted on card</span><b>5.87</b>
+          <span>primary on card</span><b>7.00</b>
+          <span>primary-ink on primary (button)</span><b>6.76</b>
+          <span>app title on page (large, min 3)</span><b>6.34</b>
+          <span>teal on card</span><b>6.81</b>
+          <span>accent on card</span><b>5.98</b>
+          <span>border on card (min 3)</span><b>4.33</b>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Decorative CSS — the only addition</h3>
+        <p class="code">/* two soft cloud banks + one warm ground glow */
+<b>#app::before</b> { content:""; position:fixed; inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(560px 190px at 78% 6%,  rgba(255,255,255,.95), transparent 72%),
+    radial-gradient(460px 160px at 12% 30%, rgba(255,255,255,.75), transparent 72%),
+    radial-gradient(300px at 50% 108%, rgba(255,214,168,.35), transparent 70%); }</p>
+      </div>
+
+      <div class="panel">
+        <h3>Notes</h3>
+        <ul class="notes">
+          <li><b>Why it works.</b> Cool neutrals are the only backdrop that makes the illustrations' gold look like light rather than like more brown. Maximum separation between UI and art.</li>
+          <li><b>Best for.</b> Reading comprehension. The calmest, least competing surface of the four; long chapters feel shorter here.</li>
+          <li><b>Trade-off.</b> The most "app", the least "storybook". If the goal is more magic rather than more clarity, 02 beats it.</li>
+          <li><b>Watch.</b> <code>--color-card</code> is near-white; keep the 1px <code>--shadow-soft</code> ring or cards vanish into the page. Same index.html light-mode changes as 03.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== FOOTER ============================== -->
+<footer class="footer">
+  <div class="wrap">
+    <h2>What none of these touch</h2>
+    <p>Every option above is a value-only change inside the <code>:root</code> block of <code>public/styles.css</code>, plus one <code>#app::before</code> decorative rule. No view file, no markup, no illustration, no layout.</p>
+
+    <div class="keeps">
+      <div class="keep"><h4>The artwork</h4><p>All eight <code>.webp</code> assets and <code>icon.svg</code> ship exactly as they are. The style is the brief, not the variable.</p></div>
+      <div class="keep"><h4>Hebrew-first RTL</h4><p><code>dir="rtl"</code>, right-aligned option pills and the <code>dir="ltr"</code> English story block are untouched — the mockups above render them live.</p></div>
+      <div class="keep"><h4>The background recipe</h4><p>The four-layer gradient string in <code>body</code> is byte-identical; only the four paint tokens it references change value.</p></div>
+      <div class="keep"><h4>The contrast gate</h4><p>All 52 pairs in <code>scripts/check-contrast.mjs</code> pass for every option, computed with that script's own luminance math.</p></div>
+      <div class="keep"><h4>Type &amp; spacing</h4><p>Rubik, the 480px column, the 68px nav, the 48px tap targets, every font size — unchanged. Only <code>--radius</code> moves, by 2–8px.</p></div>
+      <div class="keep"><h4>One test to update</h4><p><code>tests/background.test.js</code> pins the four paint tokens as literals. Whichever option wins, those four lines get the new hexes — nothing else in the suite moves.</p></div>
+    </div>
+
+    <p class="sig">PROPOSAL ONLY — NO APPLICATION CODE WAS MODIFIED TO PRODUCE THIS PAGE</p>
+  </div>
+</footer>
+
+<script>
+// Clone the single authored screen into all four sections, so the four
+// mockups are provably the same markup under four different palettes.
+(function () {
+  var tpl = document.getElementById('screen-tpl');
+  document.querySelectorAll('[data-screen]').forEach(function (host) {
+    host.appendChild(tpl.content.cloneNode(true));
+  });
+})();
+</script>
+
+</body>
+</html>
