@@ -1,4 +1,7 @@
-CURRENT: phase 4 "the quiz surface", next step 4.4 (the after-chapter check in reader.js).
+CURRENT: phase 4 "the quiz surface", next step 4.5 (the shell bump, sw.js v13 + PRECACHE).
+  4.4 ACCEPTED at 93847b8 (STEP-4.4-OK re-run by the orchestrator; 277 pass / 0 fail; audit
+  match; NOTE: renderChapter's local `stage` shadows the view's outer `stage` — harmless today,
+  recorded in the journal).
   4.3 ACCEPTED at 70ac7c1 (STEP-4.3-OK re-run by the orchestrator; 274 pass / 0 fail; first
   submission REJECTED by audit for a byte-identity breach, fixed and re-audited match — A8).
   4.1 ACCEPTED at 1aabd37 (STEP-4.1-OK re-run by the orchestrator; 264 pass / 0 fail; audit

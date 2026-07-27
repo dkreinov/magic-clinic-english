@@ -30,7 +30,7 @@ flowchart LR
 | 1 | item format, checker, 50-word pilot | done — you approved it |
 | 2 | the full bank | not a phase — the bank grows weekly on demand |
 | 3 | profile: strikes and demotion | done — you approved the transcript |
-| 4 | the quiz screens | **building now — 3 of 6 steps done** (brain, question card, practice button; the checker caught and we fixed one invisible layout change before it shipped) |
+| 4 | the quiz screens | **building now — 4 of 6 steps done** (brain, question card, practice button, after-chapter quiz; next: the offline/version step) |
 | 5 | automatic promotion | not started |
 | 6 | deploy (+ first bank top-up, + profile backup) | not started |
 

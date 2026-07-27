@@ -1124,3 +1124,31 @@ STEP 4.3 the quiz button inside המילים שלי (D10)
   tokens: worker=107870 (both rounds, cumulative), checker=75971 (39547+36424, both rounds)
   commit: 70ac7c1
   accepted: 2026-07-27
+
+STEP 4.4 the after-chapter check of 4 words (D17)
+  tier: WORKER (Sonnet)
+  did: public/views/reader.js — afterChapterStage + chapterQuizState (NEW exports), closure
+       quizState/lemmas/knownSet, renderChapter branches celebrate/quiz/questions, bindEvents
+       auto-starts startQuiz into .reader-quiz-slot once per chapter.
+       tests/reader-ui.test.js — import extended, three flat tests appended (decision table,
+       wiring markers, the reset-by-keying property from the plan-review find).
+  surprises: renderChapter's local `const stage` SHADOWS the view's outer `let stage`
+       ("loading"/"chapter"/...). Harmless today — renderChapter only runs when the outer stage
+       is already "chapter" — but a future edit inside renderChapter that means the OUTER stage
+       will silently get the local one. Flagged by the worker itself; recording rather than
+       renaming, since renaming is out of the step's scope.
+  deviations: none. Auditor noted two explanatory comment blocks as unrequested; kept — they
+       document the chapter-keying constraint (the flat-boolean bug) that the code cannot show.
+  fail_first: REAL — with reader.js stashed and the new tests in place, the suite failed at
+       import (no export named afterChapterStage). Restored by stash pop.
+  validation_first_try: yes (worker), re-run by me in a clean shell: STEP-4.4-OK, 277 pass /
+       0 fail, exactly the two expected files.
+  retries: 0
+  escalations: 0
+  interventions: 0
+  audit: match (one comment-only note), CONFIDENCE low solely on whether latestChapter() exists
+       outside the diff — it does, verified by me at reader.js:337 during planning; both
+       renderChapter and the new bindEvents block use the same helper.
+  tokens: worker=58983, checker=38933
+  commit: 93847b8
+  accepted: 2026-07-27
