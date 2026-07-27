@@ -113,6 +113,11 @@ same matcher `coverageAgainst` already uses for chapter verification), in at lea
 `KNOWN_AFTER_QUIET_CHAPTERS = 2` chapters whose `generatedAt` is later than that
 word's `lastSeen`. Promotion is one-way; nothing in this design ever demotes a word
 back to `learning`.
+> **CORRECTION (2026-07-27, the word-quiz run):** the sentence above is no longer true of the
+> app. The quiz shipped: a claimed word now returns to `learning` after three wrong answers on
+> three separate sittings (one strike per sitting; a right answer wipes the slate). G1 above
+> remains UNBUILT and this document remains unsigned; before it is amended and signed, G1 must
+> be re-designed against a world where demotion exists.
 
 Why this signal and not tap count: re-tapping a word is evidence she does NOT know
 it - `taps` on an existing entry only increments on a fresh tap (`lib/profile.js:198`),

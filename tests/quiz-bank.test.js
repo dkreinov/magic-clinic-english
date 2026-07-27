@@ -121,8 +121,12 @@ test('the REAL public/quiz/ bank gates green', () => {
 
   const ok = /QUIZ BANK OK: (\d+) files, (\d+) items/.exec(result.stdout);
   assert.ok(ok, `missing the OK line, got:\n${result.stdout}`);
-  assert.equal(Number(ok[1]), 50, 'the shipped bank is 50 files');
-  assert.ok(Number(ok[2]) >= 50, `50 files must carry at least 50 items, got ${ok[2]}`);
+  // D23 reversed D8: the bank starts at the 50 pilot words and GROWS on demand,
+  // so an exact count would go red on the first top-up. The property that matters
+  // is unchanged -- the bank must never shrink, and a deleted public/quiz/ still
+  // fails this test, which is the hole the audit found.
+  assert.ok(Number(ok[1]) >= 50, `the shipped bank never shrinks below the 50 pilot files, got ${ok[1]}`);
+  assert.ok(Number(ok[2]) >= Number(ok[1]), `every file must carry at least one item, got ${ok[2]} items in ${ok[1]} files`);
 
   // Rule 11 was briefly deferred to a warning while the 8 pre-D22 glosses were
   // rewritten. It is now armed, so this test carries the whole claim: the bank
