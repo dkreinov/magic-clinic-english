@@ -5,9 +5,12 @@ CURRENT: **PHASE 1 CLOSED 2026-07-27 (second attempt), owner approved. All 9 cri
   2217 up front was measured at ~55M tokens / ~45 agent-hours against a top-up cost of ~9k tokens
   and ~70 s per word. Top-ups run WEEKLY, not daily.
 
-CURRENT: **PHASE 3 IS EXECUTING. 3.1 (18dbda1), 3.2 (b273c74), 3.3 (76eb416) ACCEPTED.
-  NEXT STEP IS 3.4 — and it is BLOCKED until I write the QZ-16 transcript pair myself.**
-  Ledger 225 -> 231 -> 241 -> 245, `# fail 0`. Tree clean apart from `.oplan/`. Contrast untouched (phase 3 is
+CURRENT: **PHASE 3 IS EXECUTING. 3.1 (18dbda1), 3.2 (b273c74), 3.3 (76eb416), 3.4 (f9760b2)
+  ACCEPTED. NEXT AND LAST STEP IS 3.5 — the independent child-experience pass.**
+  Ledger 225 -> 231 -> 241 -> 245 -> 252, `# fail 0`.
+  QZ-16 DISCHARGED: `transcript.mjs` + `transcript-expected.txt` were written by the orchestrator at
+  dd96168, BEFORE 3.4 was dispatched, with the expected output derived BY HAND from QZ-12's table.
+  Run against the finished handler the diff is EMPTY. Criterion 9 is ready for the owner. Tree clean apart from `.oplan/`. Contrast untouched (phase 3 is
   QZ-13 no-`public/`, so criterion 8 is re-checked at the phase gate, not per step).
   Step 3.1 carries **AMENDMENT A3**: `strikes`/`quizRight`/`quizWrong` validate as
   `Number.isInteger(v) && v >= 0`; "range-lenient" means no UPPER and no POLICY bound, so `99` is
@@ -87,6 +90,15 @@ ACCEPTED: 1.1 (lib/quiz-item.js + tests/quiz-item.test.js; STEP-1.1-OK re-run by
   UNMODIFIED validator too, because it already ignored unknown keys — they guard against a future
   OVER-strict validator and can never produce fail-first evidence. That is not a defect, but it
   means 3.1's real regression coverage is the four type-strictness tests.
+  · **3.4** (api/profile.js + tests/api-profile-quiz.test.js; STEP-3.4-OK re-run by the
+  orchestrator; 252 pass / 0 fail; `.data/profile.json` absent; audit `match`/high). Mutations
+  proved the two failures that matter: a session-id that fails OPEN is caught by test 3, and a
+  write on a 400 path is caught by test 5's byte-identity.
+  **RECORD THIS, it bounds a claim:** `migrateWordKeys` sorts word keys, so a GET REWRITES a stored
+  profile whose keys are not already alphabetical — pre-existing behaviour, verified by me with a
+  probe. Test 7 therefore proves "an ALREADY-NORMALISED old-shape profile is not rewritten on load",
+  not the broader "her file is never rewritten". Her real file has been sorted since the first GET
+  after that code shipped, so the narrow claim covers her — but say the narrow one.
   · **3.3** (lib/profile.js + tests/profile-quiz-retap.test.js; STEP-3.3-OK re-run by the
   orchestrator; 245 pass / 0 fail; audit `match`/high). Three lines of implementation. The mutation
   that matters was proved: making a tap ALSO increment `strikes` is caught by tests 1 and 4.

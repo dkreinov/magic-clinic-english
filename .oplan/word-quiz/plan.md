@@ -448,6 +448,28 @@ everything she has collected. Planned as a data-integrity phase, not a feature p
    ```
    Run it against the working tree BEFORE committing the phase. Deleting an existing test is the
    cheapest way to make a ledger land, which is why the deletion check is separate and explicit.
+   **AMENDMENT A5 (orchestrator, at the phase gate).** As frozen, this command reads the WORKING
+   TREE — it assumed the whole phase would be committed in one go at the end. oplan's own procedure
+   commits each step ON ACCEPTANCE, so by the time the gate runs the tree is clean and the command
+   compares an EMPTY set against the expected seven and fails for the wrong reason. The PROPERTY
+   being checked is unchanged; only the instrument moves, from the working tree to the phase's
+   commit range:
+   ```bash
+   changed=$(git diff --name-only d9e0b9b..HEAD -- . ':(exclude).oplan' | sort | tr '\n' ' ')
+   expected='api/profile.js lib/profile.js tests/api-profile-quiz.test.js tests/profile-quiz-answer.test.js tests/profile-quiz-retap.test.js tests/profile-quiz-scenario.test.js tests/profile-quiz-schema.test.js '
+   [ "$changed" = "$expected" ] || { echo "FAIL: [$changed]"; exit 1; }
+   dels=$(git diff --name-status d9e0b9b..HEAD -- . ':(exclude).oplan' | awk '$1 ~ /^D/ {print $2}')
+   [ -z "$dels" ] || { echo "FAIL: DELETED: $dels"; exit 1; }
+   echo CRIT-6-OK
+   ```
+   This is STRICTLY STRONGER than the original, and the reason matters: the working-tree form could
+   only ever see the tree's final state, so an edit made and reverted across steps was invisible to
+   it. The range form sees every file the phase touched. The plan's warning that "`git diff` is blind
+   to untracked files" still stands but does not apply here — over a commit range a created file is
+   tracked and shows as `A`, which is exactly why the untracked blindness bit the working-tree form
+   and does not bite this one. **Verified green at the gate.**
+   Recorded rather than quietly swapped, because changing an acceptance command after the work is
+   done is precisely how a phase redefines "done" to fit what it built.
 7. `.data/profile.json` does not exist and no step ran a server against the real data dir.
 8. `node scripts/check-contrast.mjs` exits 0, prints `ALL PASS`, and **`grep -c '^PASS'` is exactly
    52** (QZ-7). The anchor is load-bearing: a naive `grep -c PASS` returns **53**, because the

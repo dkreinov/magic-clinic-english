@@ -798,6 +798,7 @@ STEP 3.4 the `quiz-answer` action
   escalations: 0
   interventions: 0
   audit: match, CONFIDENCE high, having traced the precedence order and every write path by hand.
+  tokens: worker=60352, checker=42952
   commit: f9760b2
   accepted: 2026-07-27
 
@@ -814,3 +815,117 @@ agreeing, which is worth considerably more than the green test suite: the tests 
 same agent that wrote the code, the expected transcript was not.
 
 `.data/` verified empty afterwards (criterion 7).
+
+STEP 3.5 the child-experience pass, by a worker that did not write the code
+  tier: WORKER (Sonnet)
+  did: tests/profile-quiz-scenario.test.js — NEW, five flat top-level `test()` calls, each an
+       episode of her week driven entirely through the REAL handler as HTTP POSTs, each ending with
+       a real GET so persistence is part of every episode, each asserting possession through
+       `knownLemmaSet` rather than the raw `status` field.
+  surprises: episode 5's mutation was caught by the "still known" assertion rather than by the
+       strike count — a non-resetting `strikes` reached 3 on the FOURTH answer and demoted the word
+       one answer early. A stronger failure signal than the worker expected, not a weaker one.
+  deviations: added a local `withOpenGate` helper that deletes and restores `APP_CODE` around each
+       episode, because the harness I quoted did not cover it.
+  MUTATION EVIDENCE — all five episodes observed failing, none NOT-CAUGHT:
+       ep1 correct-answer increments `strikes` instead of clearing -> "light should have no strikes"
+       ep2 a tap also strikes -> "tapping must never add a strike"
+       ep3 the demotion line deleted -> "three separate failures ... must take the word back"
+       ep4 `sameSession` hardcoded false (the sitting check fails OPEN) -> "repeated wrong taps in
+           one sitting must never cost the word"
+       ep5 the correct-answer `strikes = 0` removed -> "wrong-wrong-RIGHT-wrong-wrong must never
+           take the word"
+  DEFECT: none. An agent that did not write the implementation, working from the contracts, could
+       not make it misbehave. That is the strongest single result of this phase.
+  restored: `git checkout -- lib/ api/`, and I verified it myself with `git diff --quiet lib/ api/`
+       inside the frozen script rather than trusting a self-reported hash.
+  validation_first_try: yes (worker), re-run by me: STEP-3.5-OK, 257 pass / 0 fail.
+  retries: 0 · escalations: 0 · interventions: 0
+  audit: match, CONFIDENCE high. It was asked the sharper question for a test-only step — "could
+       this test pass while the behaviour it names is broken?" — and traced the strike arithmetic
+       for episodes 3/4/5 by hand before answering.
+  tokens: worker=87261, checker=41257
+  commit: 521ae9b
+  accepted: 2026-07-27
+
+### The `withOpenGate` decision, and a fragility it exposed across the whole suite
+
+The 3.5 worker added a helper deleting `APP_CODE` for the duration of each episode. Strictly that is
+work I did not ask for, so I had to decide it rather than let the auditor flag it.
+
+Accepted, and I amended the spec I handed the auditor rather than leaving it to argue with a
+decision I had already taken. Reasons: it is not a feature, it is env hygiene; field guide 5 — which
+the packet carried verbatim — explicitly requires it; and on this machine it is a no-op, so it
+changes no result, it only stops the file breaking elsewhere. The incomplete thing was the harness I
+quoted, not the worker's judgement.
+
+Then I checked how wide the gap is: **of the 8 test files that copy-paste `withTempDataDir`, only
+this new one deletes `APP_CODE`.** The other seven — including every pre-existing handler test —
+would 401 on a machine that exports it. Pre-existing, not introduced here, out of scope to fix now,
+and written into the field guide so phase 4 does not rediscover it the hard way.
+
+### A5 — criterion 6's command assumed a workflow oplan does not use
+
+Criterion 6 froze a `git status --porcelain` check "against the working tree BEFORE committing the
+phase". But oplan commits each step ON ACCEPTANCE, so at the gate the tree is clean and the frozen
+command compares an EMPTY set against the expected seven — it fails for a reason that has nothing to
+do with whether the phase stayed inside its boundary.
+
+Moved to the phase's commit range, `d9e0b9b..HEAD`, and logged in plan.md beside the original. The
+property is identical and the instrument is strictly stronger: the working-tree form could only see
+the tree's FINAL state, so an edit made and reverted across steps was invisible to it, while the
+range form sees every file the phase touched. Result: exactly the seven expected files, no
+deletions, `CRIT-6-OK`.
+
+I am recording this at length because changing an acceptance command after the work is finished is
+exactly how a phase quietly redefines "done" to fit what it built. The defence is that the change is
+visible, argued, and strengthens rather than relaxes the check — not that it was small.
+
+## PHASE 3 CLOSED — mechanically. Criterion 9 (the owner) is the only thing outstanding.
+
+PHASE 3 CLOSED
+  steps: 5, first-try passes: 5/5
+  escalations: 0 (no step needed a stronger model; the specs were complete enough for Sonnet)
+  interventions: 2 (both bad-spec, both caught by ME at packet-writing time, before dispatch:
+    A3 in step 3.1 and A4 in step 3.2. A5 was a third, found at the gate.)
+  auditor verdicts: 5 match / 0 mismatch, all CONFIDENCE high
+  mutation evidence: 13 mutations run across steps 3.2-3.5, every one caught by the test it was
+    aimed at. Zero NOT-CAUGHT.
+  defects found by the independent step-3.5 agent: NONE
+  tokens: worker=338855, checker=211491, total subagent=550346 (summed with awk, not by hand)
+  cost: unavailable — this harness did not surface per-model cost for the run
+  orchestrator_context: unavailable — /context is a human command and I cannot read it
+  field_guide: 50/40 lines
+
+FIELD GUIDE OVER BUDGET: 50/40. Justification, as the skill requires. I evicted rather than only
+adding: twelve lessons became TEN (the two evidence lessons and the transform lesson merged into one
+"what counts as evidence"; the deploy recipe became a two-line pointer to the word-audio journal),
+and the file still shrank from 52 to 50 while GAINING four measured facts phase 3 paid for — that
+`migrateWordKeys` sorts and therefore rewrites an unsorted profile, that 7 of 8 harness files 401
+when `APP_CODE` is exported, that a hand-derived expected output diffed against real output is the
+strongest gate this project has built, and that roughly a third of any frozen assertion list can
+never fail first. What I could NOT compress is lesson 3: phase 6 has to restore a backup of her real
+profile, and each sub-bullet there is a distinct hazard with a command attached.
+
+### What phase 3 actually proved, stated at the width of the evidence and no wider
+
+- **Three wrong answers in one sitting cost one strike, not the word.** Proved at the HTTP boundary
+  by criterion 3 (ten wrong answers, one session), by step 3.4's test 3, and by step 3.5's episode 4
+  — the last written by an agent that did not write the code, and observed failing when the session
+  check was made to fail open.
+- **The demotion reaches the STORY.** Criterion 4 asserts through `knownLemmaSet`, the function
+  `buildAllowedSet` actually consumes, not through the `status` string we wrote.
+- **A tap is never a strike.** Criterion 5, and mutation-proved twice.
+- **An ALREADY-NORMALISED old-shape profile is not rewritten by a GET.** NOT the broader claim that
+  her file is never rewritten on load — an unsorted one IS, which I verified myself. Her real file
+  has been sorted since the first GET after `migrateWordKeys` shipped, so the narrow claim covers
+  her, but the narrow claim is the true one.
+- **Nothing she can see changed.** No `public/` file was touched, so no `CACHE` bump, and nothing is
+  deployed. Contrast still 52 ALL PASS.
+
+What is still NOT proved, and cannot be by anything in this phase: that her REAL profile loads
+(D25 skipped the end-to-end test; phase 6 carries a backup instead), that phase 4 will mint a
+genuinely new `sessionId` per sitting (QZ-11 pushed that into phase 4's criteria in advance — if a
+phase-4 client sends a constant id, every word becomes un-strikeable and NO phase-3 test can see
+it), and whether three-strikes-per-three-sittings is the policy the owner wants. That last one is
+criterion 9, and it is a human's call.
