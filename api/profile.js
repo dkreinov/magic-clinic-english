@@ -1,6 +1,6 @@
 import { sendJson, readJsonBody } from '../lib/http.js';
 import { loadProfile, saveProfile } from '../lib/store.js';
-import { defaultProfile, applyWordTap, markWordKnown, setLearner, logCheck, migrateWordKeys } from '../lib/profile.js';
+import { defaultProfile, applyWordTap, markWordKnown, setLearner, logCheck, migrateWordKeys, applyQuizAnswer } from '../lib/profile.js';
 import { isAuthorized, rejectUnauthorized } from '../lib/auth.js';
 import { resolveLemma } from '../public/lemma.js';
 import wordManifest from '../public/audio/words/index.json' with { type: 'json' };
@@ -107,6 +107,31 @@ export default async function handler(req, res) {
       chosenIndex: body.chosenIndex,
       correctIndex: body.correctIndex,
     });
+  } else if (body.action === 'quiz-answer') {
+    if (typeof body.lemma !== 'string' || body.lemma.trim() === '') {
+      sendJson(res, 400, { ok: false, error: 'lemma required' });
+      return;
+    }
+    if (
+      typeof body.sessionId !== 'string' ||
+      body.sessionId.trim() === '' ||
+      body.sessionId.length > 64
+    ) {
+      sendJson(res, 400, { ok: false, error: 'session required' });
+      return;
+    }
+    if (body.correct !== true && body.correct !== false) {
+      sendJson(res, 400, { ok: false, error: 'answer required' });
+      return;
+    }
+    // Deliberately NOT resolveLemma: the quiz client sends a key it read
+    // straight out of the profile, so we look it up directly.
+    const k = String(body.lemma).trim().toLowerCase();
+    if (!p.words[k]) {
+      sendJson(res, 400, { ok: false, error: 'unknown word' });
+      return;
+    }
+    applyQuizAnswer(p, { lemma: body.lemma, correct: body.correct, sessionId: body.sessionId });
   } else {
     sendJson(res, 400, { ok: false, error: 'unknown action' });
     return;
