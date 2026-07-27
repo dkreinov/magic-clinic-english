@@ -9,6 +9,12 @@ CURRENT: **PHASE 1 RE-OPENED BY AUDIT, 2026-07-27. Do not treat it as closed.**
   took **D22: the item shows the MEANING (the `sense` gloss) as well as the sentence.** That kills
   13 of the 15 flagged leaks outright and makes `sense` learner-facing, which adds QZ-1 rule 11.
 
+  STATUS 2026-07-27: **R1, R2, R3, R4 ALL DONE AND VERIFIED. R5 is the only thing outstanding and
+  it is the owner's re-approval.** Gate green (50 files, 71 items), 225 tests / 0 fail, contrast 52
+  ALL PASS, tree clean. Rules 11, 12, 13 added; rules 4 and 9 hardened; all 8 audit attack fixtures
+  now blocked and a valid control still passes; both test gaps closed and verified BY MUTATION.
+  NOTE: the field guide is now 54 lines against a 40-line budget — trim before phase 2.
+
   PHASE 1 RE-CLOSURE WORK, in order:
     R1. Gate holes — add rule 12 (`allowed.has(answer)`, closes 3 of the 5) and harden rule 4 to
         reject on residue (closes the other 2). tests/ must gain a case per hole.
