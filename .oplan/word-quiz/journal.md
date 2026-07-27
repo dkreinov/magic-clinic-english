@@ -1152,3 +1152,17 @@ STEP 4.4 the after-chapter check of 4 words (D17)
   tokens: worker=58983, checker=38933
   commit: 93847b8
   accepted: 2026-07-27
+
+STEP 4.5 the shell bump
+  tier: WORKER (Sonnet)
+  did: public/sw.js — CACHE v12 -> v13; PRECACHE gained "/quiz-core.js" and "/quiz.js" after
+       "/words-index.js". tests/shell.test.js — the two pinned expectations moved in lockstep.
+  surprises: none · deviations: none
+  fail_first: n/a — this step edits a pin and its pinned value together; the shell test itself is
+       the instrument (deepStrictEqual on the full array).
+  validation_first_try: yes (worker), re-run by me: STEP-4.5-OK, 277 pass / 0 fail.
+  retries: 0 · escalations: 0 · interventions: 0
+  audit: match, CONFIDENCE high (the complete 4-hunk diff was in the packet).
+  tokens: worker=32953, checker=25225
+  commit: e4147aa
+  accepted: 2026-07-27

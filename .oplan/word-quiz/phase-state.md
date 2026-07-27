@@ -1,4 +1,6 @@
-CURRENT: phase 4 "the quiz surface", next step 4.5 (the shell bump, sw.js v13 + PRECACHE).
+CURRENT: phase 4 "the quiz surface", next step 4.6 (the independent child-experience pass).
+  4.5 ACCEPTED at e4147aa (STEP-4.5-OK re-run by the orchestrator; 277 pass / 0 fail; audit
+  match/high).
   4.4 ACCEPTED at 93847b8 (STEP-4.4-OK re-run by the orchestrator; 277 pass / 0 fail; audit
   match; NOTE: renderChapter's local `stage` shadows the view's outer `stage` — harmless today,
   recorded in the journal).
