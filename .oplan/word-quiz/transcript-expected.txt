@@ -1,0 +1,16 @@
+claim -> light: status=known strikes=0 needsReview=false right=0 wrong=0
+claim -> fair: status=known strikes=0 needsReview=false right=0 wrong=0
+claim -> method: status=known strikes=0 needsReview=false right=0 wrong=0
+tap -> light: status=known strikes=0 needsReview=true right=0 wrong=0
+tap -> light: status=known strikes=0 needsReview=true right=0 wrong=0
+quiz WRONG s1 -> light: status=known strikes=1 needsReview=false right=0 wrong=1
+quiz WRONG s1 -> light: status=known strikes=1 needsReview=false right=0 wrong=2
+quiz WRONG s1 -> light: status=known strikes=1 needsReview=false right=0 wrong=3
+quiz WRONG s2 -> light: status=known strikes=2 needsReview=false right=0 wrong=4
+quiz RIGHT s2 -> fair: status=known strikes=0 needsReview=false right=1 wrong=0
+quiz RIGHT s3 -> light: status=known strikes=0 needsReview=false right=1 wrong=4
+quiz WRONG s4 -> light: status=known strikes=1 needsReview=false right=1 wrong=5
+quiz WRONG s5 -> light: status=known strikes=2 needsReview=false right=1 wrong=6
+quiz WRONG s6 -> light: status=learning strikes=0 needsReview=false right=1 wrong=7
+quiz WRONG s6 -> method: status=known strikes=1 needsReview=false right=0 wrong=1
+knownLemmaSet: fair, method

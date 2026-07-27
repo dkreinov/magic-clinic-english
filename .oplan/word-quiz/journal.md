@@ -723,3 +723,30 @@ STEP 3.2 applyQuizAnswer, the re-claim reset, the merge rule
   tokens: worker=85256, checker=57690
   commit: b273c74
   accepted: 2026-07-27
+
+STEP 3.3 D11 — a re-tap flags, it never strikes
+  tier: WORKER (Sonnet)
+  did: lib/profile.js — three lines inside `applyWordTap`'s existing-entry branch:
+       `if (existing.status === 'known') existing.needsReview = true;`. Nothing else.
+       tests/profile-quiz-retap.test.js — NEW, four flat top-level `test()` calls.
+  surprises: none
+  deviations: none
+  fail_first: honest and useful. Tests 1 and 4 FAILED against the untouched lib (they exercise the
+       new behaviour); tests 2 and 3 PASSED before the change, because "a tap on a `learning` word
+       adds no key" and "a first tap yields the frozen 6-key entry" are both already true today.
+       So this step has TWO regression tests and TWO guards against a future mistake. Same shape as
+       3.1 and worth noticing as a pattern: roughly a third of a frozen assertion list is
+       byte-identity cover, which can never fail first and is still worth having.
+  mutations: · condition flipped to `!== 'known'` — caught by tests 1, 2 and 4 (3 of 4 failed).
+       · the bug this step exists to prevent — a tap ALSO doing `strikes = (strikes ?? 0) + 1` —
+         caught by tests 1 and 4, both via `!('strikes' in entry)`. NOT a hole. This is the one I
+         most wanted an answer to, because a tap silently striking a word is invisible until she
+         loses a word she never got wrong.
+  validation_first_try: yes (worker), re-run by me in a clean tree: STEP-3.3-OK, 245 pass / 0 fail.
+  retries: 0
+  escalations: 0
+  interventions: 0 (the first step this phase that needed none — the packet had no gap to fill)
+  audit: match, CONFIDENCE high.
+  tokens: worker=55576, checker=34023
+  commit: 76eb416
+  accepted: 2026-07-27
