@@ -1,16 +1,16 @@
 [
   {
     "lemma": "fair",
-    "sense": "treating everyone in the same way",
+    "sense": "treating each person in the same way",
     "sentence": "Each girl gets the same number of sweets, so the game is ___.",
     "answer": "fair",
     "distractors": ["easy", "hard", "funny", "silly", "quick", "slow", "noisy", "safe"]
   },
   {
     "lemma": "fair",
-    "sense": "a fun outdoor event with rides, games and things to buy",
+    "sense": "a fun event with rides, food and things to buy",
     "sentence": "We ate popcorn and went on the big wheel at the school ___.",
     "answer": "fair",
-    "distractors": ["party", "concert", "race", "lesson", "meeting", "wedding", "picnic", "game"]
+    "distractors": ["match", "concert", "race", "lesson", "meeting", "wedding", "show", "game"]
   }
 ]

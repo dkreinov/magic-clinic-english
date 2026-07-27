@@ -272,6 +272,54 @@ alone, a distractor that fits the sentence but not the gloss stops being a corre
 entire failure class dissolves using data already in all 71 files. That is an owner decision
 touching D3/D4, so it is put to them rather than taken here.
 
+## R1-R4 — the re-closure work (2026-07-27)
+
+**R1+R2 — the gate and the tests.** Rule 12 (`allowed.has(answer)`, no transform) closed three of
+the five audit holes at once; rule 4 hardened to reject on character RESIDUE rather than
+tokenise-and-drop closed the other two. Rule 9 hardened so whitespace is not a sense. All eight
+audit attack fixtures now exit 1, and a genuinely valid item still exits 0 — checked, because a
+gate that rejects everything is not a fixed gate.
+
+Both test gaps verified closed BY MUTATION rather than by inspection:
+- deleting `public/quiz/` now fails a test (before: 218 passed with the bank gone);
+- neutralising the `== null` guard now fails a test (before: the assertion was on `gave`, which has
+  no band entry, so `|| new Set()` made it pass either way).
+Ledger 218 -> 224.
+
+**R3 — rule 11 armed, then the glosses.** I armed rule 11 in the gate BEFORE dispatching the
+content work, deliberately: that turned the gate red on exactly the 8 bad glosses and converted a
+prose instruction into a mechanical target. The deferral lasted exactly as long as the work it was
+covering, which is the only way a deferred rule ever gets re-armed.
+
+**Rule 13 — a hazard D22 CREATED, found by the worker and not by me.** While `sense` was private
+editorial metadata, a gloss mentioning one of its own distractors was harmless. The moment D22 put
+the gloss on screen beside the options, `rest[0]`'s *"the PART that is left over"* sat next to an
+option `part` — the item's own explanation pointing at a wrong answer. NINE glosses did this.
+
+I banned it outright rather than "unless the mention is contrastive". The five that survived the
+worker's sweep were all negations — `"correct and not wrong"` beside the option `wrong` — and the
+argument for tolerating those is exactly the argument that fails at scale: negation is the first
+thing an ESL learner drops when skimming, and "is this mention contrastive?" is a human judgement
+that will not hold across phase 2's ~3150 glosses where a mechanical check will. Rewording cost one
+clause each and blocked nothing. Ledger 224 -> 225.
+
+The worker also caught something the packet got wrong: rule 11 uses `resolveLemma`, not exact set
+membership, so inflections are legal in a gloss (`rides`, `checks`, `lasting`). The helper's `has`
+command is exact-match, so following my instructions literally would have made it reject valid
+wordings. It built its own dry-run against the real functions instead of trusting my tooling.
+
+**R4 — the two leaks D22 does not cover.** `boy[0]`/`uncle` -> `teenager`, which is false by
+definition against "is ten years old" and is a sharper near-miss than the word it replaced.
+`fair[1]`/`party`+`picnic` -> `match`+`show`, plus a gloss that no longer says "games" (an option).
+`festival`, `trip` and `camp` were considered and rejected as fresh leaks — all three can have
+rides.
+
+Three glosses could not be made both fully accurate and readable, reported rather than fudged:
+`itself[0]` ("used for a thing, not a person" is over-narrow — `itself` is correct for an animal
+too, but there is no child-readable phrase for "non-personal singular referent"); `euro[0]`
+("the money that many countries use" equally describes the dollar, because `Europe` is not in the
+manifest); `grammar[0]` (both `rule` and `rules` are absent).
+
 ## D20 — the owner cut 37 words from the quiz
 
 Asked how ~50 sensitive words should be handled, the owner answered "dont need these words there

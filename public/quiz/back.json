@@ -15,7 +15,7 @@
   },
   {
     "lemma": "back",
-    "sense": "the part of something that is behind the front",
+    "sense": "the side of a thing that you do not see first",
     "sentence": "We sit at the ___ of the bus, behind all the other kids.",
     "answer": "back",
     "distractors": ["front", "middle", "center", "top", "bottom", "corner", "edge", "start"]

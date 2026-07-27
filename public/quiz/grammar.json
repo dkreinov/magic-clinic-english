@@ -1,7 +1,7 @@
 [
   {
     "lemma": "grammar",
-    "sense": "the rules for putting words together correctly",
+    "sense": "the right way to put words together in a sentence",
     "sentence": "She makes many mistakes with verbs because she never studies ___.",
     "answer": "grammar",
     "distractors": ["literature", "history", "geography", "science", "physics", "chemistry", "mathematics", "art"]

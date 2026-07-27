@@ -126,6 +126,16 @@ own siblings or compare their senses.
    MEASURED at the time of the change: 8 of 71 glosses failed, on 7 distinct words — `everyone
    teeth outdoor rules brightness sensible relax`. This is the FIRST mechanically-checkable content
    rule the feature has, and it exists only because D22 made the gloss learner-facing.
+13. **(NEW, and a hazard D22 CREATED) the gloss must not name any of the item's own distractors.**
+   Compared by resolved lemma, so `towns` catches the distractor `town`. While `sense` was private
+   editorial metadata this was harmless; the moment D22 put it on screen beside the options, a gloss
+   reading *"the PART that is left over"* next to an option `part` points her at a wrong answer in
+   the item's own explanation. NINE shipped glosses did this — found by the R3 worker, not by me.
+   **Banned outright, not "unless the mention is contrastive".** The five survivors were all
+   negations (`"correct and not wrong"` beside the option `wrong`), negation is the first thing an
+   ESL learner drops when skimming, and "is this mention contrastive?" is a human judgement that
+   will not hold across phase 2's ~3150 glosses where a mechanical ban will. Rewording costs a
+   clause and has never yet blocked a gloss.
 12. **(NEW) `answer` must itself be a manifest word** — `allowed.has(answer)`, checked directly and
    not via any transform. The audit proved rules 4, 8 and 10 all reach the answer through a lossy
    transform (`tokenize`, `posIndex` lookup, `resolveLemma`) and every one of them FAILS OPEN:
@@ -265,7 +275,7 @@ to carry / to endure) and `gentle` carries a malformed `pos` of `"adj gently adv
 rule 8's first-whitespace-token reduction.
 
 **QZ-6 — the test ledger.** 208 today. 1.1 +6 -> 214. 1.2 +4 -> 218. 1.3 +0 -> 218.
-RE-FROZEN AFTER THE AUDIT: R1+R2+R3-code +6 -> **224**. The six are: the REAL bank gates green;
+RE-FROZEN AFTER THE AUDIT: R1+R2+R3-code +6 -> 224, then rule 13 +1 -> **225**. The six are: the REAL bank gates green;
 rule 12; rule 4 hardened; rule 11; rule 9 hardened; and a NON-VACUOUS `== null` guard test.
 Both audit-found test gaps are verified closed by mutation: deleting `public/quiz/` now fails a
 test (it did not before), and neutralising the guard now fails a test (the old one asserted on

@@ -1,7 +1,7 @@
 [
   {
     "lemma": "right",
-    "sense": "correct and not wrong",
+    "sense": "true, with no mistake in it",
     "sentence": "Two plus two is four, so her answer is ___.",
     "answer": "right",
     "distractors": ["wrong", "false", "incorrect", "impossible", "strange", "silly", "funny", "terrible"]

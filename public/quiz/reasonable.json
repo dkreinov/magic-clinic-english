@@ -1,7 +1,7 @@
 [
   {
     "lemma": "reasonable",
-    "sense": "fair and sensible",
+    "sense": "fair and showing good sense",
     "sentence": "Her plan was so ___ that all the parents agreed with it.",
     "answer": "reasonable",
     "distractors": ["silly", "stupid", "crazy", "strange", "cruel", "terrible", "impossible", "difficult"]

@@ -1,7 +1,7 @@
 [
   {
     "lemma": "watch",
-    "sense": "to look at moving pictures or a show",
+    "sense": "to sit and follow a film or a show with your eyes",
     "sentence": "We will ___ the movie on the big screen to see the dragon.",
     "answer": "watch",
     "distractors": ["hear", "listen", "look", "read", "notice", "smell", "touch", "taste"]

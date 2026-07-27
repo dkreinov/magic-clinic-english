@@ -1,7 +1,7 @@
 [
   {
     "lemma": "dentist",
-    "sense": "the person whose job is taking care of your teeth",
+    "sense": "the person whose job is to keep every tooth in your mouth healthy",
     "sentence": "I went to the ___ so that she could fix my broken tooth.",
     "answer": "dentist",
     "distractors": ["teacher", "waiter", "waitress", "farmer", "driver", "singer", "pilot", "barber"]

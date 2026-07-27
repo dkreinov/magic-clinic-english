@@ -1,7 +1,7 @@
 [
   {
     "lemma": "since",
-    "sense": "from that time in the past until now",
+    "sense": "starting at a time in the past and lasting to now",
     "sentence": "I have played the piano ___ I was seven, so now I play well.",
     "answer": "since",
     "distractors": ["until", "whenever", "where", "although", "unless", "whether", "if", "that"]

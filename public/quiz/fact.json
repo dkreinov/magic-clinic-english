@@ -1,7 +1,7 @@
 [
   {
     "lemma": "fact",
-    "sense": "something that is true and everyone can check it",
+    "sense": "something that is true and anyone can check it",
     "sentence": "It is a ___ that the earth goes around the sun.",
     "answer": "fact",
     "distractors": ["story", "joke", "dream", "secret", "wish", "lie", "guess", "question"]

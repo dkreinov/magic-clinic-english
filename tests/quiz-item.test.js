@@ -34,6 +34,42 @@ const feel = (over = {}) => ({ ...FEEL, ...over });
 const broke = (res, n) => res.errors.some((e) => e.includes(`rule ${n}:`));
 const why = (res) => res.errors.join(' | ');
 
+// Rule 13 guards a hazard that D22 CREATED. While `sense` was private editorial
+// metadata, a gloss mentioning a distractor was harmless; the moment D22 put the
+// gloss on screen beside the options, "the PART that is left over" next to an
+// option `part` points her at a wrong answer in the item's own explanation.
+// Nine shipped glosses did this. Banned outright rather than "unless the mention
+// is contrastive": the survivors were all negations ("correct and not wrong"
+// beside `wrong`), negation is the first thing an ESL learner drops when
+// skimming, and at phase 2's ~3150 glosses a contrastive//not judgement call does
+// not hold where a mechanical ban does.
+test('rule 13: a gloss may not name one of its own distractors', () => {
+  const clean = validateItem(feel(), ctx);
+  assert.ok(!broke(clean, 13), why(clean));
+
+  // `jump` is one of FEEL's eight distractors.
+  const names = validateItem(feel({ sense: 'to touch or jump at something' }), ctx);
+  assert.ok(broke(names, 13), why(names));
+  assert.ok(names.errors.some((e) => e.includes('jump')), `rule 13 must name the offender: ${why(names)}`);
+
+  // Contrastive mentions are banned too -- this is the case that survived the
+  // first sweep and the one the ban exists to settle.
+  const contrastive = validateItem(feel({ sense: 'to touch a thing, not to jump' }), ctx);
+  assert.ok(broke(contrastive, 13), `a contrastive mention is still a mention: ${why(contrastive)}`);
+
+  // Compared by RESOLVED LEMMA, so an inflected mention is caught: "jumping"
+  // resolves to the distractor `jump`.
+  const inflected = validateItem(feel({ sense: 'to touch a thing while jumping' }), ctx);
+  assert.ok(broke(inflected, 13), `inflected mentions must be caught: ${why(inflected)}`);
+
+  // ...and the real bank must be clean of it.
+  for (const w of ['back', 'complex', 'country', 'gentle', 'right']) {
+    const items = read('public', 'quiz', `${w}.json`);
+    const res = validateItemFile(w, items, ctx);
+    assert.ok(!broke(res, 13), `${w}.json must not name its own distractors: ${why(res)}`);
+  }
+});
+
 test('a valid single-item file passes validateItemFile with no errors', () => {
   const res = validateItemFile('feel', [feel()], ctx);
   assert.deepEqual(res.errors, [], why(res));
