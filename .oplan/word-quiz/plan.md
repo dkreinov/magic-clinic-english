@@ -410,12 +410,169 @@ report 2167 missing files as a failure while the thing that matters, her claimed
 **Phase 4 must tolerate a missing item** — she will claim a word days before its item exists. The
 quiz skips those silently rather than breaking.
 
-## PHASE 3 SKELETON — the profile side
+## PHASE 3 — the profile side (strikes, needsReview, quiz-answer) — PLANNED, NOT YET REVIEWED
 
-`strikes` on a word entry; `needsReview` flag set when a `known` word is re-tapped (D11); a
-`quiz-answer` action on `/api/profile` that records right/wrong, resets strikes on a pass (D15),
-increments at most once per session (D16), and demotes `known -> learning` at 3 (D1). Backward
-compatible exactly as `context` was: a profile written before this run must still validate.
+Base: commit `eddb350`, tree clean, `npm test` = `# pass 225 / # fail 0`.
+
+GOAL: build the correction term. **Nothing she can see changes in this phase** — the UI is phase 4
+— so the only thing that can go wrong is invisible: a wrong write into the one file that holds
+everything she has collected. Planned as a data-integrity phase, not a feature phase.
+
+### ACCEPTANCE CRITERIA (frozen before execution)
+
+1. `STEP-3.1-OK` .. `STEP-3.5-OK` all print, each re-run by the orchestrator in a clean tree.
+2. `npm test` prints `# fail 0` and `# pass 257` (225 +6 +10 +4 +7 +5; see QZ-15).
+3. **D16 HOLDS — three wrong taps in one sitting must never wipe a word.** Ten wrong answers for one
+   word in ONE session leave `strikes === 1` and `status === "known"`. Run against `api/profile.js`,
+   not the lib. This is the child-experience gate for the failure D16 exists to prevent.
+4. **THE DEMOTION REACHES THE STORY.** Three wrong answers in three distinct sessions remove the
+   word from `knownLemmaSet(profile)` — asserted against `lib/vocab.js`, the function
+   `buildAllowedSet` actually consumes, NOT against the raw `status` string. (`status` is what we
+   wrote; the set is what she experiences. Gating the field instead of the consumer is exactly the
+   adjacent-measurement mistake this project has shipped three times.)
+5. **A TAP IS NEVER A STRIKE (D11).** Five `word-tap` POSTs on a `known` word leave `status` known,
+   `(strikes ?? 0) === 0`, and set `needsReview === true`.
+6. **Nothing changed outside the seven allowed files**, and `git diff --name-only <base> -- public
+   data docs assets scripts package.json` prints NOTHING (so `PRECACHE`/`CACHE` are untouched and
+   QZ-7 needs no bump).
+7. `.data/profile.json` does not exist and no step ran a server against the real data dir.
+8. `node scripts/check-contrast.mjs` exits 0, prints `ALL PASS`, exactly 52 `PASS` lines (QZ-7).
+9. **HUMAN GATE — the phase does not close without it.** The orchestrator runs the QZ-16 transcript
+   and puts its output verbatim in front of the owner, who explicitly approves. Criteria 1-8 being
+   green is NOT sufficient. **The summary handed to the owner must be true** — phase 1 closed once
+   on a false assurance and had to be re-opened.
+
+**WHAT NO MACHINE CAN CHECK HERE, stated plainly:** whether 3 strikes / one-per-session / a-pass-
+wipes-the-slate is the policy the owner wants her to live with; whether her REAL profile still loads
+(D25 — the owner skipped that test, phase 6 carries a backup instead); whether phase 4 will mint a
+genuinely new `sessionId` per sitting (QZ-11 pushes that into phase 4's criteria in advance); and
+whether the demotion is *visible*, which D1 requires and phase 4 owns.
+
+### NEW FROZEN CONTRACTS
+
+**QZ-9 — the word entry after phase 3.** Gains exactly SIX optional keys and loses nothing:
+`strikes` (int ≥ 0, absent means 0) · `needsReview` (bool, absent means false) · `lastQuizAt`
+(parseable date string) · `lastStrikeSession` (string ≤ 64) · `quizRight`, `quizWrong` (ints ≥ 0,
+absent means 0 — D24).
+**NO BACKFILL, EVER.** No migration writes these onto entries that never had them; an entry gains a
+key only when the action owning it runs on that word. This is what makes loading an old profile a
+no-op read (D25) and keeps `defaultProfile`, tap-creation and claim-creation byte-identical.
+`validateProfile` is **type-strict and range-lenient**: wrong type → `words.<lemma>.<key>: ...`;
+absent → valid; `strikes: 99` → valid (a policy change must never invalidate a stored profile).
+Unknown keys keep being ignored, as `context` is. `WORD_STATUSES` does not change (D18 is phase 5).
+
+**QZ-10 — the `quiz-answer` action.** POST `/api/profile`
+`{ action, lemma, correct, sessionId }`. **`lemma` is looked up DIRECTLY in `profile.words`;
+`resolveLemma` is NOT called.** Phase 4 sends a key it read out of the profile. Deriving it would
+repeat the phase-1 failure shape — a lossy transform that fails open, except here it fails open by
+striking a word she was never asked about. `correct` is a strict boolean (`"false"`, `0`, `1` are
+400s, never truthiness). Response is the standard envelope, unchanged: `200 {ok, data:<profile>}`.
+Four 400s, these exact strings, each writing NOTHING: `lemma required` · `session required` ·
+`answer required` · `unknown word`.
+
+**QZ-11 — what a "session" is (D16 never defined it; this is the record gap that forced this
+contract).** A **client-minted opaque string**. The server never invents one, never derives one from
+a clock, compares only string equality. **REQUIRED, and it fails CLOSED** — missing/blank is a 400,
+never "treat as a new session", because that is precisely the three-wrong-taps-wipe-a-word failure
+D16 exists to prevent, and it would be silent. Invariant, stated so it is testable: *within one
+`sessionId` a word's `strikes` can rise by at most 1 net* — a strike is skipped iff
+`lastStrikeSession === sessionId`, and a PASS clears `lastStrikeSession`, so wrong→pass→wrong in one
+session ends at 1.
+
+**QZ-12 — the strike state machine.** `applyQuizAnswer(profile, {lemma, correct, sessionId, now})`.
+
+| event | strikes | status | needsReview | lastStrikeSession | counters |
+|---|---|---|---|---|---|
+| correct (D15) | → 0 | unchanged — **never promotes** (D13) | → false | deleted | `quizRight`+1 |
+| wrong, new session | +1 | see below | → false | `sessionId` | `quizWrong`+1 |
+| wrong, same session (D16) | unchanged | unchanged | → false | unchanged | `quizWrong`+1 |
+| increment reaching **3** (D1) | → 0 | `known`→`learning` | false | deleted | — |
+| `mark-known` / re-claim (D2) | → 0 | → `known` | → false | deleted | untouched |
+| `word-tap` on `known` (D11) | **untouched** | untouched | → **true** | untouched | untouched |
+| `word-tap` on `learning`/new | untouched | untouched | **key not added** | untouched | untouched |
+
+`0 ≤ strikes ≤ 2` after any answer — it means "failures since the last pass, claim or demotion".
+Resetting at the demotion is what makes D15's "three failures with no success between" true and
+stops a demoted word demoting again on its first slip. **A re-claimed word starts clean** (D2: her
+claims are honest mistakes, not gaming). **Counters always move, even on a skipped strike** — they
+count answers, not strikes.
+
+**QZ-13 — phase-3 non-goals.** No UI. **No change to `public/` at all**, therefore no `CACHE` bump.
+No `candidate` (phase 5). No promotion. No option selection or ordering (phase 4). No quiz LOG (D24
+froze counters, not a log). **No reading of `public/quiz/` from `api/` or `lib/`** — the server stays
+ignorant of the bank so a missing item is phase 4's silent skip (D23), not a 400. No deploy. No
+`docs/growth.md` edit (its "nothing ever demotes" line becomes false only when phase 4 ships — a
+phase 6 chore). No new dependency. No `scripts/`.
+
+**QZ-14 — the merge rule in `migrateWordKeys`.** It runs on EVERY profile load and copies **named
+fields only** — verified — so anything unnamed is silently dropped. When two keys fold:
+`strikes` = **max** (a merge must not launder away a failure); `needsReview` = OR; `lastQuizAt` =
+later; `lastStrikeSession` = from the later-quizzed entry; `quizRight`/`quizWrong` = **sum**. Its
+two existing invariants stand: never drops a word, idempotent.
+
+**QZ-15 — the test ledger.** 225 → 231 → 241 → 245 → 252 → **257**. MEASURED: 220 top-level
+`test()` calls + 5 subtests in `dev-server.test.js` = the 225 `npm test` prints, so **every new test
+must be a FLAT top-level `test()`** or the ledger stops being checkable.
+
+**QZ-16 — the criterion-9 transcript.** One `node -e` against the real handler in a temp
+`DATA_DIR`, playing a frozen event script and printing one plain-English line per event
+(`<event> -> <lemma>: status=<s> strikes=<n> needsReview=<b>`), ending with the sorted
+`knownLemmaSet`. Script: claim light/fair/method · tap light ×2 · quiz light WRONG s1 ×3 · quiz
+light WRONG s2 · quiz fair RIGHT s2 · quiz light RIGHT s3 · quiz light WRONG s4/s5/s6 · quiz method
+WRONG s6. The owner is asked one question: *is this what you want her week to feel like?*
+
+### STEPS
+
+**3.1 — the schema, and only the schema.** `lib/profile.js`, `tests/profile-quiz-schema.test.js`
+(NEW). Validate the six new optional keys; a profile in today's shape still validates. No behaviour
+change. Non-goals: no `applyQuizAnswer`; no change to `applyWordTap`/`markWordKnown`/
+`migrateWordKeys`/`defaultProfile`; **no backfill**; no range check on `strikes`.
+**+6 tests → 231.** Validation: `node --check lib/profile.js`, `npm test` shows `# pass 231` and
+`# fail 0`, `echo STEP-3.1-OK`. Tier WORKER · depends on nothing.
+
+**3.2 — `applyQuizAnswer`, the re-claim reset, the merge rule.** `lib/profile.js`,
+`tests/profile-quiz-answer.test.js` (NEW). The whole state machine as a pure function, plus QZ-14.
+Non-goals: no HTTP; **no promotion of any kind**; no `resolveLemma`; no change to `applyWordTap`.
+Every test also asserts `validateProfile(profile).ok`. **+10 → 241.** Tier WORKER · depends on 3.1.
+
+**3.3 — D11: a re-tap flags, it never strikes.** `lib/profile.js`,
+`tests/profile-quiz-retap.test.js` (NEW). `needsReview = true` iff the existing entry is `known`.
+Non-goals: a tap never touches `strikes`/`status`/`lastQuizAt`; a tap on a `learning` word must add
+**no key at all** (absent ≠ false — it keeps existing entries byte-identical). **+4 → 245.**
+Tier WORKER · depends on 3.2.
+
+**3.4 — the `quiz-answer` action.** `api/profile.js`, `tests/api-profile-quiz.test.js` (NEW).
+Wire QZ-10 in; every validation direct, every failure path writing nothing. Non-goals: no
+`resolveLemma`; must not create a word entry; must not read `public/quiz/`; no change to the other
+four actions or to GET. Uses the existing `withTempDataDir` harness, then verifies real `.data/`
+stayed empty. **+7 → 252.** Tier WORKER · depends on 3.3.
+
+**3.5 — the child-experience pass, by a worker that did NOT write the code.**
+`tests/profile-quiz-scenario.test.js` (NEW) only. Given the CONTRACTS and criteria, never steps
+3.1-3.4's packets; forbidden to reuse their test files or copy their assertions. **Every test must
+be run against a MUTATED implementation first and the report must carry the mutation and its
+failing output** — a test never seen to fail is not evidence, and phase 1's whole lesson is that the
+author's own green suite proves only what the author assumed. It may temporarily edit the
+implementation to produce that evidence and MUST restore it (sha256 checked). It may not fix a
+defect it finds — it REPORTS, and the orchestrator re-opens the owning step. Asserts through
+`knownLemmaSet` and the real handler, not the raw field. **+5 → 257.** Tier WORKER · depends on 3.4.
+
+### RISKS
+- **A wrongful demotion — she is right and the app takes the word away.** The worst outcome. Guarded
+  by the required, fail-closed `sessionId` (QZ-11), criterion 3, and D15's reset.
+- **The session guard fails OPEN** (missing id treated as new) → three taps wipe a word. Guarded by
+  QZ-10's 400 and a step-3.4 test asserting no write on a rejected action.
+- **The session guard fails CLOSED forever and everything stays green** — a phase-4 client sending a
+  constant id makes every word un-strikeable and the correction loop never fires. **No phase-3 test
+  can see this.** Guarded only by QZ-11 writing a criterion into phase 4 now.
+- **Her live profile breaks.** Guarded by no-backfill, unchanged `defaultProfile`, type-strict/
+  range-lenient validation — and, since D25 skipped the end-to-end test, by phase 6's backup.
+- **A read that writes** — `GET /api/profile` creates a profile when absent. Temp `DATA_DIR`
+  everywhere; criterion 7 verifies real `.data/` stayed empty.
+- **The author's own suite proves only what the author assumed.** Guarded by step 3.5 being a
+  separate worker writing from contracts with mandatory mutation evidence.
+- **A merge quietly drops a strike or a counter.** `migrateWordKeys` copies named fields only.
+  Guarded by QZ-14 and a step-3.2 test that also re-proves idempotency.
 
 ## PHASE 4 SKELETON — the quiz surface
 
@@ -451,6 +608,17 @@ pilot is shippable.
 keep entering as `known` directly (D13, asymmetric trust).
 
 ## PHASE 6 SKELETON — deploy
+
+**FIRST CRITERION, BEFORE ANY DEPLOY THAT CAN WRITE THE NEW PROFILE FIELDS (D25): BACK HER PROFILE
+UP.** Capture the live profile to a timestamped file and prove the capture is non-empty, parseable
+JSON, and contains her `words` map. There is no backup mechanism in this repo and no undo; the
+owner skipped the end-to-end compatibility test, so a recoverable failure is the mitigation that
+replaces it. A deploy that can write to her collection without a captured copy is the one
+irreversible act in this whole run.
+
+Second criterion: a post-deploy `GET /api/profile` against production must return 200 and validate
+— the only check that ever runs against her REAL data rather than a fixture.
+
 
 The recipe in `.oplan/word-audio/journal.md`: record the outgoing deployment via `vercel inspect`
 FIRST; `"$(npm prefix -g)/vercel" deploy --prod --yes`; md5 live vs WORKTREE for every changed

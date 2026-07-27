@@ -168,6 +168,42 @@ phase 1 was forbidden to touch and which `.data/` does not hold locally, so **it
 enumerated at plan time and does not need to be**: phases 3 and 4 do not depend on it. It is read
 once, at the first top-up, after the profile side exists.
 
+## D24 — two quiz counters per word, recorded from day one (owner, 2026-07-27)
+
+Nothing reads them yet. They exist because D14 promises a parent view "soon" and **any week we do
+not record is lost forever** — quiz history cannot be backfilled. The owner chose the bounded
+option over both "record nothing" and "record a full log":
+
+- `quizRight` and `quizWrong`, two integers per word entry. That is all.
+- **Bounded by construction** — two counters, not a log, so the profile cannot grow without limit.
+  (`story.checkLog` is the cautionary precedent: it grows forever and, per `docs/growth.md`, is
+  never read back out.)
+- Enough for "she got 12 of 15 right this month". NOT enough for per-day detail; that would need a
+  real log and a rotation rule, which is deliberately out of scope.
+
+## D25 — the end-to-end backward-compatibility test is SKIPPED, and a backup replaces it (owner, 2026-07-27)
+
+Her profile lives in Vercel Blob behind `APP_CODE`; this repo cannot read it, so compatibility
+could only ever be proved against a fixture reconstructed from the code. Offered that fixture test,
+a redacted export of the real key set, or skipping it, **the owner chose to skip it.** I had
+recommended against, and record that here so the choice is legible later rather than looking like
+an oversight.
+
+What actually protects her data, and it is not the test: **the change is additive by construction.**
+No new key is ever backfilled onto an existing entry, every new key is optional, `validateProfile`
+already ignores unknown keys, and `defaultProfile()` is unchanged — so loading an old profile is a
+no-op read. The test would only have confirmed that. The residual risk is that the design is wrong
+in a way nobody spotted.
+
+**The real gap was never the test — it was that there is NO UNDO.** No backup mechanism exists in
+this repo. So instead of the test, phase 6 gains a hard criterion: **capture the live profile to a
+timestamped file BEFORE the first deploy that can write the new fields, and prove the capture is
+non-empty and parseable.** That converts an unprovable risk into a recoverable one, which is worth
+more than the test would have been. Recorded in the PHASE 6 SKELETON.
+
+The cheap half is kept regardless, because it is not really a compat test: step 3.1 still asserts
+that a profile in today's shape validates. That is just testing the validator being changed.
+
 ## Decisions taken by the orchestrator at plan time (Rule 2: nothing deferred to execution)
 
 The grill left five items "still open". They are decided here, because a step containing an open
