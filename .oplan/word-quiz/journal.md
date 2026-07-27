@@ -1166,3 +1166,89 @@ STEP 4.5 the shell bump
   tokens: worker=32953, checker=25225
   commit: e4147aa
   accepted: 2026-07-27
+
+STEP 4.6 the child-experience pass, by a worker that did NOT write the code
+  tier: WORKER (Sonnet, fresh instance — never saw packets 4.1-4.5)
+  did: tests/quiz-experience.test.js — NEW, five flat episodes driving the REAL api/profile.js
+       handler and the REAL startQuiz, asserting possession through knownLemmaSet.
+  surprises: episode 1's module-scope-session mutation incidentally broke episode 3 too — a
+       shared-state mutation radiates; expected, and evidence the episodes share no fixture state.
+  deviations: episode 2's mutation evidence used the offered lib/profile.js same-session-check
+       form (declared in the packet as one of two acceptable forms).
+  MUTATION EVIDENCE — six mutations, all observed failing the right assertion, all restored
+       (restore verified by ME via the frozen script's `git diff --quiet public/ lib/ api/`):
+       ep1 module-scope session id -> "a second sitting must mint a fresh id"
+       ep2 sameSession forced false -> "three wrong answers in ONE sitting must not demote"
+       ep3 demoted hardcoded false -> "the third strike must render the demotion line"
+       ep3b (added after audit) demoted = !correct (cry-wolf) -> "sitting 1 must not render the
+            demotion line before the third strike"
+       ep4 load-loop throws on null -> uncaught throw failed the episode
+       ep5 strikes clause removed from comparator -> deepStrictEqual order failure
+  AUDIT ROUND: the first submission came back MISMATCH on a real vacuity — episode 3 had no
+       NEGATIVE control, so a cry-wolf implementation (demotion line on every wrong answer) would
+       have passed, and no other test in the suite covers that path (4.2's test checks the
+       RENDERER honours the flag, not that the flag is computed right). Fixed with the absent-in-
+       sittings-1-and-2 assertions + the ep3b mutation; re-audit: match, high.
+  DEFECTS in the real implementation: NONE. Same result as phase 3's step 3.5: an agent that did
+       not write the code, working from contracts, could not make it misbehave.
+  validation_first_try: yes (both rounds), re-run by me: STEP-4.6-OK, 282 pass / 0 fail.
+  retries: 0 · escalations: 0 · interventions: 1 (audit-found vacuity, targeted re-dispatch)
+  audit: mismatch (1 vacuity) -> fix -> match, CONFIDENCE high.
+  tokens: worker=189330 (both rounds), checker=92525 (both rounds)
+  commit: 90112d1
+  accepted: 2026-07-27
+
+### A9 — the phase-gate file-boundary command failed with both sides equal
+
+At the gate, criterion 6's frozen command reported FAIL while listing the SAME eleven files on
+both sides. Cause: bare `sort` collates by locale, and this machine's locale orders `quiz.js`
+before `quiz-core.js`; the frozen expected string was written in C-locale byte order. The
+instrument becomes `LC_ALL=C sort`; the property is untouched; verified both by the amended
+string comparison and by an independent `comm -3` set comparison returning empty. Logged in
+plan.md beside criterion 6 as A9. The pattern to remember: a frozen comparison is only frozen if
+its collation is.
+
+## PHASE 4 CLOSED — mechanically. Criterion 11 (the owner) is the only thing outstanding.
+
+PHASE 4 CLOSED
+  steps: 6, first-try passes: 6/6 (worker validations; two steps then had an audit round-trip)
+  escalations: 0 (no step needed a stronger model)
+  interventions: 3, ALL audit-found post-work (a byte-identity breach in 4.3, spec-imprecision
+    rulings in 4.2, a vacuous assertion in 4.6) — versus phase 3's 2, which were both caught at
+    packet-writing time. The auditor earned its keep this phase; the packets were cleaner.
+  auditor verdicts: 4 match first-pass (4.1 low-conf, settled by my own runs; 4.2 mismatch->A7
+    accepted; 4.4, 4.5 high) · 2 mismatch->fix->match (4.3, 4.6)
+  plan review: 1 real defect found BEFORE execution (the unreset quiz-done flag — chapter 2+
+    would silently never quiz; fixed by chapter-keyed state + a frozen test)
+  mutation evidence: 8 mutations across 4.2 and 4.6, every one caught. Zero NOT-CAUGHT.
+  defects found by the independent step-4.6 agent in the real implementation: NONE
+  QZ-21: transcript vs hand-derived expectation — DIFF EMPTY, at 4.2 acceptance AND at the gate
+  tokens: planner=185416, planreviewer=129513, workers=525499, checkers=332047,
+    total subagent=1172475 (summed with awk, not by hand)
+  cost: unavailable — this harness did not surface per-model cost for the run
+  orchestrator_context: unavailable — /context is a human command
+  field_guide: 54/40 lines (justification: four new hazards each cost a real round-trip THIS
+    phase — the negative-control rule, the Windows-path stray file, the locale-dependent sort,
+    the style-block-matches-first trap — and each carries its command or consequence; nothing
+    evicted because phases 5 and 6 still need every standing lesson, incl. the deploy pointer)
+
+### What phase 4 actually proved, stated at the width of the evidence and no wider
+
+- **Each sitting is a genuinely new sitting.** Two startQuiz calls give two ids (4.2 test 6 and
+  4.6 episode 1, the latter by an independent author, mutation-proved both ways).
+- **Three wrongs in one sitting cost one strike, not the word** — at the experience level,
+  through the real handler (4.6 ep2, control-proved).
+- **The demotion is TOLD, and only when it happens** — the line renders on the demoting answer
+  (4.6 ep3) and is ABSENT before it (the audit-forced negative control, cry-wolf mutation caught).
+- **A missing item is silence, not a crash** (4.2 test 7, 4.6 ep4).
+- **A word mid-demotion is asked first**, so the third strike can arrive (4.6 ep5).
+- **The rendered screen equals the hand-derived expectation byte-for-byte** (QZ-21, diff empty
+  twice). What this does NOT prove: how it LOOKS in a browser — no phase renders in one; the
+  first real-browser look is the owner's, post-deploy (phase 6 note).
+- Nothing outside the eleven allowed files changed; the bank is untouched; the shell is bumped
+  and complete; contrast 52; `.data/` empty.
+
+What is still NOT proved and cannot be by this phase: whether the screens read RIGHT to an
+eleven-year-old (criterion 11, the owner, pending); whether the CSS/RTL layout is right in a real
+browser (phase 6's deploy look); and the quiz has items only for the 50 pilot words until the
+first top-up runs (phase-6 criterion).

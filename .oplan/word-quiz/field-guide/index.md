@@ -7,11 +7,13 @@
 2. **WHAT COUNTS AS EVIDENCE.** · A test never seen to FAIL is not evidence — run it against mutated
    code first. · Say which CAN fail first: byte-identity guards ("an old profile still validates",
    "a first tap adds no key") pass before the change too and were a third of every frozen assertion
-   list this run. Report guards as guards. · **Derive the expected output BY HAND from the contract
-   BEFORE the code exists, then diff it.** Deriving it from the implementation makes the gate
-   circular, which is how phase 1 closed on a false assurance; phase 3's transcript was written
-   before its handler and diffed empty. · Never verify against your own RE-IMPLEMENTATION, and note
-   that anything reaching its subject through a TRANSFORM (`tokenize`, `resolveLemma`) fails OPEN.
+   list this run. Report guards as guards. · **A positive assertion needs its NEGATIVE control** —
+   "the demotion line appears on the third strike" passed while a cry-wolf mutant showed it on
+   EVERY strike; assert the line is also ABSENT before. · **Derive the expected output BY HAND from
+   the contract BEFORE the code exists, then diff it.** Deriving it from the implementation makes
+   the gate circular — phases 3 and 4 both wrote the transcript before the code and diffed empty.
+   · Never verify against your own RE-IMPLEMENTATION, and anything reaching its subject through a
+   TRANSFORM (`tokenize`, `resolveLemma`) fails OPEN.
 3. **THE PROFILE IS LIVE — the one file holding everything she has collected.**
    · Production is Vercel Blob behind `APP_CODE`, unreadable from here. NEVER probe it.
    · `GET /api/profile` CREATES one when absent — a read that writes. Point `DATA_DIR` at a temp dir
@@ -24,15 +26,17 @@
    · `isAuthorized` returns TRUE only when `APP_CODE` is UNSET — and of the 8 test files copy-pasting
      `withTempDataDir`, only ONE deletes it; the rest 401 wherever it is exported.
 4. Windows/Git Bash: forward slashes; CRLF warnings are noise; `curl` needs `--ssl-no-revoke`; npm
-   global bin is off PATH (`"$(npm prefix -g)/<tool>"`). **Git Bash's `/tmp` is NOT node's** —
-   `/c/Users/...` reaches node as `C:\c\Users\...`. Never write scratch into the repo.
+   global bin is off PATH (`"$(npm prefix -g)/<tool>"`). **Git Bash's `/tmp` is NOT node's**; a
+   Windows-style path fed to `mkdir`/redirect CREATES A STRAY REPO FILE (bit a 4.3 worker — the
+   step script's boundary check is what caught it). Never write scratch into the repo.
 5. `npm test` = bare `node --test`, and it also runs the contrast gate. Invariant: ZERO failures. The
    ledger stays checkable only if every new test is a FLAT top-level `test()` — `dev-server.test.js`'s
    5 subtests are why 252 files-worth prints as 257.
 6. Validation chains: `set -o pipefail`; a stray `;` DETACHES the rest so `…-OK` prints over a broken
    build. **`cmd | grep -q` under pipefail is a trap** — `grep -q` SIGPIPEs the producer and fails the
-   pipeline though every check passed; capture to a variable, match with `case`. Put the file-BOUNDARY
-   check (`git status --porcelain`, minus `.oplan`) in the STEP's script, not only at the phase gate.
+   pipeline though every check passed; capture to a variable, match with `case`. **`sort` collates by
+   LOCALE — a frozen string comparison needs `LC_ALL=C sort`** (bit criterion 6 at the 4-gate:
+   `quiz.js` vs `quiz-core.js`). Put the file-BOUNDARY check in the STEP's script, not only the gate.
 7. Before touching a view/style/data file, grep `tests/` for exact-shape assertions (the sw `CACHE`
    string, the exact `PRECACHE` array, class names, Hebrew strings) — append beside a frozen thing,
    never replace it. `PRECACHE` admits only first-party JS a precached file STATICALLY imports; data

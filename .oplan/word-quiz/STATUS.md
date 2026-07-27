@@ -1,26 +1,23 @@
 # STATUS — word-quiz (W5b)
 
-**Where we are:** phase 4 — the quiz screens, the part Mika actually sees — is **planned in full,
-reviewed, and now being built**. Phases 1 and 3 are done and approved by you. Nothing is deployed;
-nothing she can see has changed yet.
+**Where we are:** phase 4 — the quiz screens — is **built, tested, and waiting for one thing:
+you.** All ten automatic checks are green. The phase closes when you read the three screens below
+(in the chat) and say yes.
 
-## What this run builds
+## What got built this phase
 
-Mika can already tap "יודעת את זה" to claim she knows a word. Nothing checks that claim — and the
-claim feeds the word into the story generator's vocabulary, so a wrong claim quietly makes her
-chapters harder. This run builds the check: a short quiz after each chapter — the word's meaning,
-a sentence with a gap, six options she can read or hear. Wrong on three separate days → the word
-goes back to "learning" and the story re-teaches it, and now she is TOLD when that happens.
+Mika now gets asked. After every chapter she answers four quick questions — the word's meaning on
+top, a sentence with a gap, six words she can read or hear. There is also a "בואי נתרגל מילים"
+button in המילים שלי. Get a word wrong on three separate sittings and it goes back to
+"learning" — and a kind line TELLS her so. Nothing is deployed yet; her app is unchanged until
+phase 6.
 
 ```mermaid
 flowchart LR
-    A["4.1 the brain:<br/>which words, which options"] --> B["4.2 the screen:<br/>meaning + sentence + 6 options"]
-    B --> C["4.3 practice button<br/>in המילים שלי"]
-    B --> D["4.4 auto-quiz<br/>after each chapter"]
-    C --> E["4.5 offline list<br/>+ version bump"]
-    D --> E
-    E --> F["4.6 independent helper<br/>tries to break it all"]
-    F --> G["you read the actual screens<br/>and say yes/no"]
+    A["chapter done"] --> B["4 questions<br/>meaning + sentence + 6 words"]
+    B -->|right| C["slate wiped<br/>on to the story"]
+    B -->|"wrong, 3rd<br/>separate sitting"| D["word back to learning<br/>and she is TOLD"]
+    E["בואי נתרגל מילים<br/>button"] --> B
 ```
 
 ## Progress
@@ -28,31 +25,35 @@ flowchart LR
 | Phase | What | State |
 |---|---|---|
 | 1 | item format, checker, 50-word pilot | done — you approved it |
-| 2 | the full bank | not a phase — the bank grows weekly on demand |
+| 2 | the bank | grows weekly on demand; FIRST top-up is now a phase-6 requirement |
 | 3 | profile: strikes and demotion | done — you approved the transcript |
-| 4 | the quiz screens | **building now — 4 of 6 steps done** (brain, question card, practice button, after-chapter quiz; next: the offline/version step) |
+| 4 | the quiz screens | **10 of 11 checks green — waiting for your yes on the screens** |
 | 5 | automatic promotion | not started |
-| 6 | deploy (+ first bank top-up, + profile backup) | not started |
+| 6 | deploy (backup + first top-up + your first real look) | not started |
 
-## What the plan review caught before any code was written
+## What the checking machinery caught this phase (all fixed before anything shipped)
 
-A fresh reviewer found one real bug in the plan itself: the after-chapter quiz would have run for
-chapter 1 and then **silently never again** — the "quiz finished" switch was never flipped back
-for the next chapter. Fixed in the plan, with a test that pins it. This is exactly the kind of
-failure where every automatic check stays green, which is why the plan gets attacked before work.
+- The plan itself: the after-chapter quiz would have run once and then never again (chapter 2
+  onward) — caught by the plan reviewer before any code existed.
+- An invisible blank line quietly added to the words page — caught by a checker, rejected, fixed.
+- A test that would have stayed green while the app showed the "word taken back" message on every
+  wrong answer — caught by a checker; the test now proves the message stays silent until the
+  real third strike.
+- Eight deliberate sabotage runs against the finished code: every one was caught by a test. An
+  independent helper who never saw the code being written could not make it misbehave.
 
-## The three promises phase 4 must keep (decided before building)
+## What needs you — one decision, one look
 
-- **Each sitting is a genuinely new sitting.** Otherwise no word can ever collect its three
-  strikes, and the whole correction loop silently never fires. A separate helper who never saw the
-  code will try to break exactly this.
-- **A claimed word with no quiz question yet is skipped in silence** — she is never blocked.
-- **A demotion is visible**: a kind line tells her the word is going back to learning.
+1. **Read the three screens** I put in the chat (they match, byte for byte, a prediction I wrote
+   by hand before the screen code existed). Say yes, or say what to change.
+2. **Optional:** phases run 5 (automatic promotion) then 6 (deploy). Nothing in phase 5 blocks
+   deploying phase 4 first, so she could have the quiz sooner. Your call at the gate.
 
-## What needs you
+## Honest limits
 
-Nothing yet. At the end of phase 4 you will be shown the three actual screens — question, wrong
-answer, and the "word taken back" message — and the phase does not close until you approve them.
+- No screen has rendered in a real browser this whole run — the tests check the text and
+  structure, not the look. Your first look at the deployed app is the real look.
+- Until the first bank top-up runs, the quiz only knows the 50 pilot words.
 
 ## What it costs
 

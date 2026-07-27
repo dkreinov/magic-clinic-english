@@ -48,3 +48,41 @@ What the plan review caught before any code: the after-chapter quiz would have r
 silently never again for later chapters — the "done" switch was never reset. Fixed in the plan,
 with a test pinning it. Cost of catching it here: one message. Cost of catching it after building:
 a re-opened step.
+
+## Phase 4 — plain report at the close (2026-07-27)
+
+=== PHASE 4 — PLAIN REPORT ===
+WHAT WE SET OUT TO DO: build the quiz screens — the part Mika actually sees — so the correction
+loop phase 3 built finally reaches her.
+WHAT WE ACTUALLY DID:
+  · 4.1 the brain: which words are due (words mid-slip first), which six choices to show.
+  · 4.2 the question card: meaning on top, sentence with a gap, six words each with a little
+    speaker, praise when right, the true word when wrong, and a kind line when a word is taken
+    back. Each sitting gets a genuinely fresh identity, so three slips in one bad afternoon can
+    never cost her a word.
+  · 4.3 a "בואי נתרגל מילים" button in המילים שלי, which hides itself when there is nothing to ask.
+  · 4.4 four questions after every chapter, automatically, before the story continues; nothing to
+    ask means she goes straight on. Every chapter gets its own fresh quiz.
+  · 4.5 the app's version stamp bumped and the two new files added to the offline list.
+  · 4.6 a separate helper who never saw the code tried to break all of it.
+WHAT WE FOUND OUT:
+  · The checking machinery caught three real problems the builders' own green tests missed: an
+    invisible blank line on the words page; a "quiz finished" switch that would have silenced
+    every quiz after chapter 1 (caught before any code was written); and a test that stayed green
+    while the "word taken back" message showed on EVERY wrong answer — it now proves the message
+    stays silent until the real third strike.
+  · Eight deliberate sabotage runs each tripped the right test. The independent breaker could not
+    make the real code misbehave at all.
+  · The three screens she will see match, byte for byte, a prediction I wrote by hand before the
+    screen code existed — twice: once when the screen was built, once at the gate.
+  · One machine quirk: the file-list check failed while both lists were IDENTICAL, because "sort"
+    orders punctuation differently in different languages. The check now pins one ordering.
+WHAT WENT WRONG: nothing that reached the finished work; every catch above was fixed and
+re-checked before acceptance.
+WHAT IT COST: no money (no paid services). Agent work this phase: about 1.17 million tokens
+across one planner, one plan reviewer, six builders and six checkers.
+WHERE WE ARE NOW: 282 tests, zero failures; ten of eleven closing checks green.
+WHAT HAPPENS NEXT: the eleventh check is YOU — read the three screens in the chat and say yes or
+say what to change. Also yours: whether to deploy the quiz now (phase 6) or build automatic
+promotion first (phase 5); nothing technical forces the order.
+=== END PLAIN REPORT ===

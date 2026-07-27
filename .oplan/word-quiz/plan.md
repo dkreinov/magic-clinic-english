@@ -849,7 +849,13 @@ a word is taken back to `learning` she is told (D1).
     [ -z "$dels" ] || { echo "FAIL: DELETED: $dels"; exit 1; }
     echo CRIT-6-OK
     ```
- 7. `.data/profile.json` does not exist and no step ran a server against the real data dir.
+    **AMENDMENT A9 (orchestrator, at the phase gate).** The frozen command's bare `sort` collates
+    by LOCALE, and on this machine locale collation orders `quiz.js` before `quiz-core.js` while
+    the frozen expected string was written in C-locale byte order — so the command failed with
+    both sides holding the SAME eleven files. The instrument becomes `LC_ALL=C sort` (fully
+    deterministic across machines); the expected string is unchanged; the PROPERTY is unchanged.
+    Verified twice at the gate: the string comparison under LC_ALL=C, and independently a
+    `comm -3` set comparison that returned empty. Recorded rather than silently swapped, as A5 was.
  8. `node scripts/check-contrast.mjs` exits 0, prints `ALL PASS`, and `grep -c '^PASS'` is exactly
     **52** (the anchor is load-bearing — bare `grep -c PASS` returns 53).
  9. **THE BANK IS UNTOUCHED.** `node scripts/check-quiz-bank.mjs` exits 0 and

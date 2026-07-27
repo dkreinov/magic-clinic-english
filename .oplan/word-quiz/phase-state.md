@@ -1,70 +1,60 @@
-CURRENT: phase 4 "the quiz surface", next step 4.6 (the independent child-experience pass).
-  4.5 ACCEPTED at e4147aa (STEP-4.5-OK re-run by the orchestrator; 277 pass / 0 fail; audit
-  match/high).
-  4.4 ACCEPTED at 93847b8 (STEP-4.4-OK re-run by the orchestrator; 277 pass / 0 fail; audit
-  match; NOTE: renderChapter's local `stage` shadows the view's outer `stage` — harmless today,
-  recorded in the journal).
-  4.3 ACCEPTED at 70ac7c1 (STEP-4.3-OK re-run by the orchestrator; 274 pass / 0 fail; first
-  submission REJECTED by audit for a byte-identity breach, fixed and re-audited match — A8).
-  4.1 ACCEPTED at 1aabd37 (STEP-4.1-OK re-run by the orchestrator; 264 pass / 0 fail; audit
-  match — its low confidence was execution-only, covered by the orchestrator's own clean-state
-  run and plan-time read of light.json).
-  4.2 ACCEPTED at 2159560 (STEP-4.2-OK re-run by the orchestrator; 272 pass / 0 fail; carries
-  AMENDMENT A7 — the options wrapper div and the no-bind done screen, auditor findings accepted
-  as spec imprecision, logged beside QZ-18). **QZ-21 ALREADY DIFFS EMPTY** against the
-  hand-derived expectation — re-run it at the phase gate: `node .oplan/word-quiz/quiz-transcript.mjs`
-  diffed against `quiz-transcript-expected.txt`.
-  Phase 4 is PLANNED IN FULL in plan.md (`## PHASE 4 — the quiz surface`): 11 acceptance criteria,
-  contracts QZ-17..QZ-22, six steps 4.1-4.6, five ratified decisions (a)-(e). A fresh planner
-  drafted it from files alone; the plan reviewer found ONE real defect (the after-chapter quiz
-  state was never reset, so chapter 2+ would silently never quiz) — fixed by chapter-keyed
-  `quizState` + `chapterQuizState`; round 2 verdict: ship. See journal "PHASE 4 PLANNING".
-  **QZ-21's transcript files are ALREADY WRITTEN by the orchestrator** (quiz-transcript.mjs +
-  quiz-transcript-expected.txt, hand-derived), as required BEFORE step 4.2 is dispatched.
-  Phases 1 and 3 are CLOSED with owner approval (phase 1 was re-opened by audit once and re-closed
-  — full story in the journal). PHASE 2 IS NOT A PHASE (D23): the bank grows by a WEEKLY top-up
-  operation; the FIRST top-up is now a phase-6 criterion, or phase 4 ships green but inert.
+CURRENT: **PHASE 4 MECHANICALLY CLOSED 2026-07-27. Criteria 1-10 GREEN. Criterion 11 — the owner
+  reading the QZ-21 transcript and approving the screens — is the ONLY thing outstanding.**
+  NEXT ACTION: put the transcript (three screens, verbatim) in front of the owner. On approval,
+  plan PHASE 5 (G1 candidates) with a fresh planner — or the owner may choose to deploy first
+  (phase 6), since phase 4 is what makes the feature real for her; the plan's phase order is
+  5 then 6, but nothing in phase 5 blocks a deploy of phase 4. That sequencing question belongs
+  to the owner at the gate.
+  Six steps accepted: 4.1 1aabd37 · 4.2 2159560 (A7) · 4.3 70ac7c1 (A8) · 4.4 93847b8 ·
+  4.5 e4147aa · 4.6 90112d1.
+  Ledger 257 -> 264 -> 272 -> 274 -> 277 -> 277 -> **282**, `# fail 0`. Contrast 52 ALL PASS.
+  Bank untouched (50 files / 71 items). Shell at magic-vet-v13, both quiz modules precached.
+  `.data/profile.json` absent. Exactly the 11 expected files across `5db1d10..HEAD`, none
+  deleted (criterion 6 under A9: `LC_ALL=C sort` — locale collation broke the frozen comparison
+  with both sides EQUAL; instrument fixed, property untouched).
+  QZ-21: transcript vs hand-derived expectation DIFF EMPTY, at 4.2 acceptance AND at the gate.
+  8 mutations run (4.2, 4.6), all caught. The independent 4.6 agent found NO defect.
+  THREE AMENDMENTS this phase, all logged in plan.md beside what they amend:
+  **A7** (4.2) — options wrapper div + no-bind done screen: spec imprecision, accepted.
+  **A8** (4.3) — the auditor caught a REAL byte-identity breach (whitespace line in renderList);
+  rejected, fixed by same-line concatenation, re-audited match.
+  **A9** (gate) — criterion 6 needs `LC_ALL=C sort`; bare sort collates by locale.
+  KNOWN WART, recorded: renderChapter's local `stage` shadows the view's outer `stage`
+  (reader.js). Harmless today; a future reader.js edit should rename one of them.
 
-PLAN: .oplan/word-quiz/plan.md — read it top to bottom; amendments are logged beside what they amend.
-DESIGN: .oplan/word-quiz/design.md — FROZEN. D1-D25. Do not re-open any of them.
-FIELD GUIDE: .oplan/word-quiz/field-guide/index.md (10 lessons, 50/40, justified in the journal)
-BRIEFING: .oplan/word-quiz/briefing.md — the run's story for the human, plain words, append-only.
-PREDECESSOR: .oplan/word-audio/ — closed, deployed; its journal holds the deploy recipe + rollback.
+CARRY INTO PHASE 5/6 — what phase 4 learned that no phase-4 test can enforce:
+  · **The quiz is INERT until the first top-up runs** — the bank holds only the 50 pilot words.
+    The first top-up is a PHASE 6 criterion (run it before or with the deploy).
+  · **No phase has rendered in a real browser.** The owner's first look at the deployed app is
+    the run's only CSS/RTL check. Phase 6 must say so at its gate.
+  · Phase 5 (candidate status) touches `WORD_STATUSES` and promotion — quiz-core's
+    `pickQuizWords` filters on `status === 'known'` EXACTLY; a new `candidate` status is
+    invisible to the quiz until phase 5 decides otherwise. That is currently CORRECT per D12
+    (a candidate must pass a quiz to become known — phase 5 will need its own entry point).
+  · `docs/growth.md`'s "nothing ever demotes" line is now FALSE in the code but the doc edit is
+    deliberately deferred to phase 6 (QZ-13).
 
-BASE for phase 4: commit 5db1d10 · 257 tests / 0 fail · contrast 52 ALL PASS · bank 50 files /
-  71 items · LIVE at magic-vet-v12. Ledger target after 4.6: **282** (QZ-20).
+PLAN: .oplan/word-quiz/plan.md — read top to bottom; amendments live beside what they amend.
+DESIGN: .oplan/word-quiz/design.md — FROZEN, D1-D25. Do not re-open.
+FIELD GUIDE: .oplan/word-quiz/field-guide/index.md (10 lessons, 54/40, justified in the journal)
+BRIEFING: .oplan/word-quiz/briefing.md — append-only, for the human.
+PREDECESSOR: .oplan/word-audio/ — its journal holds the deploy recipe + rollback for phase 6.
 
-ACCEPTED (all phases):
-  1.1 — lib/quiz-item.js (amendment A1: rule 10 compares resolved lemmas)
-  1.2 — scripts/check-quiz-bank.mjs (A2: sampler stride `Math.floor(i*total/n)`)
-  1.3 — public/quiz/ ×50 (A3-numerals: cardinal/number/ordinal fold to `num`)
-  3.1 18dbda1 (A3: strikes/quizRight/quizWrong = `Number.isInteger && >= 0`, no upper bound)
-  3.2 b273c74 (A4: on a merge the later-`lastQuizAt` side's `lastStrikeSession` wins even when
-      ABSENT; compute BEFORE overwriting `existing.lastQuizAt`. One QZ-14 branch knowingly untested
-      — journal, step 3.2)
-  3.3 76eb416 · 3.4 f9760b2 · 3.5 521ae9b (verified against `git log`, not memory)
+ACCEPTED (all phases): 1.1 · 1.2 · 1.3 (phase 1, re-closed after audit; owner approved) ·
+  3.1 18dbda1 · 3.2 b273c74 · 3.3 76eb416 · 3.4 f9760b2 · 3.5 521ae9b (phase 3, owner approved) ·
+  4.1 1aabd37 · 4.2 2159560 · 4.3 70ac7c1 · 4.4 93847b8 · 4.5 e4147aa · 4.6 90112d1 (phase 4,
+  criteria 1-10 green, owner gate pending).
 
-FROZEN CONTRACTS IN FORCE:
-  QZ-1 (item file, 13 rules) · QZ-2 (generation rules + pin test) · QZ-3 (gate CLI) · QZ-4/QZ-13/
-  QZ-19 (per-phase non-goals) · QZ-5 (pilot 50) · QZ-6/QZ-15/QZ-20 (ledger: now 257 -> 282) ·
-  QZ-7 (PRECACHE first-party JS only, contrast 52, profile never probed) · QZ-8 (37 excluded
-  words) · QZ-9 (six optional word keys, NO BACKFILL EVER) · QZ-10 (quiz-answer action, direct
-  key lookup, no resolveLemma, sessionId fails CLOSED) · QZ-11 (session = client-minted opaque
-  string; PHASE 4 MUST MINT A FRESH ONE PER SITTING — criterion 3) · QZ-12 (strike table, row 3 is
-  `>= 3`) · QZ-14 (merge rules + A4) · QZ-16 (phase-3 transcript, discharged) · QZ-17 (quiz-core
-  six exports + frozen comparator) · QZ-18 (quiz.js: text-node order, frozen Hebrew strings,
-  session/binding/demoted all frozen) · QZ-21 (phase-4 transcript, orchestrator-written, diff must
-  be empty) · QZ-22 (CACHE v13 + exact 14-entry PRECACHE).
+FROZEN CONTRACTS IN FORCE: QZ-1..QZ-16 (phases 1-3, see plan.md) · QZ-17 (quiz-core six exports,
+  frozen comparator) · QZ-18 (quiz.js text-node order + frozen Hebrew + session/binding/demoted;
+  A7) · QZ-19 (phase-4 non-goals) · QZ-20 (ledger, now AT 282) · QZ-21 (the transcript pair in
+  this workspace) · QZ-22 (CACHE magic-vet-v13 + the exact 14-entry PRECACHE).
 
-THE THINGS MOST LIKELY TO BITE (phase 4 edition):
-  · Her profile is LIVE in Vercel Blob behind APP_CODE — unreadable from here, NEVER probe it.
-    `GET /api/profile` CREATES a file when absent: temp `DATA_DIR` always; `.data/` must stay empty.
-  · `isAuthorized` returns TRUE only when APP_CODE is UNSET — test harnesses must delete it
-    (`withOpenGate`), or they 401 on a machine that exports it. 7 of 10 harness copies don't.
-  · The contrast gate sees only `:root` tokens; raw hex is invisible, `color-mix()` fabricates a
-    pass; the anchor is `grep -c '^PASS'` = 52 (bare `grep -c PASS` = 53).
-  · `npm test` ledger counts only FLAT top-level `test()` calls.
-  · Validation chains: capture output to a variable and `case`-match; `| grep -q` under pipefail
-    SIGPIPEs the producer.
+THE THINGS MOST LIKELY TO BITE (unchanged, plus one):
+  · Her profile is LIVE in Vercel Blob behind APP_CODE — never probe; temp DATA_DIR always.
+  · isAuthorized is TRUE only when APP_CODE is UNSET — withOpenGate in every handler test.
+  · Contrast anchor: `grep -c '^PASS'` = 52. · Ledger counts FLAT top-level test() only.
+  · Frozen comparisons need `LC_ALL=C sort` (A9) and capture-and-case, never `| grep -q`.
 
-OPEN QUESTIONS: none. BLOCKED: no.
+OPEN QUESTIONS: criterion 11 — the owner's approval of the three screens (and their choice on
+  deploy-now-vs-phase-5-first). BLOCKED: on the owner only.
