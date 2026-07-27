@@ -1,7 +1,7 @@
 # STATUS — word-quiz (W5b)
 
-**Where we are:** phase 3 is built and every automatic check passes. **It is waiting on you** — one
-question, below. Nothing Mika can see has changed, and nothing is deployed.
+**Where we are:** phase 3 is **done and approved by you**. Three of the six phases are behind us.
+Nothing Mika can see has changed yet, and nothing is deployed — the quiz screens are phase 4.
 
 ## What this run builds
 
@@ -29,17 +29,15 @@ flowchart LR
 | Planning | design + plan + 3 review rounds | done |
 | 1 | item format, the checker, 50-word pilot | done — you approved it |
 | 2 | the full bank | cancelled as a phase — the bank now grows weekly, on demand |
-| 3 | profile: strikes and demotion | **built; waiting on your answer** |
-| 4 | the quiz screens | not started |
+| 3 | profile: strikes and demotion | done — you approved the transcript |
+| 4 | the quiz screens | **next** |
 | 5 | automatic promotion | not started |
 | 6 | deploy | not started |
 
-## The one thing that needs you
+## What you approved, and what happens next
 
-Read the transcript I printed for you and answer one question: **is this what you want her week to
-feel like?**
-
-It is a real run of the real code over one imagined week. What it shows:
+You read a printed transcript of one imagined week — a real run of the real code — and said yes.
+That approval froze the policy. For the record, what it showed:
 
 - She taps **light** twice to hear it. That costs her nothing — it just flags the word as worth
   re-asking.
@@ -49,9 +47,13 @@ It is a real run of the real code over one imagined week. What it shows:
 - Only after three separate bad days does **light** go back to "learning".
 - **method** sits at one strike. **fair** is untouched. She still has both.
 
-If you would rather it were two strikes, or four, or that a right answer only removed one strike
-instead of all of them — say so now. It is a small change now and a much bigger one after the
-screens are built on top of it.
+**Next is phase 4: the quiz screens** — the part she actually sees. It has to pick six options she
+can read or hear, show her the result, and make a demotion visible rather than silent. It also
+carries one obligation phase 3 could not test for itself: the app must treat each sitting as a
+genuinely new sitting, or every word becomes un-strikeable and this whole correction loop quietly
+never fires.
+
+Nothing needs you until phase 4 is planned and I bring you that plan.
 
 ## What I could not check, and you should know it
 

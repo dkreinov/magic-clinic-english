@@ -5,8 +5,11 @@ CURRENT: **PHASE 1 CLOSED 2026-07-27 (second attempt), owner approved. All 9 cri
   2217 up front was measured at ~55M tokens / ~45 agent-hours against a top-up cost of ~9k tokens
   and ~70 s per word. Top-ups run WEEKLY, not daily.
 
-CURRENT: **PHASE 3 IS MECHANICALLY CLOSED. CRITERIA 1-8 ALL GREEN. ONLY CRITERION 9 — THE OWNER —
-  IS OUTSTANDING, AND IT IS IN FRONT OF THEM NOW.** Do NOT start phase 4 until they answer.
+CURRENT: **PHASE 3 CLOSED 2026-07-27. ALL NINE CRITERIA MET — the owner read the QZ-16 transcript
+  and approved (criterion 9).** The policy is frozen as built: three strikes, at most ONE strike per
+  sitting, a right answer wipes the slate completely.
+  NEXT ACTION: **plan PHASE 4 (the quiz surface) with a fresh planner, review that plan, then
+  execute.** Phase 4 is a skeleton only in plan.md; it has not been planned in full.
   Five steps accepted: 3.1 18dbda1 · 3.2 b273c74 · 3.3 76eb416 · 3.4 f9760b2 · 3.5 521ae9b.
   Ledger 225 -> 231 -> 241 -> 245 -> 252 -> **257**, `# fail 0`. Contrast 52 ALL PASS.
   `.data/profile.json` absent. Exactly the 7 expected files changed across `d9e0b9b..HEAD`, none

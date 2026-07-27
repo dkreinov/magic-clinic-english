@@ -943,3 +943,34 @@ This is the second time this run that a shell quoting trap has put junk in the r
 The specific rule, stated so it is actionable: **prose containing backticks or `$` belongs in a FILE
 written by the file tool, never in a shell string.** Recorded rather than quietly fixed, because
 what makes it worth writing down is that the guide already said so and I did it anyway.
+
+## CRITERION 9 — THE OWNER APPROVED. PHASE 3 IS CLOSED. (2026-07-27)
+
+The owner read the QZ-16 transcript and answered "Yes — close phase 3": three strikes, at most one
+strike per sitting, and a right answer wiping the slate completely is the policy they want her to
+live with.
+
+**What the approval rests on, written down so a later audit can check it the way phase 1's could
+not.** Phase 1's approval was voided because it rested on my written assurance that turned out to be
+false. This one rests on:
+
+- the LITERAL stdout of a run of the real handler, not a paraphrase of it;
+- diffed against an expected output I derived BY HAND from QZ-12's table and committed at dd96168,
+  BEFORE step 3.4 was dispatched — so the instrument could not have been fitted to the result;
+- presented with the three things I could NOT check stated plainly alongside it: her real profile
+  (unreadable from this repo, phase 6 carries a backup), the narrow-not-broad version of the
+  old-profile claim, and the fact that the demotion's VISIBILITY is phase 4's and does not exist yet.
+
+If any of those three turns out to be wrong, the approval is still sound, because it was given with
+them on the table.
+
+ALL NINE CRITERIA MET:
+  1. STEP-3.1-OK .. STEP-3.5-OK, each re-run by me in a clean tree      GREEN
+  2. npm test = # pass 257 / # fail 0                                    GREEN
+  3. D16 — ten wrong answers in ONE sitting leave strikes=1, known       GREEN (phase-3-gate.mjs)
+  4. the demotion reaches knownLemmaSet, not just `status`               GREEN (phase-3-gate.mjs)
+  5. a tap is never a strike; five taps set needsReview only            GREEN (phase-3-gate.mjs)
+  6. exactly the 7 expected files across d9e0b9b..HEAD, none deleted     GREEN (amended, A5)
+  7. .data/profile.json absent; no step ran against the real data dir    GREEN
+  8. contrast exits 0, ALL PASS, grep -c '^PASS' = 52                    GREEN
+  9. the owner read the transcript and approved                          GREEN
