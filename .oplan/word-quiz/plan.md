@@ -1191,6 +1191,15 @@ with `deepStrictEqual`. `public/quiz/*.json` is DATA and stays OUT (QZ-7).
     figure for this entry point and a longer sitting is a chore (ratified decision e).
   · Imports are `import { startQuiz } from "../quiz.js"` and
     `import { pickQuizWords, knownSetFromProfile } from "../quiz-core.js"`.
+  · **AMENDMENT A8 (orchestrator, at the 4.3 audit).** Two notes. (1) The auditor caught a REAL
+    contract breach in the first submission: `${launcherHtml}` on its own template line broke the
+    byte-identity promise for two-argument calls (a whitespace-only line appeared). REJECTED and
+    fixed — `${launcherHtml}` now concatenates immediately after the words-count `</p>` on the
+    same line, so the empty default contributes zero bytes by construction; re-audited, match.
+    (2) `lemmas` and `profile` are closure-level `let`s, not a literal `const` in `render()` —
+    the click handler must close over both, which forces the pattern the file already uses for
+    `words`/`allowedWords`; the spec's `const` phrasing described when/what to compute, not the
+    declaration form. Accepted as spec imprecision.
 - the 2 frozen tests:
   1. `renderQuizLauncher(0)` is `''` exactly; `renderQuizLauncher(3)` contains `start-quiz`,
      `btn btn-primary` and `בואי נתרגל מילים`. `renderList(fixture, null)` contains NO

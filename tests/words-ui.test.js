@@ -7,7 +7,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { Readable } from 'node:stream';
-import { renderList, markKnownBody } from '../public/views/words.js';
+import { renderList, markKnownBody, renderQuizLauncher } from '../public/views/words.js';
 import profileHandler from '../api/profile.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -169,4 +169,50 @@ test('renderList speaks the resolved lemma and hides the button when there is no
 
   const unknownRow = html.slice(html.indexOf('zzzunknown'));
   assert.ok(!unknownRow.includes('btn-say'), 'no play button on a row we cannot speak');
+});
+
+// Step 4.3: renderQuizLauncher and renderList's third parameter.
+test('renderQuizLauncher renders nothing at zero and the launcher markup otherwise; renderList places it between words-count and words-grid', () => {
+  assert.strictEqual(renderQuizLauncher(0), '');
+
+  const launcher = renderQuizLauncher(3);
+  assert.ok(launcher.includes('start-quiz'), 'launcher missing start-quiz action');
+  assert.ok(launcher.includes('btn btn-primary'), 'launcher missing btn btn-primary class');
+  assert.ok(launcher.includes('בואי נתרגל מילים'), 'launcher missing label');
+
+  const fixture = {
+    cat: { status: 'learning', he: 'חתול', taps: 1, lastSeen: '2026-01-02T00:00:00.000Z' },
+  };
+
+  const withoutLauncher = renderList(fixture, null);
+  assert.ok(!withoutLauncher.includes('start-quiz'), 'default renderList call must not include the launcher');
+
+  const withLauncher = renderList(fixture, null, '<b>MARK</b>');
+  const countIdx = withLauncher.indexOf('<p class="words-count"');
+  const markIdx = withLauncher.indexOf('<b>MARK</b>');
+  const gridIdx = withLauncher.indexOf('<div class="words-grid">');
+  assert.ok(countIdx >= 0 && markIdx >= 0 && gridIdx >= 0, 'expected words-count, MARK and words-grid all present');
+  assert.ok(markIdx > countIdx, 'launcherHtml must come after words-count');
+  assert.ok(markIdx < gridIdx, 'launcherHtml must come before words-grid');
+});
+
+test('words.js wires the quiz launcher: imports, handler wiring, and pre-existing frozen strings survive', () => {
+  const src = readFileSync(viewPath, 'utf8');
+  const needles = [
+    '../quiz.js',
+    '../quiz-core.js',
+    'startQuiz',
+    'pickQuizWords',
+    'knownSetFromProfile',
+    'data-action="start-quiz"',
+    'בואי נתרגל מילים',
+  ];
+  for (const needle of needles) {
+    assert.ok(src.includes(needle), `words.js missing "${needle}"`);
+  }
+
+  const frozenStrings = ['עוד אין מילים באוסף', 'יודעת', 'לומדת'];
+  for (const str of frozenStrings) {
+    assert.ok(src.includes(str), `expected words.js to still include "${str}"`);
+  }
 });

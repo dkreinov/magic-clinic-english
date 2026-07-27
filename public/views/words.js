@@ -1,6 +1,8 @@
 import { getJson, postJson } from "../api.js";
 import { resolveLemma } from "../lemma.js";
 import { getAllowedSet } from "../words-index.js";
+import { startQuiz } from "../quiz.js";
+import { pickQuizWords, knownSetFromProfile } from "../quiz-core.js";
 
 const VIEW_STYLE = `
   .words-count {
@@ -123,7 +125,12 @@ export function markKnownBody(lemma) {
   return { action: "mark-known", lemma, source: "tap" };
 }
 
-export function renderList(words, allowedWords = null) {
+export function renderQuizLauncher(count) {
+  if (count === 0) return "";
+  return `<div class="words-quiz-launch"><button class="btn btn-primary" type="button" data-action="start-quiz">בואי נתרגל מילים</button></div>`;
+}
+
+export function renderList(words, allowedWords = null, launcherHtml = "") {
   const entries = Object.entries(words).sort((a, b) => {
     const aTime = Date.parse(a[1].lastSeen) || 0;
     const bTime = Date.parse(b[1].lastSeen) || 0;
@@ -169,7 +176,7 @@ export function renderList(words, allowedWords = null) {
     ${styleTag()}
     ${header("האוסף שלי", "המילים שלי")}
     <img class="spot-image spot-image--sm" src="/assets/words-treasure.webp" alt="" />
-    <p class="words-count">${entries.length} מילים באוסף</p>
+    <p class="words-count">${entries.length} מילים באוסף</p>${launcherHtml}
     <div class="words-grid">${cardsHtml}</div>
   `;
 }
@@ -179,13 +186,15 @@ export async function render(container, ctx) {
 
   let words = {};
   let allowedWords = null;
+  let profile = null;
+  let lemmas = [];
 
   function draw() {
     if (Object.keys(words).length === 0) {
       container.innerHTML = renderEmpty();
       return;
     }
-    container.innerHTML = renderList(words, allowedWords);
+    container.innerHTML = renderList(words, allowedWords, renderQuizLauncher(lemmas.length));
     bindEvents();
   }
 
@@ -219,10 +228,21 @@ export async function render(container, ctx) {
         draw();
       });
     });
+
+    const quizBtn = container.querySelector('[data-action="start-quiz"]');
+    if (quizBtn) {
+      quizBtn.addEventListener("click", () => {
+        startQuiz(container, {
+          lemmas,
+          knownSet: knownSetFromProfile(profile),
+          count: 4,
+          onDone: () => boot(),
+        });
+      });
+    }
   }
 
   async function boot() {
-    let profile;
     try {
       allowedWords = await getAllowedSet();
       profile = await getJson("/api/profile");
@@ -236,6 +256,7 @@ export async function render(container, ctx) {
     }
 
     words = profile.words || {};
+    lemmas = pickQuizWords(profile, 20);
     draw();
   }
 
