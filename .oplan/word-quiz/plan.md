@@ -382,16 +382,33 @@ is never contacted. Never open a browser on production. Never run `vercel env`. 
 
 ---
 
-## PHASE 2 SKELETON — the full bank
+## PHASE 2 — CANCELLED AS A PHASE (D23). It is now a recurring operation.
 
-2254 words, ~5000 items, batched worker packets, same QZ-1/QZ-2/QZ-3 contracts. Adds the
-**completeness** criterion — and it must ask the RIGHT question this time: *every word she can be
-quizzed on has an item*, i.e. every word in `public/audio/words/index.json` **minus QZ-8's 37
-exclusions** has a `public/quiz/<lemma>.json`, and **no excluded word has one**. Both directions:
-a missing file is a word she can claim but never be checked on, and a present file for an excluded
-word is the owner's decision quietly reversed. Expected count: 2254 - 37 = **2217**. (The word-audio run's criterion 6 pinned a true-but-irrelevant
-invariant and made a real defect look verified; see that run's journal.) Ends with a second owner
-sample review.
+**Do not plan or dispatch "the full bank".** D23 reversed D8: the bank starts at the 50 pilot words
+and grows on demand. Building all 2217 up front was measured at ~55M tokens and ~45 agent-hours,
+against a steady-state top-up cost of ~9,000 tokens and ~70 s per word.
+
+**THE TOP-UP OPERATION** (run weekly, not daily — 3 words costs 26k/word, 25 words costs 11k/word,
+and weekly means one deploy rather than seven):
+
+1. Read her profile; take the words with `status: "known"` that have no `public/quiz/<lemma>.json`.
+2. Drop any word in QZ-8's 37 exclusions. Never generate those.
+3. Generate in one batch under QZ-1/QZ-2, D21, D22 and the pin test — the same contracts phase 1
+   froze, unchanged.
+4. **Verify with N independent adversarial passes, not one.** MEASURED in phase 1: a single pass
+   finds only about half the leaks, and two passes agreed on 53% of each other's findings.
+5. Gate green, then deploy.
+
+**THE COMPLETENESS CRITERION INVERTS, and this is the one to get right.** It no longer asks "do
+all 2217 words have a file". It asks: **does every word she has CLAIMED have an item?** — measured
+against her profile, not the manifest. Both directions still matter: a claimed word with no item is
+a word she can never be checked on, and a file for a QZ-8 word is the owner's decision quietly
+reversed. (The word-audio run's criterion 6 pinned a true-but-irrelevant invariant and made a real
+defect look verified. A count against the manifest would be exactly that mistake again — it would
+report 2167 missing files as a failure while the thing that matters, her claimed words, was fine.)
+
+**Phase 4 must tolerate a missing item** — she will claim a word days before its item exists. The
+quiz skips those silently rather than breaking.
 
 ## PHASE 3 SKELETON — the profile side
 

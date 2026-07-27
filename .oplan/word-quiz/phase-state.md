@@ -1,10 +1,14 @@
 CURRENT: **PHASE 1 CLOSED 2026-07-27 (second attempt), owner approved. All 9 criteria met.**
   Gate green: 50 files, 71 items, 18 multi-sense. 225 tests / 0 fail. Contrast 52 ALL PASS.
-  NEXT ACTION: **PLAN phase 2. Do NOT dispatch it.** plan.md holds only a skeleton, and phase 2 is
-  not "repeat phase 1 forty times" — it is 2167 words / ~3150 items / 181-217 batches, and the
-  audit proved verification rather than generation is the dominant cost. It needs its own frozen
-  acceptance criteria, a batching strategy, and an N-passes-per-batch decision before any worker
-  runs. Two known chores: the field guide is 54 lines against a 40-line budget, and
+  **PHASE 2 IS CANCELLED AS A PHASE (D23, owner 2026-07-27, reverses D8).** The bank starts at the
+  50 pilot words and grows on demand — see plan.md "PHASE 2 — CANCELLED AS A PHASE". Building all
+  2217 up front was measured at ~55M tokens / ~45 agent-hours against a top-up cost of ~9k tokens
+  and ~70 s per word. Top-ups run WEEKLY, not daily.
+
+  NEXT ACTION: **PLAN PHASE 3 (the profile side). Do NOT dispatch it yet.** plan.md holds only a
+  skeleton for it. Per oplan it gets a fresh next-phase planner working from files alone, then my
+  review, then a plan reviewer, and only then execution.
+  Two known chores: the field guide is 54 lines against a 40-line budget, and
   criterion-9-sample.txt should be regenerated whenever the bank changes.
 
   ---- history of the first, VOIDED closure, kept deliberately ----

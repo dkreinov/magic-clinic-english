@@ -128,6 +128,46 @@ READS.** That is a real consequence and it cuts three ways:
    cloze alone, and it removes the one failure that damages her — being marked wrong for a right
    answer.
 
+## D23 — the bank is grown ON DEMAND, not built up front (owner, 2026-07-27). REVERSES D8.
+
+D8 said "all 2254 words, ~5000 items, one-and-done". Measured against phase 1's real per-word
+cost, that is **~55M tokens and ~45 hours of agent time** — roughly 40x everything phase 1 spent.
+Shown that number, the owner chose to grow the bank instead:
+
+> *"lets just work daily if she made new words we will see and generate quiz"*
+
+**The starting bank is the 50 pilot words.** Anything she has already claimed becomes the first
+top-up batch. From then on, new claims are generated in small batches.
+
+MEASURED steady-state cost, from the phase-1 batches that needed no rework: **~9,000 tokens and
+~70 seconds per word.** With per-batch fixed overhead, a top-up runs ~79k tokens for 3 words, 142k
+for 10, 276k for 25. **Batch weekly rather than daily** — 3 words costs 26k/word while 25 words
+costs 11k/word, and it means one deploy a week instead of seven. At ~20 claims/week that is
+~250k tokens and half an hour, once a week: ~11M tokens across a year instead of 55M up front,
+and nothing is ever generated for a word she does not care about.
+
+**Why this is not merely cheaper — it is better aimed.** The quiz exists to check words SHE
+CLAIMS. An item for `dentist` sits unused until the day she claims `dentist`. D8 paid for 2217
+items to cover a few hundred claims.
+
+Three consequences, all of which change the plan rather than the code:
+
+1. **Phase 2 stops being a phase.** It becomes a recurring operation (see plan.md, PHASE 2).
+2. **The completeness criterion inverts.** It no longer asks "do all 2217 words have a file"; it
+   asks *"does every word SHE HAS CLAIMED have an item"* — checked against her profile, not the
+   manifest. That is a better question and it is the one the word-audio run got wrong.
+3. **The quiz must tolerate a missing item.** She will claim a word on Monday that has no item
+   until the next top-up. The quiz skips those silently. That gap is a feature: the quiz only ever
+   asks about words that have passed the gate and a human review.
+
+**What "the ones in her vocabulary already" resolves to** (orchestrator, since it was ambiguous and
+a step containing an open question must never be dispatched): NOT the band-derived allowed set —
+at her A2 band `buildAllowedSet` returns the whole 2254-word manifest, which would be D8 again.
+It means the words she has explicitly marked `known`. That list lives in her live profile, which
+phase 1 was forbidden to touch and which `.data/` does not hold locally, so **it cannot be
+enumerated at plan time and does not need to be**: phases 3 and 4 do not depend on it. It is read
+once, at the first top-up, after the profile side exists.
+
 ## Decisions taken by the orchestrator at plan time (Rule 2: nothing deferred to execution)
 
 The grill left five items "still open". They are decided here, because a step containing an open
