@@ -1,4 +1,6 @@
-CURRENT: phase 4 "the quiz surface", next step 4.3 (the quiz button in המילים שלי).
+CURRENT: phase 4 "the quiz surface", next step 4.4 (the after-chapter check in reader.js).
+  4.3 ACCEPTED at 70ac7c1 (STEP-4.3-OK re-run by the orchestrator; 274 pass / 0 fail; first
+  submission REJECTED by audit for a byte-identity breach, fixed and re-audited match — A8).
   4.1 ACCEPTED at 1aabd37 (STEP-4.1-OK re-run by the orchestrator; 264 pass / 0 fail; audit
   match — its low confidence was execution-only, covered by the orchestrator's own clean-state
   run and plan-time read of light.json).

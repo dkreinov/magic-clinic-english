@@ -1095,3 +1095,32 @@ STEP 4.2 the quiz component — the screen, the session, the answer
   tokens: worker=80135, checker=59732
   commit: 2159560
   accepted: 2026-07-27
+
+STEP 4.3 the quiz button inside המילים שלי (D10)
+  tier: WORKER (Sonnet)
+  did: public/views/words.js — renderQuizLauncher (NEW export), renderList third param, imports,
+       lemmas via pickQuizWords(profile, 20) in boot(), start-quiz click wired to startQuiz with
+       onDone re-running boot(). tests/words-ui.test.js — import extended, two flat tests appended.
+  surprises: TWO Git-Bash traps, both self-caught by the worker: (1) its ordering test's
+       indexOf('words-grid') matched the CSS class inside <style> before the real markup — fixed
+       to match literal tags; (2) a mkdir with a Windows path created a stray file in the repo
+       root, caught by the validation's changed-files check and deleted. The second is field
+       guide 4 biting a WORKER for the first time — the boundary check in the step script is what
+       caught it, vindicating field guide 6's advice to put it there.
+  deviations: none from the fix instructions.
+  fail_first: REAL — with words.js stashed, both new tests failed at import (no export named
+       renderQuizLauncher). Plus the byte-identity re-verification: old and new modules imported
+       side by side, two-argument outputs compared equal.
+  validation_first_try: no (worker, retries=1 on its own test bug) — and the FIRST submission was
+       REJECTED BY AUDIT: `${launcherHtml}` on its own template line broke the frozen byte-identity
+       promise (a whitespace-only line). Fixed by same-line concatenation — the empty default now
+       contributes zero bytes BY CONSTRUCTION, which I verified from the diff hunk itself.
+       Re-audit: match, high. Logged as AMENDMENT A8 beside the step, together with the accepted
+       closure-scope `let` (spec imprecision — the click handler must close over lemmas/profile).
+  retries: 1 (worker-internal) + 1 audit round trip
+  escalations: 0
+  interventions: 1 (audit-found contract breach, fixed by targeted re-dispatch to the same worker)
+  audit: mismatch (2 findings) -> fix -> match, CONFIDENCE high.
+  tokens: worker=107870 (both rounds, cumulative), checker=75971 (39547+36424, both rounds)
+  commit: 70ac7c1
+  accepted: 2026-07-27
