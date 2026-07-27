@@ -949,6 +949,14 @@ node). Exports:
    `VIEW_STYLE + renderQuizDone(...)`) into `container.innerHTML`. Frozen because QZ-21's
    projection strips tags but keeps text: a style block inside the card would spray CSS lines
    through the owner's transcript.
+   **AMENDMENT A7 (orchestrator, at the 4.2 audit).** Two auditor findings accepted as the SPEC's
+   imprecision, not the work's: (1) the six option rows sit inside one grouping
+   `<div class="quiz-options">` — the contract froze TEXT-NODE order, which a wrapper div does not
+   alter (verified: the QZ-21 transcript diff is empty), and a grouping element for CSS is the
+   house pattern; (2) `bind()` runs after every CARD render; the done screen contains nothing
+   bindable by contract and binds nothing — "every render" over-demanded a literal no-op. Logged
+   here rather than silently waved through, because an accepted deviation without a written
+   contract change is how two designs end up in one codebase.
    When `chosen !== null` every `.quiz-option` carries `disabled`; the option equal to `item.answer`
    also carries class `correct`; a `chosen` that is not the answer also carries class `wrong`.
    Every interpolated value is HTML-escaped by a local `escapeHtml` copied from `views/words.js`
