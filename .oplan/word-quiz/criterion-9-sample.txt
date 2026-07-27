@@ -1,11 +1,11 @@
 ability.json[0]
-  sense:       the power or skill to do something
+  sense:       the skill to do something well
   sentence:    She has enough ___ to play the piano without any lessons.
   answer:      ability
   distractors: luck, energy, strength, health, hope, money, happiness, sleep
 
 about.json[0]
-  sense:       having something as its subject or story
+  sense:       telling the story of a person or a thing
   sentence:    This book is ___ a young girl who learns to fly.
   answer:      about
   distractors: against, among, at, despite, except, into, inside, toward
@@ -15,6 +15,12 @@ abroad.json[0]
   sentence:    My uncle lives ___, so he needs a passport to visit our country.
   answer:      abroad
   distractors: here, nearby, upstairs, downstairs, inside, outdoors, alone, below
+
+add.json[0]
+  sense:       to put numbers together to find how much they make
+  sentence:    If you ___ four and five, the answer is nine.
+  answer:      add
+  distractors: write, say, read, check, spell, guess, copy, share
 
 add.json[1]
   sense:       to put one more thing into something
@@ -28,8 +34,14 @@ back.json[0]
   answer:      back
   distractors: arm, leg, hand, knee, stomach, thumb, toe, finger
 
+back.json[1]
+  sense:       to the person or place it came from before
+  sentence:    She borrowed my pen and then gave it ___ to me.
+  answer:      back
+  distractors: away, out, up, down, here, there, inside, outside
+
 back.json[2]
-  sense:       the part of something that is behind the front
+  sense:       the side of a thing that you do not see first
   sentence:    We sit at the ___ of the bus, behind all the other kids.
   answer:      back
   distractors: front, middle, center, top, bottom, corner, edge, start
@@ -46,6 +58,12 @@ bear.json[1]
   answer:      bear
   distractors: push, pull, lift, move, count, wash, throw, draw
 
+beyond.json[0]
+  sense:       on the far side of something
+  sentence:    The farm is ___ the river, so we cross the bridge to reach it.
+  answer:      beyond
+  distractors: below, beneath, inside, outside, off, between, down, in
+
 body.json[0]
   sense:       the whole of a person or animal, with all its parts
   sentence:    Your arms and legs are all parts of your ___.
@@ -56,10 +74,16 @@ boy.json[0]
   sense:       a young male child
   sentence:    That ___ is ten years old, so he is too young to drive.
   answer:      boy
-  distractors: man, father, uncle, grandfather, husband, girl, daughter, sister
+  distractors: man, father, teenager, grandfather, husband, girl, daughter, sister
+
+chef.json[0]
+  sense:       a person whose job is cooking in a restaurant
+  sentence:    A ___ must know how to cook hundreds of different dishes.
+  answer:      chef
+  distractors: waiter, waitress, doctor, nurse, driver, farmer, singer, pilot
 
 complex.json[0]
-  sense:       made of many parts and not easy to understand
+  sense:       made of many parts and hard to understand
   sentence:    This puzzle has so many parts that it is too ___ for my brother.
   answer:      complex
   distractors: easy, short, new, old, popular, noisy, funny, cheap
@@ -70,14 +94,20 @@ country.json[0]
   answer:      country
   distractors: village, street, garden, shop, school, house, market, room
 
+country.json[1]
+  sense:       land with fields and farms, far from where many people live
+  sentence:    My grandmother lives in the ___, so she sees cows every morning.
+  answer:      country
+  distractors: city, town, station, park, shop, room, market, street
+
 dentist.json[0]
-  sense:       the person whose job is taking care of your teeth
+  sense:       the person whose job is to keep every tooth in your mouth healthy
   sentence:    I went to the ___ so that she could fix my broken tooth.
   answer:      dentist
   distractors: teacher, waiter, waitress, farmer, driver, singer, pilot, barber
 
 drama.json[0]
-  sense:       acting stories for people to watch
+  sense:       acting out a story on a stage for people to watch
   sentence:    Our school has a ___ club, so we act on the stage every year.
   answer:      drama
   distractors: music, dance, sport, book, science, garden, computer, cooking
@@ -88,20 +118,32 @@ euro.json[0]
   answer:      euro
   distractors: meter, kilometer, centimeter, kilogram, gram, liter, mile, degree
 
+ever.json[0]
+  sense:       at any time up to now
+  sentence:    Nobody has ___ climbed that mountain, so nobody knows what is at the top.
+  answer:      ever
+  distractors: never, always, often, sometimes, usually, twice, soon, tomorrow
+
 fact.json[0]
-  sense:       something that is true and everyone can check it
+  sense:       something that is true and anyone can check it
   sentence:    It is a ___ that the earth goes around the sun.
   answer:      fact
   distractors: story, joke, dream, secret, wish, lie, guess, question
 
 fair.json[0]
-  sense:       treating everyone in the same way
+  sense:       treating each person in the same way
   sentence:    Each girl gets the same number of sweets, so the game is ___.
   answer:      fair
   distractors: easy, hard, funny, silly, quick, slow, noisy, safe
 
+fair.json[1]
+  sense:       a fun event with rides, food and things to buy
+  sentence:    We ate popcorn and went on the big wheel at the school ___.
+  answer:      fair
+  distractors: match, concert, race, lesson, meeting, wedding, show, game
+
 gentle.json[0]
-  sense:       soft and careful, not rough
+  sense:       soft and careful, so you do not hurt anything
   sentence:    Her hands were so ___ that she could hold the bird without hurting it.
   answer:      gentle
   distractors: rough, hard, cold, clean, wet, heavy, quick, busy
@@ -118,6 +160,12 @@ goal.json[1]
   answer:      goal
   distractors: secret, memory, story, joke, mistake, question, reason, lesson
 
+grammar.json[0]
+  sense:       the right way to put words together in a sentence
+  sentence:    She makes many mistakes with verbs because she never studies ___.
+  answer:      grammar
+  distractors: literature, history, geography, science, physics, chemistry, mathematics, art
+
 hat.json[0]
   sense:       something you wear on your head
   sentence:    Put on your ___ so that the sun does not burn your head.
@@ -129,6 +177,12 @@ introduce.json[0]
   sentence:    You should ___ yourself so that the new girl learns your name.
   answer:      introduce
   distractors: wash, help, hide, teach, enjoy, prepare, draw, move
+
+itself.json[0]
+  sense:       on its own, with no help; used for a thing, not a person
+  sentence:    The old gate opens and shuts all by ___ when the wind blows.
+  answer:      itself
+  distractors: himself, herself, myself, yourself, yourselves, ourselves, themselves, hers
 
 job.json[0]
   sense:       the work a person does to earn money
@@ -142,6 +196,12 @@ kind.json[0]
   answer:      kind
   distractors: unpleasant, bad, horrible, awful, angry, cold, hard, terrible
 
+kind.json[1]
+  sense:       a sort or type of thing
+  sentence:    What ___ of music do you like, pop or jazz?
+  answer:      kind
+  distractors: piece, part, group, list, page, box, bit, half
+
 light.json[0]
   sense:       not heavy and easy to lift
   sentence:    The huge box was so ___ that the little girl could lift it easily.
@@ -149,7 +209,7 @@ light.json[0]
   distractors: big, small, wide, round, old, new, tall, deep
 
 light.json[1]
-  sense:       the brightness that lets you see in a dark room
+  sense:       a lamp that helps you to see when a room is dark
   sentence:    Please turn on the ___ so that I can see my book.
   answer:      light
   distractors: radio, television, oven, fan, camera, computer, machine, motor
@@ -159,6 +219,12 @@ like.json[0]
   sentence:    I ___ the taste of fresh bread, so I eat it every day.
   answer:      like
   distractors: hate, fear, miss, forget, believe, ignore, imagine, describe
+
+like.json[1]
+  sense:       similar to, the same as
+  sentence:    That big gray cloud looks ___ a huge elephant with a long nose.
+  answer:      like
+  distractors: at, into, over, under, toward, through, beside, from
 
 maximum.json[0]
   sense:       the largest number that is allowed
@@ -172,6 +238,12 @@ method.json[0]
   answer:      method
   distractors: reason, dream, hope, fear, love, joy, wish, thought
 
+million.json[0]
+  sense:       the number 1000000
+  sentence:    One ___ is a very big number with six zeros in it.
+  answer:      million
+  distractors: zero, half, pair, couple, sum, total, figure, piece
+
 net.json[0]
   sense:       a thing full of holes, used for catching fish
   sentence:    The little fish stay inside the ___ because the holes are too small.
@@ -183,6 +255,12 @@ net.json[1]
   sentence:    My school work is on the ___, so I need a computer.
   answer:      net
   distractors: paper, page, book, table, desk, wall, shelf, board
+
+online.json[0]
+  sense:       using a computer that is joined to the internet
+  sentence:    I do my homework ___, so I need a computer and the internet.
+  answer:      online
+  distractors: outside, upstairs, downstairs, alone, quietly, slowly, early, together
 
 pattern.json[0]
   sense:       a design of shapes that repeats again and again
@@ -202,6 +280,12 @@ play.json[1]
   answer:      play
   distractors: hear, clean, carry, buy, open, paint, sell, lift
 
+play.json[2]
+  sense:       a story that people act on a stage
+  sentence:    My class acted a funny ___ on the school stage last week.
+  answer:      play
+  distractors: movie, song, dance, concert, game, film, poem, picture
+
 question.json[0]
   sense:       what you ask when you want to know something
   sentence:    The teacher asked such a hard ___ that nobody in the class knew.
@@ -214,23 +298,35 @@ question.json[1]
   answer:      question
   distractors: page, line, word, letter, box, note, picture, title
 
+reality.json[0]
+  sense:       the way things really are in real life
+  sentence:    She works so hard every day that her dream can become ___.
+  answer:      reality
+  distractors: magic, gold, luck, danger, art, music, hope, silence
+
 reasonable.json[0]
-  sense:       fair and sensible
+  sense:       fair and showing good sense
   sentence:    Her plan was so ___ that all the parents agreed with it.
   answer:      reasonable
   distractors: silly, stupid, crazy, strange, cruel, terrible, impossible, difficult
 
 rest.json[0]
-  sense:       the part that is left over
+  sense:       what is left over when some has been taken away
   sentence:    If I take three apples from ten, the ___ is seven.
   answer:      rest
   distractors: half, part, piece, bit, sum, total, end, top
 
 rest.json[1]
-  sense:       to stop moving and relax for a while
+  sense:       to stop moving and be quiet for a while, so you feel better
   sentence:    Sit down and ___ for ten minutes because you are so tired.
   answer:      rest
   distractors: run, jump, walk, dance, climb, swim, play, work
+
+right.json[0]
+  sense:       true, with no mistake in it
+  sentence:    Two plus two is four, so her answer is ___.
+  answer:      right
+  distractors: wrong, false, incorrect, impossible, strange, silly, funny, terrible
 
 right.json[1]
   sense:       the side that is not the left
@@ -244,8 +340,14 @@ run.json[0]
   answer:      run
   distractors: jump, swim, climb, dance, skate, ride, fly, sail
 
+run.json[1]
+  sense:       to be in charge of a shop or a business
+  sentence:    My mother will ___ the shop, so she must pay all the workers.
+  answer:      run
+  distractors: obey, serve, visit, clean, enter, paint, wash, follow
+
 since.json[0]
-  sense:       from that time in the past until now
+  sense:       starting at a time in the past and lasting to now
   sentence:    I have played the piano ___ I was seven, so now I play well.
   answer:      since
   distractors: until, whenever, where, although, unless, whether, if, that
@@ -255,6 +357,12 @@ sir.json[0]
   sentence:    A polite girl calls a man ___ when she does not know him.
   answer:      sir
   distractors: boy, guy, king, prince, captain, master, doctor, teacher
+
+suffer.json[0]
+  sense:       to feel ill or in pain because of something
+  sentence:    I often ___ from a bad cold, so I stay at home.
+  answer:      suffer
+  distractors: come, hear, fall, borrow, return, climb, grow, drink
 
 sweet.json[0]
   sense:       tasting of sugar
@@ -274,6 +382,12 @@ ten.json[0]
   answer:      ten
   distractors: two, three, four, six, seven, nine, twelve, twenty
 
+timetable.json[0]
+  sense:       a list of the times when buses or lessons happen
+  sentence:    Look at the ___ so that you know when the next bus leaves.
+  answer:      timetable
+  distractors: map, calendar, dictionary, recipe, newspaper, diary, clock, letter
+
 vegetable.json[0]
   sense:       a plant such as a carrot or a bean that you eat with dinner
   sentence:    A potato is a ___ that grows under the ground.
@@ -281,10 +395,16 @@ vegetable.json[0]
   distractors: fruit, flower, tree, leaf, grass, fish, cake, drink
 
 watch.json[0]
-  sense:       to look at moving pictures or a show
+  sense:       to sit and follow a film or a show with your eyes
   sentence:    We will ___ the movie on the big screen to see the dragon.
   answer:      watch
   distractors: hear, listen, look, read, notice, smell, touch, taste
+
+watch.json[1]
+  sense:       to keep your eyes on someone to keep them safe
+  sentence:    Please ___ my little brother so that he does not get lost.
+  answer:      watch
+  distractors: feed, wash, teach, hug, push, kiss, draw, paint
 
 watch.json[2]
   sense:       a small clock that you wear on your arm
@@ -297,4 +417,10 @@ well.json[0]
   sentence:    She sings so ___ that the whole class stands up and claps.
   answer:      well
   distractors: badly, quietly, slowly, hardly, nearly, exactly, mostly, differently
+
+well.json[1]
+  sense:       not sick, in good health again
+  sentence:    I was sick but now I am ___ enough to go to school.
+  answer:      well
+  distractors: ill, weak, tired, worse, bad, awful, terrible, unhappy
 
