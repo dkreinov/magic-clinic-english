@@ -1028,3 +1028,32 @@ NOTE: `briefing.md` did not exist in this workspace (the run predates that file'
 skill). Created at this boundary; the phase-1..3 story lives in the journal and STATUS history.
 
 tokens: planner=185416 · reviewer=129513 (both rounds, cumulative) · summed by the harness, not me.
+
+## Execution — phase 4
+
+STEP 4.1 the pure quiz core
+  tier: WORKER (Sonnet)
+  did: public/quiz-core.js — NEW, six named exports (newSessionId, knownSetFromProfile,
+       selectOptions, isUsableItem, pickItem, pickQuizWords), zero imports.
+       tests/quiz-core.test.js — NEW, seven flat top-level test() calls, ESM style matching
+       quiz-bank.test.js.
+  surprises: none
+  deviations: none
+  fail_first: WEAK, recorded as such (same shape as 3.2): without the module the test file fails
+       at import (MODULE_NOT_FOUND) — proves the module was missing, nothing per-test. The worker
+       did hand-derive test 5's expected shuffle from the frozen algorithm before running it, and
+       the orchestrator had derived the SAME array independently at plan time (QZ-21). The real
+       mutation duty for this phase sits with step 4.6.
+  validation_first_try: yes (worker), re-run by me in a clean shell: STEP-4.1-OK, 264 pass /
+       0 fail, exactly the two expected files changed.
+  retries: 0
+  escalations: 0
+  interventions: 0
+  audit: match, CONFIDENCE low — its two unsettleables (does the suite actually run green; do all
+       light.json items pass isUsableItem for test 7's pickItem assertion) were both things I had
+       ALREADY verified myself: I re-ran the frozen validation, and I read both light.json items
+       at plan time (each has sense/sentence/answer/8 string distractors). Accepted with the
+       evidence supplied by me rather than re-auditing; logged per §10.
+  tokens: worker=56228, checker=39661
+  commit: 1aabd37
+  accepted: 2026-07-27

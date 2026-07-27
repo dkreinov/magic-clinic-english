@@ -1,4 +1,7 @@
-CURRENT: phase 4 "the quiz surface", next step 4.1 (the pure quiz core).
+CURRENT: phase 4 "the quiz surface", next step 4.2 (the quiz component).
+  4.1 ACCEPTED at 1aabd37 (STEP-4.1-OK re-run by the orchestrator; 264 pass / 0 fail; audit
+  match — its low confidence was execution-only, covered by the orchestrator's own clean-state
+  run and plan-time read of light.json).
   Phase 4 is PLANNED IN FULL in plan.md (`## PHASE 4 — the quiz surface`): 11 acceptance criteria,
   contracts QZ-17..QZ-22, six steps 4.1-4.6, five ratified decisions (a)-(e). A fresh planner
   drafted it from files alone; the plan reviewer found ONE real defect (the after-chapter quiz
