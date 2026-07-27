@@ -5,7 +5,18 @@ CURRENT: **PHASE 1 CLOSED 2026-07-27 (second attempt), owner approved. All 9 cri
   2217 up front was measured at ~55M tokens / ~45 agent-hours against a top-up cost of ~9k tokens
   and ~70 s per word. Top-ups run WEEKLY, not daily.
 
-  NEXT ACTION: **EXECUTE PHASE 3, starting at step 3.1.** It is planned in full in plan.md
+CURRENT: **PHASE 3 IS EXECUTING. 3.1 ACCEPTED (18dbda1). NEXT STEP IS 3.2.**
+  Ledger 225 -> 231, `# fail 0`. Tree clean apart from `.oplan/`. Contrast untouched (phase 3 is
+  QZ-13 no-`public/`, so criterion 8 is re-checked at the phase gate, not per step).
+  Step 3.1 carries **AMENDMENT A3**: `strikes`/`quizRight`/`quizWrong` validate as
+  `Number.isInteger(v) && v >= 0`; "range-lenient" means no UPPER and no POLICY bound, so `99` is
+  valid and `-1` is not. As frozen, the step's non-goal ("no range check on `strikes`") contradicted
+  the step's own assertion list; I decided it before dispatch. See journal "Execution — phase 3".
+  **STILL OWED BEFORE STEP 3.4 IS DISPATCHED (QZ-16):** the orchestrator — not a worker — must write
+  `.oplan/word-quiz/transcript.mjs` AND `.oplan/word-quiz/transcript-expected.txt`.
+
+  ---- how phase 3 was planned, kept for the record ----
+  It is planned in full in plan.md
   (`## PHASE 3 — the profile side`): 9 acceptance criteria, contracts QZ-9..QZ-16, five steps, and
   the frozen per-step assertion lists. A fresh planner drafted it from files alone; a plan reviewer
   attacked it TWICE, finding 23 defects (12 `undecided`), all fixed — see journal "PHASE 3 PLAN
@@ -68,6 +79,13 @@ ACCEPTED: 1.1 (lib/quiz-item.js + tests/quiz-item.test.js; STEP-1.1-OK re-run by
   ended short of the bank's tail and `--sample 50` over 80 items showed the alphabetically-first
   63% — it would have fed criterion 9's HUMAN gate a front-loaded sample presented as a whole-bank
   one. See journal "Execution — phase 1".
+  · **3.1** (lib/profile.js + tests/profile-quiz-schema.test.js; STEP-3.1-OK re-run by the
+  orchestrator in a clean tree; 231 pass / 0 fail; audit `match`/high). Carries AMENDMENT A3, above.
+  NOTE for any later step that leans on 3.1's tests: only FOUR of its six were ever seen to fail.
+  Tests 1 and 2 ("an old-shape profile validates", "six legal values validate") pass against the
+  UNMODIFIED validator too, because it already ignored unknown keys — they guard against a future
+  OVER-strict validator and can never produce fail-first evidence. That is not a defect, but it
+  means 3.1's real regression coverage is the four type-strictness tests.
 
 CARRY INTO PHASE 2 — the four things phase 1 learned that no gate can enforce:
   · D21 (owner): distractors are SAME-CLASS, so the item tests meaning and not word class.

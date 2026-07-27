@@ -623,3 +623,48 @@ one. It now checks BOTH directions against 2217: no excluded word has a file, an
 missing. That is the same class of error as the word-audio run's criterion 6 — a completeness rule
 that does not know about a deliberate exception is a rule that will be "fixed" by undoing the
 decision.
+
+## Execution — phase 3
+
+### A3 — step 3.1's non-goal contradicted step 3.1's own assertion list
+
+Caught at dispatch time, by me, before the packet went out. The frozen non-goal said "no range
+check on `strikes`" while the frozen assertion list for the same step required `-1` to be REJECTED
+and `99` to be VALID. A worker handed both sentences would have had to decide which one wins, and
+that is exactly the decision oplan says never reaches execution time.
+
+Resolved as: the check is `Number.isInteger(v) && v >= 0` for `strikes`, `quizRight`, `quizWrong`.
+Non-negative integer-ness is TYPE (QZ-9 literally says "int >= 0"); "range-lenient" means no UPPER
+bound and no POLICY bound, because a policy change must never invalidate a stored profile. Written
+into plan.md beside the non-goal, not just into the packet.
+
+Worth recording that TWO review rounds and 23 findings did not catch this one. The reviewer read
+the assertion lists and the non-goals as separate sections; the contradiction only shows up when
+you sit down to write the packet that has to carry both.
+
+STEP 3.1 the schema, and only the schema
+  tier: WORKER (Sonnet)
+  did: lib/profile.js — six presence-guarded checks inside the existing `words` loop in
+       `validateProfile`, after the `lastSeen` check, using the existing `path` variable.
+       tests/profile-quiz-schema.test.js — NEW, six flat top-level `test()` calls.
+  surprises: none about the code. The worker noticed `.oplan/word-quiz/plan.md` modified and
+       `validate-3.1.sh` untracked and correctly identified them as mine, not its own.
+  deviations: none
+  fail_first: MANDATORY and supplied. Ran the new test file against the UNMODIFIED lib first:
+       `# pass 2 / # fail 4`. Tests 1 and 2 passed before any code was written — correctly, because
+       `validateProfile` already ignores unknown keys, so "an old-shape profile validates" and "six
+       legal values validate" are both true of the unfixed code. Tests 3-6 failed. That is the
+       honest picture: only four of the six are regression tests; the other two are guards against
+       a future over-strict validator, and they can never have been seen to fail. Recorded rather
+       than dressed up as six-for-six.
+  validation_first_try: yes (worker), and re-run by me in a clean tree: STEP-3.1-OK
+  retries: 0
+  escalations: 0
+  interventions: 1 (bad-spec — the A3 contradiction above, fixed before dispatch)
+  audit: match, CONFIDENCE high. The two things it said it could not settle from diff+spec alone
+       — that `npm test` really goes 225->231, and that the error wording matches the file's
+       existing style — I had already checked myself (231 via the frozen script; the wording is
+       `${path}.<key>: expected ...`, the same shape as the existing `${path}.taps:` line).
+  tokens: worker=50410, checker=35569
+  commit: 18dbda1
+  accepted: 2026-07-27

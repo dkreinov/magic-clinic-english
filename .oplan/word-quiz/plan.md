@@ -682,6 +682,12 @@ word; the right answer in s3 wipes the slate; only the three separate bad days s
 (NEW). Validate the six new optional keys; a profile in today's shape still validates. No behaviour
 change. Non-goals: no `applyQuizAnswer`; no change to `applyWordTap`/`markWordKnown`/
 `migrateWordKeys`/`defaultProfile`; **no backfill**; no range check on `strikes`.
+**AMENDMENT A3 (orchestrator, at dispatch time).** As frozen, that last non-goal contradicted this
+step's own assertion list, which requires `-1` to be REJECTED and `99` to be VALID. Resolved, and
+this is the wording the packet carries: the check is **`Number.isInteger(v) && v >= 0`** for
+`strikes`, `quizRight` and `quizWrong`. Non-negative integer-ness is part of the TYPE (QZ-9 says
+"int ≥ 0"); "no range check" means **no UPPER bound and no policy bound** — `strikes: 99` and
+`strikes: 3` are both valid, because a policy change must never invalidate a stored profile.
 **+6 tests → 231.** Validation: `node --check lib/profile.js`, `npm test` shows `# pass 231` and
 `# fail 0`, `echo STEP-3.1-OK`. Tier WORKER · depends on nothing.
 
