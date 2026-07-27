@@ -353,6 +353,46 @@ too, but there is no child-readable phrase for "non-personal singular referent")
 ("the money that many countries use" equally describes the dollar, because `Europe` is not in the
 manifest); `grammar[0]` (both `rule` and `rules` are absent).
 
+## PHASE 3 PLANNING — the fresh planner's blockers, answered (2026-07-27)
+
+A fresh planner drafted phase 3 from the files alone. It was accurate on every claim I could check
+independently: 220 top-level tests + 5 subtests = the 225 `npm test` prints; `validateProfile` is
+never called at runtime; `isAuthorized` returns TRUE when `APP_CODE` is unset; `migrateWordKeys`
+copies NAMED fields only. It raised 7 blockers and 8 record gaps. Per oplan, every blocker gets an
+answer in writing and every record gap gets its file patched, before a single step is dispatched.
+
+**FIELD GUIDE OVER BUDGET: 51/40.** Justification, as the skill requires: the new lesson 5 (the
+profile) is six sub-bullets and each one is a distinct hazard that cost real time to find — the
+Blob location, the read-that-writes, the named-fields-only merge, the `updatedAt` mutation, the
+runtime-unused validator, and the auth-open-when-unset trap. Compressing any of them loses the
+command or the consequence. I evicted instead where I could: the old contrast and PRECACHE lessons
+are merged into one, Hebrew/BIDI and deploy are compressed, and 54 lines became 51 while GAINING
+the whole profile section. (My commit message said 47; the real number is 51.)
+
+BLOCKERS 2, 3, 4, 5, 7 — decided by me, as orchestrator:
+
+- **2. `lastQuizAt` is IN.** design.md's ordering rule needs a quiz-specific timestamp and `lastSeen`
+  is polluted by taps, so "longest-unseen" is unimplementable without it. An optional additive field
+  is cheap; removing one later is trivial. QZ-9 keeps four new keys.
+- **3. `needsReview` clears on ANY answer, right or wrong.** The flag means "she asked about this",
+  and once she has been asked it has done its job; leaving it set risks one word dominating every
+  quiz, which cuts against D1's "spread apart". **But this opens a real hole the planner did not
+  raise**: a word sitting at 1 or 2 strikes would then have NO ordering key at all, so the third
+  strike might never arrive and D1's demotion would silently never fire. Closed by writing a fourth
+  obligation into the phase 4 skeleton — **a word with `strikes > 0` must be prioritised for
+  re-asking.**
+- **4. A quiz answer on a `learning` word accrues strikes, never demotes (it is already there), and
+  never promotes** (D13 asymmetric trust). Chosen over a 400 because phase 5 needs exactly this
+  permissive shape for `candidate`.
+- **5. The `sessionId` is the CLIENT's to mint.** D16 says "mechanical, needs no dates"; a
+  server-side time window reintroduces the clocks D16 removed. Confirmed, and the correctness
+  obligation it pushes into phase 4 is written into that skeleton now rather than discovered later.
+- **7. `strikes` merges as MAX.** A merge must not launder away a failure — a missed demotion
+  silently hardens her stories, which is the harm D1 exists to undo.
+
+BLOCKERS 1 and 6 are the owner's, not mine — one is operational and one destroys data irreversibly.
+Put to them before step 3.1 is dispatched.
+
 ## D20 — the owner cut 37 words from the quiz
 
 Asked how ~50 sensitive words should be handled, the owner answered "dont need these words there
