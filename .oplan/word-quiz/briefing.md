@@ -119,6 +119,36 @@ NEEDS YOU AT: reading the new questions (gate A), the go-moment before the deplo
 phone check (gate B).
 === END ===
 
+## The morning digest (night of 2026-07-27) — five documents waiting in .oplan/word-quiz/night/
+
+All five night jobs finished and are committed. Nothing in the app, the tests, or the live site
+was touched — these are proposals for you to read.
+
+1. **growth-amended-DRAFT.md** (636 lines) — the signable rewrite of the automatic-promotion
+   design. Its sharpest find: the words that feature exists to catch (the up-to-3 off-list words
+   per chapter) have no audio and no quiz items today, so as designed it could not affect a
+   single chapter — that must be solved before it is built. Sign-off is per-question, so you can
+   accept or override each of the seven design answers individually.
+2. **second-profile-DESIGN.md** (399 lines) — recommends a SEPARATE deployment with its own
+   storage and its own code for your mock tests: safety by credential boundary (a test process
+   cannot even name her data), zero changes to the app she uses. Your local sandbox stays the
+   everyday path.
+3. **parent-view-DESIGN.md** (383 lines) — extend the #/parent screen the growth doc already
+   reserves; show only what the data can truly say (it demonstrates the limits by catching an
+   impossible example in its own brief). Demotions ARE recoverable with dates — until a re-claim
+   erases the evidence.
+4. **post-close-chores.md** (377 lines, 4 ready packets) — measured, not guessed: with the
+   APP_CODE secret exported, 48 of 282 tests fail TODAY across 6 files; the packet fixes all 42
+   call sites. Plus the variable wart and three broken doc pointers. Executes in minutes once
+   you close the phase.
+5. **visual-design-OPTIONS.html** (open it in a browser) — four real directions: Twilight
+   Terrace, Enchanted Grove, Sunrise Parchment, Cloud & Crystal. Palettes sampled from your own
+   illustrations; all four PASS the app's 52-pair contrast gate, measured with the gate's own
+   math; identical phone mockups so the comparison is fair.
+
+Still waiting on you: the phone check of the live app (gate B), then the phase close and the
+backup deletion you asked for.
+
 2026-07-27, at gate A: **you changed the design (D28).** Seeing the questions laid out, you
 chose to hide the meaning behind a רמז (hint) button instead of always showing it. Honest
 consequence, which you accepted when choosing: the always-visible meaning was the shield that
