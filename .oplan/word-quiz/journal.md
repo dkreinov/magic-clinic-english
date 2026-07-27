@@ -1347,3 +1347,62 @@ Git-Bash path form. Round 2: **ship** — all six confirmed closed, one non-bloc
 (6.10's summary line now names the between-captures report).
 
 tokens: planner=178411 · reviewer=228397 (both rounds, cumulative).
+
+## PHASE 6 EXECUTION — through the deploy (2026-07-27)
+
+6.1 pre-flight: rollback target frozen (dpl_4b6XjMSa2HRUN4a2s48cdsT6u2Z1); live build PROVEN =
+3a88e71 by byte-equal /sw.js — after my first instrument FALSELY failed: command substitution
+strips trailing newlines, so hash FILES, never `$(curl ...)` output. All probes green.
+6.2 capture #1: 200 via the frozen subshell; APP_CODE did not leak (post-assert); B2 did not
+fire. Her profile: 8115 bytes, 20 words, 12 known. sha256 58870a1b… Receipt in workspace.
+[REDACTED: her vocabulary -- D27/R-F3-5, counts only]
+ZERO dropped, N=12 (no B4). Her 12 known words overlapped the 50-word pilot bank by ZERO —
+the ships-inert risk was real and the top-up is what defused it.
+6.4 bank pin relaxed to >=50 (fail-first: 49 files still fails); growth.md +5 dated lines,
+numstat 5-0, STATUS/§10 untouched. Audit: match/high.
+6.5 generation: batch 1 (10 files/12 items, gate green first try; worker pre-checked every
+token and found air/cheer/cellar/children/silent/cloudy/damp absent from the manifest), batch 2
+(steak+zoo). Criterion 5 GREEN: every claimed word covered.
+6.6 two blind adversarial passes over the 14 items: A and B AGREED EXACTLY — desk:table and
+movie:show, both real, both fixed (desk gloss re-pinned "a special table with drawers", table+
+drawer out per rule 13 — and my frozen fix text said "schoolwork", NOT a manifest word; rule 11
+caught my own vocabulary error). One fix dispatch stalled at the watchdog with a CLEAN tree;
+re-dispatched fresh; crash-only worked as designed. Agreement 100% (phase-1 historical: 53%).
+6.7 gate A: the owner, shown the items in an HTML review page, DID NOT approve — they issued
+D28 instead ("make the explanation a hint that is hidden until pressed"). See design.md D28 and
+the 6b block in plan.md.
+
+### 6b — the D28 hint pivot (same day)
+
+Plan reviewed (fix-first: 6 real findings incl. my Edit swallowing design.md's D23 heading —
+all fixed; then ship). QZ-21 re-derived BY HAND for FOUR screens before 6b.2 dispatch.
+6b.2 the hint card: gloss hidden behind רמז, revealed on press or answer, per-question state;
+suite 282/0; transcript DIFF EMPTY vs the hand-derivation; audit match/high (it cross-checked
+the session-scoping subtlety itself). The worker self-caught wiping its own edits during a
+fail-first revert and re-applied byte-identically.
+6b.3 the QZ-24 sweep, two blind passes over ALL 85 items: A 26 flags/11 items, B 32/11; both
+independently condemned the same six structurally gloss-dependent items. Adjudication in
+d28-sweep.txt: dad/mom re-pinned DEFINITIONALLY ("My ___ is married to my mom/dad" — the
+kinship sentences were unfixable by activity-pinning); movie re-pinned (cinema + about-phrase);
+dark[1] re-pinned (the lamp remedy); add/back/country/rest/timetable/play/well distractor
+swaps; **fan[1] DELETED — 7 of 8 options flagged; phase-1's frozen lesson applied: ship fewer
+items rather than a leaky one.** 3 single-pass flags KEPT with written reasons. Bank 85 -> 84.
+6b.4 execution: the worker STOPPED CORRECTLY on my dark[1] sentence — 17 words against rule
+5's 14 (my arithmetic, its refusal to rewrite = the escalation rule working); amended to 11
+words; STEP-6B4-OK, 62 files / 84 items, 282/0.
+6b.5 gate (replaces gate A): hint-style HTML review (meaning behind a click, answer unlabeled
+among options); the owner APPROVED and then gave an explicit GO at the go-moment.
+
+### THE DEPLOY (2026-07-27 20:22)
+
+capture #2 seconds before: sha256 IDENTICAL to capture #1 (no profile change between; the
+between-captures report is empty). inspect matched the 6.1 baseline. Tree clean. Deployed:
+**dpl_Geaj9sXRPP8KSt9uZTBMQnSDFCSr / english-n3m8ep7gb-dkreinovs-projects.vercel.app**, Ready.
+6.9 GREEN: v13 live, v12 gone; **67 changed public/ files md5 live==WORKTREE**; 401 on the
+profile API; health exact; the control pair flipped exactly (light.json 404->200 parseable,
+zzzznotaword still 404).
+6.10 GREEN — the only real-data check of the run: live profile validates; 20 words, ZERO keys
+lost, ZERO status changes, and meta.updatedAt DID NOT MOVE (her file was already normalised;
+the read wrote nothing).
+OUTSTANDING: gate B (the owner's phone check) and 6.12 close (criteria re-run, field guide,
+reports, then the D27 backup deletion AFTER the gate-B yes).

@@ -1,12 +1,10 @@
 # STATUS — word-quiz (W5b)
 
-**Where we are:** mid-deploy phase, **paused on your new decision (D28): the meaning becomes a
-hidden hint (רמז).** Nothing is deployed. Already done this phase: her profile is backed up and
-proven (12 known words), quiz questions exist for every word she has claimed (2 hidden traps
-found by independent reviewers and fixed). Being done now: the question screen is rebuilt for
-the hint, and — because a child who never presses רמז faces the sentence alone — every wrong
-option in all 85 questions is re-checked to a stricter bar before you see them again and the
-deploy resumes.
+**Where we are: THE QUIZ IS LIVE.** Deployed 2026-07-27 20:22 with your approval, in the hint
+form you chose (D28). Her profile survived untouched — proven by reading it back: all 20 words,
+every status unchanged, not even the last-modified stamp moved. One thing remains: **your phone
+check** (the checklist is in the chat), then the phase closes and — as you asked — the backup
+files are deleted.
 
 ## What got built this phase
 
@@ -33,7 +31,7 @@ flowchart LR
 | 3 | profile: strikes and demotion | done — you approved the transcript |
 | 4 | the quiz screens | done — you approved the screens |
 | 5 | automatic promotion | deferred by you to a future run (design doc first) |
-| 6 | deploy (backup + first top-up + your first real look) | **paused at your gate — hint re-work (D28) running; backup + questions done** |
+| 6 | deploy (backup + first top-up + your first real look) | **LIVE — waiting only on your phone check** |
 
 ## What the checking machinery caught this phase (all fixed before anything shipped)
 
