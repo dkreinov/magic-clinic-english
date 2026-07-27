@@ -974,3 +974,57 @@ ALL NINE CRITERIA MET:
   7. .data/profile.json absent; no step ran against the real data dir    GREEN
   8. contrast exits 0, ALL PASS, grep -c '^PASS' = 52                    GREEN
   9. the owner read the transcript and approved                          GREEN
+
+## PHASE 4 PLANNING — fresh planner, one review round with a real find (2026-07-27)
+
+Session resumed fresh from the handoff prompt. Pre-flight re-verified rather than trusted: tree
+clean at 5db1d10, `npm test` = 257/0, contrast `grep -c '^PASS'` = 52.
+
+A fresh planner (Opus) drafted phase 4 from the written record alone and needed NO blockers — the
+record held. I verified every codebase claim in its draft independently before accepting a word:
+`light.json[1]`'s distractor order, the 12-entry PRECACHE, `renderList(words, allowedWords=null)`,
+reader's `checkState`/celebration structure and its profile closure (`reader.js:302/313`), the
+`shell.test.js` deepStrictEqual + v12-literal pins, `postJson`, the `withTempDataDir` trio at
+`words-ui.test.js:17/34/49`, and the `.btn-say` → `new Audio(...aac)` pattern at `words.js:193-199`.
+All held. The planner took FIVE decisions the record did not contain and flagged them for
+ratification instead of hiding them; I ratified all five (plan.md "DECISIONS TAKEN AT PLAN TIME"):
+only `known` words quizzed · "recently claimed" dropped and approximated by `lastSeen` · the
+after-chapter quiz auto-starts and gates המשך הסיפור (D10's own rationale; owner sees it in words
+at criterion 11) · no retry, the right word is revealed · words-view sitting is also 4.
+
+Orchestrator additions folded in BEFORE review, each a would-be worker guess found while reading
+the draft against the code: event binding frozen to the words.js querySelectorAll pattern (a fake
+container returning [] makes it a no-op, which is how the DOM-less tests drive `session.answer()`
+directly) · the `demoted` expression frozen (`!correct && resp.words[lemma].status==='learning'`,
+sound because only `known` words are picked) · `session.answer`/`session.next` attachment stated ·
+`renderQuizCard` returns the CARD ONLY, style block lives in `startQuiz`'s innerHTML write (a style
+block inside the card would spray CSS through QZ-21's projected transcript) · the feedback markup
+frozen to the tag (`<strong>` decides whether the answer is its own transcript line) · QZ-21's
+screen separators frozen.
+
+PLAN REVIEW round 1 (Sonnet, fresh): **fix-first, and the find was real.** The draft held flat
+`quizDone`/`quizStarted` booleans that nothing ever reset — she finishes chapter 1's quiz, reaches
+chapter 2, and `afterChapterStage(true, true, >0)` returns `'celebrate'`: the after-chapter quiz
+silently never runs again, D17 broken with every gate green, and no planned test looked at a second
+chapter. The reviewer verified against the real `runGenerate()` (it only pushes a chapter and
+redraws). FIXED by the house pattern the reviewer itself pointed at: quiz state keyed by
+`chapter.n` exactly as `checkState` is keyed by question id — new export
+`chapterQuizState(quizState, n)`, a new chapter's entry starts absent so no explicit reset exists
+or is needed — plus a frozen test 3 pinning reset-by-keying. Ledger 281 -> 282 (4.4 is +3), and
+the 4.4/4.5/4.6 validations moved to 277/277/282. Round 2: **ship, no findings, nothing stale.**
+
+Record gaps from the planner, each patched in a file: PHASE 6 skeleton gained the FIRST-TOP-UP
+criterion (the bank holds only the 50 pilot words, so phase 4 can ship fully green and completely
+inert until the first top-up runs — nothing owned that) plus the growth.md chore repeat and the
+no-real-browser note; the PHASE 2 operation section now states there is deliberately NO quiz
+manifest — the client discovers a missing item only by fetching it.
+
+QZ-21 DISCHARGED EARLY: `quiz-transcript.mjs` and `quiz-transcript-expected.txt` written by ME,
+now, before step 4.2 exists — the expected file derived BY HAND from QZ-18's frozen text-node
+order (Fisher-Yates under `rand=()=>0` rotates to `radio television oven fan camera light`,
+verified by hand against the frozen algorithm, not by running anything).
+
+NOTE: `briefing.md` did not exist in this workspace (the run predates that file's addition to the
+skill). Created at this boundary; the phase-1..3 story lives in the journal and STATUS history.
+
+tokens: planner=185416 · reviewer=129513 (both rounds, cumulative) · summed by the harness, not me.

@@ -1,68 +1,59 @@
 # STATUS — word-quiz (W5b)
 
-**Where we are:** phase 3 is **done and approved by you**. Three of the six phases are behind us.
-Nothing Mika can see has changed yet, and nothing is deployed — the quiz screens are phase 4.
+**Where we are:** phase 4 — the quiz screens, the part Mika actually sees — is **planned in full,
+reviewed, and now being built**. Phases 1 and 3 are done and approved by you. Nothing is deployed;
+nothing she can see has changed yet.
 
 ## What this run builds
 
 Mika can already tap "יודעת את זה" to claim she knows a word. Nothing checks that claim — and the
-claim is not just a badge: it feeds the word into the story generator's vocabulary, so a wrong claim
-quietly makes her chapters harder. This run builds the check.
-
-She gets a short quiz after each chapter: a sentence with one word missing plus its meaning, six
-options she can read or hear, drawn from the words she has claimed. Get it wrong on three separate
-days and the word goes back to "learning" so the story teaches it again.
+claim feeds the word into the story generator's vocabulary, so a wrong claim quietly makes her
+chapters harder. This run builds the check: a short quiz after each chapter — the word's meaning,
+a sentence with a gap, six options she can read or hear. Wrong on three separate days → the word
+goes back to "learning" and the story re-teaches it, and now she is TOLD when that happens.
 
 ```mermaid
 flowchart LR
-    A["she taps<br/>יודעת את זה"] --> B["word enters the<br/>story's vocabulary"]
-    B --> C["after each chapter:<br/>a short quiz"]
-    C -->|right| D["slate wiped<br/>she feels correct"]
-    C -->|"wrong on 3<br/>separate days"| E["back to learning<br/>story re-teaches it"]
-    E --> A
+    A["4.1 the brain:<br/>which words, which options"] --> B["4.2 the screen:<br/>meaning + sentence + 6 options"]
+    B --> C["4.3 practice button<br/>in המילים שלי"]
+    B --> D["4.4 auto-quiz<br/>after each chapter"]
+    C --> E["4.5 offline list<br/>+ version bump"]
+    D --> E
+    E --> F["4.6 independent helper<br/>tries to break it all"]
+    F --> G["you read the actual screens<br/>and say yes/no"]
 ```
 
 ## Progress
 
 | Phase | What | State |
 |---|---|---|
-| Planning | design + plan + 3 review rounds | done |
-| 1 | item format, the checker, 50-word pilot | done — you approved it |
-| 2 | the full bank | cancelled as a phase — the bank now grows weekly, on demand |
+| 1 | item format, checker, 50-word pilot | done — you approved it |
+| 2 | the full bank | not a phase — the bank grows weekly on demand |
 | 3 | profile: strikes and demotion | done — you approved the transcript |
-| 4 | the quiz screens | **next** |
+| 4 | the quiz screens | **building now — 0 of 6 steps done** |
 | 5 | automatic promotion | not started |
-| 6 | deploy | not started |
+| 6 | deploy (+ first bank top-up, + profile backup) | not started |
 
-## What you approved, and what happens next
+## What the plan review caught before any code was written
 
-You read a printed transcript of one imagined week — a real run of the real code — and said yes.
-That approval froze the policy. For the record, what it showed:
+A fresh reviewer found one real bug in the plan itself: the after-chapter quiz would have run for
+chapter 1 and then **silently never again** — the "quiz finished" switch was never flipped back
+for the next chapter. Fixed in the plan, with a test that pins it. This is exactly the kind of
+failure where every automatic check stays green, which is why the plan gets attacked before work.
 
-- She taps **light** twice to hear it. That costs her nothing — it just flags the word as worth
-  re-asking.
-- On day 1 she gets **light** wrong **three times in a row**. That costs her **one** strike, not
-  three. A bad two minutes is one bad moment, not three failures.
-- On day 3 she gets it **right**, and the slate is wiped completely — back to zero.
-- Only after three separate bad days does **light** go back to "learning".
-- **method** sits at one strike. **fair** is untouched. She still has both.
+## The three promises phase 4 must keep (decided before building)
 
-**Next is phase 4: the quiz screens** — the part she actually sees. It has to pick six options she
-can read or hear, show her the result, and make a demotion visible rather than silent. It also
-carries one obligation phase 3 could not test for itself: the app must treat each sitting as a
-genuinely new sitting, or every word becomes un-strikeable and this whole correction loop quietly
-never fires.
+- **Each sitting is a genuinely new sitting.** Otherwise no word can ever collect its three
+  strikes, and the whole correction loop silently never fires. A separate helper who never saw the
+  code will try to break exactly this.
+- **A claimed word with no quiz question yet is skipped in silence** — she is never blocked.
+- **A demotion is visible**: a kind line tells her the word is going back to learning.
 
-Nothing needs you until phase 4 is planned and I bring you that plan.
+## What needs you
 
-## What I could not check, and you should know it
-
-- **Her real saved profile.** It lives in Vercel storage and cannot be read from here, so backward
-  compatibility was proved against a reconstructed copy, not her actual file. Phase 6 takes a
-  backup before deploying anything. This was a deliberate call you made earlier.
-- **Whether the demotion is visible to her.** That is phase 4's job, and phase 4 is not built.
+Nothing yet. At the end of phase 4 you will be shown the three actual screens — question, wrong
+answer, and the "word taken back" message — and the phase does not close until you approve them.
 
 ## What it costs
 
-**No money.** The sentences are written by Claude here, not by a paid API, and there is no live AI
-call in the app.
+**No money.** No paid API, no live AI call in the app.

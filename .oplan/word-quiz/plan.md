@@ -408,7 +408,10 @@ defect look verified. A count against the manifest would be exactly that mistake
 report 2167 missing files as a failure while the thing that matters, her claimed words, was fine.)
 
 **Phase 4 must tolerate a missing item** — she will claim a word days before its item exists. The
-quiz skips those silently rather than breaking.
+quiz skips those silently rather than breaking. **There is deliberately NO quiz manifest** (QZ-19
+forbids `/quiz/index.json`): the client discovers a missing item only by fetching it and getting a
+404, which is why the skip lives in the loader. A top-up therefore needs no index regeneration —
+dropping the new `<lemma>.json` files in is the whole deploy.
 
 ## PHASE 3 — the profile side (strikes, needsReview, quiz-answer) — PLANNED, NOT YET REVIEWED
 
@@ -782,32 +785,620 @@ it also asserts through the real handler and its file list permits only its own 
 - **A merge quietly drops a strike or a counter.** `migrateWordKeys` copies named fields only.
   Guarded by QZ-14 and a step-3.2 test that also re-proves idempotency.
 
-## PHASE 4 SKELETON — the quiz surface
+## PHASE 4 — the quiz surface (planned in full at the phase-3 → phase-4 boundary)
 
-`selectOptions(item, knownSet)` in `public/` (pure, exported, tested) returning 6 options — the
-answer plus 5 of the 8 distractors, preferring words she knows, falling back to the frozen 8 (D19).
-A speaker button per option reusing `.btn-say`. The after-chapter check of 4 words (D17) in
-`reader.js`, and the quiz button inside `words.js` (D10). One cache bump `magic-vet-v12 -> v13`.
-**D22: the item shows the `sense` gloss ABOVE the sentence.** That is what makes a distractor which
-fits the sentence but not the meaning stop being a correct answer, and it is the whole reason the
-pilot is shippable.
+Base: commit `5db1d10`, tree clean, `npm test` = `# pass 257 / # fail 0`, contrast 52 ALL PASS,
+bank 50 files / 71 items, `.data/` empty — all re-verified at planning time, not carried on trust.
 
-**FOUR OBLIGATIONS PHASE 4 INHERITS, written down now so they are not rediscovered late:**
-1. **It must mint a FRESH `sessionId` per quiz sitting, and ship a test proving two sittings give
-   two different ids.** A constant id makes every word permanently un-strikeable — the correction
-   loop never fires and *every gate in this project stays green while it happens*. No phase-3 test
-   can see this. (QZ-11.)
-2. **It must tolerate a word with no quiz item** and skip it silently (D23). She will claim a word
-   days before its item is generated.
-3. **The ordering rule needs fields that did not exist.** design.md says "flagged, then recently
-   claimed, then longest-unseen", and the record never said which field each key reads — a record
-   gap the phase-3 planner found. Resolved: *flagged* = `needsReview`, *longest-unseen* =
-   `lastQuizAt` (NOT `lastSeen`, which a tap moves). **"Recently claimed" has NO field** — nothing
-   records when a word was claimed — so phase 4 must either add one or drop that key and say so.
-4. **A word with `strikes > 0` must be prioritised for re-asking.** Orchestrator decision, taken
-   because `needsReview` is cleared by ANY answer (QZ-12): without this, a word sitting at 1 or 2
-   strikes has no ordering key at all, so the third strike may never arrive and D1's demotion
-   silently never fires.
+Provenance: drafted by a fresh next-phase planner from the written record alone. The orchestrator
+independently verified every codebase claim in the draft (`light.json[1]`'s distractor order, the
+12-entry `PRECACHE`, `renderList`'s signature, reader's `checkState`/celebration structure, the
+`shell.test.js` pins, `postJson`, the `withTempDataDir` trio, reader's profile closure, and the
+`.btn-say`/`new Audio(...aac)` house pattern) before accepting a word of it.
+
+GOAL: the correction loop phase 3 built becomes something she experiences. She is asked about
+words she claimed — gloss above the sentence (D22), six options (D4), a speaker on each — after
+every chapter (D17) and on demand from המילים שלי (D10). Each sitting mints a genuinely fresh
+session id (QZ-11's advance criterion), a word with no item is skipped in silence (D23), and when
+a word is taken back to `learning` she is told (D1).
+
+**THE FOUR INHERITED OBLIGATIONS, and where each is discharged:**
+1. fresh `sessionId` per sitting → acceptance criterion 3, step 4.2 test 6, step 4.6 episode 1
+   (independent author + mandatory mutation).
+2. tolerate a missing item → criterion 4, step 4.2 test 7, step 4.6 episode 4. Discharged at the
+   LOADER, not the picker: no quiz manifest exists, so the client can only discover a missing item
+   by asking for it — the picker returns an ordered candidate list and `startQuiz` walks it,
+   skipping nulls, until it has `count` questions.
+3. the ordering rule → QZ-17's frozen comparator. *Flagged* = `needsReview`; *longest-unseen* =
+   `lastQuizAt`. **"Recently claimed" is DROPPED, as the skeleton permitted, and approximated:**
+   nothing records claim time, and adding `claimedAt` would re-open QZ-9's frozen six-keys/
+   no-backfill promise — a large cost for a tie-break. A never-quizzed word has no `lastQuizAt`
+   and sorts into the front bucket already; within that bucket the tie-break is `lastSeen`
+   descending, which `markWordKnown` sets at claim time. Residual divergence, stated rather than
+   hidden: taps also move `lastSeen`, so "recently claimed" is approximated, not measured.
+4. `strikes > 0` prioritised → comparator clause 1 (before `needsReview`), step 4.6 episode 5.
+
+### ACCEPTANCE CRITERIA (frozen before execution)
+
+ 1. `STEP-4.1-OK` .. `STEP-4.6-OK` all print, each re-run by the orchestrator in a clean tree.
+ 2. `npm test` prints `# fail 0` and `# pass 282` (257 +7 +8 +2 +3 +0 +5; see QZ-20).
+ 3. **A SITTING MINTS A FRESH SESSION ID (QZ-11, pushed into this phase in advance).** Two calls
+    to `startQuiz` produce two different `sessionId`s, and every answer inside one sitting carries
+    the SAME id. This is the failure that leaves every gate in the project green while the
+    correction loop never fires. Asserted by step 4.6 episode 1.
+ 4. **A WORD WITH NO QUIZ ITEM IS SKIPPED SILENTLY (D23).** A sitting whose candidate list
+    contains a lemma with no `public/quiz/<lemma>.json` asks the others, throws nothing, and
+    POSTs nothing for the missing one. Asserted by step 4.6 episode 4.
+ 5. **THE DEMOTION IS VISIBLE (D1).** The answer that takes a word back to `learning` renders the
+    frozen Hebrew demotion line and the word itself. Phase 3 built the mechanism; this is the
+    telling. Asserted by step 4.6 episode 3, through the REAL handler and `knownLemmaSet`.
+    FROZEN COMMAND for 3+4+5 together:
+    ```bash
+    out=$(node --test tests/quiz-experience.test.js 2>&1) || true
+    case "$out" in *'# pass 5'*) ;; *) echo FAIL-pass; exit 1;; esac
+    case "$out" in *'# fail 0'*) ;; *) echo FAIL-fail; exit 1;; esac
+    echo CRIT-345-OK
+    ```
+ 6. **Exactly these eleven files changed across `5db1d10..HEAD`, none deleted** (A5's range form —
+    oplan commits each step on acceptance, so a working-tree check would compare an empty set):
+    ```bash
+    changed=$(git diff --name-only 5db1d10..HEAD -- . ':(exclude).oplan' | sort | tr '\n' ' ')
+    expected='public/quiz-core.js public/quiz.js public/sw.js public/views/reader.js public/views/words.js tests/quiz-core.test.js tests/quiz-experience.test.js tests/quiz-ui.test.js tests/reader-ui.test.js tests/shell.test.js tests/words-ui.test.js '
+    [ "$changed" = "$expected" ] || { echo "FAIL: [$changed]"; exit 1; }
+    dels=$(git diff --name-status 5db1d10..HEAD -- . ':(exclude).oplan' | awk '$1 ~ /^D/ {print $2}')
+    [ -z "$dels" ] || { echo "FAIL: DELETED: $dels"; exit 1; }
+    echo CRIT-6-OK
+    ```
+ 7. `.data/profile.json` does not exist and no step ran a server against the real data dir.
+ 8. `node scripts/check-contrast.mjs` exits 0, prints `ALL PASS`, and `grep -c '^PASS'` is exactly
+    **52** (the anchor is load-bearing — bare `grep -c PASS` returns 53).
+ 9. **THE BANK IS UNTOUCHED.** `node scripts/check-quiz-bank.mjs` exits 0 and
+    `ls public/quiz/*.json | wc -l` is **50**. Phase 4 consumes the bank; it never edits it.
+10. **THE SHELL IS BUMPED AND COMPLETE.** `public/sw.js` contains `magic-vet-v13` and NOT
+    `magic-vet-v12`, and `PRECACHE` contains both `/quiz-core.js` and `/quiz.js`. A new first-party
+    module statically imported by a precached view and left out of PRECACHE gives a BLANK PAGE
+    offline (docs/visual-design.md, as amended by word-audio A11).
+11. **HUMAN GATE — the phase does not close without it.** The orchestrator runs the QZ-21
+    transcript, DIFFS it against the hand-derived expected file, and puts the literal stdout in
+    front of the owner, who explicitly approves. Criteria 1-10 being green is NOT sufficient: they
+    check that the screen is built, not that it is the right screen for an eleven-year-old. The
+    summary handed over must be true and must state what it does not cover — phase 1 closed once
+    on a summary broader than its evidence.
+
+**WHAT NO MACHINE CAN CHECK HERE, stated plainly:** whether the gloss-above-sentence screen reads
+as a question a child can answer; whether an auto-starting after-chapter quiz feels like a gate she
+resents (deliberate — D10 — and reversible in one line of `afterChapterStage`); whether the
+demotion wording is kind enough to survive being read by her; and whether the bank has any item
+for the words she has actually claimed (see RISKS — the first top-up is now a phase-6 criterion).
+
+### NEW FROZEN CONTRACTS
+
+**QZ-17 — `public/quiz-core.js`.** Pure ESM, ZERO imports, no `fetch`, no DOM, no `Date.now()`
+except inside `newSessionId`. Exactly six named exports:
+
+ · `newSessionId()` -> `"q-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2,10)`.
+   Frozen shape `/^q-[0-9a-z]+-[0-9a-z]{1,8}$/`, always ≤ 64 chars (QZ-10's limit is a 400, never
+   a truncation).
+ · `knownSetFromProfile(profile)` -> `Set` of every key of `profile.words` whose entry is an
+   object with `status === 'known'`. **This knowingly duplicates `lib/vocab.js:knownLemmaSet` in
+   three lines**, because `lib/` is not servable to the browser while `public/lemma.js` proves the
+   reverse direction is the house solution. The duplication is pinned MECHANICALLY: a test imports
+   BOTH and asserts they agree on a fixture (field guide 2 — never verify against a
+   re-implementation; here the re-implementation is forced, so it is diffed against the original).
+ · `selectOptions(item, knownSet, rand = Math.random)` -> array of exactly **6** distinct strings.
+   Algorithm, frozen: `known` = `item.distractors` that are in `knownSet`, in the item's own order;
+   `rest` = the remainder, in the item's own order; `chosen` = first 5 of `known.concat(rest)`
+   (D5 prefers words she knows, D19 falls back to the item's own frozen 8); then
+   `shuffle([item.answer, ...chosen])` by Fisher-Yates:
+   `for (let i = arr.length-1; i > 0; i--) { const j = Math.floor(rand()*(i+1)); [arr[i],arr[j]] = [arr[j],arr[i]]; }`
+   No length guard: QZ-1 rule 7 guarantees exactly 8 distinct distractors and the gate is green.
+ · `isUsableItem(x)` -> boolean. True iff `x` is a plain object AND `typeof x.sense === 'string'`
+   and non-blank AND `typeof x.sentence === 'string'` and contains `'___'` AND
+   `typeof x.answer === 'string'` and non-blank AND `Array.isArray(x.distractors)` and
+   `x.distractors.length >= 5` and every element is a string. This is the ONLY validation the
+   client does; it exists so a truncated or 404-HTML response is skipped, not rendered.
+ · `pickItem(items, rand = Math.random)` -> filter `items` by `isUsableItem` first; if the filtered
+   list is empty (or `items` is not a non-empty array) return `null`, else return
+   `filtered[Math.floor(rand()*filtered.length)]`. Random, not first — D9's whole point is that a
+   polysemous word has more than one sense and both should be met.
+ · `pickQuizWords(profile, limit = 20)` -> ordered array of profile KEYS. Candidates are entries
+   with `status === 'known'` ONLY. **`learning` words are NOT quizzed** — the quiz exists to check
+   words SHE CLAIMS (design.md), a `learning` word cannot be demoted (it is already there), and
+   D13 forbids promotion, so asking would cost her confidence and change nothing. Comparator,
+   frozen and applied in this order:
+     1. `(b.strikes ?? 0) - (a.strikes ?? 0)`      — a word mid-demotion is asked first (obligation 4)
+     2. `(b.needsReview === true) - (a.needsReview === true)` — flagged next (obligation 3)
+     3. never-quizzed before quizzed (`lastQuizAt` absent or `Date.parse` NaN = never)
+     4. both never-quizzed: `Date.parse(b.lastSeen) - Date.parse(a.lastSeen)` — most recent first
+     5. both quizzed: `Date.parse(a.lastQuizAt) - Date.parse(b.lastQuizAt)` — longest-unseen first
+     6. `a.key < b.key ? -1 : 1` — total order, so the result is deterministic and testable.
+   Unparseable dates sort as 0. Returns at most `limit`.
+
+**QZ-18 — `public/quiz.js`.** ESM. Imports `postJson` from `./api.js` and the core from
+`./quiz-core.js` (VERIFIED: `public/api.js` has no top-level DOM access and imports cleanly under
+node). Exports:
+
+ · `answerBody(sessionId, lemma, correct)` -> `{ action:'quiz-answer', lemma, correct, sessionId }`
+   and nothing else.
+ · `async loadItem(lemma, rand = Math.random)` -> a usable item object, or **`null`**. Returns null
+   — never throws — on: `fetch` rejecting, `!res.ok`, `res.json()` rejecting, the body not being a
+   non-empty array, and every element failing `isUsableItem`. URL is
+   `` `/quiz/${encodeURIComponent(lemma)}.json` ``.
+ · `renderQuizCard(state)` -> HTML string. `state = { lemma, item, options, index, total, chosen,
+   correct, demoted }`. **The TEXT NODES appear in exactly this order, and that order is the
+   contract the QZ-21 transcript is diffed against:**
+     1. `.quiz-progress`  — `שאלה <index+1> מתוך <total>`
+     2. `.quiz-prompt`    — `איזו מילה מתאימה?`
+     3. `.quiz-sense`     — `item.sense`   ← **ABOVE the sentence. This is D22 and it is the whole
+                            reason the pilot is shippable.**
+     4. `.quiz-sentence`  — `item.sentence` verbatim (blank shown as the literal `___`), `dir="ltr"`
+     5. six `<div class="quiz-option-row">`, in `options` order, each containing
+        `<button class="quiz-option" data-choice="<opt>">` with the option text, then a SIBLING
+        `<button class="btn-say" data-say="<opt>" aria-label="הקשיבי למילה">🔊</button>`
+        (D4: a speaker on every option; `.btn-say` is reused from `styles.css`, not redefined —
+        a button inside a button is invalid HTML, hence the sibling)
+     6. when `chosen !== null`: `<p class="quiz-feedback">כל הכבוד!</p>` if `correct`, else
+        `<p class="quiz-feedback">כמעט! המילה הנכונה היא <strong>` + escaped `item.answer` +
+        `</strong></p>` — **markup frozen to the tag, because QZ-21's transcript projects text
+        nodes and the `<strong>` decides whether the answer is its own line** (it is).
+     7. when `demoted`: `<p class="quiz-demoted">המילה הזאת חוזרת ללמידה, נלמד אותה שוב יחד</p>`
+        ← **D1's telling**
+     8. when `chosen !== null`: `<button class="btn btn-primary" data-action="quiz-next">הלאה</button>`
+   **`renderQuizCard` returns the CARD ONLY — the `VIEW_STYLE` `<style>` block is NOT part of its
+   return value.** `startQuiz` is what writes `VIEW_STYLE + renderQuizCard(state)` (and
+   `VIEW_STYLE + renderQuizDone(...)`) into `container.innerHTML`. Frozen because QZ-21's
+   projection strips tags but keeps text: a style block inside the card would spray CSS lines
+   through the owner's transcript.
+   When `chosen !== null` every `.quiz-option` carries `disabled`; the option equal to `item.answer`
+   also carries class `correct`; a `chosen` that is not the answer also carries class `wrong`.
+   Every interpolated value is HTML-escaped by a local `escapeHtml` copied from `views/words.js`
+   (the house pattern — it is already duplicated in two views).
+ · `renderQuizDone({ right, total })` -> `סיימנו את התרגול!` then `<right> מתוך <total>`.
+ · `createQuizSession(questions)` -> `{ sessionId: newSessionId(), questions, index: 0, right: 0,
+   wrong: 0 }`. **Never module-level — one per call.**
+ · `async startQuiz(container, { lemmas, knownSet, count = 4, onDone = () => {},
+   load = loadItem, post = (body) => postJson('/api/profile', body), rand = Math.random })`
+   -> resolves to the session object. Behaviour, frozen:
+     1. build `questions` by walking `lemmas` IN ORDER, `await load(lemma, rand)`, keeping
+        `{ lemma, item, options: selectOptions(item, knownSet, rand) }` for each non-null result,
+        stopping at `count`. **A null is skipped in silence — no log, no throw, no POST** (D23).
+     2. if `questions.length === 0`: call `onDone({ right: 0, total: 0 })` and return the session
+        WITHOUT writing to `container`. She is never shown an empty quiz and never blocked.
+     3. `const session = createQuizSession(questions)`; **attach `session.answer` and
+        `session.next` (below) to it**; render question 0 into `container`.
+     4. `await session.answer(option)` — POSTs `answerBody(session.sessionId, q.lemma, option === q.item.answer)`
+        **exactly once per question** (a second call on an answered question is a no-op — mirrors
+        `reader.js`'s `isFirstAnswer` guard; a double POST would double-count D24's counters),
+        updates `right`/`wrong`, then re-renders the current card with `chosen`/`correct`/`demoted`
+        set. **`demoted` is FROZEN as:**
+        `correct === false && resp && resp.words && resp.words[q.lemma] && resp.words[q.lemma].status === 'learning'`
+        — sound because `pickQuizWords` returns only `known` words, so `learning`-after-POST means
+        demoted-now. **The client never re-implements QZ-12's strike arithmetic; it reads the
+        server's answer.** A rejected or failed post leaves `demoted` false and the question
+        answered.
+     5. `session.next()` — advance `index`; render the next card, or `renderQuizDone` and
+        `onDone({ right, total: questions.length })`.
+     6. **`q.lemma` (the PROFILE KEY) is what is POSTed; `q.item.answer` is what is compared
+        against.** QZ-10 looks the key up directly with no `resolveLemma`, so sending anything else
+        is a 400 or, worse, a strike on a word she was never asked about.
+     7. **EVENT BINDING, frozen to the house pattern (words.js:193-199):** after every render, a
+        local `bind()` iterates `container.querySelectorAll("[data-choice]")` (click →
+        `session.answer(btn.getAttribute("data-choice"))`), `container.querySelectorAll("[data-say]")`
+        (click → `new Audio("/audio/words/" + encodeURIComponent(btn.getAttribute("data-say")) +
+        ".aac").play().catch(() => {})` — the options are manifest lemmas by QZ-1 rules 7/12, so
+        every clip exists), and `container.querySelectorAll('[data-action="quiz-next"]')` (click →
+        `session.next()`). **Iteration over `querySelectorAll` results means a fake container
+        returning `[]` makes binding a no-op** — which is exactly how the tests drive the session
+        through `session.answer()` directly, with no DOM library.
+   `load`/`post`/`rand` are injectable ONLY because that is the only way this is mechanically
+   testable without a DOM or network library; the defaults are the real thing.
+   The module carries its own `VIEW_STYLE` `<style>` block with `.quiz-*` rules, exactly as
+   `words.js` and `reader.js` do. **It uses only existing `:root` tokens — no raw hex, no
+   `color-mix()`** (the contrast gate sees only `:root`: a raw hex is invisible to it and
+   `color-mix()` FABRICATES a pass). `public/styles.css` is NOT edited by this phase.
+
+**QZ-19 — phase-4 non-goals.** No change to `lib/`, `api/`, `data/`, `scripts/`,
+`public/quiz/*.json`, `public/styles.css`, `public/index.html`, `public/app.js`, `docs/`. No new
+route and no new nav tab (D10). No `candidate` status (phase 5). No promotion of any kind (D13).
+No new profile field — in particular no `claimedAt`. No `/quiz/index.json` manifest. No spaced
+repetition beyond QZ-17's comparator. No quiz for `learning` words. No new npm dependency. No
+deploy (phase 6). No `docs/growth.md` edit — its "nothing in this design ever demotes" line becomes
+false when this SHIPS, and that is already recorded as a phase-6 chore in QZ-13.
+
+**QZ-20 — the test ledger.** 257 -> 264 -> 272 -> 274 -> 277 -> 277 -> **282**. Every new test must
+be a FLAT top-level `test()` or the ledger stops being checkable (field guide 5). **The counts are
+the LENGTH of the frozen lists in each step below, not the other way round** — a step that hits its
+count while missing a listed item is a FAILED step, and the auditor is told to check the LIST.
+
+**QZ-21 — the criterion-11 transcript. The ORCHESTRATOR writes
+`.oplan/word-quiz/quiz-transcript.mjs` AND `.oplan/word-quiz/quiz-transcript-expected.txt`
+BEFORE step 4.2 is dispatched**, deriving the expected text BY HAND from QZ-18's frozen text-node
+order — exactly as QZ-16 was derived by hand from QZ-12's table before step 3.4. The owner's gate
+must not rest on output generated by the implementer's own code. The script:
+ · uses the REAL bank item `public/quiz/light.json[1]` (the lamp sense) with an EMPTY `knownSet`
+   and `rand = () => 0`;
+ · prints three screens, each from a FROZEN state:
+   screen 1 `{ lemma:'light', item, options, index:0, total:4, chosen:null, correct:null, demoted:false }`
+   (the question as first shown); screen 2 = screen 1 with `chosen:'radio', correct:false` (after a
+   wrong choice); screen 3 = screen 2 with `demoted:true` (the telling);
+ · before each screen prints the frozen separator lines
+   `=== SCREEN 1: the question as she first sees it ===`,
+   `=== SCREEN 2: she chose "radio" — wrong ===`,
+   `=== SCREEN 3: the third strike — the word is taken back, and she is told ===`;
+ · projects each to plain text with the frozen transform
+   `html.replace(/<[^>]*>/g,'\n').split('\n').map(s=>s.trim()).filter(Boolean).join('\n')`.
+ With `rand = () => 0` the frozen Fisher-Yates rotates `[light, radio, television, oven, fan,
+ camera]` to **`radio, television, oven, fan, camera, light`** — derivable by hand, which is the
+ point (VERIFIED against the real `light.json[1]`: its first five distractors are exactly
+ `radio television oven fan camera`). **If the diff is non-empty the phase does not reach the
+ owner.** Prose is a paraphrase and comparing against a paraphrase is a judgement call; that is
+ precisely how phase 1 closed on a false assurance.
+
+**QZ-22 — the shell change.** `CACHE` becomes `"magic-vet-v13"`. `PRECACHE` becomes exactly:
+`["/", "/styles.css", "/app.js", "/api.js", "/lemma.js", "/words-index.js", "/quiz-core.js",
+"/quiz.js", "/views/home.js", "/views/placement.js", "/views/reader.js", "/views/words.js",
+"/manifest.webmanifest", "/icons/icon.svg"]` — order is load-bearing, `shell.test.js` compares it
+with `deepStrictEqual`. `public/quiz/*.json` is DATA and stays OUT (QZ-7).
+
+### STEPS
+
+**STEP 4.1 — the pure quiz core**
+- goal: `public/quiz-core.js` exists, exporting exactly the six functions of QZ-17 with exactly
+  those behaviours. Nothing fetches, nothing renders, nothing imports.
+- files: `public/quiz-core.js` (NEW), `tests/quiz-core.test.js` (NEW). No others, at all.
+- commands: none — direct file edits.
+- validation (frozen; handed over as a script FILE, not a pasted chain — field guide 9; and note
+  `cmd | grep -q` under pipefail SIGPIPEs the producer, hence capture-and-`case`):
+  ```bash
+  set -o pipefail
+  node --check public/quiz-core.js || { echo "FAIL: node --check"; exit 1; }
+  out=$(npm test 2>&1) || true
+  case "$out" in *'# pass 264'*) ;; *) echo "FAIL: not 264"; exit 1;; esac
+  case "$out" in *'# fail 0'*)   ;; *) echo "FAIL: failures";  exit 1;; esac
+  changed=$(git status --porcelain -- . ':(exclude).oplan' | awk '{print $NF}' | sort | tr '\n' ' ')
+  [ "$changed" = "public/quiz-core.js tests/quiz-core.test.js " ] || { echo "FAIL: [$changed]"; exit 1; }
+  echo STEP-4.1-OK
+  ```
+- the 7 frozen tests (the count is this list's length):
+  1. `newSessionId` — two calls differ; 100 calls give 100 distinct values; every one matches
+     `/^q-[0-9a-z]+-[0-9a-z]{1,8}$/` and is ≤ 64 chars.
+  2. `knownSetFromProfile` agrees with `lib/vocab.js`'s `knownLemmaSet` — `deepStrictEqual` on
+     the sorted arrays, over a fixture with `known`, `learning` and a non-object entry.
+  3. `selectOptions` always returns 6 distinct strings, always contains `item.answer`, and every
+     option is the answer or one of the item's own 8 distractors — over 50 runs with real
+     `Math.random`.
+  4. `selectOptions` PREFERS known words: a `knownSet` holding exactly 5 of the 8 gives those 5;
+     a `knownSet` holding 2 gives those 2 plus the first 3 of the remainder in the item's own
+     order (D19's fallback); an EMPTY `knownSet` gives the item's first 5.
+  5. `selectOptions` really shuffles and is deterministic under a stub: `rand = () => 0` on
+     `light.json[1]` yields exactly `['radio','television','oven','fan','camera','light']`
+     (hand-derived from the frozen Fisher-Yates), and two calls with the same stub are equal.
+  6. `pickQuizWords` returns only `known` keys, never a `learning` one, honours `limit`, and
+     orders a hand-built 7-word profile into ONE frozen expected array exercising all six
+     comparator clauses in turn.
+  7. `isUsableItem` rejects: `null`, a non-object, a blank `sense`, a `sentence` with no `___`, a
+     missing `answer`, `distractors` of length 4, `distractors` containing a non-string — and
+     accepts a real item read from `public/quiz/light.json`. `pickItem` returns `null` for `[]`
+     and for an array whose every element is unusable, and honours a stubbed `rand`.
+- non-goals: NO fetch, NO DOM, NO import of anything (not `./api.js`, not `../lib/*`). No
+  rendering. No session STATE — `newSessionId` mints a string and nothing more. Do not add an
+  `available` or `hasItem` parameter to `pickQuizWords`: the missing-item skip is step 4.2's,
+  deliberately. Do not edit `lib/vocab.js` even though test 2 imports it.
+- tier: WORKER — pure functions against a fully frozen spec. · depends on: nothing.
+
+**STEP 4.2 — the quiz component: the screen, the session, the answer**
+- goal: `public/quiz.js` exists and satisfies QZ-18 in full: the gloss renders above the sentence,
+  every option has a speaker, one sitting has one session id, a missing item is silence, and a
+  demotion is told.
+- files: `public/quiz.js` (NEW), `tests/quiz-ui.test.js` (NEW). No others.
+- commands: none — direct file edits.
+- validation (frozen):
+  ```bash
+  set -o pipefail
+  node --check public/quiz.js || { echo "FAIL: node --check"; exit 1; }
+  out=$(npm test 2>&1) || true
+  case "$out" in *'# pass 272'*) ;; *) echo "FAIL: not 272"; exit 1;; esac
+  case "$out" in *'# fail 0'*)   ;; *) echo "FAIL: failures";  exit 1;; esac
+  changed=$(git status --porcelain -- . ':(exclude).oplan' | awk '{print $NF}' | sort | tr '\n' ' ')
+  [ "$changed" = "public/quiz.js tests/quiz-ui.test.js " ] || { echo "FAIL: [$changed]"; exit 1; }
+  echo STEP-4.2-OK
+  ```
+- contracts: QZ-18 in full, quoted verbatim, INCLUDING the eight-item text-node order and every
+  frozen Hebrew string. **The packet must also QUOTE `withTempDataDir`, `createMockRes` and
+  `createPostReq` verbatim from `tests/words-ui.test.js`, plus a `withOpenGate` helper that
+  deletes and restores `APP_CODE`** — `withTempDataDir` is copy-pasted across 8 test files and is
+  NOT a shared module, the step's file list does not permit reading its source, and 7 of those 8
+  copies 401 on a machine that exports `APP_CODE` (`isAuthorized` returns TRUE only when it is
+  UNSET).
+- the 8 frozen tests:
+  1. `public/quiz.js` passes `node --check` and imports cleanly under node (it must not touch
+     `document`, `window` or `localStorage` at module scope).
+  2. **D22 — the gloss is ABOVE the sentence.** For a real `light.json[1]` state,
+     `html.indexOf(item.sense) < html.indexOf(item.sentence)`; the prompt `איזו מילה מתאימה?`
+     and the progress line render; all six options render as `data-choice`; each option has a
+     sibling `data-say` with the same value and the aria-label `הקשיבי למילה`; a `<` in a sense
+     comes back as `&lt;`.
+  3. Feedback: `chosen === answer` renders `כל הכבוד!`, marks the answer `correct`, and disables
+     every option; a wrong `chosen` renders `כמעט! המילה הנכונה היא` AND the answer text, marks
+     the chosen `wrong` and the answer `correct`, and disables every option; `chosen === null`
+     renders neither string and no `disabled` and no `quiz-next`.
+  4. **D1 — the demotion is told.** `demoted: true` renders
+     `המילה הזאת חוזרת ללמידה, נלמד אותה שוב יחד`; `demoted: false` does not.
+  5. `answerBody('s1','light',false)` `deepStrictEqual`s the four frozen keys, and the real
+     `api/profile.js` handler ACCEPTS it with 200 against a temp `DATA_DIR` (after a
+     `mark-known` on `light`), leaving `strikes === 1`.
+  6. **Criterion 3 at component level.** `startQuiz` twice over a fake container yields two
+     different `sessionId`s; and inside ONE sitting, three `session.answer(...)` calls through an
+     injected `post` spy all carry the SAME `sessionId` and the correct `lemma`. Also: answering
+     the same question twice POSTs ONCE.
+  7. **Criterion 4 at component level.** With an injected `load` returning `null` for the middle
+     lemma, `startQuiz` builds 2 questions from 3 lemmas, throws nothing, POSTs nothing for the
+     skipped one; with `load` returning `null` for ALL lemmas it calls `onDone({right:0,total:0})`
+     and leaves `container.innerHTML` untouched. `loadItem` itself returns `null` for a rejecting
+     fetch, `res.ok === false`, a non-array body, an empty array, and an array of unusable items.
+  8. Source and style: `public/quiz.js` contains `/api/profile`, `quiz-answer`, `postJson`,
+     `btn-say`, `/quiz/`, `encodeURIComponent`, and every frozen Hebrew string; its `VIEW_STYLE`
+     block contains no `#` and no `color-mix(`; and `node scripts/check-contrast.mjs` exits 0,
+     prints `ALL PASS`, and its lines starting with `PASS` number exactly **52**.
+- non-goals: does NOT touch `views/`, `sw.js` or `styles.css` — wiring is 4.3/4.4, the bump is
+  4.5. Does not re-implement QZ-12's strike arithmetic: `demoted` comes from the frozen expression
+  reading the server's answer. Does not add a retry — one choice per question, then `הלאה`. Does
+  not add a skip button. Does not read `lib/`. Does not add a DOM library.
+- tier: WORKER — the largest step, but it is the same string-returning view pattern as
+  `views/words.js` against a text-node order frozen down to the line.
+- depends on: 4.1 COMMITTED, **AND on the orchestrator having written QZ-21's transcript and
+  hand-derived expected file BEFORE this step is dispatched.**
+
+**STEP 4.3 — the quiz button inside המילים שלי (D10)**
+- goal: the words view offers a practice button when she has quizzable words, and offers nothing
+  when she does not.
+- files: `public/views/words.js`, `tests/words-ui.test.js`. No others.
+- commands: none — direct file edits.
+- validation (frozen):
+  ```bash
+  set -o pipefail
+  node --check public/views/words.js || { echo "FAIL: node --check"; exit 1; }
+  out=$(npm test 2>&1) || true
+  case "$out" in *'# pass 274'*) ;; *) echo "FAIL: not 274"; exit 1;; esac
+  case "$out" in *'# fail 0'*)   ;; *) echo "FAIL: failures";  exit 1;; esac
+  changed=$(git status --porcelain -- . ':(exclude).oplan' | awk '{print $NF}' | sort | tr '\n' ' ')
+  [ "$changed" = "public/views/words.js tests/words-ui.test.js " ] || { echo "FAIL: [$changed]"; exit 1; }
+  echo STEP-4.3-OK
+  ```
+- contracts:
+  · NEW export `renderQuizLauncher(count)` -> `''` exactly when `count === 0`, otherwise
+    `<button class="btn btn-primary" type="button" data-action="start-quiz">בואי נתרגל מילים</button>`
+    wrapped in a `<div class="words-quiz-launch">`.
+  · `renderList` gains a THIRD parameter: `renderList(words, allowedWords = null, launcherHtml = '')`,
+    and `${launcherHtml}` is inserted BETWEEN the `<p class="words-count">` line and
+    `<div class="words-grid">`. **Defaulting to `''` makes every existing two-argument call
+    byte-identical**, which is why `tests/words-ui.test.js`'s existing frozen `renderList`
+    assertions keep passing untouched. Do NOT move the launcher inside the grid and do NOT reorder
+    the page.
+  · `render()`: after loading the profile, `const lemmas = pickQuizWords(profile, 20)` and
+    `draw()` passes `renderQuizLauncher(lemmas.length)`. Clicking `[data-action="start-quiz"]`
+    calls `startQuiz(container, { lemmas, knownSet: knownSetFromProfile(profile), count: 4,
+    onDone: () => boot() })` — `boot()` re-fetches the profile so a demotion shows in the list
+    immediately. **`count: 4`** matches D17's after-chapter number; the record gives no separate
+    figure for this entry point and a longer sitting is a chore (ratified decision e).
+  · Imports are `import { startQuiz } from "../quiz.js"` and
+    `import { pickQuizWords, knownSetFromProfile } from "../quiz-core.js"`.
+- the 2 frozen tests:
+  1. `renderQuizLauncher(0)` is `''` exactly; `renderQuizLauncher(3)` contains `start-quiz`,
+     `btn btn-primary` and `בואי נתרגל מילים`. `renderList(fixture, null)` contains NO
+     `start-quiz`, and `renderList(fixture, null, '<b>MARK</b>')` contains `<b>MARK</b>` at an
+     index AFTER `words-count` and BEFORE `words-grid`.
+  2. `views/words.js` contains `../quiz.js`, `../quiz-core.js`, `startQuiz`, `pickQuizWords`,
+     `knownSetFromProfile`, `data-action="start-quiz"` and the frozen Hebrew label; and it still
+     contains the three pre-existing frozen Hebrew strings `עוד אין מילים באוסף`, `יודעת`, `לומדת`.
+- non-goals: no per-word quiz button on a card. No change to `markKnownBody`, the empty state, the
+  card markup, `.word-badge`, or any existing test in `tests/words-ui.test.js` — APPEND only,
+  never edit or delete (deleting an existing test is the cheapest way to make a ledger land, and
+  criterion 6 checks for deletions explicitly). No change to `sw.js`.
+- tier: WORKER. · depends on: 4.2 COMMITTED.
+
+**STEP 4.4 — the after-chapter check of 4 words (D17)**
+- goal: when she has answered every chapter question correctly the quiz runs automatically, and
+  when there is nothing to ask she goes straight to the celebration.
+- files: `public/views/reader.js`, `tests/reader-ui.test.js`. No others.
+- commands: none — direct file edits.
+- validation (frozen):
+  ```bash
+  set -o pipefail
+  node --check public/views/reader.js || { echo "FAIL: node --check"; exit 1; }
+  out=$(npm test 2>&1) || true
+  case "$out" in *'# pass 277'*) ;; *) echo "FAIL: not 277"; exit 1;; esac
+  case "$out" in *'# fail 0'*)   ;; *) echo "FAIL: failures";  exit 1;; esac
+  changed=$(git status --porcelain -- . ':(exclude).oplan' | awk '{print $NF}' | sort | tr '\n' ' ')
+  [ "$changed" = "public/views/reader.js tests/reader-ui.test.js " ] || { echo "FAIL: [$changed]"; exit 1; }
+  echo STEP-4.4-OK
+  ```
+- contracts:
+  · NEW export `afterChapterStage({ doneAll, quizDone, lemmaCount })` -> one of
+    `'questions'` | `'quiz'` | `'celebrate'`. Frozen table, exhaustive:
+      `doneAll=false`                              -> `'questions'`  (regardless of the other two)
+      `doneAll=true, quizDone=true`                -> `'celebrate'`
+      `doneAll=true, quizDone=false, lemmaCount=0` -> `'celebrate'`   ← **she is NEVER blocked**
+      `doneAll=true, quizDone=false, lemmaCount>0` -> `'quiz'`
+  · **THE QUIZ STATE IS KEYED BY CHAPTER, exactly as `checkState` is keyed by question id — this
+    is what makes a fresh chapter reset it (AMENDED after plan review round 1: the draft held flat
+    `quizDone`/`quizStarted` booleans that nothing ever reset, so from chapter 2 onward the
+    after-chapter quiz would silently never run again — breaking D17 with every gate green).**
+    A closure-level `const quizState = {};` beside `checkState`, and a NEW export
+    `chapterQuizState(quizState, n)` mirroring `questionState`:
+    `if (!quizState[n]) quizState[n] = { started: false, done: false }; return quizState[n];`
+    A new chapter has a new `chapter.n`, so its entry starts absent → `done: false` → its quiz
+    runs; stale entries just go unused. No explicit reset exists or is needed.
+  · `renderChapter()`: `const qs = chapterQuizState(quizState, chapter.n)` and it consults
+    `afterChapterStage({ doneAll, quizDone: qs.done, lemmaCount: lemmas.length })`. In `'quiz'` it
+    renders a `<div class="reader-quiz-slot">` INSTEAD of the celebration image and the
+    `המשך הסיפור` button, and `bindEvents` — when the stage is `'quiz'` and `!qs.started` — sets
+    `qs.started = true` and calls `startQuiz(slot, { lemmas, knownSet, count: 4,
+    onDone: () => { qs.done = true; draw(); } })`.
+    `lemmas = pickQuizWords(profile, 20)` and `knownSet = knownSetFromProfile(profile)`, from the
+    profile the view already holds in its render closure (VERIFIED: `reader.js:302/313`).
+    In `'celebrate'` the existing celebration image and `המשך הסיפור` button render exactly as
+    today. In `'questions'` nothing changes.
+  · **The quiz runs BEFORE she may continue the story, automatically (ratified decision c).** D10
+    chose the after-chapter slot precisely because it "lands strikes on a predictable schedule
+    WITHOUT her opting in"; an opt-in button would give back the thing D10 bought. This is the
+    phase's most consequential experience decision and criterion 11 puts it in front of the owner
+    in words.
+- the 3 frozen tests:
+  1. `afterChapterStage` over the frozen table — six calls, six `strictEqual`s, including
+     `{doneAll:true, quizDone:false, lemmaCount:0} -> 'celebrate'` (the never-blocked case) and
+     `{doneAll:false, quizDone:true, lemmaCount:0} -> 'questions'`.
+  2. `views/reader.js` contains `../quiz.js`, `../quiz-core.js`, `startQuiz`, `pickQuizWords`,
+     `knownSetFromProfile`, `afterChapterStage`, `chapterQuizState`, `reader-quiz-slot`; and it
+     STILL contains all ten pre-existing frozen Hebrew strings and `wordTapBody`/`sentenceFor`.
+  3. **The reset-by-keying property (the reviewer's finding, pinned mechanically):** on one shared
+     map, `chapterQuizState(m, 1).done = true` leaves `chapterQuizState(m, 2)` at
+     `{ started: false, done: false }` — chapter 2's quiz runs even after chapter 1's finished;
+     and `chapterQuizState(m, 1)` returns the SAME object both times (`strictEqual`), so the
+     started-guard actually guards.
+- non-goals: no change to `wordTapBody`, `sentenceFor`, `renderQuestion`, the popup, `log-check`,
+  the glossary lookup or `renderWords`. No skip button. No new Hebrew string in `reader.js` — the
+  quiz brings its own. APPEND to `tests/reader-ui.test.js`; edit or delete nothing in it.
+- tier: WORKER. · depends on: 4.2 COMMITTED. (Independent of 4.3 — disjoint write sets — but
+  sequenced after so the ledger steps cleanly.)
+
+**STEP 4.5 — bump the shell so the new modules exist offline**
+- goal: `CACHE` is `magic-vet-v13` and both new modules are precached, so a returning device does
+  not serve a stale shell and an offline launch does not go blank.
+- files: `public/sw.js`, `tests/shell.test.js`. No others.
+- commands: none — direct file edits.
+- validation (frozen):
+  ```bash
+  set -o pipefail
+  node --check public/sw.js || { echo "FAIL: node --check"; exit 1; }
+  grep -qF 'magic-vet-v13' public/sw.js || { echo "FAIL: no v13"; exit 1; }
+  if grep -qF 'magic-vet-v12' public/sw.js; then echo "FAIL: v12 still present"; exit 1; fi
+  grep -qF '"/quiz-core.js"' public/sw.js || { echo "FAIL: quiz-core not precached"; exit 1; }
+  grep -qF '"/quiz.js"' public/sw.js || { echo "FAIL: quiz not precached"; exit 1; }
+  out=$(npm test 2>&1) || true
+  case "$out" in *'# pass 277'*) ;; *) echo "FAIL: not 277"; exit 1;; esac
+  case "$out" in *'# fail 0'*)   ;; *) echo "FAIL: failures";  exit 1;; esac
+  changed=$(git status --porcelain -- . ':(exclude).oplan' | awk '{print $NF}' | sort | tr '\n' ' ')
+  [ "$changed" = "public/sw.js tests/shell.test.js " ] || { echo "FAIL: [$changed]"; exit 1; }
+  echo STEP-4.5-OK
+  ```
+- contracts: QZ-22, quoted verbatim — the exact `CACHE` string and the exact 14-entry `PRECACHE`
+  array in that exact order. In `tests/shell.test.js`, change exactly two things: the
+  `assert.ok(sw.includes('magic-vet-v12'))` literal becomes `'magic-vet-v13'`, and the
+  `deepStrictEqual` array gains `'/quiz-core.js'` and `'/quiz.js'` after `'/words-index.js'`.
+  **Test count does not move** — this step adds no test.
+- non-goals: no other `sw.js` change — the install/activate/fetch handlers are untouched. No
+  `public/quiz/*.json` in `PRECACHE`: it is DATA and stays out (QZ-7), it is fetched at runtime
+  like the audio, and 50 files would bloat the install. No other edit to `shell.test.js` — the
+  manifest, `node --check` and token tests stay byte-identical.
+- tier: WORKER. · depends on: 4.3 AND 4.4 COMMITTED (the modules must actually be imported by
+  precached views before the shell claims to precache them).
+
+**STEP 4.6 — the child-experience pass, by a worker that did NOT write the code**
+- goal: an agent given only the CONTRACTS and the acceptance criteria — never steps 4.1-4.5's
+  packets — cannot make the quiz misbehave, and criteria 3, 4 and 5 have evidence that does not
+  come from the author of the thing being tested.
+- files: `tests/quiz-experience.test.js` (NEW) ONLY.
+- commands: none — direct file edits. It MAY temporarily mutate implementation files to produce
+  fail-first evidence and MUST restore them.
+- validation (frozen):
+  ```bash
+  set -o pipefail
+  git diff --quiet public/ lib/ api/ || { echo "FAIL: implementation not restored"; exit 1; }
+  out=$(npm test 2>&1) || true
+  case "$out" in *'# pass 282'*) ;; *) echo "FAIL: not 282"; exit 1;; esac
+  case "$out" in *'# fail 0'*)   ;; *) echo "FAIL: failures";  exit 1;; esac
+  ep=$(node --test tests/quiz-experience.test.js 2>&1) || true
+  case "$ep" in *'# pass 5'*) ;; *) echo "FAIL: not 5 episodes"; exit 1;; esac
+  changed=$(git status --porcelain -- . ':(exclude).oplan' | awk '{print $NF}' | sort | tr '\n' ' ')
+  [ "$changed" = "tests/quiz-experience.test.js " ] || { echo "FAIL: [$changed]"; exit 1; }
+  [ ! -e .data/profile.json ] || { echo "FAIL: real data dir written"; exit 1; }
+  echo STEP-4.6-OK
+  ```
+  The restore check is `git diff --quiet public/ lib/ api/`, run by the ORCHESTRATOR — never a
+  self-reported hash, since a worker hashing its own file after mutating it proves nothing.
+- contracts: QZ-17, QZ-18 and acceptance criteria 3/4/5, quoted verbatim. The packet must also
+  QUOTE `withTempDataDir`, `createMockRes`, `createPostReq` and a `withOpenGate` helper verbatim
+  (same reason as 4.2). **Every episode drives the REAL `api/profile.js` handler** through an
+  injected `post` that builds a mock req/res against a temp `DATA_DIR`, and asserts possession
+  through `knownLemmaSet` from `lib/vocab.js`, never through the raw `status` string — the set is
+  what `buildAllowedSet` consumes and the string is only what we wrote.
+  **EVERY episode must be observed FAILING against a MUTATED implementation first, and the report
+  must carry the mutation and its failing output.** A test never seen to fail is not evidence.
+- the 5 frozen episodes:
+  1. **Two sittings, two ids (criterion 3).** Two `startQuiz` calls give different `sessionId`s;
+     within one sitting three answers all carry one id. Suggested mutation: hoist the session to
+     module scope.
+  2. **Three wrong answers in one sitting cost ONE strike, not the word (D16).** After three
+     wrong answers in a single sitting the word is still in `knownLemmaSet` and `strikes === 1`.
+     Suggested mutation: mint a new id per question.
+  3. **Three wrong answers in three sittings take the word back, AND she is told (criterion 5).**
+     `knownLemmaSet` loses it, and the HTML written to the container on the third answer contains
+     `המילה הזאת חוזרת ללמידה, נלמד אותה שוב יחד` and the word. Suggested mutation: hardcode
+     `demoted = false`.
+  4. **A missing item is silence (criterion 4).** Three candidates, the middle one 404s: two
+     questions are asked, nothing throws, and the profile records no answer for the missing word.
+     Suggested mutation: make `loadItem` throw instead of returning null.
+  5. **A word mid-demotion is asked first (obligation 4).** A profile built by real handler calls
+     — one word at 1 strike, one flagged `needsReview`, one quizzed long ago, one never quizzed —
+     comes back from `pickQuizWords` in the frozen order. Suggested mutation: drop the `strikes`
+     clause from the comparator.
+  **On independence, honestly:** the other workers' test files are in the repo and `npm test`
+  runs them, so "forbidden to copy" is unenforceable by any command. The teeth are the mutation
+  evidence — a copied assertion that was never seen to fail cannot produce it.
+  It may NOT fix a defect it finds. It REPORTS; the orchestrator re-opens the owning step.
+- non-goals: no change to any implementation file that survives the step. No new npm dependency.
+  No DOM library — the fake container is `{ innerHTML: '', querySelector: () => null,
+  querySelectorAll: () => [] }` and answers are driven through `session.answer()`.
+- tier: WORKER — but it MUST be a different worker instance from 4.1-4.5, given the contracts and
+  the criteria and never those steps' packets. That independence is the entire value of the step.
+- depends on: 4.5 COMMITTED.
+
+### DECISIONS TAKEN AT PLAN TIME (fresh planner proposed, orchestrator ratified — Rule 2)
+
+ (a) only `known` words are quizzed — design.md: "the quiz exists to check words SHE CLAIMS"; a
+     `learning` word cannot be demoted (phase-3 blocker 4) nor promoted (D13).
+ (b) "recently claimed" is dropped and approximated by `lastSeen` — the skeleton's obligation 3
+     explicitly permitted dropping it provided phase 4 says so, which the plan does.
+ (c) the after-chapter quiz auto-starts and gates `המשך הסיפור` — D10's stated reason for
+     choosing that slot was "without her opting in". Reversible in one line of `afterChapterStage`;
+     put before the owner in words at criterion 11.
+ (d) a wrong answer reveals the right word and there is no retry — the answer is recorded
+     server-side on the first choice, so a retry would teach her that a second guess counts.
+ (e) the words-view sitting is also 4 questions — D17 fixes 4 for the chapter check and the
+     record gives no other number.
+
+### RISKS
+
+ · **The session id is constant and every gate stays green.** The one failure phase 3 could not
+   see. If `startQuiz` were rewritten to hoist the session, every word becomes permanently
+   un-strikeable, D1's demotion never fires, and NOTHING goes red. Guarded by criterion 3, by 4.2
+   test 6, by 4.6 episode 1 written by a different agent, and by a mandatory mutation.
+ · **She ships into an empty quiz, and it looks broken.** D23 froze the bank at the 50 pilot
+   words; her actually-claimed words may include NONE of them until the first top-up runs. Then
+   the launcher never appears and the after-chapter check silently skips. Correct behaviour that
+   looks like a dead feature. **Mitigation: the first top-up (PHASE 2's recurring operation) must
+   run before or with the deploy — now written into the PHASE 6 skeleton as a criterion.**
+ · **A bad item marks her wrong for being right.** Still the worst outcome, still not mechanically
+   detectable, and phase 4 is what makes it reach her. The owner's chosen mitigation is D22's
+   gloss; criterion 11 shows the owner the actual assembled screen, gloss and options together.
+ · **The auto-starting after-chapter quiz feels like a gate she resents.** Deliberate (D10) and
+   reversible in one line. Put to the owner in words at criterion 11 rather than discovered from
+   her reaction.
+ · **A blank page offline.** A new first-party module statically imported by a precached view and
+   left out of `PRECACHE` breaks the whole module graph. Guarded by step 4.5 and criterion 10.
+ · **D24's counters double-count.** A re-render that re-POSTs would silently inflate
+   `quizRight`/`quizWrong`, and nothing reads them yet, so it would surface months later in a
+   parent view showing nonsense. Guarded by the once-per-question rule and 4.2 test 6.
+ · **`quiz-core.js` drifts from `lib/vocab.js`.** The forced three-line duplication of
+   `knownLemmaSet`. Guarded by 4.1 test 2 importing both and diffing them.
+ · **An existing frozen test gets edited rather than appended to.** Steps 4.3/4.4/4.5 all touch
+   pre-existing test files. Guarded by criterion 6's explicit deletion check and by each step's
+   non-goals naming what must stay byte-identical.
+ · **No phase ever renders in a real browser.** Every UI assertion in this repo is a string
+   returned by a function; QZ-7 forbids opening a browser on production. If the CSS or RTL layout
+   is wrong, nothing in this plan catches it. Criterion 11's transcript is the closest substitute;
+   the owner's first look at the deployed app (phase 6) is the real one. Stated, not hidden.
 
 ## PHASE 5 SKELETON — G1 candidates
 
@@ -826,6 +1417,18 @@ irreversible act in this whole run.
 
 Second criterion: a post-deploy `GET /api/profile` against production must return 200 and validate
 — the only check that ever runs against her REAL data rather than a fixture.
+
+Third criterion (record gap found by the phase-4 planner): **the FIRST TOP-UP runs before or with
+the deploy.** The bank holds only the 50 pilot words; her actually-claimed words may include none
+of them, and then phase 4 ships fully green and completely inert — the launcher never appears and
+the after-chapter check silently skips. The top-up is PHASE 2's recurring operation, run once,
+seeded from her real profile's `known` words. Without this criterion no phase owns it.
+
+Chores at deploy time, so they are not lost between phases: update `docs/growth.md`'s "Promotion
+is one-way; nothing in this design ever demotes" line (it becomes false the moment phase 4 ships —
+already a QZ-13 note, repeated here because phase 6 is where it is due); and note that the owner's
+first look at the deployed app is the run's ONLY real-browser check — every UI assertion in this
+repo is a string returned by a function, so CSS/RTL layout defects are invisible until then.
 
 
 The recipe in `.oplan/word-audio/journal.md`: record the outgoing deployment via `vercel inspect`
