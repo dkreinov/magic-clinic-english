@@ -124,14 +124,14 @@ test('the REAL public/quiz/ bank gates green', () => {
   assert.equal(Number(ok[1]), 50, 'the shipped bank is 50 files');
   assert.ok(Number(ok[2]) >= 50, `50 files must carry at least 50 items, got ${ok[2]}`);
 
-  // Rule 11 is deliberately DOWNGRADED to a warning while 8 shipped glosses are
-  // still being rewritten (see DEFERRED_RULE in the gate). The count is asserted
-  // to be reported, not to be any particular number, so that fixing the glosses
-  // drives it to 0 without touching this test -- and so that the day the rule is
-  // promoted to a hard failure, this test is what proves the bank survived it.
+  // Rule 11 was briefly deferred to a warning while the 8 pre-D22 glosses were
+  // rewritten. It is now armed, so this test carries the whole claim: the bank
+  // she actually reads passes EVERY rule, including that every gloss D22 puts in
+  // front of her is in her own vocabulary. This is the test the audit found
+  // missing -- before it existed, `npm test` was green with public/quiz/ deleted.
   assert.ok(
-    /RULE-11 PENDING: \d+ items/.test(result.stdout),
-    `the deferred-rule count must be reported, got:\n${result.stdout}`
+    !/RULE-11 PENDING/.test(result.stdout),
+    `rule 11 must be armed, not deferred, got:\n${result.stdout}`
   );
 });
 
