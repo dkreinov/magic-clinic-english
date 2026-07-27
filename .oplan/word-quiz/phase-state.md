@@ -28,8 +28,11 @@ ACCEPTED: 1.1 (lib/quiz-item.js + tests/quiz-item.test.js; STEP-1.1-OK re-run by
 CARRY INTO PHASE 2 — the four things phase 1 learned that no gate can enforce:
   · D21 (owner): distractors are SAME-CLASS, so the item tests meaning and not word class.
   · THE PIN TEST: `and`/`but` pin NOTHING. Only `so`, `so that`, `so ... that`, `because`,
-    `... enough to`, purpose infinitives and verb/argument selection constrain the blank. Five of
-    the first 23 items pinned with an `and`/`but` and every one leaked.
+    `... enough to`, purpose infinitives and verb/argument selection constrain the blank. SIX of the
+    first 23 D21 items pinned with a coordinator: four leaked outright (`run[1] play[0] play[1]
+    right[1]`) and two were weak (`kind[0] well[1]`). This is NOT a ban on the words — 11 of the
+    final 71 items contain an `and`/`but` and are fine, because something else is doing the
+    pinning. The rule is that a coordinator may never be the ONLY pin.
   · AMBIGUITY IS THE FAILURE, not difficulty. `count` in "___ four and five, the answer is nine"
     and `because` in "played the piano ___ I was seven" were both rejected for having a readable
     second meaning, not for fitting outright.

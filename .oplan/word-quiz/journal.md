@@ -224,8 +224,18 @@ lets `clean` through, and `"...so her answer is ___."` lets `clear` through. The
 constrain the blank not at all; only `so`, `so that`, `so ... that`, `because`, `... enough to`,
 purpose infinitives and verb/argument selection do. Handed back as a test — *does this distractor
 make the sentence FALSE, or merely describe something else that is also possible?* — it found
-three more genuine escapes and four weak pins that neither of us had seen. Five of the original 23
-items had an `and` or a `but` as their only pin and every one of them leaked.
+three more genuine escapes and four weak pins that neither of us had seen.
+
+CORRECTED ON AUDIT: I first wrote "five of the original 23 items pinned with an `and`/`but` and
+every one leaked". That was repeated from the worker's summary without being counted, and it is
+wrong twice over. Reconstructed from its own itemised report: **SIX** items pinned with a
+coordinator — `run[1]`, `play[0]`, `play[1]`, `right[1]` leaked outright, and `kind[0]`, `well[1]`
+used `but` and were weak rather than leaking. `right[0]` leaked too but for an unrelated reason (a
+second axis, clarity/difficulty, that the sentence never closed). Note also that the intermediate
+draft was never committed, so this rests on the worker's report and cannot be re-derived from git;
+that is itself a process gap worth avoiding in phase 2. Making the same
+number-repeated-without-measuring mistake the planning phase logged three times is not a good look,
+which is exactly why the audit ran.
 
 Frozen into QZ-2 as the pin test. Final batch 1: 23 items, gate green, 10 of 10 words multi-sense,
 zero irregular give-aways, and no distractor I can find that fits its blank.

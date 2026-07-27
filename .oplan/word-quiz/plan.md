@@ -153,8 +153,11 @@ own siblings or compare their senses.
   `"My mother will ___ the shop and choose what to sell."` lets `clean` straight through, because
   cleaning the shop AND choosing the stock is a perfectly good sentence. Only **`so`, `so that`,
   `so ... that`, `because`, `... enough to`, purpose infinitives (`to catch the bus`), and
-  verb/argument selection** actually constrain the blank. Discovered at the batch-1 gate: the first
-  pass shipped five items whose pin was an `and` or a `but`, and every one of them leaked.
+  verb/argument selection** actually constrain the blank. Discovered at the batch-1 gate: six of
+  the first 23 D21 items pinned with a coordinator — four leaked outright and two were merely weak.
+  **This is not a ban on the words.** 11 of the final 71 items contain an `and` or a `but` and are
+  fine, because something else does the pinning. The rule is that a coordinator may never be the
+  ONLY pin.
 - Age-appropriate for an 11-year-old girl. **If a word cannot be given an age-appropriate sentence,
   STOP and return the question. Do not guess.** The 37 words the owner ruled out are already gone
   (QZ-8), so this should not fire — but it stays as the backstop, because a list written in advance
