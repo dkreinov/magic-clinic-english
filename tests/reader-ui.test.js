@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { sentenceFor } from '../public/views/reader.js';
+import { sentenceFor, afterChapterStage, chapterQuizState } from '../public/views/reader.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
@@ -132,4 +132,71 @@ test('reader.js resolves the printed word against the manifest', () => {
   assert.ok(src.includes('resolveLemma'), 'reader must resolve the tapped word');
   assert.ok(src.includes('getAllowedSet'), 'reader must load the manifest');
   assert.ok(src.includes('activePopup.canSay'), 'the button is conditional on having a clip');
+});
+
+// Step 4.4. The after-chapter check of 4 words.
+test('afterChapterStage follows the frozen decision table', () => {
+  assert.strictEqual(
+    afterChapterStage({ doneAll: false, quizDone: false, lemmaCount: 5 }),
+    'questions',
+    'not done answering questions yet'
+  );
+  assert.strictEqual(
+    afterChapterStage({ doneAll: false, quizDone: true, lemmaCount: 0 }),
+    'questions',
+    'doneAll=false always wins regardless of the other two'
+  );
+  assert.strictEqual(
+    afterChapterStage({ doneAll: true, quizDone: true, lemmaCount: 5 }),
+    'celebrate',
+    'quiz already done'
+  );
+  assert.strictEqual(
+    afterChapterStage({ doneAll: true, quizDone: false, lemmaCount: 0 }),
+    'celebrate',
+    'nothing to ask -- she is NEVER blocked'
+  );
+  assert.strictEqual(
+    afterChapterStage({ doneAll: true, quizDone: false, lemmaCount: 5 }),
+    'quiz',
+    'questions done, quiz not done, words available'
+  );
+  assert.strictEqual(
+    afterChapterStage({ doneAll: true, quizDone: false, lemmaCount: 1 }),
+    'quiz',
+    'one word is still enough to run the quiz'
+  );
+});
+
+test('reader.js wires the after-chapter quiz: imports, exports, slot, and existing hooks', () => {
+  const src = readFileSync(viewPath, 'utf8');
+  for (const needle of [
+    '../quiz.js',
+    '../quiz-core.js',
+    'startQuiz',
+    'pickQuizWords',
+    'knownSetFromProfile',
+    'afterChapterStage',
+    'chapterQuizState',
+    'reader-quiz-slot',
+    'wordTapBody',
+    'sentenceFor',
+  ]) {
+    assert.ok(src.includes(needle), `reader.js should include "${needle}"`);
+  }
+});
+
+test('chapterQuizState is keyed by chapter number: a fresh chapter gets a fresh quiz', () => {
+  const m = {};
+  chapterQuizState(m, 1).done = true;
+  assert.deepStrictEqual(
+    chapterQuizState(m, 2),
+    { started: false, done: false },
+    "chapter 2's quiz must run even after chapter 1's finished"
+  );
+  assert.strictEqual(
+    chapterQuizState(m, 1),
+    chapterQuizState(m, 1),
+    'the same chapter must return the SAME object on a second call, so a started-guard actually guards'
+  );
 });

@@ -1,6 +1,8 @@
 import { getJson, postJson } from "../api.js";
 import { resolveLemma } from "../lemma.js";
 import { getAllowedSet } from "../words-index.js";
+import { startQuiz } from "../quiz.js";
+import { pickQuizWords, knownSetFromProfile } from "../quiz-core.js";
 
 const CHAPTER_BANNERS = { 0: "chapter-night", 1: "chapter-clinic", 2: "chapter-forest" };
 
@@ -286,6 +288,23 @@ export function sentenceFor(text, word) {
   return "";
 }
 
+// Frozen decision table: she is NEVER blocked from continuing the story --
+// if there is nothing to ask (lemmaCount=0), 'celebrate' wins even though the
+// quiz has not run.
+export function afterChapterStage({ doneAll, quizDone, lemmaCount }) {
+  if (!doneAll) return "questions";
+  if (quizDone) return "celebrate";
+  if (lemmaCount === 0) return "celebrate";
+  return "quiz";
+}
+
+// Keyed by chapter number so a fresh chapter always gets a fresh quiz -- a
+// flat boolean here would silently skip the quiz on chapter 2 onward.
+export function chapterQuizState(quizState, n) {
+  if (!quizState[n]) quizState[n] = { started: false, done: false };
+  return quizState[n];
+}
+
 function findInGlossary(chapter, dataWord) {
   if (!chapter || !Array.isArray(chapter.glossary)) return null;
   for (const g of chapter.glossary) {
@@ -305,12 +324,16 @@ export async function render(container, ctx) {
   let genError = false;
   let activePopup = null; // { lemma, surface, he, saved, canSay }
   let allowedWords = new Set();
+  let lemmas = [];
+  let knownSet = new Set();
 
   async function boot() {
     draw();
     try {
       allowedWords = await getAllowedSet();
       profile = await getJson("/api/profile");
+      lemmas = pickQuizWords(profile, 20);
+      knownSet = knownSetFromProfile(profile);
       decideStage();
     } catch (err) {
       stage = "error";
@@ -425,6 +448,7 @@ export async function render(container, ctx) {
   }
 
   const checkState = {};
+  const quizState = {};
 
   function questionState(q) {
     const key = q.id;
@@ -493,10 +517,13 @@ export async function render(container, ctx) {
     const bannerName = CHAPTER_BANNERS[chapter.n % 3];
     const questionsHtml = chapter.questions.map((q) => renderQuestion(chapter, q)).join("");
     const doneAll = allQuestionsCorrect(chapter);
-    const celebrateHtml = doneAll
+    const qs = chapterQuizState(quizState, chapter.n);
+    const stage = afterChapterStage({ doneAll, quizDone: qs.done, lemmaCount: lemmas.length });
+    const quizHtml = stage === "quiz" ? `<div class="reader-quiz-slot"></div>` : "";
+    const celebrateHtml = stage === "celebrate"
       ? `<img class="celebrate-image" src="/assets/celebration.webp" alt="" />`
       : "";
-    const continueHtml = doneAll
+    const continueHtml = stage === "celebrate"
       ? `<button class="btn btn-primary" type="button" data-action="continue-story">המשך הסיפור</button>`
       : "";
 
@@ -510,6 +537,7 @@ export async function render(container, ctx) {
         <div class="reader-text" dir="ltr">${renderWords(chapter.text)}</div>
       </div>
       ${questionsHtml}
+      ${quizHtml}
       ${celebrateHtml}
       ${continueHtml}
       ${renderPopup()}
@@ -687,6 +715,24 @@ export async function render(container, ctx) {
       popup.addEventListener("click", (ev) => {
         ev.stopPropagation();
       });
+    }
+
+    const slot = container.querySelector(".reader-quiz-slot");
+    if (slot) {
+      const chapter = latestChapter();
+      const qs = chapterQuizState(quizState, chapter.n);
+      if (!qs.started) {
+        qs.started = true;
+        startQuiz(slot, {
+          lemmas,
+          knownSet,
+          count: 4,
+          onDone: () => {
+            qs.done = true;
+            draw();
+          },
+        });
+      }
     }
   }
 
