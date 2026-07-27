@@ -5,9 +5,14 @@ CURRENT: **PHASE 1 CLOSED 2026-07-27 (second attempt), owner approved. All 9 cri
   2217 up front was measured at ~55M tokens / ~45 agent-hours against a top-up cost of ~9k tokens
   and ~70 s per word. Top-ups run WEEKLY, not daily.
 
-  NEXT ACTION: **PLAN PHASE 3 (the profile side). Do NOT dispatch it yet.** plan.md holds only a
-  skeleton for it. Per oplan it gets a fresh next-phase planner working from files alone, then my
-  review, then a plan reviewer, and only then execution.
+  NEXT ACTION: **EXECUTE PHASE 3, starting at step 3.1.** It is planned in full in plan.md
+  (`## PHASE 3 — the profile side`): 9 acceptance criteria, contracts QZ-9..QZ-16, five steps, and
+  the frozen per-step assertion lists. A fresh planner drafted it from files alone; a plan reviewer
+  attacked it TWICE, finding 23 defects (12 `undecided`), all fixed — see journal "PHASE 3 PLAN
+  REVIEW". Blockers 2/3/4/5/7 decided by the orchestrator, 1 and 6 by the owner (D24, D25).
+  **BEFORE step 3.4 the orchestrator must write `.oplan/word-quiz/transcript.mjs` AND
+  `transcript-expected.txt` itself** (QZ-16) — the owner's gate must not rest on a command the
+  implementer wrote.
   Two known chores: the field guide is 54 lines against a 40-line budget, and
   criterion-9-sample.txt should be regenerated whenever the bank changes.
 

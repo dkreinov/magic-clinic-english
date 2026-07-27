@@ -393,6 +393,51 @@ BLOCKERS 2, 3, 4, 5, 7 — decided by me, as orchestrator:
 BLOCKERS 1 and 6 are the owner's, not mine — one is operational and one destroys data irreversibly.
 Put to them before step 3.1 is dispatched.
 
+## PHASE 3 PLAN REVIEW — two rounds, 23 findings, all fixed (2026-07-27)
+
+The plan reviewer earned its keep twice over, and most of what it found was mine.
+
+**Round 1 — 13 findings, 6 of them `undecided`.** The sharpest: QZ-12's table had "wrong, new
+session" and "reaching 3" both matching the SAME event with contradictory cells, and if `deleted`
+won, the demoting session was re-armed so a 4th wrong answer in that sitting would strike again —
+breaking the very rule (D16) the contract exists to enforce. Also: `lastQuizAt` was defined in QZ-9,
+required by phase-4 ordering, and **written by no row of the state machine** — I dropped the column
+while rewriting the table to add D24's counters. And criterion 8 used `grep -c PASS`, which returns
+**53**, not 52 — the identical bug that had already cost me a debug earlier in this same run.
+
+**Round 2 — 10 more, after I claimed to have fixed round 1.** Twelve of thirteen fixes landed; the
+rest were new holes I created or patches that only looked like fixes:
+
+- **`== 3` should be `>= 3`.** QZ-9 stores `strikes: 99` as valid and QZ-14's `max` can carry it
+  through a merge, so an `== 3` branch leaves such a word matching NO row — **permanently
+  un-demotable, silently**, a fail-open in the one function whose whole job is to demote.
+- **Row 5 was a backfill in disguise.** VERIFIED in `public/views/words.js:150`: the claim button
+  renders only for `status === "learning"`, so re-claiming a `known` word is unreachable. Row 5's
+  only real effect was adding `strikes: 0` to old entries on the hottest write path — contradicting
+  QZ-9's no-backfill promise. Now it DELETES.
+- **My criterion 6 command could never pass.** `git diff` is blind to untracked files (verified) and
+  five of the seven expected files are new, so it would report an empty set and pass on any tree.
+  Now `git status --porcelain`.
+- **My D25 patch was trivial.** I had added "an old-shape entry survives `migrateWordKeys`
+  byte-identically" — but a non-merging entry already survives via `{...entry}` and
+  `tests/profile-mutations.test.js:184` already asserts it, while a merging one cannot survive
+  byte-identically at all (`taps` sum). The real direction is the inverse: a NEW-shape entry as the
+  NON-surviving side, losing all six keys to the named-fields-only branch. Plus a real GET over an
+  old-shape profile in 3.4, since `loadProfile → migrateWordKeys → saveProfile` is the only path
+  that ever touches her file.
+- **The ledger fix was displacement, not a fix.** Freezing a count before any assertion list exists
+  just moves the problem to packet time, where the list gets fitted to the number by whoever set it.
+  The lists are now frozen IN THE PLAN and the counts are their length.
+- **QZ-16's "expected reading" was prose.** Comparing a transcript against a paraphrase is still a
+  judgement call — exactly the failure that closed phase 1 on a false assurance. The literal expected
+  stdout is now frozen beside the script and diffed before the owner sees anything.
+
+**And I did the thing the field guide warns about.** A probe command exited non-zero at a `grep -c`
+that legitimately returned 0, so its trailing `rm -f` never ran, and the next `git add -A` swept
+`tests/__probe.test.js` into commit 71e666b. Removed in 96c850c. Lesson 6 says never write scratch
+into the repo; I wrote it into the repo and then committed it. The `&&`-chain-with-a-counting-grep
+is the specific trap — `grep -c` returning 0 is a *successful* count, not a failure, but it exits 1.
+
 ## D20 — the owner cut 37 words from the quiz
 
 Asked how ~50 sensitive words should be handled, the owner answered "dont need these words there
