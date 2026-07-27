@@ -436,13 +436,18 @@ everything she has collected. Planned as a data-integrity phase, not a feature p
    The reviewer found the earlier draft only diffed `public data docs assets scripts package.json`,
    so an edit to `lib/vocab.js` or **a DELETED existing test** (the cheapest way to make a ledger
    land) would have passed every criterion. FROZEN:
+   **`git diff` is BLIND to untracked files — VERIFIED — and five of the seven expected files are
+   NEW, so a `git diff`-based check would report an empty set and pass on any tree. Use
+   `git status --porcelain`, which sees them.**
    ```bash
-   changed=$(git diff --name-only <base> -- . ':(exclude).oplan' | sort | tr '\n' ' ')
+   changed=$(git status --porcelain -- . ':(exclude).oplan' | awk '{print $NF}' | sort | tr '\n' ' ')
    expected='api/profile.js lib/profile.js tests/api-profile-quiz.test.js tests/profile-quiz-answer.test.js tests/profile-quiz-retap.test.js tests/profile-quiz-scenario.test.js tests/profile-quiz-schema.test.js '
-   [ "$changed" = "$expected" ] || { echo "FAIL: $changed"; exit 1; }
-   [ "$(git diff --diff-filter=D --name-only <base> -- . | wc -l)" = "0" ] || { echo "FAIL: a file was DELETED"; exit 1; }
+   [ "$changed" = "$expected" ] || { echo "FAIL: [$changed]"; exit 1; }
+   [ -z "$(git status --porcelain -- . ':(exclude).oplan' | grep '^ *D')" ] || { echo "FAIL: a file was DELETED"; exit 1; }
    echo CRIT-6-OK
    ```
+   Run it against the working tree BEFORE committing the phase. Deleting an existing test is the
+   cheapest way to make a ledger land, which is why the deletion check is separate and explicit.
 7. `.data/profile.json` does not exist and no step ran a server against the real data dir.
 8. `node scripts/check-contrast.mjs` exits 0, prints `ALL PASS`, and **`grep -c '^PASS'` is exactly
    52** (QZ-7). The anchor is load-bearing: a naive `grep -c PASS` returns **53**, because the
@@ -464,11 +469,22 @@ still asserts a profile in today's shape validates". The plan reviewer showed th
 sounds: **`validateProfile` is NEVER called at runtime** (verified), so proving it accepts an old
 shape proves nothing about the path that actually loads her file. The real breaking direction is
 `GET` → `migrateWordKeys` → `saveProfile`, which RUNS on every load and copies **named fields only**.
-So step 3.2's QZ-14 test **must include an old-shape entry** — one carrying none of the six new keys,
-plus a `context` — and assert it survives `migrateWordKeys` byte-identically. That is one assertion
-inside a test the step already needs; it is not the end-to-end criterion the owner cut, and it covers
-the direction that can actually destroy her data. Recorded here so the closure summary is TRUE —
-phase 1 closed once on a summary that was not.
+My first attempt to patch this was rejected by the plan reviewer as trivial: an old-shape entry that
+does NOT merge already survives via `{...entry}` and `tests/profile-mutations.test.js:184` already
+asserts it, while one that DOES merge cannot survive byte-identically (`taps` sum). **Two real
+assertions replace it:**
+
+- **step 3.2** — a NEW-shape entry as the NON-SURVIVING side of a merge must not lose its six keys
+  (the named-fields-only branch is exactly where they would vanish). This is the inverse of what I
+  first wrote, and it is the direction that actually destroys data.
+- **step 3.4** — write an OLD-SHAPE profile into the temp `DATA_DIR`, issue a real `GET`, and assert
+  the stored bytes are UNCHANGED and no save occurred. `loadProfile → migrateWordKeys → conditional
+  saveProfile` is the only path that ever touches her file, and a lib-level test proves the function,
+  not the path.
+
+Both fit inside budgets the steps already have. This is NOT the elaborate end-to-end criterion the
+owner cut under D25 — it is the minimum that makes the closure summary TRUE, and phase 1 closed once
+on a summary that was not.
 
 ### NEW FROZEN CONTRACTS
 
@@ -531,9 +547,9 @@ mutually exclusive on the resulting count.)
 |---|---|---|---|---|---|---|---|
 | 1 | correct (D15) | set 0 | unchanged — **never promotes** (D13) | set false | **delete** | set `now` | `quizRight`+1 |
 | 2 | wrong, new session, result **< 3** | +1 | unchanged | set false | set `sessionId` | set `now` | `quizWrong`+1 |
-| 3 | wrong, new session, result **== 3** (D1) | set 0 | `known`→`learning`; `learning` stays | set false | **set `sessionId`** | set `now` | `quizWrong`+1 |
+| 3 | wrong, new session, result **>= 3** (D1) | set 0 | `known`→`learning`; `learning` stays | set false | **set `sessionId`** | set `now` | `quizWrong`+1 |
 | 4 | wrong, same session (D16) | unchanged | unchanged | set false | unchanged | set `now` | `quizWrong`+1 |
-| 5 | `mark-known`, entry EXISTS (re-claim, D2) | set 0 | set `known` | set false | **delete** | unchanged | untouched |
+| 5 | `mark-known`, entry EXISTS (re-claim, D2) | **delete** | set `known` | **delete** | **delete** | unchanged | untouched |
 | 6 | `mark-known`, NO entry (first claim) | **key not added** | `known` | **key not added** | **key not added** | **key not added** | **not added** |
 | 7 | `word-tap` on `known` (D11) | untouched | untouched | set **true** | untouched | untouched | untouched |
 | 8 | `word-tap` on `learning`/new | untouched | untouched | **key not added** | untouched | untouched | untouched |
@@ -543,9 +559,29 @@ appear at all** (absent ≠ false, and it is what keeps existing entries byte-id
 what resolves the contradiction the reviewer found between row 5 and QZ-9's no-backfill rule: a
 FIRST claim creates the frozen 6-key entry and nothing more.
 
+**Row 3 is `>= 3`, NOT `== 3`.** QZ-9 stores `strikes: 99` as valid (range-lenient) and QZ-14's
+`max` can carry a large value through a merge, so an `== 3` branch would leave such a word matching
+NO row and therefore **permanently un-demotable, silently** — a fail-open in the one function whose
+entire job is to demote. Found by the plan reviewer on the second pass.
+
 **Row 3 keeps `lastStrikeSession = sessionId`, deliberately.** Deleting it at the demotion would
 re-arm that same session and let a 4th wrong answer in the same sitting strike the freshly demoted
 word — two strikes in one session, exactly what D16 forbids.
+
+**Row 5 DELETES rather than zeroes, and that is not cosmetic.** VERIFIED in
+`public/views/words.js:150`: the claim button renders only when `status === "learning"`, so
+re-claiming a `known` word is unreachable from the UI. Row 5's only real production effect is
+therefore what it does to OLD-SHAPE entries on the app's hottest write path — and "set 0 / set
+false" would quietly add the new keys to entries that never had them, i.e. **a backfill by another
+name, contradicting QZ-9.** Deleting is behaviourally identical for every reader (absent means 0,
+absent means false) and keeps the no-backfill promise literally true. A step-3.2 test must assert
+the keys are ABSENT, not zero.
+
+**`now` is OPTIONAL and defaults inside the lib** to `new Date().toISOString()`, exactly as every
+sibling mutator behaves. The handler does NOT pass it; tests DO, so they stay deterministic. Frozen
+because the reviewer found the gap: if the lib had required it and the handler omitted it,
+`lastQuizAt` would be assigned `undefined`, `JSON.stringify` would drop the key, and the field this
+whole fix exists to create would silently never be written.
 
 `0 ≤ strikes ≤ 2` after any answer — it means "failures since the last pass, claim or demotion".
 Resetting at the demotion is what makes D15's "three failures with no success between" true and
@@ -574,7 +610,14 @@ earlier draft undefined for `undefined` operands; this closes it.
 | `needsReview` | OR | key not added |
 | `quizRight`, `quizWrong` | **sum** | key not added |
 | `lastQuizAt` | the later parseable date; if only one is parseable, that one | key not added |
-| `lastStrikeSession` | the one belonging to the entry with the later `lastQuizAt`; **if neither entry has a parseable `lastQuizAt`, prefer the SURVIVING entry's own value** | key not added |
+| `lastStrikeSession` | the one belonging to the entry with the later `lastQuizAt`; **if neither has a parseable `lastQuizAt`, keep `existing`'s own value** — `existing` being the base object the merge accumulates onto, NOT "the lemma" and NOT the alphabetically-first key, which need not be either | key not added |
+
+**THE DANGEROUS MERGE DIRECTION is a NEW-shape entry arriving as the NON-surviving side** — the
+branch copies named fields only, so all six new keys vanish unless QZ-14 names them. That, not the
+old-shape case, is what a test must cover: an old-shape `existing` merged with a new-shape `entry`
+must end up carrying the new-shape entry's `strikes`, counters and flags. (The plan reviewer showed
+my first attempt at this test was trivial — a non-merging old entry already survives byte-identically
+via `{...entry}`, and `tests/profile-mutations.test.js:184` already asserts it.)
 
 Its two existing invariants stand and must be re-proved: never drops a word, and **idempotent** —
 running it twice changes nothing (which the sum rule makes non-trivial, so the test must merge, then
@@ -584,12 +627,31 @@ re-run on the merged result, and assert equality).
 `test()` calls + 5 subtests in `dev-server.test.js` = the 225 `npm test` prints, so **every new test
 must be a FLAT top-level `test()`** or the ledger stops being checkable.
 
-**ONE TEST MAY CARRY SEVERAL ASSERTIONS — and each step's packet MUST enumerate the assertions, not
-just the count.** The reviewer's point stands: an exact total with no named coverage list is an
-invitation to bundle or silently drop cases to make the number land. This is the phase-1 pattern
-("the 6 tests, one per line, each may carry several assertions") and it is only safe because the
-packet lists what must be proved. **A step whose count is hit but whose enumerated assertions are
-missing is a FAILED step, and the auditor is told to check the list, not the number.**
+**ONE TEST MAY CARRY SEVERAL ASSERTIONS. The COUNT IS DERIVED FROM THE LIST BELOW, not the other
+way round** — the reviewer's second-pass point was that freezing a number before any list exists
+just moves the problem to packet time, where the list gets fitted to the number by whoever set it.
+So the lists are frozen HERE, in the plan, and each step's count is simply their length. **A step
+that hits its count while missing a listed item is a FAILED step; the auditor is told to check the
+LIST.**
+
+- **3.1 (6):** old-shape profile validates · all six new keys with legal values validate ·
+  `strikes` rejects `"2"`/`-1`/`1.5`/`null`/`NaN` with a `words.<lemma>.strikes` prefix ·
+  `needsReview` rejects `"true"`/`1`/`null` · `lastQuizAt` unparseable and `lastStrikeSession`
+  non-string rejected · `quizRight`/`quizWrong` reject non-integers, and `strikes: 99` is VALID.
+- **3.2 (10):** rows 1-4 of QZ-12, one test each (4) · row 3 fires on a pre-existing `strikes: 99`
+  (the `>= 3` guard) · rows 5+6 — re-claim DELETES the keys, first claim adds none (`deepStrictEqual`
+  on the frozen 6-key entry) · the four throws, each leaving the profile unmodified · QZ-14's six
+  merge fields · **a NEW-shape entry as the NON-surviving merge side keeps its keys** · idempotency
+  re-run on the merged result. Every test also asserts `validateProfile(profile).ok`.
+- **3.3 (4):** re-tap a `known` word flags it · re-tap a `learning` word adds NO key · first-ever tap
+  yields the exact frozen 6-key entry · five taps on a `known` word leave it in `knownLemmaSet`.
+- **3.4 (7):** happy path persists across a GET · three wrongs / three sessions demote · three wrongs
+  / one session do not · a pass resets · the four 400s with exact strings **and byte-identical file
+  after each** · an inflected lemma 400s as `unknown word` · **an OLD-SHAPE profile survives a real
+  GET with its bytes unchanged** (the D25 replacement).
+- **3.5 (5):** all-correct week changes nothing · tapping to hear a word is not a strike · three bad
+  days demote, asserted via `knownLemmaSet` · six wrongs in one sitting do not · wrong/wrong/right/
+  wrong/wrong across five sessions never demotes (D15).
 
 **QZ-16 — the criterion-9 transcript.** **The ORCHESTRATOR writes this as a script file into
 `.oplan/word-quiz/transcript.mjs` BEFORE step 3.4 is dispatched, not a worker** — the owner's
@@ -603,10 +665,16 @@ ending with the sorted `knownLemmaSet`.
 
 FROZEN event script: claim light/fair/method · tap light ×2 · quiz light WRONG s1 ×3 · quiz light
 WRONG s2 · quiz fair RIGHT s2 · quiz light RIGHT s3 · quiz light WRONG s4/s5/s6 · quiz method WRONG
-s6. **Expected reading, written down now so the gate is a comparison and not a vibe:** the three
-wrong taps in sitting s1 cost her ONE strike, not the word; one right answer in s3 wipes the slate;
-only the three separate bad days s4/s5/s6 demote `light`; `method` sits at one strike; `fair` is
-untouched. The owner is asked one question: *is this what you want her week to feel like?*
+s6. **The LITERAL expected stdout is frozen beside the script in
+`.oplan/word-quiz/transcript-expected.txt`, and the orchestrator DIFFS the two before the output
+goes anywhere near the owner.** Prose ("one right answer wipes the slate") is a paraphrase, and
+comparing against a paraphrase is still a judgement call — which is precisely the failure that made
+phase 1 close on a false assurance. If the diff is non-empty the phase does not reach the gate.
+
+The owner then reads the transcript and answers one question: *is this what you want her week to
+feel like?* What it should show: the three wrong taps in sitting s1 cost her ONE strike, not the
+word; the right answer in s3 wipes the slate; only the three separate bad days s4/s5/s6 demote
+`light`; `method` sits at one strike; `fair` is untouched.
 
 ### STEPS
 
@@ -650,7 +718,9 @@ and the real handler, not the raw field.
 **On independence, honestly:** the other workers' test files are in the repo and `npm test` runs
 them, so "forbidden to copy" is unenforceable by any command. The teeth are the mutation evidence —
 a copied assertion that was never seen to fail cannot produce it. Stated here rather than pretended
-away. **+5 → 257.** Tier WORKER · depends on 3.4.
+away. **Like 3.4, its packet must QUOTE `withTempDataDir` and the mock req/res verbatim**, because
+it also asserts through the real handler and its file list permits only its own new test file.
+**+5 → 257.** Tier WORKER · depends on 3.4.
 
 ### RISKS
 - **A wrongful demotion — she is right and the app takes the word away.** The worst outcome. Guarded
