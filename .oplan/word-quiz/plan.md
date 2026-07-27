@@ -612,6 +612,21 @@ earlier draft undefined for `undefined` operands; this closes it.
 | `lastQuizAt` | the later parseable date; if only one is parseable, that one | key not added |
 | `lastStrikeSession` | the one belonging to the entry with the later `lastQuizAt`; **if neither has a parseable `lastQuizAt`, keep `existing`'s own value** — `existing` being the base object the merge accumulates onto, NOT "the lemma" and NOT the alphabetically-first key, which need not be either | key not added |
 
+**AMENDMENT A4 (orchestrator, at 3.2 dispatch time) — the `lastStrikeSession` row had a case with
+no answer.** It says "the one belonging to the entry with the later `lastQuizAt`". It does not say
+what happens when that winning side has a later `lastQuizAt` but **no `lastStrikeSession` at all**,
+while the losing side has one. Decided: **the winning side's value wins even when it is ABSENT — the
+merged entry then has no `lastStrikeSession`.** Not a coin-flip: row 1 DELETES `lastStrikeSession`
+and sets `lastQuizAt`, so "later `lastQuizAt`, no session id" means *the most recent thing that
+happened on that side was a PASS*, and a pass is exactly what is supposed to clear the id. Carrying
+the older side's id forward would resurrect a session a pass had already ended, and the next wrong
+answer would be silently skipped as a duplicate. The rival reading fails safe against a wrongful
+demotion, which is why it is tempting — but it does so by discarding a real event, and this one
+discards nothing.
+**Implementation trap this creates, and a test must pin it:** the `lastStrikeSession` decision reads
+BOTH sides' `lastQuizAt`, so it must be computed **before** `existing.lastQuizAt` is overwritten.
+Compute the two dates first, then assign.
+
 **THE DANGEROUS MERGE DIRECTION is a NEW-shape entry arriving as the NON-surviving side** — the
 branch copies named fields only, so all six new keys vanish unless QZ-14 names them. That, not the
 old-shape case, is what a test must cover: an old-shape `existing` merged with a new-shape `entry`

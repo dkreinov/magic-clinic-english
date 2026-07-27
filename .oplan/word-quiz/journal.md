@@ -668,3 +668,58 @@ STEP 3.1 the schema, and only the schema
   tokens: worker=50410, checker=35569
   commit: 18dbda1
   accepted: 2026-07-27
+
+### A4 — QZ-14's `lastStrikeSession` row had a case with no answer (step 3.2)
+
+Caught at dispatch time. The rule says "the one belonging to the entry with the later `lastQuizAt`",
+and says nothing about the winning side having a later `lastQuizAt` but NO `lastStrikeSession` while
+the loser has one. Decided: **the winner's value wins even when it is ABSENT.** Row 1 DELETES
+`lastStrikeSession` and sets `lastQuizAt`, so "later `lastQuizAt`, no session id" means the most
+recent event on that side was a PASS — and a pass is exactly what clears the id.
+
+The rival reading (carry the loser's id forward) fails SAFE against a wrongful demotion, which is
+the harm the plan calls the worst outcome, so it was tempting. It was rejected because it does so by
+resurrecting a session a pass had already ended, i.e. by discarding a real event. A4 discards
+nothing. Recorded because a future reader will re-derive this and should see the losing argument.
+
+A4 also creates an ordering trap: the decision reads BOTH sides' `lastQuizAt`, so it must run
+BEFORE `existing.lastQuizAt` is overwritten. Written into the packet as a required mutation test,
+and the worker's mutation confirmed it — reordering those two statements makes tests 8 AND 9 fail.
+
+STEP 3.2 applyQuizAnswer, the re-claim reset, the merge rule
+  tier: WORKER (Sonnet)
+  did: lib/profile.js — new exported `applyQuizAnswer` (four throws validated before any mutation,
+       then QZ-12 rows 1-4); `markWordKnown` deletes strikes/needsReview/lastStrikeSession on a
+       re-claim (row 5) with first-claim creation untouched (row 6); `migrateWordKeys` gained the
+       six-key merge beside its existing lines (max / OR / sum / later-date / A4).
+       tests/profile-quiz-answer.test.js — NEW, ten flat top-level `test()` calls.
+  surprises: none
+  deviations: none
+  fail_first: WEAK and I am recording it as weak. Running the new file against the untouched lib
+       failed at MODULE LOAD ("no export named 'applyQuizAnswer'"), so zero tests actually ran.
+       That proves the export was missing and nothing else. The real evidence for this step is the
+       mutation pass below, which is why the packet demanded three specific mutations rather than
+       relying on fail-first.
+  mutations: (all three restored, verified by the boundary check in the frozen script)
+       · `>= 3` -> `== 3`: test 5 failed ALONE (9 pass / 1 fail). The un-demotable-`strikes:99`
+         fail-open is genuinely covered.
+       · A4 ordering trap — `lastQuizAt` assigned before the `lastStrikeSession` decision:
+         tests 8 AND 9 failed (8 pass / 2 fail).
+       · merge sum run twice: tests 8, 9 and 10 failed (7 pass / 3 fail). Idempotency is sensitive
+         to double-counting, which was the whole point of test 10.
+  validation_first_try: yes (worker), re-run by me in a clean tree: STEP-3.2-OK, 241 pass / 0 fail.
+       The 3.2 script also enforces the file boundary, so a stray edit outside the two files fails
+       the step rather than waiting for the phase gate.
+  retries: 0
+  escalations: 0
+  interventions: 1 (bad-spec — the A4 gap above, fixed before dispatch)
+  audit: match, CONFIDENCE high, traced by hand against all four rows, the throw precedence, and
+       the merge rule. The only thing it could not settle (the 231->241 count) I had already run.
+  KNOWN UNTESTED BRANCH, recorded rather than quietly left: QZ-14's "neither side has a parseable
+       `lastQuizAt`, so keep `existing`'s own `lastStrikeSession`" branch has no test. The frozen
+       assertion list did not ask for one and I am not re-opening an accepted step to add it, but a
+       future edit to that block is unguarded. Reachable only when two duplicate keys merge and
+       neither has ever been quizzed while at least one carries a session id.
+  tokens: worker=85256, checker=57690
+  commit: b273c74
+  accepted: 2026-07-27
