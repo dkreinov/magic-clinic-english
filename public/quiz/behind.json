@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "behind",
+    "sense": "in the position at the back of someone or something",
+    "sentence": "The girl ran ___ her friend so she crossed the finish line second.",
+    "answer": "behind",
+    "distractors": ["near", "beyond", "around", "below", "over", "opposite", "past", "across"]
+  }
+]

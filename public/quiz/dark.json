@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "dark",
+    "sense": "having little or no light, so it is hard to see",
+    "sentence": "The room was so ___ that I could not see my own hand.",
+    "answer": "dark",
+    "distractors": ["bright", "quiet", "warm", "cold", "loud", "empty", "wet", "noisy"]
+  },
+  {
+    "lemma": "dark",
+    "sense": "the state of having no light, especially at night",
+    "sentence": "Many kids are afraid of the ___ when they go to bed at night.",
+    "answer": "dark",
+    "distractors": ["bright", "warm", "cold", "quiet", "wet", "dry", "hot", "cool"]
+  }
+]

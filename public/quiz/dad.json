@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "dad",
+    "sense": "a father, the male parent in a family",
+    "sentence": "My ___ drives me to school every morning.",
+    "answer": "dad",
+    "distractors": ["mom", "sister", "brother", "uncle", "teacher", "friend", "neighbor", "cousin"]
+  }
+]

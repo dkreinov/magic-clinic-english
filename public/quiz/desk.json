@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "desk",
+    "sense": "a piece of furniture where you sit to write, read or use a computer",
+    "sentence": "I do my homework at the ___ in my bedroom.",
+    "answer": "desk",
+    "distractors": ["table", "chair", "bed", "drawer", "seat", "bookcase", "cupboard", "basket"]
+  }
+]

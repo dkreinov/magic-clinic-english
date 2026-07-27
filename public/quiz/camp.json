@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "camp",
+    "sense": "a place outdoors where people stay in tents for a while, often in summer",
+    "sentence": "Every summer, my brother goes to a ___ where he sleeps in a tent.",
+    "answer": "camp",
+    "distractors": ["hotel", "cottage", "village", "farm", "castle", "palace", "school", "museum"]
+  }
+]

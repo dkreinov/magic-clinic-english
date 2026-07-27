@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "monkey",
+    "sense": "an animal with hands and a long tail that likes to climb trees",
+    "sentence": "At the zoo, the hungry ___ picked up a banana with its clever hands.",
+    "answer": "monkey",
+    "distractors": ["cow", "pig", "sheep", "dog", "duck", "chicken", "rabbit", "bird"]
+  }
+]

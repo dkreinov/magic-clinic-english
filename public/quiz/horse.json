@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "horse",
+    "sense": "a big animal that people can ride",
+    "sentence": "The farmer rides his ___ across the big field every morning.",
+    "answer": "horse",
+    "distractors": ["cow", "pig", "sheep", "dog", "duck", "chicken", "rabbit", "mouse"]
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "fan",
+    "sense": "a machine that turns around fast to cool a room down",
+    "sentence": "My mother turned on the ___ so the hot room was cooler.",
+    "answer": "fan",
+    "distractors": ["radio", "television", "oven", "camera", "computer", "iron", "lamp", "clock"]
+  },
+  {
+    "lemma": "fan",
+    "sense": "a person who loves and supports a sports team or a famous singer",
+    "sentence": "Every ___ in the stadium shouted loudly when the team scored a goal.",
+    "answer": "fan",
+    "distractors": ["player", "coach", "captain", "winner", "guest", "visitor", "athlete", "musician"]
+  }
+]
