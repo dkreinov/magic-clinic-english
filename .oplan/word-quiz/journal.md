@@ -1057,3 +1057,41 @@ STEP 4.1 the pure quiz core
   tokens: worker=56228, checker=39661
   commit: 1aabd37
   accepted: 2026-07-27
+
+### QZ-21 ran EARLY and the diff is EMPTY — the strongest evidence of step 4.2
+
+The moment the renderer existed I ran `.oplan/word-quiz/quiz-transcript.mjs` (written by me BEFORE
+4.2 was dispatched) against `quiz-transcript-expected.txt` (hand-derived from QZ-18's frozen
+text-node order at plan time). `diff` is EMPTY — three screens, Hebrew and all. Two independent
+derivations of the same screen agreeing, same shape as phase 3's QZ-16 result. The owner's
+criterion-11 gate will re-run this at phase close; it is not discharged by this early run, but
+contract drift is now impossible to introduce unnoticed.
+
+STEP 4.2 the quiz component — the screen, the session, the answer
+  tier: WORKER (Sonnet)
+  did: public/quiz.js — NEW: answerBody, loadItem, renderQuizCard, renderQuizDone,
+       createQuizSession, startQuiz, VIEW_STYLE (var(--...) tokens only).
+       tests/quiz-ui.test.js — NEW, eight flat top-level test() calls, harness copied verbatim
+       per the packet (withTempDataDir renamed prefix, withOpenGate included).
+  surprises: none
+  deviations: none reported by the worker; two found by the AUDITOR, both accepted by me as
+       spec imprecision and logged as AMENDMENT A7 beside QZ-18: a grouping
+       `<div class="quiz-options">` (adds no text node — transcript unaffected, and that is
+       PROVEN, not argued, by the empty QZ-21 diff) and no bind() on the done screen (nothing
+       bindable exists there by contract; a literal no-op).
+  fail_first: REAL this time, unprompted by the packet: the worker mutated its own implementation
+       twice (sense/sentence order flipped -> test 2 failed; the answered-question no-op guard
+       removed -> test 6's double-POST assertion failed), reverted, and byte-compared the revert.
+  validation_first_try: yes (worker), re-run by me in a clean shell: STEP-4.2-OK, 272 pass /
+       0 fail, exactly the two expected files, .data/ empty.
+  retries: 0
+  escalations: 0
+  interventions: 0
+  audit: MISMATCH (2 findings) -> both accepted with the contract amended visibly (A7), per the
+       phase-3 withOpenGate precedent: the auditor reports against the letter, the orchestrator
+       owns the decision. CONFIDENCE low on cross-file behaviour (quiz-core, the handler, the
+       contrast count) — all three were already covered by my own clean-state validation run and
+       the empty transcript diff.
+  tokens: worker=80135, checker=59732
+  commit: 2159560
+  accepted: 2026-07-27
