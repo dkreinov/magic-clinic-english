@@ -42,9 +42,12 @@ const FEEL_TOUCH = {
   distractors: ['jump', 'sing', 'open', 'carry', 'paint', 'climb', 'wash', 'count'],
 };
 
+// The gloss is in HER vocabulary because rule 11 now holds it to the same
+// standard as the sentence. This fixture used to read "to have an emotion", and
+// "emotion" is not a manifest word.
 const FEEL_EMOTION = {
   ...FEEL_TOUCH,
-  sense: 'to have an emotion',
+  sense: 'to be happy or sad inside',
   sentence: 'I ___ happy when my dog can play.',
 };
 
@@ -92,6 +95,44 @@ test('a broken item fails the gate and the output names the rule and the token',
     `rule 4 must name the offending token, got: ${result.stdout}`
   );
   assert.ok(result.stdout.includes('QUIZ BANK FAILED: '), `missing the FAILED line, got: ${result.stdout}`);
+});
+
+test('the REAL public/quiz/ bank gates green', () => {
+  // Every other test in this suite builds a fixture bank in a temp dir, which
+  // means the whole suite passed with 218 green tests while public/quiz/ was
+  // MOVED ASIDE ENTIRELY. Nothing referenced the shipped bank, so "npm test is
+  // green" said nothing whatsoever about the 71 items actually being shipped.
+  //
+  // This test is the one that fails when the bank is deleted or rots. Run with
+  // no --dir, so it gates the real default directory. A missing directory is
+  // treated as an empty one by design (the gate must be green before the
+  // generator has ever run), so it would exit 0 reporting "0 files" -- which is
+  // exactly why the file COUNT is asserted and not merely the exit code.
+  const result = run();
+  assert.equal(
+    result.status,
+    0,
+    `the shipped bank must gate clean, got exit ${result.status}:\n${result.stdout}${result.stderr}`
+  );
+  assert.ok(
+    !result.stdout.includes('QUIZ BANK FAILED'),
+    `the shipped bank must have no hard problems, got:\n${result.stdout}`
+  );
+
+  const ok = /QUIZ BANK OK: (\d+) files, (\d+) items/.exec(result.stdout);
+  assert.ok(ok, `missing the OK line, got:\n${result.stdout}`);
+  assert.equal(Number(ok[1]), 50, 'the shipped bank is 50 files');
+  assert.ok(Number(ok[2]) >= 50, `50 files must carry at least 50 items, got ${ok[2]}`);
+
+  // Rule 11 is deliberately DOWNGRADED to a warning while 8 shipped glosses are
+  // still being rewritten (see DEFERRED_RULE in the gate). The count is asserted
+  // to be reported, not to be any particular number, so that fixing the glosses
+  // drives it to 0 without touching this test -- and so that the day the rule is
+  // promoted to a hard failure, this test is what proves the bank survived it.
+  assert.ok(
+    /RULE-11 PENDING: \d+ items/.test(result.stdout),
+    `the deferred-rule count must be reported, got:\n${result.stdout}`
+  );
 });
 
 test('--sample is deterministic: two runs are byte-identical', () => {

@@ -265,6 +265,17 @@ to carry / to endure) and `gentle` carries a malformed `pos` of `"adj gently adv
 rule 8's first-whitespace-token reduction.
 
 **QZ-6 — the test ledger.** 208 today. 1.1 +6 -> 214. 1.2 +4 -> 218. 1.3 +0 -> 218.
+RE-FROZEN AFTER THE AUDIT: R1+R2+R3-code +6 -> **224**. The six are: the REAL bank gates green;
+rule 12; rule 4 hardened; rule 11; rule 9 hardened; and a NON-VACUOUS `== null` guard test.
+Both audit-found test gaps are verified closed by mutation: deleting `public/quiz/` now fails a
+test (it did not before), and neutralising the guard now fails a test (the old one asserted on
+`gave`, which has no band entry, so it passed either way).
+
+**RULE 11 IS DEFERRED IN THE GATE, NOT IN THE CONTRACT.** `lib/quiz-item.js` returns rule 11 as a
+real error. `scripts/check-quiz-bank.mjs` downgrades it to a printed warning via `DEFERRED_RULE`
+and prints `RULE-11 PENDING: <n> items`, so the 8 pre-D22 glosses do not turn the gate red before
+R3 rewrites them. **Deleting the `isDeferred` branch re-arms it, and R3 must do exactly that.** A
+deferred rule that is never re-armed is a gate that does not gate.
 
 **QZ-8 — the excluded words (owner decision, 2026-07-26).** These 37 words get **no quiz file and
 no quiz item, ever**. The owner's reasoning: "dont need these words there are enough other words" —

@@ -15,6 +15,12 @@
 // bare rule-4 token list) are passed through verbatim and merely prefixed with
 // the file they came from, because a downstream worker cannot fix "rule 4
 // failed" but it can fix "feel.json[1] rule 4: children, after".
+//
+// The gate decides SEVERITY, never validity: rule 11 is currently downgraded to
+// a printed warning here (see DEFERRED_RULE below) while the contract in
+// lib/quiz-item.js still returns it as a full error. That split is the point --
+// the rule stays in one place and stays true; only this file's exit code is
+// temporarily lenient about it.
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -101,9 +107,31 @@ function loadContext() {
   return { allowed, posIndex };
 }
 
+// Rule 11 is the ONE rule this gate does not enforce yet, and the exception is
+// deliberate, scoped and temporary.
+//
+// D22 put the `sense` gloss in front of the learner, so rule 11 holds it to her
+// vocabulary exactly as rule 4 holds the sentence. But 8 items already in the
+// shipped bank violate it, on `everyone teeth outdoor rules brightness sensible
+// relax`, and rewriting those glosses is a separate job with a separate review.
+// Landing rule 11 as a hard failure would have turned the gate red on work that
+// is not wrong yet -- so the rule NOT being enforced is recorded loudly on
+// stdout and counted, rather than the rule being left out of the contract and
+// silently forgotten.
+//
+// lib/quiz-item.js returns rule 11 as a REAL error and must keep doing so; the
+// downgrade lives here and only here, so promotion is a local edit.
+//
+// TO PROMOTE, once the glosses are fixed: delete this constant and the
+// `isDeferred` branch in the loop below, so rule 11 errors fall through into
+// `problems` like every other rule. The warning print block and the RULE-11
+// PENDING line then have nothing to report and can go with it.
+const DEFERRED_RULE = /^\[(\d+)\] rule 11: (.*)$/;
+
 function runGate(dir) {
   const ctx = loadContext();
   const problems = [];
+  const deferred = [];
   let items = 0;
   let multiSense = 0;
 
@@ -120,11 +148,25 @@ function runGate(dir) {
     }
     const lemma = name.slice(0, -'.json'.length);
     for (const err of validateItemFile(lemma, loaded.items, ctx).errors) {
+      const isDeferred = DEFERRED_RULE.exec(err);
+      if (isDeferred) {
+        // Same file[i] anchor and the same bare token list a hard problem gets,
+        // so the eventual fixer reads it the same way -- only the verdict and
+        // the exit code differ.
+        deferred.push(`rule 11 (warning): ${name}[${isDeferred[1]}]: ${isDeferred[2]}`);
+        continue;
+      }
       // Item-level errors already carry their "[i] " index, so they are
       // concatenated to give feel.json[1]; file-level ones get a space.
       problems.push(err.startsWith('[') ? `${name}${err}` : `${name} ${err}`);
     }
   }
+
+  // Printed in BOTH verdict paths, and the count is printed even when it is
+  // zero: a pending-work line that vanishes when the work is done is a line
+  // nobody notices going stale.
+  for (const line of deferred) console.log(line);
+  console.log(`RULE-11 PENDING: ${deferred.length} items`);
 
   if (problems.length) {
     for (const line of problems) console.log(line);
