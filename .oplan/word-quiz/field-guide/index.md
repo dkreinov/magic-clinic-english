@@ -29,6 +29,9 @@
    non-ASCII run before and after.
 8. Validation chains: always `set -o pipefail`; a stray `;` DETACHES the rest so `…-OK` prints over
    a broken build; `grep -qF --` before `--patterns`; never `! grep -q '<bare number>'`.
+   **But `cmd | grep -q` UNDER pipefail is a trap**: `grep -q` exits on its first match and
+   SIGPIPEs the producer, so the pipeline fails while every check actually passed. Cost a real
+   debug on a green tree. Capture into a variable and match with `case`, not a `grep -q` pipe.
 9. **THE CONTRAST GATE ONLY SEES `:root` TOKENS.** A raw hex is invisible to it. It is also blind
    to `<button>` not inheriting `color` (the UA paints `buttontext`), and to `color-mix()`, which
    an `rgb()` regex reads as black and FABRICATES a pass for. Any new button class must declare
