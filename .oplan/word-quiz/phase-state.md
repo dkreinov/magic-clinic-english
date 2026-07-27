@@ -1,10 +1,8 @@
-CURRENT: **PHASE 4 MECHANICALLY CLOSED 2026-07-27. Criteria 1-10 GREEN. Criterion 11 — the owner
-  reading the QZ-21 transcript and approving the screens — is the ONLY thing outstanding.**
-  NEXT ACTION: put the transcript (three screens, verbatim) in front of the owner. On approval,
-  plan PHASE 5 (G1 candidates) with a fresh planner — or the owner may choose to deploy first
-  (phase 6), since phase 4 is what makes the feature real for her; the plan's phase order is
-  5 then 6, but nothing in phase 5 blocks a deploy of phase 4. That sequencing question belongs
-  to the owner at the gate.
+CURRENT: **PHASE 4 CLOSED 2026-07-27. ALL ELEVEN CRITERIA MET — the owner read the three-screen
+  transcript and approved ("yes approve, go ahead"), with the unchecked things stated alongside.**
+  Offered deploy-first explicitly, the owner did not take it; the plan's order stands.
+  NEXT ACTION: **plan PHASE 5 (G1 candidates) with a fresh planner, review that plan, then
+  execute.** Phase 5 is a skeleton only in plan.md; it has not been planned in full.
   Six steps accepted: 4.1 1aabd37 · 4.2 2159560 (A7) · 4.3 70ac7c1 (A8) · 4.4 93847b8 ·
   4.5 e4147aa · 4.6 90112d1.
   Ledger 257 -> 264 -> 272 -> 274 -> 277 -> 277 -> **282**, `# fail 0`. Contrast 52 ALL PASS.
@@ -56,5 +54,4 @@ THE THINGS MOST LIKELY TO BITE (unchanged, plus one):
   · Contrast anchor: `grep -c '^PASS'` = 52. · Ledger counts FLAT top-level test() only.
   · Frozen comparisons need `LC_ALL=C sort` (A9) and capture-and-case, never `| grep -q`.
 
-OPEN QUESTIONS: criterion 11 — the owner's approval of the three screens (and their choice on
-  deploy-now-vs-phase-5-first). BLOCKED: on the owner only.
+OPEN QUESTIONS: none. BLOCKED: no.

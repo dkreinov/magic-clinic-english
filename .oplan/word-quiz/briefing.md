@@ -86,3 +86,7 @@ WHAT HAPPENS NEXT: the eleventh check is YOU — read the three screens in the c
 say what to change. Also yours: whether to deploy the quiz now (phase 6) or build automatic
 promotion first (phase 5); nothing technical forces the order.
 === END PLAIN REPORT ===
+
+2026-07-27, later: **you approved the screens** ("yes approve, go ahead") and kept the planned
+order. Phase 4 is closed — all eleven checks. Next: a fresh planner drafts phase 5 (automatic
+promotion) from the written record; you'll see its plan in plain words before anything runs.

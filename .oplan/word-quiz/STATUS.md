@@ -1,8 +1,8 @@
 # STATUS — word-quiz (W5b)
 
-**Where we are:** phase 4 — the quiz screens — is **built, tested, and waiting for one thing:
-you.** All ten automatic checks are green. The phase closes when you read the three screens below
-(in the chat) and say yes.
+**Where we are:** phase 4 — the quiz screens — is **done and approved by you.** All eleven
+checks green. Now planning phase 5 (automatic promotion). Nothing is deployed yet; her app
+changes only at phase 6.
 
 ## What got built this phase
 
@@ -27,8 +27,8 @@ flowchart LR
 | 1 | item format, checker, 50-word pilot | done — you approved it |
 | 2 | the bank | grows weekly on demand; FIRST top-up is now a phase-6 requirement |
 | 3 | profile: strikes and demotion | done — you approved the transcript |
-| 4 | the quiz screens | **10 of 11 checks green — waiting for your yes on the screens** |
-| 5 | automatic promotion | not started |
+| 4 | the quiz screens | done — you approved the screens |
+| 5 | automatic promotion | **being planned now** |
 | 6 | deploy (backup + first top-up + your first real look) | not started |
 
 ## What the checking machinery caught this phase (all fixed before anything shipped)
@@ -42,12 +42,10 @@ flowchart LR
 - Eight deliberate sabotage runs against the finished code: every one was caught by a test. An
   independent helper who never saw the code being written could not make it misbehave.
 
-## What needs you — one decision, one look
+## What needs you
 
-1. **Read the three screens** I put in the chat (they match, byte for byte, a prediction I wrote
-   by hand before the screen code existed). Say yes, or say what to change.
-2. **Optional:** phases run 5 (automatic promotion) then 6 (deploy). Nothing in phase 5 blocks
-   deploying phase 4 first, so she could have the quiz sooner. Your call at the gate.
+Nothing right now. You approved the screens and chose to keep the planned order (promotion, then
+deploy). The next thing you will see is the phase-5 plan in plain words.
 
 ## Honest limits
 

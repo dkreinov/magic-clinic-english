@@ -1252,3 +1252,22 @@ What is still NOT proved and cannot be by this phase: whether the screens read R
 eleven-year-old (criterion 11, the owner, pending); whether the CSS/RTL layout is right in a real
 browser (phase 6's deploy look); and the quiz has items only for the 50 pilot words until the
 first top-up runs (phase-6 criterion).
+
+## CRITERION 11 — THE OWNER APPROVED. PHASE 4 IS CLOSED. (2026-07-27)
+
+The owner read the three-screen transcript and answered "yes approve, go ahead."
+
+What the approval rests on, written down so a later audit can check it: the LITERAL projected
+output of the real renderer, byte-identical (diffed, twice) to an expectation I hand-derived from
+QZ-18's frozen text-node order BEFORE step 4.2 was dispatched — so the instrument could not have
+been fitted to the result. Presented WITH the three unchecked things stated plainly: no
+real-browser render exists anywhere in this run; the after-chapter gate (D10) is a felt
+experience no test can judge; and the quiz is inert beyond the 50 pilot words until the first
+top-up. If any of those turns out badly, the approval is still sound — they were on the table.
+
+Offered the deploy-first option explicitly, the owner did not take it; the plan's standing order
+holds: PHASE 5 (G1 candidates) next, then phase 6 (deploy). "Go ahead" is read as: continue the
+run now, in this session, on the plan's order.
+
+ALL ELEVEN CRITERIA MET. Phase 4 is closed the way phases 1 and 3 closed: mechanically green,
+then a human yes given on evidence that was derived independently of the code it judges.
