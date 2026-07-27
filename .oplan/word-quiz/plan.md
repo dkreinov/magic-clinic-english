@@ -423,6 +423,26 @@ compatible exactly as `context` was: a profile written before this run must stil
 answer plus 5 of the 8 distractors, preferring words she knows, falling back to the frozen 8 (D19).
 A speaker button per option reusing `.btn-say`. The after-chapter check of 4 words (D17) in
 `reader.js`, and the quiz button inside `words.js` (D10). One cache bump `magic-vet-v12 -> v13`.
+**D22: the item shows the `sense` gloss ABOVE the sentence.** That is what makes a distractor which
+fits the sentence but not the meaning stop being a correct answer, and it is the whole reason the
+pilot is shippable.
+
+**FOUR OBLIGATIONS PHASE 4 INHERITS, written down now so they are not rediscovered late:**
+1. **It must mint a FRESH `sessionId` per quiz sitting, and ship a test proving two sittings give
+   two different ids.** A constant id makes every word permanently un-strikeable — the correction
+   loop never fires and *every gate in this project stays green while it happens*. No phase-3 test
+   can see this. (QZ-11.)
+2. **It must tolerate a word with no quiz item** and skip it silently (D23). She will claim a word
+   days before its item is generated.
+3. **The ordering rule needs fields that did not exist.** design.md says "flagged, then recently
+   claimed, then longest-unseen", and the record never said which field each key reads — a record
+   gap the phase-3 planner found. Resolved: *flagged* = `needsReview`, *longest-unseen* =
+   `lastQuizAt` (NOT `lastSeen`, which a tap moves). **"Recently claimed" has NO field** — nothing
+   records when a word was claimed — so phase 4 must either add one or drop that key and say so.
+4. **A word with `strikes > 0` must be prioritised for re-asking.** Orchestrator decision, taken
+   because `needsReview` is cleared by ANY answer (QZ-12): without this, a word sitting at 1 or 2
+   strikes has no ordering key at all, so the third strike may never arrive and D1's demotion
+   silently never fires.
 
 ## PHASE 5 SKELETON — G1 candidates
 

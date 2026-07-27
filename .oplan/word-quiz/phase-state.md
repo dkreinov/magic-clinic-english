@@ -80,7 +80,17 @@ CARRY INTO PHASE 2 — the four things phase 1 learned that no gate can enforce:
   Also inherited: rule 10 is blind to irregular forms that are themselves manifest words (29 lemmas
   / 42 forms, listed in QZ-2) and `became`/`tying` fail rule 4 as ordinary sentence words.
 
-FROZEN CONTRACTS IN FORCE: QZ-1 (the item file, ten rules — 1/2/9 FILE-level, 3-8/10 ITEM-level)
+WHERE HER PROFILE ACTUALLY LIVES (record gap found by the phase-3 planner, patched here): in
+  production it is in **Vercel Blob**, behind `BLOB_READ_WRITE_TOKEN` (see `lib/store.js`), gated by
+  `APP_CODE`. **It cannot be read from this repo and must never be probed** (field guide 11). `.data/`
+  is the LOCAL dir only and is empty. Consequence for any phase that touches the profile: backward
+  compatibility can only ever be proved against a RECONSTRUCTED fixture, never against her real data,
+  so a post-deploy `GET` belongs in phase 6's criteria. Also note `lib/auth.js:isAuthorized` returns
+  TRUE when `APP_CODE` is unset — verified — so frozen commands must `delete process.env.APP_CODE`
+  or they 401 on a developer machine that has it exported.
+
+FROZEN CONTRACTS IN FORCE: QZ-1 (the item file, **thirteen** rules — 1/2/9 FILE-level, 3-8/10-13
+  ITEM-level; the phase-1 summary said "ten", which was true only before the audit added 11/12/13)
   · QZ-2 (the generation rules, including the vocabulary warning and the duty to self-run the gate)
   · QZ-3 (the gate's frozen CLI: `[--dir <path>] [--sample <N>]`, item-level sampling, rule-4 errors
     name the offending tokens) · QZ-4 (phase-1 non-goals: no UI, no api/, no lib/profile.js, no
