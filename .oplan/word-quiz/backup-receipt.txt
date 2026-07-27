@@ -1,0 +1,8 @@
+PHASE 6 BACKUP RECEIPTS (contents NEVER recorded here — D27)
+capture #1: /c/Users/dkreinov/english-app-backups/profile-20260727-181106.json
+  sha256: 58870a1b059512c747452fa8114a904bf1c210930f671edd1e77deba65cd51c2
+  bytes: 8115 · words: 20 · known: 12 · proof: BACKUP OK printed, validateProfile ok
+  taken: 2026-07-27 18:11 (pre-top-up seed; criterion 5 runs against THIS capture)
+capture #2: (pending — step 6.8, seconds before the deploy; the binding D25 artifact)
+D27 rider: both files are DELETED at step 6.12 after the owner's gate-B yes; the deletion ends
+the D25 safety net and is recorded when it happens.
