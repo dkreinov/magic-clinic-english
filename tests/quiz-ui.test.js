@@ -81,7 +81,7 @@ test('D22 - renderQuizCard puts the sense above the sentence, prompt/progress re
   const item = items[1];
   const options = [item.answer, ...item.distractors.slice(0, 5)];
 
-  const html = renderQuizCard({
+  const hiddenHtml = renderQuizCard({
     lemma: 'light',
     item,
     options,
@@ -91,8 +91,40 @@ test('D22 - renderQuizCard puts the sense above the sentence, prompt/progress re
     correct: null,
     demoted: false,
   });
+  assert.ok(hiddenHtml.includes('quiz-hint-btn'), 'hint button must render before an answer/hint');
+  assert.ok(hiddenHtml.includes('רמז'), 'hint button label missing');
+  assert.ok(!hiddenHtml.includes(item.sense), 'sense must stay hidden before hint/answer');
 
-  assert.ok(html.indexOf(item.sense) < html.indexOf(item.sentence), 'sense must render above the sentence');
+  const hintShownHtml = renderQuizCard({
+    lemma: 'light',
+    item,
+    options,
+    index: 0,
+    total: 4,
+    chosen: null,
+    correct: null,
+    demoted: false,
+    hintShown: true,
+  });
+  assert.ok(hintShownHtml.includes(item.sense), 'sense must render once hintShown is true');
+  assert.ok(!hintShownHtml.includes('quiz-hint-btn'), 'hint button must not render once hintShown is true');
+  assert.ok(
+    hintShownHtml.indexOf(item.sentence) < hintShownHtml.indexOf(item.sense),
+    'sentence must render above the sense'
+  );
+
+  const html = renderQuizCard({
+    lemma: 'light',
+    item,
+    options,
+    index: 0,
+    total: 4,
+    chosen: item.answer,
+    correct: true,
+    demoted: false,
+  });
+  assert.ok(html.includes(item.sense), 'sense must render once answered');
+  assert.ok(!html.includes('quiz-hint-btn'), 'hint button must not render once answered');
   assert.ok(html.includes('איזו מילה מתאימה?'), 'prompt missing');
   assert.ok(html.includes('שאלה 1 מתוך 4'), 'progress text missing');
 
@@ -112,6 +144,7 @@ test('D22 - renderQuizCard puts the sense above the sentence, prompt/progress re
     chosen: null,
     correct: null,
     demoted: false,
+    hintShown: true,
   });
   assert.ok(withAngle.includes('a &lt; b sense'), '< in sense must be escaped');
 });
@@ -446,6 +479,9 @@ test('source and style: frozen strings, VIEW_STYLE token-only, contrast gate una
     'הלאה',
     'סיימנו את התרגול!',
     'הקשיבי למילה',
+    'quiz-hint-btn',
+    'quiz-hint',
+    'רמז',
   ];
   for (const needle of needles) {
     assert.ok(src.includes(needle), `quiz.js missing "${needle}"`);

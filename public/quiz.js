@@ -28,6 +28,19 @@ const VIEW_STYLE = `<style>
     margin: 0 0 16px;
   }
 
+  .quiz-hint-btn {
+    min-height: 40px;
+    padding: 0 16px;
+    margin: 0 0 16px;
+    border-radius: var(--radius);
+    border: 2px solid var(--color-border);
+    background: var(--color-surface-2);
+    color: var(--color-ink);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
   .quiz-options {
     display: flex;
     flex-direction: column;
@@ -145,7 +158,7 @@ export async function loadItem(lemma, rand = Math.random) {
 }
 
 export function renderQuizCard(state) {
-  const { item, options, index, total, chosen, correct, demoted } = state;
+  const { item, options, index, total, chosen, correct, demoted, hintShown } = state;
 
   const feedbackHtml =
     chosen !== null
@@ -163,11 +176,16 @@ export function renderQuizCard(state) {
       ? `<button type="button" class="btn btn-primary" data-action="quiz-next">הלאה</button>`
       : '';
 
+  const hintHtml =
+    hintShown || chosen !== null
+      ? `<p class="quiz-sense">${escapeHtml(item.sense)}</p>`
+      : `<button class="quiz-hint-btn" type="button" data-action="quiz-hint">רמז</button>`;
+
   return `
     <p class="quiz-progress">שאלה ${index + 1} מתוך ${total}</p>
     <p class="quiz-prompt">איזו מילה מתאימה?</p>
-    <p class="quiz-sense">${escapeHtml(item.sense)}</p>
     <p class="quiz-sentence" dir="ltr">${escapeHtml(item.sentence)}</p>
+    ${hintHtml}
     <div class="quiz-options">${renderOptions(options, item, chosen)}</div>
     ${feedbackHtml}
     ${demotedHtml}
@@ -209,7 +227,7 @@ export async function startQuiz(
     if (questions.length === count) break;
     const item = await load(lemma, rand);
     if (item === null) continue;
-    questions.push({ lemma, item, options: selectOptions(item, knownSet, rand) });
+    questions.push({ lemma, item, options: selectOptions(item, knownSet, rand), hintShown: false });
     if (questions.length === count) break;
   }
 
@@ -237,6 +255,9 @@ export async function startQuiz(
     container.querySelectorAll('[data-action="quiz-next"]').forEach((btn) => {
       btn.addEventListener('click', () => session.next());
     });
+    container.querySelectorAll('[data-action="quiz-hint"]').forEach((btn) => {
+      btn.addEventListener('click', () => session.hint());
+    });
   }
 
   function renderCurrent() {
@@ -250,6 +271,7 @@ export async function startQuiz(
       chosen,
       correct: correctFlag,
       demoted,
+      hintShown: q.hintShown,
     });
     container.innerHTML = VIEW_STYLE + html;
     bind();
@@ -279,6 +301,13 @@ export async function startQuiz(
       resp.words[q.lemma] &&
       resp.words[q.lemma].status === 'learning';
 
+    renderCurrent();
+  };
+
+  session.hint = function hint() {
+    if (chosen !== null) return;
+    const q = session.questions[session.index];
+    q.hintShown = true;
     renderCurrent();
   };
 
