@@ -1485,7 +1485,10 @@ against her real data, and put the first-ever real-browser look in front of the 
    re-run; the D27 deletion happens strictly after it.
 6. **Only the expected files changed across `0b47649..HEAD`, none deleted** (`LC_ALL=C sort`,
    A9): allowed set = `docs/growth.md`, `tests/quiz-bank.test.js`, `public/quiz/*.json` (new
-   lemmas only). Frozen as the grep -v allowlist form; separate explicit deletion check.
+   lemmas AND items re-worked under QZ-24 — the frozen command's `^public/quiz/.*\.json$`
+   pattern already admits both; the prose said "new lemmas only" before D28), plus — added by
+   6b — `public/quiz.js` and `tests/quiz-ui.test.js`. Frozen as the grep -v allowlist form;
+   separate explicit deletion check.
 7. Contrast: exits 0, `ALL PASS`, `grep -c '^PASS'` = 52.
 8. **`.data/profile.json` absent, and no byte of her profile anywhere inside the repo**;
    `git status --porcelain` empty after every step; the backup path resolves outside the repo.
@@ -1516,11 +1519,11 @@ against her real data, and put the first-ever real-browser look in front of the 
     roll back code, owner.
 11. The rollback command is written into `phase-state.md` verbatim BEFORE the deploy and
     re-confirmed after.
-12. **HUMAN GATE A — the owner reads EVERY new top-up item** (all of them via the frozen sampler
-    at `--sample <total new items>`, not a stride) and explicitly approves. The summary handed
-    over must be true and must state its limits — two adversarial passes, their agreement rate,
-    flags and dispositions, dropped words with reasons, and plainly: a distractor that also fits
-    cannot be detected mechanically.
+12. **HUMAN GATE A — the owner reads EVERY new top-up item** and explicitly approves.
+    **SUPERSEDED BY D28 at the gate itself:** the governing form is now 6b.5 — the owner
+    reviews, in the HINT presentation, every item CHANGED since they last looked (the 14 top-up
+    items as re-shown plus every QZ-24-re-worked item), with the sweep summary and its limits
+    stated. The old always-visible-gloss review was never completed and does not count.
 13. **HUMAN GATE B — the owner's first real-browser look, against the written checklist in step
     6.11** (defeat the cache first; launcher; RTL/LTR layout; gloss above sentence; six options
     with speakers; after-chapter placement; wrong-answer feedback). The run's ONLY CSS/RTL
@@ -1628,6 +1631,15 @@ false). Frozen text-node order becomes:
   POSTs NOTHING, records NOTHING (no new profile field; QZ-9 stays frozen; pressing the hint is
   free). Binding: `container.querySelectorAll('[data-action="quiz-hint"]')` → `session.hint()`,
   same house pattern. Frozen Hebrew: the button text is `רמז`.
+  **רמז IS PER-QUESTION (frozen after plan review):** `hintShown` lives on the QUESTION object,
+  initialized false for every question; `session.next()` therefore shows the next card with the
+  hint hidden again; pressing רמז affects only the current question and nothing persists across
+  questions or sittings.
+  **6b.2's test-2 replacement assertions, FROZEN (not narrative):** (a) `chosen: null`, no
+  `hintShown` → the HTML contains `quiz-hint-btn` and `רמז` and does NOT contain the gloss
+  text; (b) `hintShown: true` → gloss present, hint button absent; (c) `chosen` set (any) →
+  gloss present, hint button absent; (d) the `&lt;`-escaping assertion runs against a
+  `hintShown: true` state (the gloss must be rendered to be escaped).
 
 **QZ-24 — the sentence-only re-vet bar.** Because the child who never presses רמז faces the
 sentence bare, the pre-D22 strict bar returns: **every distractor of every item in the whole
@@ -1666,9 +1678,11 @@ parseable arrays; sizes) into `deploy-verify.txt`. → STEP-6.9-OK
 capture#1-vs-capture#2 diff, whose new `known` words are reported as next-weekly-top-up work
 (criterion 5's routing). Non-empty backup\live → STOP + rollback + owner. → STEP-6.10-OK
 **6.11 HUMAN GATE B** [OWNER]: the written checklist (defeat the cache — close all tabs/PWA,
-reopen twice; launcher present and starts; RTL right, LTR sentence; gloss ABOVE sentence; six
-options, speakers play; after-chapter check before המשך הסיפור and does it feel fair; wrong
-answer shows כמעט + the right word; would she come back tomorrow). Defect → re-open the phase.
+reopen twice; launcher present and starts; RTL right, LTR sentence; **the meaning HIDDEN behind
+a רמז button — pressing it reveals it, answering reveals it too (AMENDED under D28; the old
+"gloss above sentence" check is void)**; six options, speakers play; after-chapter check before
+המשך הסיפור and does it feel fair; wrong answer shows כמעט + the right word; would she come
+back tomorrow). Defect → re-open the phase.
 **6.12 close** [ORCHESTRATOR]: re-run every mechanical criterion → `PHASE-6-ALL-CRITERIA-OK`;
 record deployment ids + rollback + backup SHA-256s; fix the broken recipe citation in the
 record; re-curate the field guide; the two phase reports; **then, after the owner's gate-B yes:

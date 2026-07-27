@@ -155,6 +155,8 @@ product") was offered EXPLICITLY as its own choice and the owner did not take it
 hint-button reading instead. Multiple choice therefore stays. If the owner meant something
 narrower by those words (e.g. fewer options), that is not in evidence and was not assumed.
 
+## D23 — the bank is grown ON DEMAND, not built up front (owner, 2026-07-27). REVERSES D8.
+
 D8 said "all 2254 words, ~5000 items, one-and-done". Measured against phase 1's real per-word
 cost, that is **~55M tokens and ~45 hours of agent time** — roughly 40x everything phase 1 spent.
 Shown that number, the owner chose to grow the bank instead:

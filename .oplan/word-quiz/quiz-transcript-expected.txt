@@ -1,8 +1,8 @@
-=== SCREEN 1: the question as she first sees it ===
+=== SCREEN 1: the question as she first sees it — the meaning is hidden ===
 שאלה 1 מתוך 4
 איזו מילה מתאימה?
-a lamp that helps you to see when a room is dark
 Please turn on the ___ so that I can see my book.
+רמז
 radio
 🔊
 television
@@ -15,11 +15,28 @@ camera
 🔊
 light
 🔊
-=== SCREEN 2: she chose "radio" — wrong ===
+=== SCREEN 2: she pressed רמז — the meaning appears ===
 שאלה 1 מתוך 4
 איזו מילה מתאימה?
-a lamp that helps you to see when a room is dark
 Please turn on the ___ so that I can see my book.
+a lamp that helps you to see when a room is dark
+radio
+🔊
+television
+🔊
+oven
+🔊
+fan
+🔊
+camera
+🔊
+light
+🔊
+=== SCREEN 3: she chose "radio" — wrong; the meaning is revealed with the answer ===
+שאלה 1 מתוך 4
+איזו מילה מתאימה?
+Please turn on the ___ so that I can see my book.
+a lamp that helps you to see when a room is dark
 radio
 🔊
 television
@@ -35,11 +52,11 @@ light
 כמעט! המילה הנכונה היא
 light
 הלאה
-=== SCREEN 3: the third strike — the word is taken back, and she is told ===
+=== SCREEN 4: the third strike — the word is taken back, and she is told ===
 שאלה 1 מתוך 4
 איזו מילה מתאימה?
-a lamp that helps you to see when a room is dark
 Please turn on the ___ so that I can see my book.
+a lamp that helps you to see when a room is dark
 radio
 🔊
 television
