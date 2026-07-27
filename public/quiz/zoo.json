@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "zoo",
+    "sense": "a place where wild animals live and people come to see them",
+    "sentence": "We walked around the ___ to see many wild animals in cages.",
+    "answer": "zoo",
+    "distractors": ["park", "school", "museum", "library", "farm", "forest", "garden", "beach"]
+  }
+]

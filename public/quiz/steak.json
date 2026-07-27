@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "steak",
+    "sense": "a thick piece of meat from a cow that you cook and eat with a knife and fork",
+    "sentence": "The cook cut a thick ___ from a cow to grill for dinner.",
+    "answer": "steak",
+    "distractors": ["bread", "cake", "soup", "rice", "egg", "sandwich", "pizza", "salad"]
+  }
+]
