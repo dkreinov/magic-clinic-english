@@ -188,6 +188,90 @@ importing the real `tokenize`/`resolveLemma` rather than re-implementing them �
 manifest, every one has a band pos entry, and all 467 distinct spoken words have a real `.aac`.
 None of D1-D5 is currently exploited. The holes are in the gate, not in today's bank.
 
+## THE FORMAT INVESTIGATION — two hypotheses tested, both REFUTED (2026-07-27)
+
+The owner, shown the audit, chose "stop and rethink the format" over patching the five leaks. That
+was the right call and here is what the rethink found. Three experiments, two of my own hypotheses
+dead.
+
+### Hypothesis 1 — "an item needs two independent constraints" — REFUTED
+
+I noticed all five leaks sat in single-constraint items while the survivors had two, and had all 71
+items classified blind (the classifier never saw which had leaked). The correlation does not exist:
+
+    1 constraint  (n=60):  13.3% robust
+    2 constraints (n=10):   0%   robust   <- mean fragility slightly WORSE
+    3 constraints (n=1):    0%   robust
+
+Every robust item in the bank has exactly ONE constraint. Stacking clauses does not help, and the
+reason is structural: constraints rule words out **by meaning**, but the dangerous alternatives are
+near-synonyms, co-hyponyms and hypernyms, which satisfy every semantic constraint by construction.
+`talent` satisfies both of `ability[0]`'s constraints; `complicated` satisfies both of
+`complex[0]`'s; `kid` satisfies both of `boy[0]`'s. A fourth and fifth constraint changes nothing.
+
+The real predictor is what KIND of word the answer is:
+
+    closed-class / collocation-fixed answers (n=16):  50% robust
+    open-class content-word answers          (n=55):   0% robust
+
+**For 55 of 71 items — 77% — sentence-level robustness is unattainable in principle.** English has
+cook/chef, way/method, goal/point, fair/carnival. No sentence excludes them. The eight robust items
+are robust for reasons that do not generalise: grammatical agreement over a closed paradigm
+(`itself`), an exhaustive numeric value (`ten`, `million`), or an obligatory collocation frame
+(`suffer FROM`, `looks LIKE`, `add sugar TO`, present-perfect `since`).
+
+The corollary matters more than the refutation: **what actually keeps this bank alive is that
+workers have been silently refusing to offer near-synonyms** — `cook` for chef, `way` for method,
+`target` for goal, `market` for fair. Every batch report lists them. That curation is the
+load-bearing design decision of the entire feature and **it was never written into any contract.**
+
+### Hypothesis 2 — "a blind fill-the-blank test detects leaks" — REFUTED
+
+If a sentence admits several answers, a solver who never sees the options should produce them. I
+ran it: 71 sentences, no answers, no distractors, "list every word that fits". Then intersected
+against the real distractor lists.
+
+    items flagged: 0 of 71
+    known leaks caught: 0 of 5
+
+Zero. The mechanism fails because **generation is not recognition.** A blind solver offers the most
+NATURAL fillers, which are synonyms of the answer (`kind` -> nice, generous; `bear` -> hold, carry,
+support). The distractors are deliberately drawn from OTHER semantic fields, so they never surface
+spontaneously. Nobody says "turn on the computer so I can see my book" unprompted — but shown
+`computer` as an option, it is defensible. The leak is a recognition failure and I measured
+generation. Wrong instrument, cleanly disproved.
+
+### What does work — and it is not reliable enough
+
+Adversarial recognition review: give a reviewer the sentence AND the option list and ask "does any
+of these also work?" That is the only mechanism that has ever caught a leak in this project. But
+two INDEPENDENT passes over the same 71 items agree only about half the time:
+
+    pass 1: 12 items flagged      pass 2: 11 items flagged
+    union:  15 of 71 (21%)        agreement: 8 (53%)
+
+Each pass found things the other missed entirely — pass 1 alone found `add[1]`/bring,
+`bear[1]`/lift, `back[1]`/up, `run[1]`/paint; pass 2 alone found `ever[0]`/never,
+`drama[0]`/music, `complex[0]`/old. Both rate `light[1]`/`computer` CERTAIN.
+
+**So the true defect rate is roughly one item in five, and a single adversarial pass finds about
+half of it.** My criterion-9 assurance of zero was not marginally wrong, it was wrong by an order of
+magnitude. For phase 2 this inverts the cost model: generation is the cheap part, and N-pass
+adversarial verification is the entire budget.
+
+### The finding that may dissolve the problem
+
+Every leak has the same shape: **the distractor fits the SENTENCE but does not mean what the item
+is testing.** `computer` does not mean "the brightness that lets you see in a dark room". `total`
+does not mean "the part that is left over". `piece` does not mean "a sort or type". `differently`
+does not mean "in a good way". `never` does not mean "at any time up to now".
+
+Every item already carries that gloss in its `sense` field, and **`sense` is currently shown to
+nobody** — no quiz UI exists yet. If the item is presented as gloss + sentence rather than sentence
+alone, a distractor that fits the sentence but not the gloss stops being a correct answer, and the
+entire failure class dissolves using data already in all 71 files. That is an owner decision
+touching D3/D4, so it is put to them rather than taken here.
+
 ## D20 — the owner cut 37 words from the quiz
 
 Asked how ~50 sensitive words should be handled, the owner answered "dont need these words there
