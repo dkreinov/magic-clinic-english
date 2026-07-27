@@ -4,6 +4,6 @@
     "sense": "a long set of moving pictures that you watch, often at a cinema or on a screen",
     "sentence": "My family and I watched a new ___ together in the living room.",
     "answer": "movie",
-    "distractors": ["song", "game", "match", "concert", "story", "show", "race", "book"]
+    "distractors": ["song", "game", "match", "concert", "story", "race", "book", "poem"]
   }
 ]

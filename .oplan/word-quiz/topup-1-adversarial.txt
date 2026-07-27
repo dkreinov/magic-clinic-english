@@ -1,0 +1,34 @@
+STEP 6.6 — two independent adversarial passes over the 14 top-up items (2026-07-27)
+Frozen question: does any of the eight distractors satisfy BOTH the gloss AND the sentence?
+
+PASS A FLAGS: desk[0]:table · movie[0]:show
+PASS B FLAGS: desk[0]:table · movie[0]:show
+UNION: 2 flags · INTERSECTION: 2 · AGREEMENT: 100% (phase-1 historical: 53%)
+
+DISPOSITIONS (orchestrator adjudication):
+  desk[0]:table  — REAL LEAK, both passes. Fix: gloss re-pinned to "a special table with
+    drawers where you do your schoolwork"; `table` and `drawer` leave the distractor list
+    (rule 13 — the new gloss names both); two safe replacements added.
+  movie[0]:show — REAL LEAK, both passes. Fix: `show` replaced by a clearly-failing noun;
+    gloss/sentence unchanged.
+
+BORDERLINES, adjudicated NOT leaks (kept; reported to the owner at gate A):
+  fan[1]:player  — A and B both borderline: a player is a participant, not a supporter; the
+    gloss's "loves and supports" plus the fan-vs-player distinction holds for most kids.
+  camp[0]:cottage — "sleeps in a tent" anchors against it (A).
+  desk[0]:chair  — no writing surface; and the re-pinned gloss ("a special table") now
+    excludes it outright (B).
+  zoo[0]:park    — plain "park" does not fit "in cages" (B).
+  movie[0]:match / race — sport broadcasts are a distinct category for kids; "often at a
+    cinema" cuts against them (A and B).
+
+GLOSS PROBLEMS: none reported by either pass.
+
+FIXES LANDED AND RE-VERIFIED (gate 62/85 green, suite 282/0):
+  desk[0]: gloss -> "a special table with drawers where you do your homework" (my frozen text
+    said "schoolwork" — NOT a manifest word; rule 11 caught it and "homework" replaced it);
+    distractors table+drawer -> shelf+mirror (rule 13 clean: no distractor named in the gloss).
+  movie[0]: show -> poem; gloss/sentence unchanged.
+  Note: the first fix dispatch (to the batch-1 author) stalled at the harness watchdog with a
+  CLEAN tree — nothing written; re-dispatched to a fresh worker, which completed. Crash-only
+  design working as intended.
