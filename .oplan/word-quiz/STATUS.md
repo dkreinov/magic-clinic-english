@@ -1,8 +1,12 @@
 # STATUS — word-quiz (W5b)
 
-**Where we are:** phase 4 — the quiz screens — is **done and approved by you.** All eleven
-checks green. Now planning phase 5 (automatic promotion). Nothing is deployed yet; her app
-changes only at phase 6.
+**Where we are:** mid-deploy phase, **paused on your new decision (D28): the meaning becomes a
+hidden hint (רמז).** Nothing is deployed. Already done this phase: her profile is backed up and
+proven (12 known words), quiz questions exist for every word she has claimed (2 hidden traps
+found by independent reviewers and fixed). Being done now: the question screen is rebuilt for
+the hint, and — because a child who never presses רמז faces the sentence alone — every wrong
+option in all 85 questions is re-checked to a stricter bar before you see them again and the
+deploy resumes.
 
 ## What got built this phase
 
@@ -29,7 +33,7 @@ flowchart LR
 | 3 | profile: strikes and demotion | done — you approved the transcript |
 | 4 | the quiz screens | done — you approved the screens |
 | 5 | automatic promotion | deferred by you to a future run (design doc first) |
-| 6 | deploy (backup + first top-up + your first real look) | **being planned now** |
+| 6 | deploy (backup + first top-up + your first real look) | **paused at your gate — hint re-work (D28) running; backup + questions done** |
 
 ## What the checking machinery caught this phase (all fixed before anything shipped)
 

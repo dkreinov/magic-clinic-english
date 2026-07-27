@@ -118,3 +118,11 @@ promised away.
 NEEDS YOU AT: reading the new questions (gate A), the go-moment before the deploy, and the
 phone check (gate B).
 === END ===
+
+2026-07-27, at gate A: **you changed the design (D28).** Seeing the questions laid out, you
+chose to hide the meaning behind a רמז (hint) button instead of always showing it. Honest
+consequence, which you accepted when choosing: the always-visible meaning was the shield that
+made close wrong options safe, so every wrong option in all 85 questions is being re-checked to
+the stricter "wrong from the sentence alone" bar, the question screen is being rebuilt, and the
+deploy waits for your fresh approval of the result. Everything already done (backup, question
+generation, trap-hunting) stays valid.
