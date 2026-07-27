@@ -28,8 +28,8 @@ flowchart LR
 | 2 | the bank | grows weekly on demand; FIRST top-up is now a phase-6 requirement |
 | 3 | profile: strikes and demotion | done — you approved the transcript |
 | 4 | the quiz screens | done — you approved the screens |
-| 5 | automatic promotion | **paused — its design doc was never signed by you; needs your call** |
-| 6 | deploy (backup + first top-up + your first real look) | recommended next |
+| 5 | automatic promotion | deferred by you to a future run (design doc first) |
+| 6 | deploy (backup + first top-up + your first real look) | **being planned now** |
 
 ## What the checking machinery caught this phase (all fixed before anything shipped)
 
@@ -42,13 +42,12 @@ flowchart LR
 - Eight deliberate sabotage runs against the finished code: every one was caught by a test. An
   independent helper who never saw the code being written could not make it misbehave.
 
-## What needs you — one decision
+## What needs you
 
-The planner discovered phase 5's design document (docs/growth.md, the automatic-promotion
-design) is still marked "awaiting your sign-off", and your own brief says to rewrite it before
-signing. Building from an unsigned design would repeat the exact mistake this run's checks exist
-to prevent. **Recommended: deploy first (phase 6) — backup, ship the quiz, run the first bank
-top-up, and you take the first real look — then decide about automatic promotion separately.**
+Nothing right now. You chose deploy-first; automatic promotion waits for its design doc. The
+next thing you will see is the deploy plan in plain words — and the deploy itself will need you
+at two points: the backup of her profile happens before anything ships, and you take the first
+real look at the app afterwards.
 
 ## Honest limits
 

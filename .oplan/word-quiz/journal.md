@@ -1302,3 +1302,9 @@ owner's first real-browser look) — and re-open G1 as its own run once growth.m
 signed and the quiz has been observed on her real data.
 
 Put to the owner as a decision, not proceeded on. tokens: planner=154374.
+
+**THE OWNER CHOSE: DEPLOY FIRST (2026-07-27). Recorded as D26.** Phase 5 (G1 candidates) is
+DEFERRED to its own future run, gated on growth.md being amended (per the brief's W1-W5
+instruction) and signed. Phase 6 — backup, deploy, first top-up, the owner's first real-browser
+look — is next. The phase-5 planner's conditional plan and its seven blockers stay in this
+journal as the starting record for that future run.
