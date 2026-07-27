@@ -5,7 +5,23 @@ CURRENT: **PHASE 1 RE-OPENED BY AUDIT, 2026-07-27. Do not treat it as closed.**
   count.** Phase 2 must NOT be dispatched until the leaks are fixed and the owner re-approves.
   An adversarial audit of the gate separately found 5 HIGH-severity holes that let bad items through
   (see journal "AUDIT"). The 71 shipped items do not exploit them; phase 2's generator would.
-  Next action: fix the leaks and the gate, then re-run criterion 9. Do not plan phase 2 yet.
+  The owner then chose "stop and rethink the format" over patching, and after the investigation
+  took **D22: the item shows the MEANING (the `sense` gloss) as well as the sentence.** That kills
+  13 of the 15 flagged leaks outright and makes `sense` learner-facing, which adds QZ-1 rule 11.
+
+  PHASE 1 RE-CLOSURE WORK, in order:
+    R1. Gate holes — add rule 12 (`allowed.has(answer)`, closes 3 of the 5) and harden rule 4 to
+        reject on residue (closes the other 2). tests/ must gain a case per hole.
+    R2. Test gaps — a test that runs the gate against the REAL bank (today `npm test` is green with
+        `public/quiz/` deleted, verified), and a NON-VACUOUS guard test (today it asserts on `gave`,
+        which has no band entry, so it passes with or without the guard; use one of the 13 words the
+        guard actually governs: all each than become repeat video worst writing zone).
+        Also cover the 3 other surviving mutants: stray underscores, MAX_SENSE, extra keys.
+    R3. Rule 11 in code + gate + tests; then fix the 8 failing glosses
+        (`everyone teeth outdoor rules brightness sensible relax`) and `itself[0]`'s WRONG gloss.
+    R4. Fix the 2 leaks D22 does not cover: `boy[0]`/`uncle`, `fair[1]`/`party`+`picnic`.
+    R5. Re-run criterion 9 at **`--sample 71`** (not 50 — `--sample 50` showed only 40 of 50 words).
+  Only then may phase 2 be planned. The QZ-6 ledger will move past 218; re-freeze it when R1-R3 land.
 PLAN: .oplan/word-quiz/plan.md — fixed in place through THREE review rounds, so there is no
   amendments appendix to read separately. Read it top to bottom.
 DESIGN: .oplan/word-quiz/design.md — FROZEN. 14 owner decisions (D1-D14) from a grill-me pass plus

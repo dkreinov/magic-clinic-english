@@ -75,6 +75,14 @@ own siblings or compare their senses.
 4. the **filled sentence** (`___` replaced by `answer`) tokenises via `tokenize` from
    `lib/vocab.js`, and **every** token resolves via `resolveLemma` (from `public/lemma.js`) into the
    manifest set `public/audio/words/index.json`. This is what guarantees she can read it.
+   **HARDENED AFTER THE AUDIT — rule 4 must reject on RESIDUE, not merely tokenise-and-drop.**
+   `tokenize` matches `[a-z]+(?:'[a-z]+)?` and silently DISCARDS everything else, so the rule was
+   blind to digits, non-Latin script and emoji: `"I ___ 42 soft cat toys."` passed, as did a
+   Cyrillic word and an emoji, and the discarded junk still counted toward rule 5's word budget so
+   it could pad a too-short sentence into legality. Worse, accent residue was laundered — `caté`
+   tokenises to `cat`, which IS in the manifest, so the garbage word passed; `café` was blocked
+   only by the luck of `cafe` not being a manifest word. The sentence must therefore be checked for
+   characters outside `[A-Za-z' .!?,-]` and rejected if any remain, IN ADDITION to the token check.
 5. the filled sentence is between **4 and 14 words** inclusive.
 6. the sentence starts with an uppercase letter and ends with `.`, `!` or `?`.
 7. `distractors` is exactly **8** strings, all distinct, none equal to `answer`, every one present
@@ -109,7 +117,20 @@ own siblings or compare their senses.
    comma-segment is reduced to its FIRST WHITESPACE TOKEN. A lemma being several parts of speech is
    the normal case, and intersection is the linguistically correct test for "plausible distractor".
 9. `sense` is a non-empty string ≤ 80 characters; when a file holds >1 item all `sense` values are
-   distinct.
+   distinct. **`sense` must also contain at least one non-whitespace character** — the audit found
+   `"   "` passes as "non-empty" and that two whitespace strings of different length count as
+   "distinct".
+11. **(NEW, D22) `sense` IS SHOWN TO THE LEARNER, so it must be in her vocabulary.** Every token of
+   `sense` must resolve via `resolveLemma` into the manifest, exactly as rule 4 requires of the
+   filled sentence. She reads the gloss now; a gloss she cannot decode is worse than no gloss.
+   MEASURED at the time of the change: 8 of 71 glosses failed, on 7 distinct words — `everyone
+   teeth outdoor rules brightness sensible relax`. This is the FIRST mechanically-checkable content
+   rule the feature has, and it exists only because D22 made the gloss learner-facing.
+12. **(NEW) `answer` must itself be a manifest word** — `allowed.has(answer)`, checked directly and
+   not via any transform. The audit proved rules 4, 8 and 10 all reach the answer through a lossy
+   transform (`tokenize`, `posIndex` lookup, `resolveLemma`) and every one of them FAILS OPEN:
+   `feels.json` and `cats.json` passed the gate, and `answer:"Feel"` silently disabled rule 8
+   entirely while `answer:"feel "` silently disabled rule 10. One direct check closes all three.
 10. the answer word does **not** appear anywhere else in the sentence (it would give the answer
     away). Checked on the filled sentence, whole-word, case-insensitive, **by RESOLVED LEMMA**:
     every token is passed through `resolveLemma` and compared against the resolved answer, so an

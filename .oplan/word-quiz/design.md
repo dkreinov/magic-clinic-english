@@ -94,6 +94,40 @@ it**" is what kills `big`). A same-class distractor set with a loose sentence is
 dangerous thing this run can produce, and it is why the owner's criterion-9 review of all 50 items
 is now load-bearing rather than a formality. Batch 1's 22 items are regenerated under this rule.
 
+## D22 — the item shows the MEANING as well as the sentence (owner, 2026-07-27, after the audit)
+
+The audit found that roughly **one item in five** has a distractor that also fits its blank, and
+that no mechanical gate can detect it: a blind fill-the-blank experiment caught 0 of 5 known leaks,
+because generation is not recognition. Two independent adversarial passes agreed only 53% of the
+time. Shown that, the owner chose to change the presentation rather than buy the defect rate down.
+
+**Every leak has the same shape: the distractor fits the SENTENCE but does not mean what the item
+is testing.** `computer` does not mean "the brightness that lets you see in a dark room"; `total`
+does not mean "the part that is left over"; `piece` does not mean "a sort or type".
+
+So the item is presented as **gloss + sentence**, not sentence alone:
+
+> Which word means *"the brightness that lets you see in a dark room"*?
+> Please turn on the ___ so that I can see my book.
+
+MEASURED: this kills the leak outright in **13 of the 15** flagged items. Only `boy[0]`/`uncle` and
+`fair[1]`/`party` partly survive it and are fixed by hand.
+
+**The `sense` field therefore stops being authoring metadata and becomes text an ELEVEN-YEAR-OLD
+READS.** That is a real consequence and it cuts three ways:
+
+1. It creates the first mechanically-checkable CONTENT rule this feature has ever had — the gloss
+   must be in her vocabulary, exactly as rule 4 demands of sentences. Frozen as QZ-1 rule 11.
+   MEASURED: 8 of 71 glosses currently fail it, on 7 distinct words — `everyone teeth outdoor rules
+   brightness sensible relax`. Including, with some irony, `light[1]`'s own gloss.
+2. Glosses must now be judged for accuracy against the sense actually being tested. At least one is
+   wrong today: `itself[0]` is glossed as reflexive coreference while the item tests the idiom
+   *by itself* = without help.
+3. The known cost, accepted by the owner: more reading for her, and the gloss is a strong hint. The
+   counter-argument is that mapping a meaning onto a word is a more direct test of vocabulary than
+   cloze alone, and it removes the one failure that damages her — being marked wrong for a right
+   answer.
+
 ## Decisions taken by the orchestrator at plan time (Rule 2: nothing deferred to execution)
 
 The grill left five items "still open". They are decided here, because a step containing an open
