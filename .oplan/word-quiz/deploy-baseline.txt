@@ -1,0 +1,14 @@
+PHASE 6 STEP 6.1 — pre-flight baseline, frozen 2026-07-27
+ROLLBACK TARGET (the only one):
+  id:  dpl_4b6XjMSa2HRUN4a2s48cdsT6u2Z1
+  url: https://english-d0roovfpq-dkreinovs-projects.vercel.app
+  created: Sun Jul 26 2026 14:44:29 GMT+0300
+  command: "$(npm prefix -g)/vercel" rollback https://english-d0roovfpq-dkreinovs-projects.vercel.app --yes
+LIVE IDENTITY: /sw.js byte-equal to git blob 3a88e71:public/sw.js (md5 f77e2c888eef73f57a7e899e34df64c3,
+  compared FILE-TO-FILE — command substitution strips trailing newlines and gave a false mismatch first)
+LIVE BASELINES: sw carries magic-vet-v12 · /api/health exact {"ok":true,"data":{"status":"up","version":1}}
+  · /api/profile unauth -> 401 (gate enforced) · /quiz/light.json -> 404 · /quiz/zzzznotaword.json -> 404
+  · /.env -> 404
+LOCAL BASELINES at 494f78a: npm test 282/0 · contrast 52 · bank QUIZ BANK OK: 50 files, 71 items
+  · .data/profile.json absent · tree clean
+STEP-6.1-OK
