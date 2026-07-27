@@ -1,4 +1,14 @@
-CURRENT: **PHASE 1 RE-OPENED BY AUDIT, 2026-07-27. Do not treat it as closed.**
+CURRENT: **PHASE 1 CLOSED 2026-07-27 (second attempt), owner approved. All 9 criteria met.**
+  Gate green: 50 files, 71 items, 18 multi-sense. 225 tests / 0 fail. Contrast 52 ALL PASS.
+  NEXT ACTION: **PLAN phase 2. Do NOT dispatch it.** plan.md holds only a skeleton, and phase 2 is
+  not "repeat phase 1 forty times" — it is 2167 words / ~3150 items / 181-217 batches, and the
+  audit proved verification rather than generation is the dominant cost. It needs its own frozen
+  acceptance criteria, a batching strategy, and an N-passes-per-batch decision before any worker
+  runs. Two known chores: the field guide is 54 lines against a 40-line budget, and
+  criterion-9-sample.txt should be regenerated whenever the bank changes.
+
+  ---- history of the first, VOIDED closure, kept deliberately ----
+  **PHASE 1 WAS RE-OPENED BY AUDIT ONCE, 2026-07-27.**
   It was declared closed and the owner approved criterion 9 — but the owner approved on my written
   assurance that "no distractor fits its blank", and an independent content audit then found one
   CERTAIN leak and four PROBABLE ones. **The approval rests on a false premise, so it does not
