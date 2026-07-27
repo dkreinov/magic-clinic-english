@@ -1,7 +1,8 @@
-CURRENT: phase 1 — steps 1.1, 1.2, 1.3 ALL COMPLETE. Criteria 1-8 all verified green by the
-  orchestrator. **BLOCKED ON CRITERION 9, the HUMAN GATE** — the owner must review
-  `node scripts/check-quiz-bank.mjs --sample 50` and explicitly approve. Phase 2 must NOT open
-  without it. A green criterion 3 does not satisfy it.
+CURRENT: **PHASE 1 CLOSED 2026-07-27 — all 9 criteria met, criterion 9 approved by the owner, who
+  opened phase 2.** Phase 2 is NOT YET PLANNED: plan.md holds only a skeleton for it, and this
+  project's rule is that a step containing an open question must never be dispatched. Phase 2 needs
+  its own frozen acceptance criteria, a batching strategy, and a decision on scale BEFORE any
+  worker runs. Next action: plan phase 2, do not dispatch it.
 PLAN: .oplan/word-quiz/plan.md — fixed in place through THREE review rounds, so there is no
   amendments appendix to read separately. Read it top to bottom.
 DESIGN: .oplan/word-quiz/design.md — FROZEN. 14 owner decisions (D1-D14) from a grill-me pass plus
@@ -23,6 +24,19 @@ ACCEPTED: 1.1 (lib/quiz-item.js + tests/quiz-item.test.js; STEP-1.1-OK re-run by
   ended short of the bank's tail and `--sample 50` over 80 items showed the alphabetically-first
   63% — it would have fed criterion 9's HUMAN gate a front-loaded sample presented as a whole-bank
   one. See journal "Execution — phase 1".
+
+CARRY INTO PHASE 2 — the four things phase 1 learned that no gate can enforce:
+  · D21 (owner): distractors are SAME-CLASS, so the item tests meaning and not word class.
+  · THE PIN TEST: `and`/`but` pin NOTHING. Only `so`, `so that`, `so ... that`, `because`,
+    `... enough to`, purpose infinitives and verb/argument selection constrain the blank. Five of
+    the first 23 items pinned with an `and`/`but` and every one leaked.
+  · AMBIGUITY IS THE FAILURE, not difficulty. `count` in "___ four and five, the answer is nine"
+    and `because` in "played the piano ___ I was seven" were both rejected for having a readable
+    second meaning, not for fitting outright.
+  · SHIP FEWER ITEMS RATHER THAN A LEAKY ONE. Two senses were abandoned on this ground and that was
+    the right call.
+  Also inherited: rule 10 is blind to irregular forms that are themselves manifest words (29 lemmas
+  / 42 forms, listed in QZ-2) and `became`/`tying` fail rule 4 as ordinary sentence words.
 
 FROZEN CONTRACTS IN FORCE: QZ-1 (the item file, ten rules — 1/2/9 FILE-level, 3-8/10 ITEM-level)
   · QZ-2 (the generation rules, including the vocabulary warning and the duty to self-run the gate)

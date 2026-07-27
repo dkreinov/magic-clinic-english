@@ -74,6 +74,37 @@ child who cannot read the distractors, which is a weaker argument at eleven. Eig
 more defensible. Left at six — the owner chose it and changing a locked decision on my own initiative
 because a premise shifted slightly is exactly the "work redefines done" hazard.
 
+## PHASE 1 CLOSED — the owner approved the sample (2026-07-27)
+
+Criteria 1-8 verified green by the orchestrator in a clean tree: 218 tests / 0 fail, gate
+`QUIZ BANK OK: 50 files, 71 items`, the file set exactly equal to QZ-5 with no QZ-8 word present,
+71 items inside the 50-150 band, 10 of 10 polysemous words carrying >=2 items against a
+requirement of 6, nothing changed outside `lib/quiz-item.js`, `scripts/check-quiz-bank.mjs`,
+`tests/` and `public/quiz/`, and `.data/profile.json` still absent. Contrast still 52 ALL PASS.
+
+Criterion 9, the human gate, was run as specified — `--sample 50`, output put in front of the
+owner — and the owner approved and opened phase 2. The sample reached 40 of the 50 words, which is
+only true because of amendment A2; under the stride as originally written it would have shown the
+alphabetically-first 63% and stopped at `question`.
+
+WHAT PHASE 1 ACTUALLY BOUGHT, which is the thing it existed for: the format was wrong when the
+first 22 items were written, and nothing mechanical could tell. Every gate was green. It took the
+owner's D21 decision plus three audit rounds to find that distractors chosen to be *impossible in
+the slot* measure grammar rather than vocabulary, and then that `and`/`but` clauses pin nothing at
+all. Seven separate leaks were found and fixed by hand — `clean`, `clear`, `count`, `because`,
+`while`, `warm`, `wet` — every one of which would have marked an eleven-year-old WRONG FOR A RIGHT
+ANSWER, and not one of which the gate could see. Had this run generated 2217 words first and
+reviewed after, all of it would have been generated in the broken style.
+
+PHASE 1 METRICS
+  steps: 3 · frozen contracts: 8 (QZ-1..QZ-8) + D21 · acceptance criteria: 9, all met
+  execution-time amendments: 3 (A1 rule 10 by lemma, A2 sampler stride, A3 numeral pos fold)
+  owner decisions taken during execution: 1 (D21, same-class distractors)
+  leaks found by audit that the gate could not see: 7
+  senses deliberately abandoned rather than shipped leaky: 2 (`pattern` abstract, `bear` endure)
+  worker batches dispatched: 7 (5 batches + 2 rework rounds), all returned green
+  tests: 208 -> 218, exactly as QZ-6 froze
+
 ## D20 — the owner cut 37 words from the quiz
 
 Asked how ~50 sensitive words should be handled, the owner answered "dont need these words there
