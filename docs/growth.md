@@ -110,6 +110,10 @@ word-quiz runs; the line numbers in the previous version of this document were s
 - The item bank is `public/quiz/*.json`: 62 files, 84 items. It is grown on demand (D23), in
   weekly top-ups derived from the words she has claimed — not built up front.
 
+- CORRECTION (2026-07-28, word-g1 phase 3, B7 accepted): the top-up list is no longer
+  "the words she has claimed". It is `known` UNION `candidate`, on-manifest words only,
+  minus the 37 QZ-8 exclusions. Derived by `node scripts/quiz-topup.mjs --profile <capture>`.
+
 - The item is gloss + sentence + answer + 8 distractors, presented as sentence-only with the gloss
   behind a רמז button (D28). Pressing the hint is free: no strike, no record.
 
