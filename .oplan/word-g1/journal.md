@@ -429,5 +429,19 @@ STEP 2.6 the child's experience end to end — episode 6
   fail-first: single-file # pass 5 / # fail 1; full suite # pass 296 / # fail 2 (episode 6 +
     the overlapping 2.4 test); quiz.js restored, git diff --stat empty
   audit: match / high
+  commit: 175de68
+  accepted: 2026-07-28
+
+STEP 2.7 CACHE bump v16 -> v17 — LAST code change
+  tier: WORKER (Sonnet)
+  did: public/sw.js:1 CACHE = magic-vet-v17; tests/shell.test.js:58 pin moved in lockstep.
+  surprises: none
+  deviations: none
+  validation_first_try: yes
+  retries: 0
+  escalations: 0
+  tokens: worker=29826, checker=25024, orchestrator_delta=unavailable
+  interventions: 0
+  audit: match / high (the 4-line diff quoted whole in the packet)
   commit: (this commit)
   accepted: 2026-07-28
