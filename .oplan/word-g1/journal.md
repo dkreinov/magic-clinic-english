@@ -601,3 +601,26 @@ STEP 3.1 the top-up list becomes an executable, tested rule
     the auditor layer caught what validation could not.)
   commit: 07ea2b4 (journal folded into the step commit by amend; this is the final hash)
   accepted: 2026-07-28
+
+STEP 3.2 the signed document stops teaching the old rule
+  tier: WORKER (Sonnet)
+  did: docs/growth.md: the frozen 4-line dated CORRECTION (1 blank + 3 ASCII content lines)
+       inserted immediately after line 111; 637 -> 641; numstat 4 0; sign-off untouched.
+  surprises: none (second attempt)
+  deviations: attempt #1 used the Edit tool and the file materialised with CRLF on EVERY line
+    (641 CR bytes) — invisible to the frozen validation because git diff normalises under
+    core.autocrlf=true; the orchestrator's raw byte check caught it, the file was restored
+    byte-exactly from the blob, and the redo used python newline='' (byte-preserving). The
+    blob was never at risk (numstat proved +4/-0 normalised) — the DISK state violated the
+    spec's "LF endings" contract. Field-guide 4's law, new costume: autocrlf makes disk
+    endings unstable; edits to LF files must be byte-preserving, and only python -rb checks
+    see the truth.
+  validation_first_try: no (attempt #1 failed the orchestrator's byte check; redo passed
+    first try incl. the byte check folded into the re-run)
+  retries: 1
+  escalations: 0
+  tokens: worker=34586+37387=71973, checker=35076, orchestrator_delta=unavailable
+  interventions: 0
+  audit: match / high
+  commit: 231572f
+  accepted: 2026-07-28

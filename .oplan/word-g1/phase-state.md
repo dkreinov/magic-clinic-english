@@ -6,8 +6,9 @@ PLAN: .oplan/word-g1/plan.md ("PHASE 3 IN FULL", end of file — supersedes the 
 JOURNAL: journal.md (PHASE 3 PLANNING appended) · BRIEFING: briefing.md · STATUS: STATUS.md ·
 DESIGN: design.md (SIGNED) · FIELD GUIDE: field-guide/index.md (12 lessons)
 
-BASE (phase 3): to be recorded immediately before 3.1 (expected 4f12820 + this planning commit).
-ACCEPTED: (none yet this phase)
+BASE (phase 3): 5a90a7f (the planning commit).
+ACCEPTED: 3.1 — 07ea2b4 (quiz-topup.mjs + 5 flat tests, ledger 303; audit mismatch #1 —
+  unrequested defensive extras — reworked to the bare contract, re-audit match/high)
 
 Phase-2 record: BASE 558a5bc · 2.1 dbe5a4f · 2.2 0621b1e · 2.3 d077dcc · 2.4 b83b538 ·
   2.5 ef7396c · 2.6 175de68 · 2.7 e786273 · 2.8 6094724 · 2.9-2.11 in journal · close 4f12820.
