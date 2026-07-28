@@ -24,6 +24,16 @@ function withTempDataDir(fn) {
     });
 }
 
+function withOpenGate(fn) {
+  const original = process.env.APP_CODE;
+  delete process.env.APP_CODE;
+  return Promise.resolve()
+    .then(fn)
+    .finally(() => {
+      if (original !== undefined) process.env.APP_CODE = original;
+    });
+}
+
 function createMockReqRes(method) {
   const req = { method };
   const res = {
@@ -58,18 +68,18 @@ test('health POST returns 405', async () => {
 });
 
 test('profile GET returns a valid profile', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const { req, res } = createMockReqRes('GET');
     await profileHandler(req, res);
     assert.strictEqual(res.statusCode, 200);
     const parsed = JSON.parse(res.body);
     assert.strictEqual(parsed.ok, true);
     assert.strictEqual(validateProfile(parsed.data).ok, true);
-  });
+  }));
 });
 
 test('second profile GET returns the persisted profile', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const { req: req1, res: res1 } = createMockReqRes('GET');
     await profileHandler(req1, res1);
     const first = JSON.parse(res1.body);
@@ -79,15 +89,15 @@ test('second profile GET returns the persisted profile', async () => {
     const second = JSON.parse(res2.body);
 
     assert.strictEqual(second.data.meta.createdAt, first.data.meta.createdAt);
-  });
+  }));
 });
 
 test('profile PUT returns 405', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const { req, res } = createMockReqRes('PUT');
     await profileHandler(req, res);
     assert.strictEqual(res.statusCode, 405);
     const parsed = JSON.parse(res.body);
     assert.strictEqual(parsed.ok, false);
-  });
+  }));
 });

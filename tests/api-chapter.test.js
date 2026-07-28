@@ -37,6 +37,16 @@ function withTempDataDir(fn) {
     });
 }
 
+function withOpenGate(fn) {
+  const original = process.env.APP_CODE;
+  delete process.env.APP_CODE;
+  return Promise.resolve()
+    .then(fn)
+    .finally(() => {
+      if (original !== undefined) process.env.APP_CODE = original;
+    });
+}
+
 function createMockRes() {
   return {
     statusCode: undefined,
@@ -133,7 +143,7 @@ function tooHardChapterFixture() {
 }
 
 test('POST generate with no placement returns 400 "placement required"', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     setTransport(async () => goodChapterFixture());
     try {
       const req = createPostReq({ action: 'generate' });
@@ -147,11 +157,11 @@ test('POST generate with no placement returns 400 "placement required"', async (
     } finally {
       resetTransport();
     }
-  });
+  }));
 });
 
 test('POST generate with placement but no learner names returns 400 "learner required"', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const p = defaultProfile();
     p.placement.completed = true;
     await saveProfile(p);
@@ -169,11 +179,11 @@ test('POST generate with placement but no learner names returns 400 "learner req
     } finally {
       resetTransport();
     }
-  });
+  }));
 });
 
 test('POST generate with placement and learner names returns 200 and persists chapter', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const p = defaultProfile();
     p.placement.completed = true;
     p.learner.heroineName = 'Noa';
@@ -207,11 +217,11 @@ test('POST generate with placement and learner names returns 200 and persists ch
     } finally {
       resetTransport();
     }
-  });
+  }));
 });
 
 test('POST generate returns 502 when transport always returns a too-hard chapter, without persisting', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const p = defaultProfile();
     p.placement.completed = true;
     p.learner.heroineName = 'Noa';
@@ -234,11 +244,11 @@ test('POST generate returns 502 when transport always returns a too-hard chapter
     } finally {
       resetTransport();
     }
-  });
+  }));
 });
 
 test('GET returns 405', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createGetReq();
     const res = createMockRes();
     await chapterHandler(req, res);
@@ -246,11 +256,11 @@ test('GET returns 405', async () => {
     const parsed = JSON.parse(res.body);
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
-  });
+  }));
 });
 
 test('unknown action returns 400', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({ action: 'nope' });
     const res = createMockRes();
     await chapterHandler(req, res);
@@ -259,11 +269,11 @@ test('unknown action returns 400', async () => {
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
     assert.strictEqual(parsed.error, 'unknown action');
-  });
+  }));
 });
 
 test('malformed JSON body returns 400', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq('{');
     const res = createMockRes();
     await chapterHandler(req, res);
@@ -272,7 +282,7 @@ test('malformed JSON body returns 400', async () => {
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
     assert.strictEqual(parsed.error, 'invalid JSON body');
-  });
+  }));
 });
 
 // Sanity check that GOOD_TEXT actually passes the real verifier against the

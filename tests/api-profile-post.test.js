@@ -23,6 +23,16 @@ function withTempDataDir(fn) {
     });
 }
 
+function withOpenGate(fn) {
+  const original = process.env.APP_CODE;
+  delete process.env.APP_CODE;
+  return Promise.resolve()
+    .then(fn)
+    .finally(() => {
+      if (original !== undefined) process.env.APP_CODE = original;
+    });
+}
+
 function createMockRes() {
   return {
     statusCode: undefined,
@@ -61,7 +71,7 @@ function assertEnvelope(parsed) {
 }
 
 test('word-tap POST creates a learning word with taps=1', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({ action: 'word-tap', lemma: 'dog', he: 'כלב', context: 'The dog ran fast.' });
     const res = createMockRes();
     await profileHandler(req, res);
@@ -73,11 +83,11 @@ test('word-tap POST creates a learning word with taps=1', async () => {
     assert.strictEqual(parsed.data.words.dog.taps, 1);
     assert.strictEqual(parsed.data.words.dog.he, 'כלב');
     assert.strictEqual(parsed.data.words.dog.context, 'The dog ran fast.');
-  });
+  }));
 });
 
 test('word-tap persists across a subsequent GET', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const postReq = createPostReq({ action: 'word-tap', lemma: 'dog', he: 'כלב' });
     const postRes = createMockRes();
     await profileHandler(postReq, postRes);
@@ -90,11 +100,11 @@ test('word-tap persists across a subsequent GET', async () => {
     const parsed = JSON.parse(getRes.body);
     assertEnvelope(parsed);
     assert.strictEqual(parsed.data.words.dog.taps, 1);
-  });
+  }));
 });
 
 test('second identical word-tap POST increments taps to 2', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req1 = createPostReq({ action: 'word-tap', lemma: 'dog', he: 'כלב' });
     const res1 = createMockRes();
     await profileHandler(req1, res1);
@@ -107,11 +117,11 @@ test('second identical word-tap POST increments taps to 2', async () => {
     const parsed = JSON.parse(res2.body);
     assertEnvelope(parsed);
     assert.strictEqual(parsed.data.words.dog.taps, 2);
-  });
+  }));
 });
 
 test('mark-known POST with valid source marks the word known', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({ action: 'mark-known', lemma: 'cat', source: 'placement' });
     const res = createMockRes();
     await profileHandler(req, res);
@@ -120,11 +130,11 @@ test('mark-known POST with valid source marks the word known', async () => {
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, true);
     assert.strictEqual(parsed.data.words.cat.status, 'known');
-  });
+  }));
 });
 
 test('mark-known POST without source returns 400', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({ action: 'mark-known', lemma: 'cat' });
     const res = createMockRes();
     await profileHandler(req, res);
@@ -132,11 +142,11 @@ test('mark-known POST without source returns 400', async () => {
     const parsed = JSON.parse(res.body);
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
-  });
+  }));
 });
 
 test('unknown action POST returns 400', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({ action: 'nope' });
     const res = createMockRes();
     await profileHandler(req, res);
@@ -145,11 +155,11 @@ test('unknown action POST returns 400', async () => {
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
     assert.strictEqual(parsed.error, 'unknown action');
-  });
+  }));
 });
 
 test('malformed JSON body POST returns 400', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq('{');
     const res = createMockRes();
     await profileHandler(req, res);
@@ -158,11 +168,11 @@ test('malformed JSON body POST returns 400', async () => {
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
     assert.strictEqual(parsed.error, 'invalid JSON body');
-  });
+  }));
 });
 
 test('word-tap POST without lemma returns 400', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({ action: 'word-tap' });
     const res = createMockRes();
     await profileHandler(req, res);
@@ -170,11 +180,11 @@ test('word-tap POST without lemma returns 400', async () => {
     const parsed = JSON.parse(res.body);
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
-  });
+  }));
 });
 
 test('set-learner POST sets both names and persists via GET', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({ action: 'set-learner', heroineName: 'Noa', petName: 'Sparky' });
     const res = createMockRes();
     await profileHandler(req, res);
@@ -192,11 +202,11 @@ test('set-learner POST sets both names and persists via GET', async () => {
     const getParsed = JSON.parse(getRes.body);
     assert.strictEqual(getParsed.data.learner.heroineName, 'Noa');
     assert.strictEqual(getParsed.data.learner.petName, 'Sparky');
-  });
+  }));
 });
 
 test('set-learner POST with neither name returns 400 "name required"', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({ action: 'set-learner' });
     const res = createMockRes();
     await profileHandler(req, res);
@@ -205,11 +215,11 @@ test('set-learner POST with neither name returns 400 "name required"', async () 
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
     assert.strictEqual(parsed.error, 'name required');
-  });
+  }));
 });
 
 test('set-learner POST with blank heroineName returns 400', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({ action: 'set-learner', heroineName: '   ' });
     const res = createMockRes();
     await profileHandler(req, res);
@@ -218,11 +228,11 @@ test('set-learner POST with blank heroineName returns 400', async () => {
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
     assert.strictEqual(parsed.error, 'name required');
-  });
+  }));
 });
 
 test('log-check POST appends an entry to story.checkLog and persists', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({
       action: 'log-check',
       chapter: 1,
@@ -246,11 +256,11 @@ test('log-check POST appends an entry to story.checkLog and persists', async () 
     assert.strictEqual(getRes.statusCode, 200);
     const getParsed = JSON.parse(getRes.body);
     assert.strictEqual(getParsed.data.story.checkLog.length, 1);
-  });
+  }));
 });
 
 test('log-check POST missing questionId returns 400 "invalid check"', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({ action: 'log-check', chapter: 1, chosenIndex: 0, correctIndex: 0 });
     const res = createMockRes();
     await profileHandler(req, res);
@@ -259,11 +269,11 @@ test('log-check POST missing questionId returns 400 "invalid check"', async () =
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
     assert.strictEqual(parsed.error, 'invalid check');
-  });
+  }));
 });
 
 test('PUT method returns 405', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = { method: 'PUT' };
     const res = createMockRes();
     await profileHandler(req, res);
@@ -271,5 +281,5 @@ test('PUT method returns 405', async () => {
     const parsed = JSON.parse(res.body);
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
-  });
+  }));
 });

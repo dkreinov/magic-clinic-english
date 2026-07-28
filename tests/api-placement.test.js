@@ -27,6 +27,16 @@ function withTempDataDir(fn) {
     });
 }
 
+function withOpenGate(fn) {
+  const original = process.env.APP_CODE;
+  delete process.env.APP_CODE;
+  return Promise.resolve()
+    .then(fn)
+    .finally(() => {
+      if (original !== undefined) process.env.APP_CODE = original;
+    });
+}
+
 function createMockRes() {
   return {
     statusCode: undefined,
@@ -80,7 +90,7 @@ function buildAllCorrectTask2Answers() {
 }
 
 test('GET returns stripped item bank', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createGetReq();
     const res = createMockRes();
     await placementHandler(req, res);
@@ -90,11 +100,11 @@ test('GET returns stripped item bank', async () => {
     assert.strictEqual(parsed.ok, true);
     assert.ok(!res.body.includes('"correctIndex"'));
     assert.strictEqual(parsed.data.task1.length, bank.task1.length);
-  });
+  }));
 });
 
 test('POST submit task1 scores answers and updates profile', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const answers = buildTask1Answers({ wrongCount: 2 });
     const req = createPostReq({ action: 'submit', task1: answers });
     const res = createMockRes();
@@ -119,11 +129,11 @@ test('POST submit task1 scores answers and updates profile', async () => {
     assert.ok(wordEntry, 'expected known lemma in profile.words');
     assert.strictEqual(wordEntry.status, 'known');
     assert.strictEqual(wordEntry.source, 'placement');
-  });
+  }));
 });
 
 test('profile persists across a subsequent GET to api/profile.js', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const answers = buildTask1Answers({ wrongCount: 2 });
     const postReq = createPostReq({ action: 'submit', task1: answers });
     const postRes = createMockRes();
@@ -142,11 +152,11 @@ test('profile persists across a subsequent GET to api/profile.js', async () => {
     const wordEntry = parsed.data.words[lastCorrectItem.lemma.toLowerCase()];
     assert.ok(wordEntry);
     assert.strictEqual(wordEntry.status, 'known');
-  });
+  }));
 });
 
 test('POST submit task2 (all correct) marks completed', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const task1Answers = buildTask1Answers({ wrongCount: 0 });
     const req1 = createPostReq({ action: 'submit', task1: task1Answers });
     const res1 = createMockRes();
@@ -164,11 +174,11 @@ test('POST submit task2 (all correct) marks completed', async () => {
     assert.strictEqual(parsed.data.skills.readingComprehension.state, 'estimated');
     assert.strictEqual(parsed.data.placement.completed, true);
     assert.ok(typeof parsed.data.placement.completedAt === 'string');
-  });
+  }));
 });
 
 test('malformed JSON body returns 400', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq('{');
     const res = createMockRes();
     await placementHandler(req, res);
@@ -177,11 +187,11 @@ test('malformed JSON body returns 400', async () => {
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
     assert.strictEqual(parsed.error, 'invalid JSON body');
-  });
+  }));
 });
 
 test('unknown action returns 400', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({ action: 'nope' });
     const res = createMockRes();
     await placementHandler(req, res);
@@ -190,11 +200,11 @@ test('unknown action returns 400', async () => {
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
     assert.strictEqual(parsed.error, 'unknown action');
-  });
+  }));
 });
 
 test('submit with no answer arrays returns 400 "no answers"', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({ action: 'submit' });
     const res = createMockRes();
     await placementHandler(req, res);
@@ -203,11 +213,11 @@ test('submit with no answer arrays returns 400 "no answers"', async () => {
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
     assert.strictEqual(parsed.error, 'no answers');
-  });
+  }));
 });
 
 test('submit with only unknown-id answers returns 400 "no valid answers"', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({ action: 'submit', task1: [{ id: 'zzz', choice: 0 }] });
     const res = createMockRes();
     await placementHandler(req, res);
@@ -216,11 +226,11 @@ test('submit with only unknown-id answers returns 400 "no valid answers"', async
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
     assert.strictEqual(parsed.error, 'no valid answers');
-  });
+  }));
 });
 
 test('PUT method returns 405', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = { method: 'PUT' };
     const res = createMockRes();
     await placementHandler(req, res);
@@ -228,11 +238,11 @@ test('PUT method returns 405', async () => {
     const parsed = JSON.parse(res.body);
     assertEnvelope(parsed);
     assert.strictEqual(parsed.ok, false);
-  });
+  }));
 });
 
 test('final profile after full submission passes validateProfile', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const task1Answers = buildTask1Answers({ wrongCount: 0 });
     const req1 = createPostReq({ action: 'submit', task1: task1Answers });
     const res1 = createMockRes();
@@ -248,5 +258,5 @@ test('final profile after full submission passes validateProfile', async () => {
 
     const result = validateProfile(parsed.data);
     assert.strictEqual(result.ok, true, JSON.stringify(result.errors));
-  });
+  }));
 });

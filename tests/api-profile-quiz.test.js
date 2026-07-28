@@ -23,6 +23,16 @@ function withTempDataDir(fn) {
     });
 }
 
+function withOpenGate(fn) {
+  const original = process.env.APP_CODE;
+  delete process.env.APP_CODE;
+  return Promise.resolve()
+    .then(fn)
+    .finally(() => {
+      if (original !== undefined) process.env.APP_CODE = original;
+    });
+}
+
 function createMockRes() {
   return {
     statusCode: undefined,
@@ -72,7 +82,7 @@ async function markKnown(lemma) {
 // --------------------------------------------------------------------------
 
 test('quiz-answer happy path persists across a GET', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     await markKnown('light');
     const { res, parsed } = await doPost({
       action: 'quiz-answer',
@@ -89,11 +99,11 @@ test('quiz-answer happy path persists across a GET', async () => {
     assert.strictEqual(getRes.statusCode, 200);
     assert.strictEqual(getParsed.data.words.light.strikes, 1);
     assert.strictEqual(getParsed.data.words.light.lastStrikeSession, 's1');
-  });
+  }));
 });
 
 test('three wrongs in three distinct sessions demote to learning', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     await markKnown('fair');
     await doPost({ action: 'quiz-answer', lemma: 'fair', correct: false, sessionId: 's1' });
     await doPost({ action: 'quiz-answer', lemma: 'fair', correct: false, sessionId: 's2' });
@@ -106,11 +116,11 @@ test('three wrongs in three distinct sessions demote to learning', async () => {
     assert.strictEqual(res.statusCode, 200);
     assert.strictEqual(parsed.data.words.fair.status, 'learning');
     assert.strictEqual(parsed.data.words.fair.strikes, 0);
-  });
+  }));
 });
 
 test('three wrongs in one session do not demote', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     await markKnown('method');
     await doPost({ action: 'quiz-answer', lemma: 'method', correct: false, sessionId: 'same-session' });
     await doPost({ action: 'quiz-answer', lemma: 'method', correct: false, sessionId: 'same-session' });
@@ -123,11 +133,11 @@ test('three wrongs in one session do not demote', async () => {
     assert.strictEqual(res.statusCode, 200);
     assert.strictEqual(parsed.data.words.method.status, 'known');
     assert.strictEqual(parsed.data.words.method.strikes, 1);
-  });
+  }));
 });
 
 test('a correct answer resets strikes and never promotes', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     await markKnown('dog');
     await doPost({ action: 'quiz-answer', lemma: 'dog', correct: false, sessionId: 's1' });
     await doPost({ action: 'quiz-answer', lemma: 'dog', correct: false, sessionId: 's2' });
@@ -142,11 +152,11 @@ test('a correct answer resets strikes and never promotes', async () => {
     assert.strictEqual('lastStrikeSession' in parsed.data.words.dog, false);
     assert.strictEqual(parsed.data.words.dog.quizRight, 1);
     assert.strictEqual(parsed.data.words.dog.status, 'known');
-  });
+  }));
 });
 
 test('the four 400s use exact error strings and write nothing to disk', async () => {
-  await withTempDataDir(async (tmpDir) => {
+  await withOpenGate(() => withTempDataDir(async (tmpDir) => {
     await markKnown('cat');
     const profilePath = path.join(tmpDir, 'profile.json');
 
@@ -186,11 +196,11 @@ test('the four 400s use exact error strings and write nothing to disk', async ()
       const after = fs.readFileSync(profilePath, 'utf8');
       assert.strictEqual(after, before);
     }
-  });
+  }));
 });
 
 test('an inflected lemma 400s as unknown word and mints no new entry', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     await markKnown('light');
     const { res, parsed } = await doPost({
       action: 'quiz-answer',
@@ -203,11 +213,11 @@ test('an inflected lemma 400s as unknown word and mints no new entry', async () 
 
     const { parsed: getParsed } = await doGet();
     assert.strictEqual('lights' in getParsed.data.words, false);
-  });
+  }));
 });
 
 test('an old-shape profile survives a real GET with its bytes unchanged', async () => {
-  await withTempDataDir(async (tmpDir) => {
+  await withOpenGate(() => withTempDataDir(async (tmpDir) => {
     const nowIso = new Date().toISOString();
     const oldProfile = {
       version: 1,
@@ -254,5 +264,5 @@ test('an old-shape profile survives a real GET with its bytes unchanged', async 
 
     assert.strictEqual(parsed.data.words.light.status, 'known');
     assert.strictEqual(parsed.data.words.fair.status, 'learning');
-  });
+  }));
 });

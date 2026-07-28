@@ -31,6 +31,16 @@ function withTempDataDir(fn) {
     });
 }
 
+function withOpenGate(fn) {
+  const original = process.env.APP_CODE;
+  delete process.env.APP_CODE;
+  return Promise.resolve()
+    .then(fn)
+    .finally(() => {
+      if (original !== undefined) process.env.APP_CODE = original;
+    });
+}
+
 function createMockRes() {
   return {
     statusCode: undefined,
@@ -103,7 +113,7 @@ test('renderList renders context/escaping/btn-say/btn-know per row', () => {
 });
 
 test('markKnownBody is accepted by the real /api/profile handler', async () => {
-  await withTempDataDir(async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq(markKnownBody('cat'));
     const res = createMockRes();
     await profileHandler(req, res);
@@ -111,7 +121,7 @@ test('markKnownBody is accepted by the real /api/profile handler', async () => {
     const parsed = JSON.parse(res.body);
     assert.strictEqual(parsed.ok, true);
     assert.strictEqual(parsed.data.words.cat.status, 'known');
-  });
+  }));
 });
 
 test('words.js wires the play affordance, mark-known, and the token-only contrast gate', () => {

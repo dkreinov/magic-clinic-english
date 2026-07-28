@@ -42,7 +42,17 @@ function assertEnvelope(parsed) {
   }
 }
 
-test('POST translates a word using the injected transport', async () => {
+function withOpenGate(fn) {
+  const original = process.env.APP_CODE;
+  delete process.env.APP_CODE;
+  return Promise.resolve()
+    .then(fn)
+    .finally(() => {
+      if (original !== undefined) process.env.APP_CODE = original;
+    });
+}
+
+test('POST translates a word using the injected transport', () => withOpenGate(async () => {
   setTransport(async () => ({ he: 'כלב' }));
   try {
     const req = createPostReq({ word: ' dog ' });
@@ -57,9 +67,9 @@ test('POST translates a word using the injected transport', async () => {
   } finally {
     resetTransport();
   }
-});
+}));
 
-test('POST returns 502 when the transport throws', async () => {
+test('POST returns 502 when the transport throws', () => withOpenGate(async () => {
   setTransport(async () => {
     throw new Error('network blip');
   });
@@ -75,9 +85,9 @@ test('POST returns 502 when the transport throws', async () => {
   } finally {
     resetTransport();
   }
-});
+}));
 
-test('POST with a blank word returns 400', async () => {
+test('POST with a blank word returns 400', () => withOpenGate(async () => {
   const req = createPostReq({ word: '   ' });
   const res = createMockRes();
   await translateHandler(req, res);
@@ -86,9 +96,9 @@ test('POST with a blank word returns 400', async () => {
   assertEnvelope(parsed);
   assert.strictEqual(parsed.ok, false);
   assert.strictEqual(parsed.error, 'word required');
-});
+}));
 
-test('POST without a word returns 400', async () => {
+test('POST without a word returns 400', () => withOpenGate(async () => {
   const req = createPostReq({});
   const res = createMockRes();
   await translateHandler(req, res);
@@ -97,9 +107,9 @@ test('POST without a word returns 400', async () => {
   assertEnvelope(parsed);
   assert.strictEqual(parsed.ok, false);
   assert.strictEqual(parsed.error, 'word required');
-});
+}));
 
-test('GET returns 405', async () => {
+test('GET returns 405', () => withOpenGate(async () => {
   const req = createGetReq();
   const res = createMockRes();
   await translateHandler(req, res);
@@ -107,9 +117,9 @@ test('GET returns 405', async () => {
   const parsed = JSON.parse(res.body);
   assertEnvelope(parsed);
   assert.strictEqual(parsed.ok, false);
-});
+}));
 
-test('malformed JSON body returns 400', async () => {
+test('malformed JSON body returns 400', () => withOpenGate(async () => {
   const req = createPostReq('{');
   const res = createMockRes();
   await translateHandler(req, res);
@@ -118,4 +128,4 @@ test('malformed JSON body returns 400', async () => {
   assertEnvelope(parsed);
   assert.strictEqual(parsed.ok, false);
   assert.strictEqual(parsed.error, 'invalid JSON body');
-});
+}));
