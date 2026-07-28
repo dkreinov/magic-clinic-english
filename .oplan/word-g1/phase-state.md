@@ -23,7 +23,7 @@ ROLLBACK LADDER (code only, newest first):
 
 STATE OF THE TREE: HEAD clean at the close commit · ledger 291/0 (also APP_CODE=dummy) ·
   contrast 52 · shell magic-vet-v16 · .data/profile.json absent · sandbox restored (12/12
-  known) + server stopped · D25 backup KEPT at
+  known) + server stopped · D25 backup DELETED at owner instruction (D27 rider re-applied at close); receipt (sha256+counts only) retained. Former path:
   C:/Users/dkreinov/english-app-backups/profile-20260728-135019.json (sha256 in
   backup-receipt.txt).
 
@@ -34,7 +34,6 @@ FROZEN CONTRACTS IN FORCE: signed design §10 · QZ-12/QZ-17/QZ-18 still amended
   never probe the live profile outside sanctioned reads · GET /api/profile creates one ·
   B4/B5-cap/B6(i,ii) are LIVE; B2, B5-clock-reset, B6(iii), B3 quota = phase 2; B7 = phase 3.
 
-OPEN QUESTIONS: D27 rider — delete the phase-1 profile backup now that the close criteria
-  passed, or keep it? OWNER; asked in the close report; backup KEPT until answered.
+OPEN QUESTIONS: none — the D27 rider was answered by the owner at the close ("Delete it now"); executed after the criteria re-run.
 BLOCKED: no — phase 1 complete; phase 2 awaits a fresh session (context hygiene) or owner
   go-ahead to continue in this one.

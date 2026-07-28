@@ -242,3 +242,10 @@ PHASE 1 CLOSED (2026-07-28) — PHASE-1-ALL-CRITERIA-OK (11/11, re-run from clea
     layers) both change future agent behaviour; re-curation deferred to the phase-2 boundary
     where the guide is re-cut for quiz-side work.
   D27 rider: owner question OPEN (asked in the phase-close report; backup KEPT until answered).
+
+D27 RIDER ANSWERED (owner, 2026-07-28, in chat at the phase-1 close): "Delete it now (as last
+run)". Executed strictly AFTER the read-back and the 11/11 criteria re-run: the phase-1 capture
+profile-20260728-135019.json is DELETED; the backups folder is empty again. Stated plainly, as
+the rider requires: NO captured copy of her profile now exists — the safety net for the phase-1
+deploy has ended; phase 2's own D25 capture will precede its first profile-writing deploy.
+backup-receipt.txt keeps only the sha256 + counts (never contents), retained as the record.
