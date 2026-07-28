@@ -79,6 +79,11 @@ const VIEW_STYLE = `
     background: color-mix(in srgb, var(--color-accent) 18%, var(--color-card));
     color: var(--color-accent);
   }
+
+  .word-badge.candidate {
+    background: color-mix(in srgb, var(--color-primary) 18%, var(--color-card));
+    color: var(--color-primary);
+  }
 `;
 
 function header(subtitle, title) {
@@ -118,6 +123,9 @@ function statusBadge(status) {
   if (status === "known") {
     return `<span class="word-badge known">יודעת</span>`;
   }
+  if (status === "candidate") {
+    return `<span class="word-badge candidate">כמעט יודעת</span>`;
+  }
   return `<span class="word-badge learning">לומדת</span>`;
 }
 
@@ -152,7 +160,7 @@ export function renderList(words, allowedWords = null, launcherHtml = "") {
         ? `<button class="btn-say" type="button" data-say="${escapeHtml(sayLemma)}" aria-label="הקשיבי למילה">🔊</button>`
         : "";
       const knowHtml =
-        entry.status === "learning"
+        entry.status === "learning" || entry.status === "candidate"
           ? `<button class="btn-know" type="button" data-action="know" data-lemma="${escapeHtml(lemma)}">יודעת את זה</button>`
           : "";
       return `

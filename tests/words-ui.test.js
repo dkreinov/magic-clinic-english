@@ -226,3 +226,25 @@ test('words.js wires the quiz launcher: imports, handler wiring, and pre-existin
     assert.ok(src.includes(str), `expected words.js to still include "${str}"`);
   }
 });
+
+test('a candidate row shows the almost-knows badge and keeps the claim button', () => {
+  const ALMOST = '\u05DB\u05DE\u05E2\u05D8 \u05D9\u05D5\u05D3\u05E2\u05EA';
+  const KNOWN = '\u05D9\u05D5\u05D3\u05E2\u05EA';
+  const LEARN = '\u05DC\u05D5\u05DE\u05D3\u05EA';
+  const words = {
+    aaa: { status: 'candidate', he: 'x', taps: 1, lastSeen: '2026-01-03T00:00:00.000Z' },
+    bbb: { status: 'learning', he: 'x', taps: 1, lastSeen: '2026-01-02T00:00:00.000Z' },
+    ccc: { status: 'known', he: 'x', taps: 1, lastSeen: '2026-01-01T00:00:00.000Z' },
+  };
+
+  const html = renderList(words, null);
+  const aaaSlice = html.slice(html.indexOf('aaa'), html.indexOf('bbb'));
+  const cccSlice = html.slice(html.indexOf('ccc'));
+
+  assert.ok(aaaSlice.includes('word-badge candidate'), 'candidate row must have the candidate badge class');
+  assert.ok(aaaSlice.includes(ALMOST), 'candidate row must show the almost-knows badge text');
+  assert.ok(aaaSlice.includes('data-lemma="aaa"'), 'candidate row must keep the claim button (B6 ii)');
+  assert.ok(!cccSlice.includes('data-lemma="ccc"'), 'known row must NOT have a claim button (negative control)');
+  assert.ok(html.includes('>' + KNOWN + '<'), 'known badge text must still render');
+  assert.ok(html.includes('>' + LEARN + '<'), 'learning badge text must still render');
+});

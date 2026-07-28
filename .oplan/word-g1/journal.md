@@ -142,3 +142,24 @@ STEP 1.4 api/chapter.js call site
   audit: match / high
   commit: (this commit)
   accepted: 2026-07-28
+
+STEP 1.5 the third badge + surviving claim button (B6 i/ii)
+  tier: WORKER (Sonnet)
+  did: public/views/words.js: statusBadge candidate branch (badge text from design.md, CRLF
+       preserved); knowHtml condition gains candidate; VIEW_STYLE .word-badge.candidate rule
+       (primary@18 over card — already gate row "card icon on its plate", anchor stays 52).
+       tests/words-ui.test.js: one appended test, Hebrew as \u escapes (ledger 291).
+  surprises: bash -e collapsed \u escapes into raw Hebrew on the worker's first write; it
+    caught this by codepoint inspection and switched to a script file (field-guide-8-shaped
+    trap in a new costume — promoted candidate for the field guide).
+  deviations: none (edits via node scripts to guarantee CRLF + literal escapes)
+  validation_first_try: yes
+  retries: 0
+  escalations: 0
+  tokens: worker=73944, checker=35911, orchestrator_delta=unavailable
+  interventions: 0
+  fail-first: (i) badge branch deleted -> only the new test failed; (ii) condition narrowed
+    back to learning-only -> only the new test failed; both restored byte-identically
+  audit: match / high (CRLF + \u escapes confirmed at byte level)
+  commit: (this commit)
+  accepted: 2026-07-28
