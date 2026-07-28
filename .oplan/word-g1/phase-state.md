@@ -1,8 +1,10 @@
-CURRENT: phase 2 "candidates enter the quiz (slice b)", EXECUTING. Next step: 2.4 (QZ-25 soft
-  line in public/quiz.js). BASE (phase 2) = 558a5bc. Ledger now 294. Interventions: 1 (2.2
-  bad-spec probe fixture, ruled + amended).
+CURRENT: phase 2 "candidates enter the quiz (slice b)", EXECUTING. Next step: 2.5 (call-site
+  merge in both views). BASE (phase 2) = 558a5bc. Ledger now 295. Interventions: 1 (2.2
+  bad-spec probe fixture, ruled + amended). QZ-25 is now IN FORCE (soft line live in code,
+  both transcripts green).
 ACCEPTED (phase 2): 2.1 — dbe5a4f (transcript gate, proven RED pre-code) · 2.2 — 0621b1e
-  (candidate branch; ledger 293) · 2.3 — (this commit; ledger 294).
+  (candidate branch; ledger 293) · 2.3 — d077dcc (quota export; ledger 294) · 2.4 — (this
+  commit; ledger 295; audit mismatch ruled cosmetic — contract-quoted indent).
 
 PLAN: .oplan/word-g1/plan.md — phase 1 executed record first, then "# PHASE 2 IN FULL"
   (steps 2.1-2.11, 12 acceptance criteria). JOURNAL: journal.md (through PHASE 2 PLANNING) ·

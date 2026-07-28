@@ -500,3 +500,85 @@ test('source and style: frozen strings, VIEW_STYLE token-only, contrast gate una
   const passLines = stdout.split('\n').filter((l) => l.startsWith('PASS'));
   assert.strictEqual(passLines.length, 52, `expected exactly 52 PASS lines, got ${passLines.length}`);
 });
+
+test('B6(iii): a demoted candidate gets the softer line, a demoted claim keeps its own, and neither appears without a demotion', async () => {
+  const { renderQuizCard, startQuiz } = await import('../public/quiz.js');
+  const items = JSON.parse(readFileSync(lightPath, 'utf8'));
+  const item = items[0];
+  const options = [item.answer, ...item.distractors.slice(0, 5)];
+
+  const SOFT = '\u05E2\u05D5\u05D3 \u05DC\u05D0 \u2014 \u05E0\u05DE\u05E9\u05D9\u05DA \u05DC\u05DC\u05DE\u05D5\u05D3 \u05D0\u05EA \u05D4\u05DE\u05D9\u05DC\u05D4 \u05D4\u05D6\u05D0\u05EA';
+  const HARD = '\u05D4\u05DE\u05D9\u05DC\u05D4 \u05D4\u05D6\u05D0\u05EA \u05D7\u05D5\u05D6\u05E8\u05EA \u05DC\u05DC\u05DE\u05D9\u05D3\u05D4, \u05E0\u05DC\u05DE\u05D3 \u05D0\u05D5\u05EA\u05D4 \u05E9\u05D5\u05D1 \u05D9\u05D7\u05D3';
+
+  const base = {
+    lemma: 'light',
+    item,
+    options,
+    index: 0,
+    total: 4,
+    chosen: options.find((o) => o !== item.answer),
+    correct: false,
+  };
+
+  const candidateDemoted = renderQuizCard({ ...base, demoted: true, wasCandidate: true });
+  assert.ok(candidateDemoted.includes(SOFT), 'a demoted candidate must render the soft line');
+  assert.ok(!candidateDemoted.includes(HARD), 'a demoted candidate must not render the claimed-word line');
+  assert.strictEqual(
+    candidateDemoted.split('<p class="quiz-demoted">').length - 1,
+    1,
+    'exactly one quiz-demoted node on a demoted candidate card'
+  );
+
+  const claimDemoted = renderQuizCard({ ...base, demoted: true, wasCandidate: false });
+  assert.ok(claimDemoted.includes(HARD), 'a demoted claim must keep its own (hard) line');
+  assert.ok(!claimDemoted.includes(SOFT), 'a demoted claim must not render the soft line');
+  assert.strictEqual(
+    claimDemoted.split('<p class="quiz-demoted">').length - 1,
+    1,
+    'exactly one quiz-demoted node on a demoted claim card'
+  );
+
+  const notDemoted = renderQuizCard({ ...base, demoted: false, wasCandidate: true });
+  assert.ok(!notDemoted.includes(SOFT), 'no demotion means no soft line, even for a candidate');
+  assert.ok(!notDemoted.includes(HARD), 'no demotion means no hard line, even for a candidate');
+
+  const stubItem = {
+    sense: 's',
+    sentence: 'a ___ b',
+    answer: 'x',
+    distractors: ['p', 'q', 'r', 's', 't', 'u', 'v', 'w'],
+  };
+  const load = async () => stubItem;
+  const post = async () => ({ words: { x: { status: 'learning' } } });
+
+  const containerA = fakeContainer();
+  const sessionA = await startQuiz(containerA, {
+    lemmas: ['x'],
+    knownSet: new Set(),
+    candidateSet: new Set(['x']),
+    count: 1,
+    load,
+    post,
+  });
+  await sessionA.answer('p');
+  assert.ok(
+    containerA.innerHTML.includes(SOFT),
+    'startQuiz must thread candidateSet through to the card as the soft line'
+  );
+  assert.ok(!containerA.innerHTML.includes(HARD));
+
+  const containerB = fakeContainer();
+  const sessionB = await startQuiz(containerB, {
+    lemmas: ['x'],
+    knownSet: new Set(),
+    count: 1,
+    load,
+    post,
+  });
+  await sessionB.answer('p');
+  assert.ok(
+    containerB.innerHTML.includes(HARD),
+    'omitting candidateSet must default to the claimed-word (hard) line'
+  );
+  assert.ok(!containerB.innerHTML.includes(SOFT));
+});

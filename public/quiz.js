@@ -158,7 +158,7 @@ export async function loadItem(lemma, rand = Math.random) {
 }
 
 export function renderQuizCard(state) {
-  const { item, options, index, total, chosen, correct, demoted, hintShown } = state;
+  const { item, options, index, total, chosen, correct, demoted, hintShown, wasCandidate } = state;
 
   const feedbackHtml =
     chosen !== null
@@ -167,8 +167,14 @@ export function renderQuizCard(state) {
         : `<p class="quiz-feedback">כמעט! המילה הנכונה היא <strong>${escapeHtml(item.answer)}</strong></p>`
       : '';
 
+  // B6(iii): a candidate is a word the APP guessed she knew. She never claimed
+  // it, so "goes back to learning" would describe a promotion she never saw
+  // herself receive. Same node, same class, same position in the frozen
+  // QZ-18/QZ-23 order -- only the text changes.
   const demotedHtml = demoted
-    ? `<p class="quiz-demoted">המילה הזאת חוזרת ללמידה, נלמד אותה שוב יחד</p>`
+    ? wasCandidate
+      ? `<p class="quiz-demoted">עוד לא — נמשיך ללמוד את המילה הזאת</p>`
+      : `<p class="quiz-demoted">המילה הזאת חוזרת ללמידה, נלמד אותה שוב יחד</p>`
     : '';
 
   const nextHtml =
@@ -215,6 +221,7 @@ export async function startQuiz(
   {
     lemmas,
     knownSet,
+    candidateSet = new Set(),
     count = 4,
     onDone = () => {},
     load = loadItem,
@@ -227,7 +234,13 @@ export async function startQuiz(
     if (questions.length === count) break;
     const item = await load(lemma, rand);
     if (item === null) continue;
-    questions.push({ lemma, item, options: selectOptions(item, knownSet, rand), hintShown: false });
+      questions.push({
+        lemma,
+        item,
+        options: selectOptions(item, knownSet, rand),
+        hintShown: false,
+        wasCandidate: candidateSet.has(lemma),
+      });
     if (questions.length === count) break;
   }
 
@@ -272,6 +285,7 @@ export async function startQuiz(
       correct: correctFlag,
       demoted,
       hintShown: q.hintShown,
+      wasCandidate: q.wasCandidate,
     });
     container.innerHTML = VIEW_STYLE + html;
     bind();

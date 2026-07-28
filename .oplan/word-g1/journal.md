@@ -361,5 +361,32 @@ STEP 2.3 B3's quota — pickCandidateWords in public/quiz-core.js
   fail-first: (i) shadow keeps entry.status -> not ok 8 (expected ['aaa'] got []);
     (ii) default limit 20 -> not ok 8 (got all four); both reverted byte-identically
   audit: match / high
+  commit: d077dcc
+  accepted: 2026-07-28
+
+STEP 2.4 B6(iii) — the softer line, and wasCandidate reaching the card (QZ-25)
+  tier: WORKER (Sonnet)
+  did: public/quiz.js: wasCandidate in the renderQuizCard destructure; demotedHtml branches
+       soft (candidate) / hard (claim, byte-preserved); startQuiz option candidateSet=new
+       Set(); questions carry wasCandidate; renderCurrent threads it. tests/quiz-ui.test.js:
+       1 flat test, Hebrew as \u escapes only. Ledger 295. BOTH transcripts diff EMPTY.
+  surprises: the worker initially typed raw Hebrew into its test-file edit, caught its own
+    violation BEFORE validating and swapped to \u escapes via a script (field-guide 8/13
+    working as training, not just as gate). Orchestrator re-verified: 0 raw-Hebrew lines added
+    to the test file; the 2 added raw-Hebrew lines are the contracted quiz.js demotedHtml edit.
+  deviations: questions.push replacement is 2 spaces deeper than its loop siblings — QUOTED SO
+    in the frozen contract (planner cosmetic slip). Worker flagged it; auditor independently
+    flagged it as its one finding.
+  validation_first_try: yes
+  retries: 0
+  escalations: 0
+  tokens: worker=78476, checker=38825, orchestrator_delta=unavailable
+  interventions: 0
+  fail-first: (i) ternary dropped -> new test's claim-half FAILED and the QZ-21 transcript
+    diff went non-empty (soft vs hard line); (ii) renderCurrent threading removed -> startQuiz
+    half FAILED; both reverted, Buffer.compare identical
+  audit: mismatch (the 6-space indent) -> ORCHESTRATOR RULING: work is byte-identical to the
+    frozen plan block (verified with a node includes() probe); the finding targets the plan's
+    own quoted contract, cosmetic only; ACCEPTED. Recorded as match-in-substance.
   commit: (this commit)
   accepted: 2026-07-28
