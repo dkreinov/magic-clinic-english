@@ -77,3 +77,23 @@ export function pickQuizWords(profile, limit = 20) {
 
   return candidates.slice(0, limit).map((c) => c.key);
 }
+
+// B3 (docs/growth.md section 8): the candidate slot. A NEW export, so QZ-17's
+// comparator above is not touched by a single byte -- candidates are ranked by
+// projecting them onto a throwaway profile in which they read as `known` and
+// handing THAT to pickQuizWords itself. So "ordered inside its tier by the
+// existing comparator" is true by construction, not by a copy that can drift.
+// The projection copies each entry, so the caller's profile is never mutated.
+// The merge with the known pool happens at the CALL SITE: one candidate per
+// sitting, and a candidate with no bank item is skipped in silence (D23).
+export function pickCandidateWords(profile, limit = 1) {
+  const words = (profile && profile.words) || {};
+  const shadow = { words: {} };
+  for (const k of Object.keys(words)) {
+    const entry = words[k];
+    if (entry && typeof entry === 'object' && entry.status === 'candidate') {
+      shadow.words[k] = { ...entry, status: 'known' };
+    }
+  }
+  return pickQuizWords(shadow, limit);
+}

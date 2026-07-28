@@ -11,6 +11,7 @@ import {
   isUsableItem,
   pickItem,
   pickQuizWords,
+  pickCandidateWords,
 } from '../public/quiz-core.js';
 import { knownLemmaSet } from '../lib/vocab.js';
 
@@ -148,4 +149,42 @@ test('isUsableItem rejects malformed shapes and accepts a real item; pickItem re
   const stub = () => 0.999;
   const picked = pickItem(lightItems, stub);
   assert.equal(picked, lightItems[Math.floor(0.999 * lightItems.length)]);
+});
+
+test('pickCandidateWords: candidates only, at most limit, ranked by the frozen comparator, and the profile is never mutated', () => {
+  const e = (over) => ({
+    status: 'candidate',
+    source: 'tap',
+    he: null,
+    taps: 1,
+    firstSeen: '2026-01-01T00:00:00.000Z',
+    lastSeen: '2026-01-01T00:00:00.000Z',
+    ...over,
+  });
+  const profile = {
+    words: {
+      aaa: e({ strikes: 2, lastSeen: '2026-01-01T00:00:00.000Z' }),
+      bbb: e({ needsReview: true, lastSeen: '2026-01-02T00:00:00.000Z' }),
+      ccc: e({ lastSeen: '2026-01-03T00:00:00.000Z' }),
+      ddd: e({ lastSeen: '2026-01-05T00:00:00.000Z' }),
+      kkk: e({ status: 'known', lastSeen: '2026-01-09T00:00:00.000Z' }),
+      lll: e({ status: 'learning', lastSeen: '2026-01-08T00:00:00.000Z' }),
+      zzz: null,
+    },
+  };
+  const before = JSON.stringify(profile);
+
+  const one = pickCandidateWords(profile);
+  assert.deepStrictEqual(one, ['aaa']);
+
+  const all = pickCandidateWords(profile, 10);
+  assert.deepStrictEqual(all, ['aaa', 'bbb', 'ddd', 'ccc']);
+
+  const known = pickQuizWords(profile, 20);
+  assert.deepStrictEqual(known, ['kkk']);
+
+  assert.equal(JSON.stringify(profile), before);
+
+  assert.deepStrictEqual(pickCandidateWords({}, 5), []);
+  assert.deepStrictEqual(pickCandidateWords(null, 5), []);
 });

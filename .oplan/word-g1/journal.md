@@ -343,5 +343,23 @@ STEP 2.2 B2 + B5's clock reset — the candidate branch in applyQuizAnswer
   fail-first: (i) lastSeen-reset deleted -> not ok 11; (ii) condition widened to !== 'known' ->
     not ok 12 (+expected collateral 1,3); (iii) branch below correct-block -> not ok 12
   audit: match / high (whitespace nit = diff-alignment illusion; bytes as contracted)
+  commit: 0621b1e
+  accepted: 2026-07-28
+
+STEP 2.3 B3's quota — pickCandidateWords in public/quiz-core.js
+  tier: WORKER (Sonnet)
+  did: public/quiz-core.js: frozen pickCandidateWords appended verbatim (shadow projection
+       through the untouched QZ-17 comparator), CRLF preserved. tests/quiz-core.test.js: import
+       extended + 1 flat test (quota, ranking, negative control, purity). Ledger 294.
+  surprises: none
+  deviations: none
+  validation_first_try: yes
+  retries: 0
+  escalations: 0
+  tokens: worker=51536, checker=31666, orchestrator_delta=unavailable
+  interventions: 0
+  fail-first: (i) shadow keeps entry.status -> not ok 8 (expected ['aaa'] got []);
+    (ii) default limit 20 -> not ok 8 (got all four); both reverted byte-identically
+  audit: match / high
   commit: (this commit)
   accepted: 2026-07-28

@@ -1,7 +1,8 @@
-CURRENT: phase 2 "candidates enter the quiz (slice b)", PLANNED (fresh Opus planner, files
-  only; orchestrator-verified; Sonnet review: ship, 0 findings; amendment #1 applied at plan
-  time — step 2.3 'known'-count 3→2). Next step: 2.1 (orchestrator writes the hand-derived
-  transcript gate). BASE (phase 2) = 558a5bc.
+CURRENT: phase 2 "candidates enter the quiz (slice b)", EXECUTING. Next step: 2.4 (QZ-25 soft
+  line in public/quiz.js). BASE (phase 2) = 558a5bc. Ledger now 294. Interventions: 1 (2.2
+  bad-spec probe fixture, ruled + amended).
+ACCEPTED (phase 2): 2.1 — dbe5a4f (transcript gate, proven RED pre-code) · 2.2 — 0621b1e
+  (candidate branch; ledger 293) · 2.3 — (this commit; ledger 294).
 
 PLAN: .oplan/word-g1/plan.md — phase 1 executed record first, then "# PHASE 2 IN FULL"
   (steps 2.1-2.11, 12 acceptance criteria). JOURNAL: journal.md (through PHASE 2 PLANNING) ·
