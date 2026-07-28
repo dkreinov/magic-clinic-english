@@ -177,3 +177,24 @@ STEP 1.6 CACHE bump v15 -> v16
   audit: match / high
   commit: (this commit)
   accepted: 2026-07-28
+
+STEP 1.7 sandbox visual gate (ORCHESTRATOR, self-served per owner directive / field guide 12)
+  did: sandbox profile backed up to ~/g1-scratch/sandbox-profile.bak; fixture camp=candidate
+    (nominations 1) + desk=learning; dev server on the sandbox DATA_DIR; fresh Playwright
+    browser (its chromium profile was recreated after killing 10 orphan chrome processes that
+    held it locked — the two launch failures were a locked profile, not the app); page
+    http://localhost:3000/#/words; screenshot saved: ~/g1-scratch/step17-badge-audit.png.
+  VERDICTS (all recorded from the screenshot + accessibility tree):
+    (1) PASS — "כמעט יודעת" renders on one line inside its pill, legible, no overflow.
+    (2) PASS — purple candidate badge clearly distinct from teal יודעת and amber לומדת.
+    (3) PASS — RTL row correct: LTR lemma right, badge left, speaker + claim button between,
+        no collisions (camp row shows all four elements cleanly).
+    (4) PASS — the claim button on the candidate row (camp) is visibly identical to the one on
+        the learning row (desk).
+    (5) PASS — every other row/element matches the live v15 look (Sunrise Parchment cards,
+        launcher, nav unchanged).
+  taste items for the owner (non-blocking, from the plan's record-gap 3): the badge colour
+    (purple, --color-primary@18) was chosen by the plan, not the owner — named in the
+    post-deploy report.
+  sandbox profile RESTORED byte-from-backup (12/12 known again); server stopped; repo clean.
+  tokens: orchestrator-only step. STEP-1.7-RECORDED.
