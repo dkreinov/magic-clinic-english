@@ -61,3 +61,11 @@
     SANDBOX browser (hard-reload past the stale localhost SW first) with screenshots/zoom, fixes
     objective defects, records verdicts — the owner is asked only for taste calls on things they
     explicitly chose. Never a browser on production.
+13. SHELLS EAT ESCAPES: bash -e / powershell -Command MANGLE inline code ($_ became `unsetenv`,
+    \uXXXX collapsed to raw Hebrew — silently violating a frozen no-raw-Hebrew contract).
+    When escapes or $ tokens matter, write the script to a FILE and run the file; then verify
+    the WRITTEN BYTES (codepoint dump), not the source you typed.
+14. A COPIED-IN SIGNED DOCUMENT has self-referential WRAPPER text (header/tail: "this file is a
+    proposal", "still reads X until then") that becomes FALSE the moment it is copied. Planner
+    AND reviewer missed it; the executor's forbidden-string check caught it. Re-derive wrapper
+    lines to state the post-copy truth; copy only the signed BODY verbatim.

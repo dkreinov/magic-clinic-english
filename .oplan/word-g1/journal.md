@@ -219,3 +219,26 @@ STEP 1.9 deploy v16 (ORCHESTRATOR)
     both md5 live==worktree; live sw v16, no v15; health byte-exact; /api/chapter 401.
   ROLLBACK (code only, corrected):
     "$(npm prefix -g)/vercel" rollback https://english-2wkxdnp9g-dkreinovs-projects.vercel.app --yes
+
+STEP 1.10 read-back (ORCHESTRATOR)
+  did: frozen subshell GET -> 200; READBACK OK words=20 candidates=0; zero keys lost; status
+    changes: none; APP_CODE leak post-assert passed. STEP-1.10-OK.
+  note: candidates=0 is the measured, expected outcome — G1 runs at the NEXT chapter
+    generation; nothing has generated a chapter since the deploy.
+
+PHASE 1 CLOSED (2026-07-28) — PHASE-1-ALL-CRITERIA-OK (11/11, re-run from clean tree)
+  steps: 10 (6 WORKER + 4 ORCHESTRATOR), worker first-try validation: 4/6 (1.1 intervention,
+    1.3 audit-mismatch fix cycle)
+  escalations: 0
+  interventions: 1 (1.1, bad-spec: contradictory frozen contract; ruled + plan amended)
+  audit results: 6/6 match (1.3 on second pass after a one-line contract-drift fix)
+  cost: worker=397125 tok, checker=288574 tok, planner=111105 tok (plan reviewer; phase-1
+    planner usage unavailable) — grand known 796,804 tokens (computed by python, journal rule).
+    Dollar figures: unavailable (no per-model pricing readout in this harness session).
+  orchestrator_context: unavailable (no programmatic /context readout; session spans planning
+    through close in one window)
+  field_guide: 76/40 lines — over budget, justified: lessons 13 (shells eat escapes — bit TWICE
+    today in two different costumes) and 14 (signed-document wrapper text — survived two review
+    layers) both change future agent behaviour; re-curation deferred to the phase-2 boundary
+    where the guide is re-cut for quiz-side work.
+  D27 rider: owner question OPEN (asked in the phase-close report; backup KEPT until answered).

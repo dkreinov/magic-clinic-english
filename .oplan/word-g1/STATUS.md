@@ -1,38 +1,33 @@
 # STATUS — word-g1 (photograph of now, 2026-07-28)
 
-The app is live and healthy (magic-vet-v15). We are building G1: the app's first ability to
-NOTICE by itself that she is learning a word. A word she looked up once, then met again in two
-later chapters without looking it up, gets marked "almost knows it" (כמעט יודעת). That guess
-never changes her stories — only a quiz pass (phase 2) or her own claim makes it count.
+PHASE 1 IS DONE AND LIVE. The app (magic-vet-v16) can now notice, by itself, that she is
+learning a word: a word she looked up once and then met in two later chapters without looking
+it up gets the new badge "almost knows it" (כמעט יודעת), and her "I know this" button still
+works on those words. The app's guess never changes her stories — only her claim or (next
+phase) a quiz pass does.
 
-Phase 1 is executing (autonomous mode). Step 1.1 is DONE: the signed growth document is now
-the document of record (docs/growth.md, byte-proven against the signed source; one stale
-"awaiting signature" line in the source's tail was replaced by an honest "signed and copied"
-note — logged, and the owner can overrule). Next: step 1.2, teaching the profile the new
-"almost known" status.
+Proof, not hope: all 291 tests pass (with and without the entry-code gate), colour contrast
+unchanged (52), the exact bytes we wrote are what the server serves, and her word collection
+was read back from production after the deploy — 20 words, nothing lost, nothing changed
+unexpectedly. Her data was backed up before the deploy and the backup is KEPT (see the one
+open question below).
 
 ```mermaid
 flowchart LR
-    A[1.1 growth.md<br/>becomes SIGNED] --> B[1.2 'candidate' legal<br/>+ merge trust rule]
-    B --> C[1.3 the G1 rule<br/>promoteToCandidate]
-    C --> D[1.4 runs on every<br/>new chapter]
-    D --> E[1.5 badge כמעט יודעת<br/>+ claim button stays]
-    E --> F[1.6 cache v16]
-    F --> G[1.7 look at it<br/>in the sandbox]
-    G --> H[1.8 BACK UP her<br/>live profile first]
-    H --> I[1.9 deploy + prove<br/>bytes live]
-    I --> J[1.10 read her data<br/>back: nothing lost]
+    A[Phase 1 DONE<br/>engine + badge LIVE v16] --> B[Phase 2 NEXT<br/>quiz asks candidates<br/>1 per sitting, kind miss-line]
+    B --> C[Phase 3<br/>weekly quiz items<br/>cover candidates]
 ```
 
-Key numbers: tests 282/0 today → 291/0 when phase 1 closes · contrast anchor stays 52 ·
-cache v15 → v16 · her live profile: backed up to C:/Users/dkreinov/english-app-backups/
-before the deploy (step 1.8), read back and proven intact after (step 1.10).
+Right now she has 0 "almost knows it" words — expected: the engine first runs the next time
+she generates a story chapter. Her phone gets the new screen on its second open (the shell
+self-updates).
 
-One question waits for the owner (asked at step 1.8): should the profile backup be DELETED
-when the phase closes, as last time (D27)? Until answered, we keep it — the safe direction.
+ONE QUESTION FOR THE OWNER: last run you asked that profile backups be deleted at close (D27).
+Apply that again and delete C:/Users/dkreinov/english-app-backups/profile-20260728-135019.json,
+or keep it? It is kept until you say.
 
 Rollback (code only): `"$(npm prefix -g)/vercel" rollback
-https://english-d0roovfpq-dkreinovs-projects.vercel.app --yes` → v15 dpl_HUjmYpAvumkWDXxsjkZiQzY7GRTn.
+https://english-2wkxdnp9g-dkreinovs-projects.vercel.app --yes` (back to v15).
 
-Phase 2 (sketch): candidates enter the quiz — one per session, one wrong answer returns it to
-learning, with a kinder message. Phase 3 (sketch): weekly quiz-item top-ups cover candidates.
+Next: phase 2 — plan first with fresh eyes, then execute; recommended in a fresh session
+(paste the handoff prompt from the briefing).

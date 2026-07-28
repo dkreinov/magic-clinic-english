@@ -51,3 +51,62 @@ BIGGEST RISK: her real profile may have NO word that qualifies yet — the engin
 working but invisible. We measure it at step 1.10 (candidates=N) and say so plainly rather
 than assume. Second risk: anything lost from her collection — that is why 1.8 backs up first
 and 1.10 refuses to pass without a mechanical explanation for every change.
+
+## Phase 1 — plain report (2026-07-28, at the close)
+
+WHAT WE SET OUT TO DO: build the app's first ability to notice she is learning a word, show it
+to her honestly, and ship it without risking a single word of her collection.
+
+WHAT WE ACTUALLY DID:
+- Made the growth document she signed the official document of record.
+- Taught her profile a third word-state, "almost knows it", and made duplicate-word merges keep
+  the higher-trust verdict instead of always favouring "knows it".
+- Built the noticing rule: looked up once, then met in 2 later chapters untapped → "almost
+  knows it"; at most 2 automatic nominations per word, ever.
+- Wired the rule to run each time a new story chapter is made.
+- Gave her the new badge (כמעט יודעת) and kept the "I know this" button on those words.
+- Bumped the cache version, looked at the badge myself in the practice sandbox (5 checks, all
+  good), backed up her live collection, shipped, and read her collection back: 20 words, zero
+  lost, zero unexplained changes.
+
+WHAT WE FOUND OUT:
+- The signed document's own last line said "the file still awaits signature" — copying it
+  verbatim would have stamped a false sentence into the record. The helper doing the copy
+  stopped and asked instead of guessing; two earlier review layers had missed it.
+- One helper accidentally wiped its own work mid-step and retyped it; the independent checker
+  caught a one-character difference from the locked text in the retyped version. Fixed,
+  re-proven, re-checked.
+- Terminal shells silently mangle escape codes (twice today, two different ways) — future
+  helpers are now told to write scripts to files instead. Recorded as lessons 13-14.
+- She has 0 "almost known" words so far — correct and expected; the engine first runs at her
+  next chapter.
+
+WHAT WENT WRONG: nothing reached production wrong. Two mid-run catches (above), both by the
+machinery working as designed; the browser needed its stuck profile cleared before the sandbox
+look.
+
+WHAT IT COST: about 800,000 helper-tokens across 14 helper/checker calls (planning included);
+dollar total not reported by this session's tooling. Wall-clock: one afternoon session.
+
+WHERE WE ARE NOW: live at v16, everything proven, backup kept.
+
+WHAT HAPPENS NEXT: phase 2 — the quiz starts asking about "almost known" words (one per
+sitting, one wrong answer sends it back to learning, with a kinder message). We need from you:
+(1) the backup question above, (2) optionally: the badge colour is purple by my choice, not
+yours — say if you want it different.
+
+--- HANDOFF PROMPT (paste into a fresh session) ---
+Continue run from: .oplan/word-g1/phase-state.md
+Read first: phase-state.md, then plan.md (PHASE 2 SKELETON at the end), then journal.md
+  (PHASE 1 section), then field-guide/index.md (14 lessons), then design.md §8 B2/B3/B6(iii)
+Resume at: Phase 2 — plan it first (fresh planner, files only), review that plan, THEN execute
+Execution mode: autonomous
+Model: Opus (PLANNER tier) or better
+Context: fresh session recommended — phase 1 filled the orchestrator's context
+Before executing:
+1. Read the files above fully. 2. git status clean; ledger 291/0; contrast 52; live v16.
+3. Re-acknowledge the frozen contracts in phase-state.md (QZ-12/17/18 amendments are exactly
+   the ones the signed design names, nothing more).
+4. D27 rider answer (delete/keep the phase-1 backup) may be in the chat above the paste —
+   record it in the journal before anything else.
+--- END HANDOFF PROMPT ---
