@@ -388,5 +388,24 @@ STEP 2.4 B6(iii) — the softer line, and wasCandidate reaching the card (QZ-25)
   audit: mismatch (the 6-space indent) -> ORCHESTRATOR RULING: work is byte-identical to the
     frozen plan block (verified with a node includes() probe); the finding targets the plan's
     own quoted contract, cosmetic only; ACCEPTED. Recorded as match-in-substance.
+  commit: b83b538
+  accepted: 2026-07-28
+
+STEP 2.5 the merge at the call sites — one candidate per sitting
+  tier: WORKER (Sonnet)
+  did: words.js + reader.js: import extended, candidateSet declared, the frozen 3-statement
+       merge block replacing the old pick (identical in both, 4/6-space indents), candidateSet
+       passed into startQuiz. tests/words-ui.test.js + tests/reader-ui.test.js: 1 flat
+       source-needle test each, with the exact-line ABSENT check on the old pick. Ledger 297.
+  surprises: none
+  deviations: none
+  validation_first_try: yes
+  retries: 0
+  escalations: 0
+  tokens: worker=68721, checker=33827, orchestrator_delta=unavailable
+  interventions: 0
+  fail-first: each view reverted to the old single line -> ONLY that file's new test failed
+    (not ok 12 in each, # pass 11 # fail 1); both restored, cmp-confirmed byte-identical
+  audit: match / high
   commit: (this commit)
   accepted: 2026-07-28

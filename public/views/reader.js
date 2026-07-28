@@ -2,7 +2,7 @@ import { getJson, postJson } from "../api.js";
 import { resolveLemma } from "../lemma.js";
 import { getAllowedSet } from "../words-index.js";
 import { startQuiz } from "../quiz.js";
-import { pickQuizWords, knownSetFromProfile } from "../quiz-core.js";
+import { pickQuizWords, knownSetFromProfile, pickCandidateWords } from "../quiz-core.js";
 
 const CHAPTER_BANNERS = { 0: "chapter-night", 1: "chapter-clinic", 2: "chapter-forest" };
 
@@ -326,13 +326,21 @@ export async function render(container, ctx) {
   let allowedWords = new Set();
   let lemmas = [];
   let knownSet = new Set();
+  let candidateSet = new Set();
 
   async function boot() {
     draw();
     try {
       allowedWords = await getAllowedSet();
       profile = await getJson("/api/profile");
-      lemmas = pickQuizWords(profile, 20);
+      // B3 (docs/growth.md section 8): at most ONE candidate per sitting, merged
+      // ahead of the known pool HERE, at the call site, so QZ-17's comparator is
+      // untouched. The slot is RESERVED, not leftover: a candidate that is never
+      // reached can never become known. A candidate with no bank item is skipped
+      // in silence (D23), so an empty slot costs nothing.
+      const candidateLemmas = pickCandidateWords(profile, 1);
+      candidateSet = new Set(candidateLemmas);
+      lemmas = candidateLemmas.concat(pickQuizWords(profile, 20));
       knownSet = knownSetFromProfile(profile);
       decideStage();
     } catch (err) {
@@ -726,6 +734,7 @@ export async function render(container, ctx) {
         startQuiz(slot, {
           lemmas,
           knownSet,
+          candidateSet,
           count: 4,
           onDone: () => {
             qs.done = true;

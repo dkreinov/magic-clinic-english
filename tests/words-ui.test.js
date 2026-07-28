@@ -248,3 +248,25 @@ test('a candidate row shows the almost-knows badge and keeps the claim button', 
   assert.ok(html.includes('>' + KNOWN + '<'), 'known badge text must still render');
   assert.ok(html.includes('>' + LEARN + '<'), 'learning badge text must still render');
 });
+
+test('words.js reserves one candidate slot: the frozen merge, candidateSet, and the pre-existing quiz wiring', () => {
+  const src = readFileSync(viewPath, 'utf8');
+  const needles = [
+    'pickCandidateWords',
+    'const candidateLemmas = pickCandidateWords(profile, 1);',
+    'candidateSet = new Set(candidateLemmas);',
+    'lemmas = candidateLemmas.concat(pickQuizWords(profile, 20));',
+    'candidateSet,',
+    'startQuiz',
+    'knownSetFromProfile',
+    'count: 4',
+  ];
+  for (const needle of needles) {
+    assert.ok(src.includes(needle), `words.js missing "${needle}"`);
+  }
+
+  assert.ok(
+    !/^\s*lemmas = pickQuizWords\(profile, 20\);\s*$/m.test(src),
+    'the OLD unmerged pick must be gone, replaced by the frozen merge'
+  );
+});

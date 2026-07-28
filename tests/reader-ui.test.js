@@ -200,3 +200,25 @@ test('chapterQuizState is keyed by chapter number: a fresh chapter gets a fresh 
     'the same chapter must return the SAME object on a second call, so a started-guard actually guards'
   );
 });
+
+test('reader.js reserves one candidate slot: the frozen merge, candidateSet, and the pre-existing quiz wiring', () => {
+  const src = readFileSync(viewPath, 'utf8');
+  const needles = [
+    'pickCandidateWords',
+    'const candidateLemmas = pickCandidateWords(profile, 1);',
+    'candidateSet = new Set(candidateLemmas);',
+    'lemmas = candidateLemmas.concat(pickQuizWords(profile, 20));',
+    'candidateSet,',
+    'startQuiz',
+    'knownSetFromProfile',
+    'count: 4',
+  ];
+  for (const needle of needles) {
+    assert.ok(src.includes(needle), `reader.js missing "${needle}"`);
+  }
+
+  assert.ok(
+    !/^\s*lemmas = pickQuizWords\(profile, 20\);\s*$/m.test(src),
+    'the OLD unmerged pick must be gone, replaced by the frozen merge'
+  );
+});
