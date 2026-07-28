@@ -95,6 +95,46 @@ sitting, one wrong answer sends it back to learning, with a kinder message). We 
 (1) the backup question above, (2) optionally: the badge colour is purple by my choice, not
 yours — say if you want it different.
 
+=== PHASE 2 — PLAN IN PLAIN WORDS (2026-07-28, reviewed: ship, 0 findings) ===
+WHAT WE ARE BUILDING: the quiz learns to ask about "almost known" words. Today the app can
+guess she almost knows a word (phase 1), but the guess just sits there — nothing can ever
+confirm or take it back. After this phase, one practice question decides it: right = the word
+is truly known; wrong = back to learning, said kindly, and the app cannot re-guess the same
+word straight away.
+
+PHASE 2 — the quiz decides   [planned in full]
+  What we do:  give one quiz slot per sitting to an "almost known" word and act on the answer
+  Why:         a guess nothing can confirm is a promise the app never keeps
+  Done when:   live at v17, all 298 tests green, both screen-transcripts match exactly, her
+               data read back intact
+  Steps:
+    2.1  I write down by hand, before any code exists, exactly what the new screen must say —
+         because a check written after the fact only proves the code agrees with itself.
+    2.2  Teach the rule she signed: one wrong answer takes an "almost known" word back and
+         restarts its clock; one right answer makes it known — the restart stops ping-pong.
+    2.3  Add the picker that gives at most ONE "almost known" word a turn per practice round —
+         so a burst of guesses cannot crowd out the words actually causing trouble.
+    2.4  Change the wording: a word she never claimed gets the kinder "not yet" line —
+         because "goes back to learning" describes a promotion she never saw herself get.
+    2.5  Wire the reserved slot into both places a practice round can start.
+    2.6  One fresh helper plays the whole thing through like a child would and tries to break it.
+    2.7  Bump the cache version to v17 so her phone actually gets the new screens.
+    2.8  I open the sandbox app, answer a question wrong on purpose, and look with my own eyes.
+    2.9  Back up her live word collection (no backup exists right now — deleted at your word).
+    2.10 Ship, and prove the exact bytes we wrote are what the server serves.
+    2.11 Read her collection back and prove nothing was lost and every change is explainable.
+PHASE 3 — weekly quiz items cover candidates   [rough sketch — planned once phase 2 is done]
+  What/Why/Done: an "almost known" word with no quiz question can never pass; the weekly
+  item top-up starts covering them too — that closes the loop this phase still leaves open.
+
+WHAT WE ARE NOT DOING: no new quiz questions are generated (phase 3); the strike rules for
+words SHE claimed do not change by one character; no colours or styles change; the app still
+never lets its own guess alter her stories.
+BIGGEST RISK: she may still have 0 "almost known" words (the engine first runs at her next
+chapter) — so this phase may ship a working path that quietly waits. We will know: the final
+read-back prints the exact count.
+=== END ===
+
 --- HANDOFF PROMPT (paste into a fresh session) ---
 Continue run from: .oplan/word-g1/phase-state.md
 Read first: phase-state.md, then plan.md (PHASE 2 SKELETON at the end), then journal.md

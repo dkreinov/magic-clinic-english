@@ -249,3 +249,49 @@ profile-20260728-135019.json is DELETED; the backups folder is empty again. Stat
 the rider requires: NO captured copy of her profile now exists — the safety net for the phase-1
 deploy has ended; phase 2's own D25 capture will precede its first profile-writing deploy.
 backup-receipt.txt keeps only the sha256 + counts (never contents), retained as the record.
+
+## PHASE 2 PLANNING (2026-07-28)
+
+Fresh session (phase-boundary /clear per the handoff). Baseline re-verified by the orchestrator
+before planning: git clean at 558a5bc · npm test 291/0 · contrast grep -c '^PASS' = 52 · live
+/sw.js line 1 = magic-vet-v16. Frozen contracts re-acknowledged. D27 rider: already answered
+and executed at the phase-1 close (nothing pending).
+
+Fresh planner (Opus, files only, read-only mandate) returned the full 11-step phase-2 plan now
+in plan.md ("PHASE 2 IN FULL"): 12 acceptance criteria; 2.1 ORCHESTRATOR (hand-derived
+transcript gate written BEFORE the code, proven able to fail), 2.2-2.7 WORKER (candidate branch
+in applyQuizAnswer + B5 clock reset, pickCandidateWords shadow-projection quota, QZ-25 soft
+line, call-site merge in both views, adversarial episode 6, CACHE v17), 2.8-2.11 ORCHESTRATOR
+(sandbox visual gate, D25 capture, deploy, read-back). BLOCKERS: none. RECORD GAPS: 7, all
+frozen in the plan with reasons (candidate slot FIRST; a correct answer mirrors markWordKnown's
+three deletes and leaves lastSeen alone; needsReview untouched on wrong; D27 rider = KEEP until
+the owner answers at close; rollback url only ever from vercel inspect; soft line reuses
+.quiz-demoted with no new CSS; ledger re-derived 286 flat + 5 subtests = 291).
+
+ORCHESTRATOR VERIFICATION of the planner's claims against the tree:
+- CONFIRMED: per-file flat counts 10/7/8/11/11/5; 286+5=291; QZ-21 transcript diffs EMPTY
+  today; public/ byte-unchanged 70d0aa7..558a5bc; quiz-core 'known' comparisons = 2 and the
+  pickQuizWords signature frozen; 4 CRLF files + sw.js LF; growth.md:486 = design.md:491 = the
+  soft line (em dash U+2014); §10 amendment licence quoted correctly; quiz-experience harness
+  helpers exist as named (makeContainer IS the mock 2.4's probe copies); baseForms identity for
+  lantern/pebble/kettle; sandbox profile 12/12 known, 1 chapter, all 12 with bank items;
+  light.json items[1] is the QZ-21 lamp item; the expected-file bodies quoted in 2.1 match
+  QZ-21 screens 1 and 4 except the demotion line; bind() survives the stub container; the
+  demoted chain evaluates true against 2.4's stub post; markWordKnown deletes exactly the three
+  keys 2.2's correct-branch mirrors.
+- WRONG and AMENDED (plan amendment #1, before review): step 2.3's validation pinned
+  `grep -cF "status === 'known'"` at 3 post-edit, but the frozen contract's shadow ASSIGNS
+  `status: 'known'` and never COMPARES it — the count stays 2 and the validation would have
+  failed a correct implementation (intervention-#1's bad-spec class, caught at plan time this
+  time). Fixed in plan.md with an inline note.
+
+PLAN REVIEW (Sonnet, fresh): VERDICT ship, findings none. It independently verified every cited
+line number, both transcript claims, the 291→298 ledger arithmetic, the contrast count, and the
+fixture ordering math.
+
+tokens: planner=237863 · reviewer=119691. Execution mode: AUTONOMOUS (owner opt-in in the
+handoff prompt) — briefing printed, no go-ahead wait. The one owner question of the phase (the
+D27 delete rider for the NEW capture) is asked in the phase-close report; default until
+answered: KEEP (record gap 4).
+
+$BASE (phase 2) = 558a5bc (recorded before step 2.1; every plan-time commit is .oplan-only).

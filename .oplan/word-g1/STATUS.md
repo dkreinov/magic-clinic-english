@@ -1,33 +1,37 @@
 # STATUS — word-g1 (photograph of now, 2026-07-28)
 
-PHASE 1 IS DONE AND LIVE. The app (magic-vet-v16) can now notice, by itself, that she is
-learning a word: a word she looked up once and then met in two later chapters without looking
-it up gets the new badge "almost knows it" (כמעט יודעת), and her "I know this" button still
-works on those words. The app's guess never changes her stories — only her claim or (next
-phase) a quiz pass does.
+PHASE 2 IS PLANNED AND EXECUTION HAS STARTED. Phase 1 (live at magic-vet-v16) taught the app
+to notice by itself that she is learning a word — the "almost knows it" (כמעט יודעת) badge.
+Phase 2 makes that guess RESOLVE: the practice quiz will ask about one "almost known" word per
+sitting; one wrong answer sends it back to learning with a kinder message written for a word
+she never claimed (עוד לא — נמשיך ללמוד את המילה הזאת), and its promotion clock restarts so it
+cannot bounce straight back; one right answer makes it properly known.
 
-Proof, not hope: all 291 tests pass (with and without the entry-code gate), colour contrast
-unchanged (52), the exact bytes we wrote are what the server serves, and her word collection
-was read back from production after the deploy — 20 words, nothing lost, nothing changed
-unexpectedly. Her data was backed up before the deploy and the backup is KEPT (see the one
-open question below).
+The plan (11 steps, 12 mechanical acceptance checks) was written by a fresh planner from the
+files alone, fact-checked by me against the code line by line (one internal contradiction
+found and fixed before any work started), and then independently reviewed: ship, zero findings.
 
 ```mermaid
 flowchart LR
-    A[Phase 1 DONE<br/>engine + badge LIVE v16] --> B[Phase 2 NEXT<br/>quiz asks candidates<br/>1 per sitting, kind miss-line]
+    A[Phase 1 DONE<br/>engine + badge LIVE v16] --> B[Phase 2 NOW<br/>quiz asks candidates<br/>1 per sitting, kind miss-line<br/>-> v17]
     B --> C[Phase 3<br/>weekly quiz items<br/>cover candidates]
 ```
 
-Right now she has 0 "almost knows it" words — expected: the engine first runs the next time
-she generates a story chapter. Her phone gets the new screen on its second open (the shell
-self-updates).
+Order of work: first I write down BY HAND what the new quiz screen must say (before any code
+exists, so the check cannot be circular); then four helper steps change the code; one fresh
+helper tries to break it end to end; then the cache version bumps to v17; I look at it in the
+sandbox with my own eyes; her live data is backed up; we ship; and her data is read back and
+proven intact.
 
-ONE QUESTION FOR THE OWNER: last run you asked that profile backups be deleted at close (D27).
-Apply that again and delete C:/Users/dkreinov/english-app-backups/profile-20260728-135019.json,
-or keep it? It is kept until you say.
+She currently has 0 "almost known" words (measured at the phase-1 close) — the engine first
+runs at her next chapter, so this phase may ship a working quiz path that simply waits.
 
-Rollback (code only): `"$(npm prefix -g)/vercel" rollback
-https://english-2wkxdnp9g-dkreinovs-projects.vercel.app --yes` (back to v15).
+NO backup of her profile exists right now (the phase-1 backup was deleted at your instruction).
+Nothing touches production before the new backup at step 2.9.
 
-Next: phase 2 — plan first with fresh eyes, then execute; recommended in a fresh session
-(paste the handoff prompt from the briefing).
+Rollback (code only, back to v16): the url is taken from `vercel inspect` at deploy time for
+dpl_9yj3HbhU7p5ZNAGQHUeTCvM2D3Dc — never constructed by hand (that bit us once).
+
+OPEN QUESTIONS FOR THE OWNER: none right now. At the close you will be asked one: delete or
+keep the new backup (your earlier "delete it now" was about the phase-1 file; I do not assume
+it was a standing order).
