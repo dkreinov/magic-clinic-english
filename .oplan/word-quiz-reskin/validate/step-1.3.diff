@@ -1,0 +1,68 @@
+diff --git a/public/styles.css b/public/styles.css
+index e39ea44..d21f6ac 100644
+--- a/public/styles.css
++++ b/public/styles.css
+@@ -1,24 +1,24 @@
+ :root {
+-  --color-primary: #c39bf0;
+-  --color-teal: #4ecec0;
+-  --color-accent: #f5c563;
+-  --color-bg: #241305;
+-  --color-ink: #fdf1d8;
+-  --radius: 16px;
+-
+-  --color-primary-ink: #2a1606;
+-  --color-muted: #d9bc92;
+-  --color-card: #3a1d08;
+-  --color-surface-2: #4d2a0e;
+-  --color-border: #a35d22;
+-  --color-nav: #2e1806;
+-  --color-danger: #ef9a7d;
+-  --color-glow: #fde3a2;
+-  --color-bg-top: #361d08;
+-  --color-bg-glow-violet: #321f1a;
+-  --color-bg-glow-teal: #282416;
+-  --color-bg-glow-amber: #331f0c;
+-  --shadow-soft: 0 0 0 1px rgba(253, 227, 162, 0.10), 0 4px 14px rgba(0, 0, 0, 0.45);
++  --color-primary: #7b3fb5;
++  --color-teal: #086055;
++  --color-accent: #8a5600;
++  --color-bg: #fff4e2;
++  --color-ink: #3a2412;
++  --radius: 22px;
++
++  --color-primary-ink: #fff6e8;
++  --color-muted: #7a5a3c;
++  --color-card: #fffaf0;
++  --color-surface-2: #fdeed6;
++  --color-border: #96682f;
++  --color-nav: #fff8ec;
++  --color-danger: #b3341c;
++  --color-glow: #ffd98a;
++  --color-bg-top: #ffe9c9;
++  --color-bg-glow-violet: #f3e4fb;
++  --color-bg-glow-teal: #dff4ee;
++  --color-bg-glow-amber: #ffe4b5;
++  --shadow-soft: 0 0 0 1px rgba(150, 104, 47, 0.16), 0 6px 18px rgba(120, 78, 30, 0.13);
+   --nav-height: 68px;
+   --transition-fast: 150ms ease;
+ }
+diff --git a/tests/background.test.js b/tests/background.test.js
+index 6ab4a06..b1643d3 100644
+--- a/tests/background.test.js
++++ b/tests/background.test.js
+@@ -11,10 +11,10 @@ const publicDir = path.join(root, 'public');
+ 
+ test('styles.css defines the four background paint tokens with their frozen values', () => {
+   const css = readFileSync(path.join(publicDir, 'styles.css'), 'utf8');
+-  assert.ok(css.includes('--color-bg-top: #361d08;'));
+-  assert.ok(css.includes('--color-bg-glow-violet: #321f1a;'));
+-  assert.ok(css.includes('--color-bg-glow-teal: #282416;'));
+-  assert.ok(css.includes('--color-bg-glow-amber: #331f0c;'));
++  assert.ok(css.includes('--color-bg-top: #ffe9c9;'));
++  assert.ok(css.includes('--color-bg-glow-violet: #f3e4fb;'));
++  assert.ok(css.includes('--color-bg-glow-teal: #dff4ee;'));
++  assert.ok(css.includes('--color-bg-glow-amber: #ffe4b5;'));
+ });
+ 
+ test('body background-image is composed only of the frozen background paint layers', () => {

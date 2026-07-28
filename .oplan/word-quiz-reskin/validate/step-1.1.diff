@@ -1,0 +1,816 @@
+diff --git a/tests/api-chapter.test.js b/tests/api-chapter.test.js
+index f83d357..fbc7765 100644
+--- a/tests/api-chapter.test.js
++++ b/tests/api-chapter.test.js
+@@ -37,6 +37,16 @@ function withTempDataDir(fn) {
+     });
+ }
+ 
++function withOpenGate(fn) {
++  const original = process.env.APP_CODE;
++  delete process.env.APP_CODE;
++  return Promise.resolve()
++    .then(fn)
++    .finally(() => {
++      if (original !== undefined) process.env.APP_CODE = original;
++    });
++}
++
+ function createMockRes() {
+   return {
+     statusCode: undefined,
+@@ -133,7 +143,7 @@ function tooHardChapterFixture() {
+ }
+ 
+ test('POST generate with no placement returns 400 "placement required"', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     setTransport(async () => goodChapterFixture());
+     try {
+       const req = createPostReq({ action: 'generate' });
+@@ -147,11 +157,11 @@ test('POST generate with no placement returns 400 "placement required"', async (
+     } finally {
+       resetTransport();
+     }
+-  });
++  }));
+ });
+ 
+ test('POST generate with placement but no learner names returns 400 "learner required"', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const p = defaultProfile();
+     p.placement.completed = true;
+     await saveProfile(p);
+@@ -169,11 +179,11 @@ test('POST generate with placement but no learner names returns 400 "learner req
+     } finally {
+       resetTransport();
+     }
+-  });
++  }));
+ });
+ 
+ test('POST generate with placement and learner names returns 200 and persists chapter', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const p = defaultProfile();
+     p.placement.completed = true;
+     p.learner.heroineName = 'Noa';
+@@ -207,11 +217,11 @@ test('POST generate with placement and learner names returns 200 and persists ch
+     } finally {
+       resetTransport();
+     }
+-  });
++  }));
+ });
+ 
+ test('POST generate returns 502 when transport always returns a too-hard chapter, without persisting', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const p = defaultProfile();
+     p.placement.completed = true;
+     p.learner.heroineName = 'Noa';
+@@ -234,11 +244,11 @@ test('POST generate returns 502 when transport always returns a too-hard chapter
+     } finally {
+       resetTransport();
+     }
+-  });
++  }));
+ });
+ 
+ test('GET returns 405', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createGetReq();
+     const res = createMockRes();
+     await chapterHandler(req, res);
+@@ -246,11 +256,11 @@ test('GET returns 405', async () => {
+     const parsed = JSON.parse(res.body);
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+-  });
++  }));
+ });
+ 
+ test('unknown action returns 400', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq({ action: 'nope' });
+     const res = createMockRes();
+     await chapterHandler(req, res);
+@@ -259,11 +269,11 @@ test('unknown action returns 400', async () => {
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+     assert.strictEqual(parsed.error, 'unknown action');
+-  });
++  }));
+ });
+ 
+ test('malformed JSON body returns 400', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq('{');
+     const res = createMockRes();
+     await chapterHandler(req, res);
+@@ -272,7 +282,7 @@ test('malformed JSON body returns 400', async () => {
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+     assert.strictEqual(parsed.error, 'invalid JSON body');
+-  });
++  }));
+ });
+ 
+ // Sanity check that GOOD_TEXT actually passes the real verifier against the
+diff --git a/tests/api-placement.test.js b/tests/api-placement.test.js
+index e9f9970..5d2851e 100644
+--- a/tests/api-placement.test.js
++++ b/tests/api-placement.test.js
+@@ -27,6 +27,16 @@ function withTempDataDir(fn) {
+     });
+ }
+ 
++function withOpenGate(fn) {
++  const original = process.env.APP_CODE;
++  delete process.env.APP_CODE;
++  return Promise.resolve()
++    .then(fn)
++    .finally(() => {
++      if (original !== undefined) process.env.APP_CODE = original;
++    });
++}
++
+ function createMockRes() {
+   return {
+     statusCode: undefined,
+@@ -80,7 +90,7 @@ function buildAllCorrectTask2Answers() {
+ }
+ 
+ test('GET returns stripped item bank', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createGetReq();
+     const res = createMockRes();
+     await placementHandler(req, res);
+@@ -90,11 +100,11 @@ test('GET returns stripped item bank', async () => {
+     assert.strictEqual(parsed.ok, true);
+     assert.ok(!res.body.includes('"correctIndex"'));
+     assert.strictEqual(parsed.data.task1.length, bank.task1.length);
+-  });
++  }));
+ });
+ 
+ test('POST submit task1 scores answers and updates profile', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const answers = buildTask1Answers({ wrongCount: 2 });
+     const req = createPostReq({ action: 'submit', task1: answers });
+     const res = createMockRes();
+@@ -119,11 +129,11 @@ test('POST submit task1 scores answers and updates profile', async () => {
+     assert.ok(wordEntry, 'expected known lemma in profile.words');
+     assert.strictEqual(wordEntry.status, 'known');
+     assert.strictEqual(wordEntry.source, 'placement');
+-  });
++  }));
+ });
+ 
+ test('profile persists across a subsequent GET to api/profile.js', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const answers = buildTask1Answers({ wrongCount: 2 });
+     const postReq = createPostReq({ action: 'submit', task1: answers });
+     const postRes = createMockRes();
+@@ -142,11 +152,11 @@ test('profile persists across a subsequent GET to api/profile.js', async () => {
+     const wordEntry = parsed.data.words[lastCorrectItem.lemma.toLowerCase()];
+     assert.ok(wordEntry);
+     assert.strictEqual(wordEntry.status, 'known');
+-  });
++  }));
+ });
+ 
+ test('POST submit task2 (all correct) marks completed', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const task1Answers = buildTask1Answers({ wrongCount: 0 });
+     const req1 = createPostReq({ action: 'submit', task1: task1Answers });
+     const res1 = createMockRes();
+@@ -164,11 +174,11 @@ test('POST submit task2 (all correct) marks completed', async () => {
+     assert.strictEqual(parsed.data.skills.readingComprehension.state, 'estimated');
+     assert.strictEqual(parsed.data.placement.completed, true);
+     assert.ok(typeof parsed.data.placement.completedAt === 'string');
+-  });
++  }));
+ });
+ 
+ test('malformed JSON body returns 400', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq('{');
+     const res = createMockRes();
+     await placementHandler(req, res);
+@@ -177,11 +187,11 @@ test('malformed JSON body returns 400', async () => {
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+     assert.strictEqual(parsed.error, 'invalid JSON body');
+-  });
++  }));
+ });
+ 
+ test('unknown action returns 400', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq({ action: 'nope' });
+     const res = createMockRes();
+     await placementHandler(req, res);
+@@ -190,11 +200,11 @@ test('unknown action returns 400', async () => {
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+     assert.strictEqual(parsed.error, 'unknown action');
+-  });
++  }));
+ });
+ 
+ test('submit with no answer arrays returns 400 "no answers"', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq({ action: 'submit' });
+     const res = createMockRes();
+     await placementHandler(req, res);
+@@ -203,11 +213,11 @@ test('submit with no answer arrays returns 400 "no answers"', async () => {
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+     assert.strictEqual(parsed.error, 'no answers');
+-  });
++  }));
+ });
+ 
+ test('submit with only unknown-id answers returns 400 "no valid answers"', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq({ action: 'submit', task1: [{ id: 'zzz', choice: 0 }] });
+     const res = createMockRes();
+     await placementHandler(req, res);
+@@ -216,11 +226,11 @@ test('submit with only unknown-id answers returns 400 "no valid answers"', async
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+     assert.strictEqual(parsed.error, 'no valid answers');
+-  });
++  }));
+ });
+ 
+ test('PUT method returns 405', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = { method: 'PUT' };
+     const res = createMockRes();
+     await placementHandler(req, res);
+@@ -228,11 +238,11 @@ test('PUT method returns 405', async () => {
+     const parsed = JSON.parse(res.body);
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+-  });
++  }));
+ });
+ 
+ test('final profile after full submission passes validateProfile', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const task1Answers = buildTask1Answers({ wrongCount: 0 });
+     const req1 = createPostReq({ action: 'submit', task1: task1Answers });
+     const res1 = createMockRes();
+@@ -248,5 +258,5 @@ test('final profile after full submission passes validateProfile', async () => {
+ 
+     const result = validateProfile(parsed.data);
+     assert.strictEqual(result.ok, true, JSON.stringify(result.errors));
+-  });
++  }));
+ });
+diff --git a/tests/api-profile-post.test.js b/tests/api-profile-post.test.js
+index 658678c..de23d14 100644
+--- a/tests/api-profile-post.test.js
++++ b/tests/api-profile-post.test.js
+@@ -23,6 +23,16 @@ function withTempDataDir(fn) {
+     });
+ }
+ 
++function withOpenGate(fn) {
++  const original = process.env.APP_CODE;
++  delete process.env.APP_CODE;
++  return Promise.resolve()
++    .then(fn)
++    .finally(() => {
++      if (original !== undefined) process.env.APP_CODE = original;
++    });
++}
++
+ function createMockRes() {
+   return {
+     statusCode: undefined,
+@@ -61,7 +71,7 @@ function assertEnvelope(parsed) {
+ }
+ 
+ test('word-tap POST creates a learning word with taps=1', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq({ action: 'word-tap', lemma: 'dog', he: 'כלב', context: 'The dog ran fast.' });
+     const res = createMockRes();
+     await profileHandler(req, res);
+@@ -73,11 +83,11 @@ test('word-tap POST creates a learning word with taps=1', async () => {
+     assert.strictEqual(parsed.data.words.dog.taps, 1);
+     assert.strictEqual(parsed.data.words.dog.he, 'כלב');
+     assert.strictEqual(parsed.data.words.dog.context, 'The dog ran fast.');
+-  });
++  }));
+ });
+ 
+ test('word-tap persists across a subsequent GET', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const postReq = createPostReq({ action: 'word-tap', lemma: 'dog', he: 'כלב' });
+     const postRes = createMockRes();
+     await profileHandler(postReq, postRes);
+@@ -90,11 +100,11 @@ test('word-tap persists across a subsequent GET', async () => {
+     const parsed = JSON.parse(getRes.body);
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.data.words.dog.taps, 1);
+-  });
++  }));
+ });
+ 
+ test('second identical word-tap POST increments taps to 2', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req1 = createPostReq({ action: 'word-tap', lemma: 'dog', he: 'כלב' });
+     const res1 = createMockRes();
+     await profileHandler(req1, res1);
+@@ -107,11 +117,11 @@ test('second identical word-tap POST increments taps to 2', async () => {
+     const parsed = JSON.parse(res2.body);
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.data.words.dog.taps, 2);
+-  });
++  }));
+ });
+ 
+ test('mark-known POST with valid source marks the word known', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq({ action: 'mark-known', lemma: 'cat', source: 'placement' });
+     const res = createMockRes();
+     await profileHandler(req, res);
+@@ -120,11 +130,11 @@ test('mark-known POST with valid source marks the word known', async () => {
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, true);
+     assert.strictEqual(parsed.data.words.cat.status, 'known');
+-  });
++  }));
+ });
+ 
+ test('mark-known POST without source returns 400', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq({ action: 'mark-known', lemma: 'cat' });
+     const res = createMockRes();
+     await profileHandler(req, res);
+@@ -132,11 +142,11 @@ test('mark-known POST without source returns 400', async () => {
+     const parsed = JSON.parse(res.body);
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+-  });
++  }));
+ });
+ 
+ test('unknown action POST returns 400', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq({ action: 'nope' });
+     const res = createMockRes();
+     await profileHandler(req, res);
+@@ -145,11 +155,11 @@ test('unknown action POST returns 400', async () => {
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+     assert.strictEqual(parsed.error, 'unknown action');
+-  });
++  }));
+ });
+ 
+ test('malformed JSON body POST returns 400', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq('{');
+     const res = createMockRes();
+     await profileHandler(req, res);
+@@ -158,11 +168,11 @@ test('malformed JSON body POST returns 400', async () => {
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+     assert.strictEqual(parsed.error, 'invalid JSON body');
+-  });
++  }));
+ });
+ 
+ test('word-tap POST without lemma returns 400', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq({ action: 'word-tap' });
+     const res = createMockRes();
+     await profileHandler(req, res);
+@@ -170,11 +180,11 @@ test('word-tap POST without lemma returns 400', async () => {
+     const parsed = JSON.parse(res.body);
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+-  });
++  }));
+ });
+ 
+ test('set-learner POST sets both names and persists via GET', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq({ action: 'set-learner', heroineName: 'Noa', petName: 'Sparky' });
+     const res = createMockRes();
+     await profileHandler(req, res);
+@@ -192,11 +202,11 @@ test('set-learner POST sets both names and persists via GET', async () => {
+     const getParsed = JSON.parse(getRes.body);
+     assert.strictEqual(getParsed.data.learner.heroineName, 'Noa');
+     assert.strictEqual(getParsed.data.learner.petName, 'Sparky');
+-  });
++  }));
+ });
+ 
+ test('set-learner POST with neither name returns 400 "name required"', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq({ action: 'set-learner' });
+     const res = createMockRes();
+     await profileHandler(req, res);
+@@ -205,11 +215,11 @@ test('set-learner POST with neither name returns 400 "name required"', async ()
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+     assert.strictEqual(parsed.error, 'name required');
+-  });
++  }));
+ });
+ 
+ test('set-learner POST with blank heroineName returns 400', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq({ action: 'set-learner', heroineName: '   ' });
+     const res = createMockRes();
+     await profileHandler(req, res);
+@@ -218,11 +228,11 @@ test('set-learner POST with blank heroineName returns 400', async () => {
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+     assert.strictEqual(parsed.error, 'name required');
+-  });
++  }));
+ });
+ 
+ test('log-check POST appends an entry to story.checkLog and persists', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq({
+       action: 'log-check',
+       chapter: 1,
+@@ -246,11 +256,11 @@ test('log-check POST appends an entry to story.checkLog and persists', async ()
+     assert.strictEqual(getRes.statusCode, 200);
+     const getParsed = JSON.parse(getRes.body);
+     assert.strictEqual(getParsed.data.story.checkLog.length, 1);
+-  });
++  }));
+ });
+ 
+ test('log-check POST missing questionId returns 400 "invalid check"', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq({ action: 'log-check', chapter: 1, chosenIndex: 0, correctIndex: 0 });
+     const res = createMockRes();
+     await profileHandler(req, res);
+@@ -259,11 +269,11 @@ test('log-check POST missing questionId returns 400 "invalid check"', async () =
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+     assert.strictEqual(parsed.error, 'invalid check');
+-  });
++  }));
+ });
+ 
+ test('PUT method returns 405', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = { method: 'PUT' };
+     const res = createMockRes();
+     await profileHandler(req, res);
+@@ -271,5 +281,5 @@ test('PUT method returns 405', async () => {
+     const parsed = JSON.parse(res.body);
+     assertEnvelope(parsed);
+     assert.strictEqual(parsed.ok, false);
+-  });
++  }));
+ });
+diff --git a/tests/api-profile-quiz.test.js b/tests/api-profile-quiz.test.js
+index c6006fd..f6c187f 100644
+--- a/tests/api-profile-quiz.test.js
++++ b/tests/api-profile-quiz.test.js
+@@ -23,6 +23,16 @@ function withTempDataDir(fn) {
+     });
+ }
+ 
++function withOpenGate(fn) {
++  const original = process.env.APP_CODE;
++  delete process.env.APP_CODE;
++  return Promise.resolve()
++    .then(fn)
++    .finally(() => {
++      if (original !== undefined) process.env.APP_CODE = original;
++    });
++}
++
+ function createMockRes() {
+   return {
+     statusCode: undefined,
+@@ -72,7 +82,7 @@ async function markKnown(lemma) {
+ // --------------------------------------------------------------------------
+ 
+ test('quiz-answer happy path persists across a GET', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     await markKnown('light');
+     const { res, parsed } = await doPost({
+       action: 'quiz-answer',
+@@ -89,11 +99,11 @@ test('quiz-answer happy path persists across a GET', async () => {
+     assert.strictEqual(getRes.statusCode, 200);
+     assert.strictEqual(getParsed.data.words.light.strikes, 1);
+     assert.strictEqual(getParsed.data.words.light.lastStrikeSession, 's1');
+-  });
++  }));
+ });
+ 
+ test('three wrongs in three distinct sessions demote to learning', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     await markKnown('fair');
+     await doPost({ action: 'quiz-answer', lemma: 'fair', correct: false, sessionId: 's1' });
+     await doPost({ action: 'quiz-answer', lemma: 'fair', correct: false, sessionId: 's2' });
+@@ -106,11 +116,11 @@ test('three wrongs in three distinct sessions demote to learning', async () => {
+     assert.strictEqual(res.statusCode, 200);
+     assert.strictEqual(parsed.data.words.fair.status, 'learning');
+     assert.strictEqual(parsed.data.words.fair.strikes, 0);
+-  });
++  }));
+ });
+ 
+ test('three wrongs in one session do not demote', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     await markKnown('method');
+     await doPost({ action: 'quiz-answer', lemma: 'method', correct: false, sessionId: 'same-session' });
+     await doPost({ action: 'quiz-answer', lemma: 'method', correct: false, sessionId: 'same-session' });
+@@ -123,11 +133,11 @@ test('three wrongs in one session do not demote', async () => {
+     assert.strictEqual(res.statusCode, 200);
+     assert.strictEqual(parsed.data.words.method.status, 'known');
+     assert.strictEqual(parsed.data.words.method.strikes, 1);
+-  });
++  }));
+ });
+ 
+ test('a correct answer resets strikes and never promotes', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     await markKnown('dog');
+     await doPost({ action: 'quiz-answer', lemma: 'dog', correct: false, sessionId: 's1' });
+     await doPost({ action: 'quiz-answer', lemma: 'dog', correct: false, sessionId: 's2' });
+@@ -142,11 +152,11 @@ test('a correct answer resets strikes and never promotes', async () => {
+     assert.strictEqual('lastStrikeSession' in parsed.data.words.dog, false);
+     assert.strictEqual(parsed.data.words.dog.quizRight, 1);
+     assert.strictEqual(parsed.data.words.dog.status, 'known');
+-  });
++  }));
+ });
+ 
+ test('the four 400s use exact error strings and write nothing to disk', async () => {
+-  await withTempDataDir(async (tmpDir) => {
++  await withOpenGate(() => withTempDataDir(async (tmpDir) => {
+     await markKnown('cat');
+     const profilePath = path.join(tmpDir, 'profile.json');
+ 
+@@ -186,11 +196,11 @@ test('the four 400s use exact error strings and write nothing to disk', async ()
+       const after = fs.readFileSync(profilePath, 'utf8');
+       assert.strictEqual(after, before);
+     }
+-  });
++  }));
+ });
+ 
+ test('an inflected lemma 400s as unknown word and mints no new entry', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     await markKnown('light');
+     const { res, parsed } = await doPost({
+       action: 'quiz-answer',
+@@ -203,11 +213,11 @@ test('an inflected lemma 400s as unknown word and mints no new entry', async ()
+ 
+     const { parsed: getParsed } = await doGet();
+     assert.strictEqual('lights' in getParsed.data.words, false);
+-  });
++  }));
+ });
+ 
+ test('an old-shape profile survives a real GET with its bytes unchanged', async () => {
+-  await withTempDataDir(async (tmpDir) => {
++  await withOpenGate(() => withTempDataDir(async (tmpDir) => {
+     const nowIso = new Date().toISOString();
+     const oldProfile = {
+       version: 1,
+@@ -254,5 +264,5 @@ test('an old-shape profile survives a real GET with its bytes unchanged', async
+ 
+     assert.strictEqual(parsed.data.words.light.status, 'known');
+     assert.strictEqual(parsed.data.words.fair.status, 'learning');
+-  });
++  }));
+ });
+diff --git a/tests/api-translate.test.js b/tests/api-translate.test.js
+index c47162b..41a5bfa 100644
+--- a/tests/api-translate.test.js
++++ b/tests/api-translate.test.js
+@@ -42,7 +42,17 @@ function assertEnvelope(parsed) {
+   }
+ }
+ 
+-test('POST translates a word using the injected transport', async () => {
++function withOpenGate(fn) {
++  const original = process.env.APP_CODE;
++  delete process.env.APP_CODE;
++  return Promise.resolve()
++    .then(fn)
++    .finally(() => {
++      if (original !== undefined) process.env.APP_CODE = original;
++    });
++}
++
++test('POST translates a word using the injected transport', () => withOpenGate(async () => {
+   setTransport(async () => ({ he: 'כלב' }));
+   try {
+     const req = createPostReq({ word: ' dog ' });
+@@ -57,9 +67,9 @@ test('POST translates a word using the injected transport', async () => {
+   } finally {
+     resetTransport();
+   }
+-});
++}));
+ 
+-test('POST returns 502 when the transport throws', async () => {
++test('POST returns 502 when the transport throws', () => withOpenGate(async () => {
+   setTransport(async () => {
+     throw new Error('network blip');
+   });
+@@ -75,9 +85,9 @@ test('POST returns 502 when the transport throws', async () => {
+   } finally {
+     resetTransport();
+   }
+-});
++}));
+ 
+-test('POST with a blank word returns 400', async () => {
++test('POST with a blank word returns 400', () => withOpenGate(async () => {
+   const req = createPostReq({ word: '   ' });
+   const res = createMockRes();
+   await translateHandler(req, res);
+@@ -86,9 +96,9 @@ test('POST with a blank word returns 400', async () => {
+   assertEnvelope(parsed);
+   assert.strictEqual(parsed.ok, false);
+   assert.strictEqual(parsed.error, 'word required');
+-});
++}));
+ 
+-test('POST without a word returns 400', async () => {
++test('POST without a word returns 400', () => withOpenGate(async () => {
+   const req = createPostReq({});
+   const res = createMockRes();
+   await translateHandler(req, res);
+@@ -97,9 +107,9 @@ test('POST without a word returns 400', async () => {
+   assertEnvelope(parsed);
+   assert.strictEqual(parsed.ok, false);
+   assert.strictEqual(parsed.error, 'word required');
+-});
++}));
+ 
+-test('GET returns 405', async () => {
++test('GET returns 405', () => withOpenGate(async () => {
+   const req = createGetReq();
+   const res = createMockRes();
+   await translateHandler(req, res);
+@@ -107,9 +117,9 @@ test('GET returns 405', async () => {
+   const parsed = JSON.parse(res.body);
+   assertEnvelope(parsed);
+   assert.strictEqual(parsed.ok, false);
+-});
++}));
+ 
+-test('malformed JSON body returns 400', async () => {
++test('malformed JSON body returns 400', () => withOpenGate(async () => {
+   const req = createPostReq('{');
+   const res = createMockRes();
+   await translateHandler(req, res);
+@@ -118,4 +128,4 @@ test('malformed JSON body returns 400', async () => {
+   assertEnvelope(parsed);
+   assert.strictEqual(parsed.ok, false);
+   assert.strictEqual(parsed.error, 'invalid JSON body');
+-});
++}));
+diff --git a/tests/api.test.js b/tests/api.test.js
+index 1fcab6a..7ce72e6 100644
+--- a/tests/api.test.js
++++ b/tests/api.test.js
+@@ -24,6 +24,16 @@ function withTempDataDir(fn) {
+     });
+ }
+ 
++function withOpenGate(fn) {
++  const original = process.env.APP_CODE;
++  delete process.env.APP_CODE;
++  return Promise.resolve()
++    .then(fn)
++    .finally(() => {
++      if (original !== undefined) process.env.APP_CODE = original;
++    });
++}
++
+ function createMockReqRes(method) {
+   const req = { method };
+   const res = {
+@@ -58,18 +68,18 @@ test('health POST returns 405', async () => {
+ });
+ 
+ test('profile GET returns a valid profile', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const { req, res } = createMockReqRes('GET');
+     await profileHandler(req, res);
+     assert.strictEqual(res.statusCode, 200);
+     const parsed = JSON.parse(res.body);
+     assert.strictEqual(parsed.ok, true);
+     assert.strictEqual(validateProfile(parsed.data).ok, true);
+-  });
++  }));
+ });
+ 
+ test('second profile GET returns the persisted profile', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const { req: req1, res: res1 } = createMockReqRes('GET');
+     await profileHandler(req1, res1);
+     const first = JSON.parse(res1.body);
+@@ -79,15 +89,15 @@ test('second profile GET returns the persisted profile', async () => {
+     const second = JSON.parse(res2.body);
+ 
+     assert.strictEqual(second.data.meta.createdAt, first.data.meta.createdAt);
+-  });
++  }));
+ });
+ 
+ test('profile PUT returns 405', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const { req, res } = createMockReqRes('PUT');
+     await profileHandler(req, res);
+     assert.strictEqual(res.statusCode, 405);
+     const parsed = JSON.parse(res.body);
+     assert.strictEqual(parsed.ok, false);
+-  });
++  }));
+ });
+diff --git a/tests/words-ui.test.js b/tests/words-ui.test.js
+index d32e214..4e953cc 100644
+--- a/tests/words-ui.test.js
++++ b/tests/words-ui.test.js
+@@ -31,6 +31,16 @@ function withTempDataDir(fn) {
+     });
+ }
+ 
++function withOpenGate(fn) {
++  const original = process.env.APP_CODE;
++  delete process.env.APP_CODE;
++  return Promise.resolve()
++    .then(fn)
++    .finally(() => {
++      if (original !== undefined) process.env.APP_CODE = original;
++    });
++}
++
+ function createMockRes() {
+   return {
+     statusCode: undefined,
+@@ -103,7 +113,7 @@ test('renderList renders context/escaping/btn-say/btn-know per row', () => {
+ });
+ 
+ test('markKnownBody is accepted by the real /api/profile handler', async () => {
+-  await withTempDataDir(async () => {
++  await withOpenGate(() => withTempDataDir(async () => {
+     const req = createPostReq(markKnownBody('cat'));
+     const res = createMockRes();
+     await profileHandler(req, res);
+@@ -111,7 +121,7 @@ test('markKnownBody is accepted by the real /api/profile handler', async () => {
+     const parsed = JSON.parse(res.body);
+     assert.strictEqual(parsed.ok, true);
+     assert.strictEqual(parsed.data.words.cat.status, 'known');
+-  });
++  }));
+ });
+ 
+ test('words.js wires the play affordance, mark-known, and the token-only contrast gate', () => {
