@@ -8,7 +8,9 @@ DESIGN: design.md (SIGNED) · FIELD GUIDE: field-guide/index.md (12 lessons)
 
 BASE (phase 3): 5a90a7f (the planning commit).
 ACCEPTED: 3.1 — 07ea2b4 (quiz-topup.mjs + 5 flat tests, ledger 303; audit mismatch #1 —
-  unrequested defensive extras — reworked to the bare contract, re-audit match/high)
+  unrequested defensive extras — reworked to the bare contract, re-audit match/high) ·
+  3.2 — 231572f (growth.md 4-line dated correction, 641 lines; retry 1: attempt #1 CRLF'd
+  the whole file on disk — caught by the orchestrator's byte check, redone byte-preserving)
 
 Phase-2 record: BASE 558a5bc · 2.1 dbe5a4f · 2.2 0621b1e · 2.3 d077dcc · 2.4 b83b538 ·
   2.5 ef7396c · 2.6 175de68 · 2.7 e786273 · 2.8 6094724 · 2.9-2.11 in journal · close 4f12820.

@@ -624,3 +624,27 @@ STEP 3.2 the signed document stops teaching the old rule
   audit: match / high
   commit: 231572f
   accepted: 2026-07-28
+
+STEP 3.3 the D25 capture (ORCHESTRATOR)
+  did: frozen subshell GET -> 200; BACKUP OK bytes=7525 words=20 known=12 candidate=0;
+    APP_CODE leak post-assert passed; sha256 + path appended to backup-receipt.txt; repo clean
+    outside .oplan; .data/profile.json absent.
+    BK=/c/Users/dkreinov/english-app-backups/profile-20260728-195804.json
+  note: candidate=0 matches the phase-2 read-back — G1 has still never run (no chapter
+    generated since). This capture is again the ONLY copy of her profile in existence.
+    D27 rider for THIS capture: KEEP until the owner answers at the phase close (the two
+    prior "delete" answers were each about their own capture, not a standing order).
+  STEP-3.3-OK.
+
+STEP 3.4 derive the top-up list, measure N (ORCHESTRATOR)
+  did: node scripts/quiz-topup.mjs --profile $BK -> exit 0;
+    header: TOPUP known=12 candidate=0 pool=12 dropped=0 covered=12 missing=0 banned=0;
+    topup-2-words.txt written (0 lines), topup-2-dropped.txt written (0 lines); NEED/DROP
+    counts reconcile with the header; exclusions file re-verified at 37.
+  RESULT: N=0 — the three-way gate's first branch. A GOOD outcome, recorded plainly, not
+    dressed up: every word she has claimed OR the app has nominated already has an item
+    (B7's inverted completeness criterion, proven against her real captured profile, not
+    the manifest). Steps 3.5-3.12 SKIPPED per the frozen gate: no items, no public/ change,
+    no CACHE bump (QZ-22's second branch), NO DEPLOY — v17 stays live. The phase closes on
+    criteria 1-11.
+  STEP-3.4-OK N=0.
