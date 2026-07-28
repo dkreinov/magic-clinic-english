@@ -198,3 +198,11 @@ STEP 1.7 sandbox visual gate (ORCHESTRATOR, self-served per owner directive / fi
     post-deploy report.
   sandbox profile RESTORED byte-from-backup (12/12 known again); server stopped; repo clean.
   tokens: orchestrator-only step. STEP-1.7-RECORDED.
+
+STEP 1.8 D25 capture (ORCHESTRATOR)
+  did: frozen subshell GET -> 200; BACKUP OK bytes=7525 words=20 known=12 candidate=0;
+    APP_CODE leak post-assert passed; sha256 + path in backup-receipt.txt; repo clean;
+    .data/profile.json absent. BK=/c/Users/dkreinov/english-app-backups/profile-20260728-135019.json
+  D27 rider: owner NOT yet asked mid-run (autonomous mode; deletion is a close-time action) —
+    the question goes in the phase-close report; default until answered: KEEP the backup.
+  STEP-1.8-OK.

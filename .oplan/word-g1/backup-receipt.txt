@@ -1,0 +1,1 @@
+capture /c/Users/dkreinov/english-app-backups/profile-20260728-135019.json sha256=58870a1b059512c747452fa8114a904bf1c210930f671edd1e77deba65cd51c2
