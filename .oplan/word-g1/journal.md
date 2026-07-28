@@ -295,3 +295,19 @@ D27 delete rider for the NEW capture) is asked in the phase-close report; defaul
 answered: KEEP (record gap 4).
 
 $BASE (phase 2) = 558a5bc (recorded before step 2.1; every plan-time commit is .oplan-only).
+
+STEP 2.1 the hand-derived candidate transcript, written BEFORE the code (ORCHESTRATOR)
+  did: g1-transcript.mjs + g1-transcript-expected.txt written by a build script from the plan's
+    frozen blocks (never a heredoc — field guide 13); every line cross-proven against its
+    SOURCE: screen bodies byte-equal QZ-21 expected screens 1/4, the soft line extracted from
+    docs/growth.md:486 (34 codepoints, U+2014 confirmed), the hard line from public/quiz.js:171;
+    the mjs embeds NO raw Hebrew demotion line. validate-2.1.sh..validate-2.7.sh extracted
+    verbatim from plan.md as files.
+  surprises: the plan's prose says the expected file is "EXACTLY these 55 lines" — the frozen
+    block itself is 59 lines. No frozen validation pins that number; recorded as a planner
+    prose slip, not an amendment. The quoted block is the contract and is what was written.
+  validation: bash .oplan/word-g1/validate-2.1.sh → EXPECTED-SHAPE-OK · GATE-CAN-FAIL-OK
+    (the gate is RED against today's code, as required) · STEP-2.1-OK
+  tokens: orchestrator-only step.
+  commit: (this commit)
+  accepted: 2026-07-28

@@ -1,0 +1,59 @@
+=== SCREEN 1: a CANDIDATE question as she first sees it — nothing marks it out ===
+שאלה 1 מתוך 4
+איזו מילה מתאימה?
+Please turn on the ___ so that I can see my book.
+רמז
+radio
+🔊
+television
+🔊
+oven
+🔊
+fan
+🔊
+camera
+🔊
+light
+🔊
+=== SCREEN 2: she chose "radio" — wrong; one wrong answer is enough for a candidate ===
+שאלה 1 מתוך 4
+איזו מילה מתאימה?
+Please turn on the ___ so that I can see my book.
+a lamp that helps you to see when a room is dark
+radio
+🔊
+television
+🔊
+oven
+🔊
+fan
+🔊
+camera
+🔊
+light
+🔊
+כמעט! המילה הנכונה היא
+light
+עוד לא — נמשיך ללמוד את המילה הזאת
+הלאה
+=== SCREEN 3: CONTROL — the same wrong answer on a word SHE claimed ===
+שאלה 1 מתוך 4
+איזו מילה מתאימה?
+Please turn on the ___ so that I can see my book.
+a lamp that helps you to see when a room is dark
+radio
+🔊
+television
+🔊
+oven
+🔊
+fan
+🔊
+camera
+🔊
+light
+🔊
+כמעט! המילה הנכונה היא
+light
+המילה הזאת חוזרת ללמידה, נלמד אותה שוב יחד
+הלאה
