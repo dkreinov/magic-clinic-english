@@ -135,18 +135,67 @@ chapter) — so this phase may ship a working path that quietly waits. We will k
 read-back prints the exact count.
 === END ===
 
---- HANDOFF PROMPT (paste into a fresh session) ---
+--- HANDOFF PROMPT (superseded — phase 2 was executed 2026-07-28; kept for the record) ---
 Continue run from: .oplan/word-g1/phase-state.md
 Read first: phase-state.md, then plan.md (PHASE 2 SKELETON at the end), then journal.md
   (PHASE 1 section), then field-guide/index.md (14 lessons), then design.md §8 B2/B3/B6(iii)
 Resume at: Phase 2 — plan it first (fresh planner, files only), review that plan, THEN execute
 Execution mode: autonomous
+--- END (superseded) ---
+
+=== PHASE 2 — PLAIN REPORT (2026-07-28) ===
+WHAT WE SET OUT TO DO: let one quiz question settle each "almost known" word — right makes it
+known, wrong takes it back kindly — without touching any rule for words she claimed herself.
+WHAT WE ACTUALLY DID:
+- Wrote down by hand, before any code, exactly what the new quiz screen must say — and first
+  proved that check FAILS against the old code, so it really tests something.
+- Taught the answer rule (one wrong = back to learning + clock restart; one right = known).
+- Added the picker that gives at most one "almost known" word a turn per round, reusing the
+  existing ranking untouched.
+- Put the kinder "not yet" line on screen for words she never claimed; the old line stays,
+  byte-for-byte, for words she did claim.
+- Wired the reserved first slot into both places a practice round starts.
+- Had a fresh helper play the whole thing through like a child and try to break it.
+- Bumped the cache to v17; I played a full round in the sandbox myself and answered wrong on
+  purpose — the kind message, the first-slot rule, and the after-quiz badge all looked right.
+- Backed up her live collection, shipped, proved the exact bytes are live, and read her data
+  back: 20 words, nothing lost, nothing changed.
+WHAT WE FOUND OUT:
+- One of the agreed checks had a bug of its own — it built a fake profile no correct code
+  could ever satisfy. The helper doing the work refused to guess, stopped, and asked; I fixed
+  the check, not the code. Third time this run a pre-agreed text was wrong and a different
+  layer of the machinery caught it.
+- A leftover practice server from an old session was squatting on the port with the wrong
+  data folder — killed it before it could confuse the sandbox check; added "check the port
+  first" to the lesson book.
+- One helper caught ITSELF about to paste Hebrew the forbidden way and corrected course.
+- She still has 0 "almost known" words — correct: the nominating engine first runs at her
+  next story chapter. The quiz slot quietly waits.
+WHAT WENT WRONG: nothing reached production wrong; the two catches above cost one round trip
+each. One check flagged a cosmetic indent that turned out to be quoted that way in the frozen
+plan itself — recorded, left as-is.
+WHAT IT COST: about 1,060,000 helper-tokens across 15 helper/checker calls (planning
+included); dollar total not reported by this session's tooling. Wall-clock: one session.
+WHERE WE ARE NOW: live at v17, everything proven, her data intact, backup KEPT.
+WHAT HAPPENS NEXT: phase 3 — the weekly quiz-question top-ups start covering "almost known"
+words (today a nominated word with no question can never be confirmed). We need from you:
+delete or keep the new backup file? (Kept until you answer.)
+=== END PLAIN REPORT ===
+
+--- HANDOFF PROMPT (paste into a fresh session for PHASE 3) ---
+Continue run from: .oplan/word-g1/phase-state.md
+Read first: phase-state.md, then plan.md (PHASE 3 SKELETON, mid-file, before "PHASE 2 IN
+  FULL"), then journal.md (PHASE 2 section), then field-guide/index.md (12 lessons),
+  then design.md §8 B7 + §5.5
+Resume at: Phase 3 — plan it first (fresh planner, files only), review that plan, THEN execute
+Execution mode: autonomous
 Model: Opus (PLANNER tier) or better
-Context: fresh session recommended — phase 1 filled the orchestrator's context
+Context: fresh session recommended — phase 2 filled the orchestrator's context
 Before executing:
-1. Read the files above fully. 2. git status clean; ledger 291/0; contrast 52; live v16.
-3. Re-acknowledge the frozen contracts in phase-state.md (QZ-12/17/18 amendments are exactly
-   the ones the signed design names, nothing more).
-4. D27 rider answer (delete/keep the phase-1 backup) may be in the chat above the paste —
-   record it in the journal before anything else.
+1. Read the files above fully. 2. git status clean; ledger 298/0; contrast 52; live v17
+   (dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw).
+3. Re-acknowledge the frozen contracts in phase-state.md.
+4. D27 rider answer (delete/keep the phase-2 backup profile-20260728-175238.json) may be in
+   the chat above the paste — record it in the journal before anything else; KEEP is the
+   default until answered.
 --- END HANDOFF PROMPT ---

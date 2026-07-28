@@ -469,3 +469,57 @@ STEP 2.8 sandbox visual gate (ORCHESTRATOR, self-served per owner directive / fi
   taste items for the owner: none new (the soft line reuses the existing demotion styling).
   sandbox profile RESTORED byte-from-backup (12/12 known); server stopped; port 3000 free;
   repo clean; .data/profile.json absent. STEP-2.8-RECORDED.
+
+STEP 2.9 D25 capture (ORCHESTRATOR)
+  did: frozen subshell GET -> 200; BACKUP OK bytes=7525 words=20 known=12 candidate=0;
+    APP_CODE leak post-assert passed; sha256 + path appended to backup-receipt.txt; repo clean;
+    .data/profile.json absent. BK=/c/Users/dkreinov/english-app-backups/profile-20260728-175238.json
+  note: candidate=0 matches the phase-1 close — G1 has not run since (no chapter generated).
+    This capture is the ONLY copy of her profile in existence (phase-1's was deleted at the
+    owner's instruction). D27 rider for THIS capture: KEEP until the owner answers at the
+    phase close (record gap 4 — "as last run" is not assumed to be a standing order).
+  STEP-2.9-OK.
+
+STEP 2.10 deploy v17 (ORCHESTRATOR)
+  did: vercel inspect BEFORE deploy: live id = dpl_9yj3HbhU7p5ZNAGQHUeTCvM2D3Dc (hard stop
+    passed), true url english-g80h5gnd9-dkreinovs-projects.vercel.app recorded in
+    ~/g1-deploy2/outgoing.txt AND the rollback line written into phase-state.md verbatim
+    BEFORE deploying. Deploy invoked ONCE, output to a file (the phase-1 double-deploy trap
+    avoided): new deployment dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw
+    (english-qh5ne6g96-dkreinovs-projects.vercel.app), status Ready, aliased to
+    english-app-three-tan.vercel.app.
+  validation: DEPLOY-V17-OK — public/ enumeration since 558a5bc exactly the five files; ALL
+    FIVE md5 live==worktree; live sw v17, no v16; health byte-exact; /api/chapter 401.
+  ROLLBACK (code only, back to v16):
+    "$(npm prefix -g)/vercel" rollback https://english-g80h5gnd9-dkreinovs-projects.vercel.app --yes
+
+STEP 2.11 read-back (ORCHESTRATOR)
+  did: frozen subshell GET -> 200; READBACK OK words=20 candidates=0; zero keys lost; status
+    changes: none; APP_CODE leak post-assert passed. STEP-2.11-OK.
+  note: candidates=0 remains the measured outcome — G1 runs at her NEXT chapter generation;
+    the quiz's candidate slot correctly stays empty until then (D23 silence).
+
+PHASE 2 CLOSED (2026-07-28) — PHASE-2-ALL-CRITERIA-OK (12/12, re-run from clean tree)
+  steps: 11 (6 WORKER + 5 ORCHESTRATOR incl. the transcript-gate authoring), worker first-try
+    validation: 5/6 (2.2 hit the bad-spec probe — intervention #1 — then passed first try)
+  escalations: 0
+  interventions: 1 (2.2, bad-spec: a frozen probe fixture no implementation could pass;
+    executor stop-rule caught it — the run's third bad-spec, third different catching layer)
+  audit results: 6/6 accepted (2.4 formally mismatch -> ruled cosmetic: the flagged indent is
+    quoted verbatim in the frozen contract; worker and auditor flagged it independently)
+  plan amendments at plan time: 1 (2.3 'known'-count 3 -> 2, caught by orchestrator
+    verification before review). Planner prose slips (non-frozen): "55 lines" for a 59-line
+    expected file — logged at 2.1.
+  cost: worker=490859 tok, checker=209192 tok, planner+reviewer=357554 tok — grand 1,057,605
+    tokens (computed by python, journal rule). Dollar figures: unavailable (no per-model
+    pricing readout in this harness session). Wall-clock: one session, same day as phase 1.
+  orchestrator_context: unavailable (no programmatic /context readout; session spans phase-2
+    planning through close in one window)
+  field_guide: re-cut at this boundary per the phase-1 deferral: 14 lessons -> 12, 76 -> ~49
+    lines. Evicted: old lesson 11 (packet file-coverage staleness — phase-6-specific, least
+    referenced this run; its core survives in lesson 9's "re-verify against the tree" spirit).
+    New material folded in: stale-port check (11), executor stop-rule as last net (9), extract-
+    don't-retype Hebrew (8). Still 49/40 — justified: lessons 9 and 10 carry four distinct
+    money-costing traps each and compress no further without losing the command or the trigger.
+  D27 rider: owner question OPEN for the phase-2 capture (asked in the close report; backup
+    KEPT until answered): delete profile-20260728-175238.json or keep it?

@@ -1,37 +1,35 @@
 # STATUS — word-g1 (photograph of now, 2026-07-28)
 
-PHASE 2 IS PLANNED AND EXECUTION HAS STARTED. Phase 1 (live at magic-vet-v16) taught the app
-to notice by itself that she is learning a word — the "almost knows it" (כמעט יודעת) badge.
-Phase 2 makes that guess RESOLVE: the practice quiz will ask about one "almost known" word per
-sitting; one wrong answer sends it back to learning with a kinder message written for a word
-she never claimed (עוד לא — נמשיך ללמוד את המילה הזאת), and its promotion clock restarts so it
-cannot bounce straight back; one right answer makes it properly known.
+PHASE 2 IS DONE AND LIVE (magic-vet-v17). The quiz can now DECIDE about an "almost known"
+word: each practice round reserves its first question for one such word; a right answer makes
+it properly known, a wrong answer sends it back to learning with a kinder message written for
+a word she never claimed (עוד לא — נמשיך ללמוד את המילה הזאת) and restarts its promotion
+clock so it cannot bounce straight back. Words she claimed herself keep their old rules to
+the letter — proven by a screen-transcript that must match byte-for-byte, and it does.
 
-The plan (11 steps, 12 mechanical acceptance checks) was written by a fresh planner from the
-files alone, fact-checked by me against the code line by line (one internal contradiction
-found and fixed before any work started), and then independently reviewed: ship, zero findings.
+Proof, not hope: all 298 tests pass (with and without the entry-code gate), colour contrast
+unchanged (52), BOTH screen transcripts (old and the new hand-written one) diff empty, the
+exact bytes we wrote are live on the server (all five changed files md5-proven), and her word
+collection was read back after the deploy — 20 words, nothing lost, nothing changed.
 
 ```mermaid
 flowchart LR
-    A[Phase 1 DONE<br/>engine + badge LIVE v16] --> B[Phase 2 NOW<br/>quiz asks candidates<br/>1 per sitting, kind miss-line<br/>-> v17]
-    B --> C[Phase 3<br/>weekly quiz items<br/>cover candidates]
+    A[Phase 1 DONE<br/>engine + badge] --> B[Phase 2 DONE<br/>quiz decides candidates<br/>LIVE v17]
+    B --> C[Phase 3 NEXT<br/>weekly quiz items<br/>cover candidates]
 ```
 
-Order of work: first I write down BY HAND what the new quiz screen must say (before any code
-exists, so the check cannot be circular); then four helper steps change the code; one fresh
-helper tries to break it end to end; then the cache version bumps to v17; I look at it in the
-sandbox with my own eyes; her live data is backed up; we ship; and her data is read back and
-proven intact.
+She still has 0 "almost known" words — expected: the nominating engine first runs the next
+time she generates a story chapter; the quiz slot correctly stays empty until then. Phase 3
+closes the last gap: a nominated word with no quiz question can never pass, so the weekly
+item top-ups must start covering candidates too.
 
-She currently has 0 "almost known" words (measured at the phase-1 close) — the engine first
-runs at her next chapter, so this phase may ship a working quiz path that simply waits.
+ONE QUESTION FOR THE OWNER: her profile was backed up before this deploy
+(C:/Users/dkreinov/english-app-backups/profile-20260728-175238.json). Delete it now, as you
+chose last time, or keep it? It is KEPT until you say (your "delete it now" was about the
+phase-1 file; I did not assume it was a standing order).
 
-NO backup of her profile exists right now (the phase-1 backup was deleted at your instruction).
-Nothing touches production before the new backup at step 2.9.
+Rollback (code only, back to v16): `"$(npm prefix -g)/vercel" rollback
+https://english-g80h5gnd9-dkreinovs-projects.vercel.app --yes`
 
-Rollback (code only, back to v16): the url is taken from `vercel inspect` at deploy time for
-dpl_9yj3HbhU7p5ZNAGQHUeTCvM2D3Dc — never constructed by hand (that bit us once).
-
-OPEN QUESTIONS FOR THE OWNER: none right now. At the close you will be asked one: delete or
-keep the new backup (your earlier "delete it now" was about the phase-1 file; I do not assume
-it was a standing order).
+Next: phase 3 — plan first with fresh eyes, then execute; recommended in a fresh session
+(paste the handoff prompt from the briefing).
