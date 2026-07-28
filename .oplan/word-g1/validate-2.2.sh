@@ -16,8 +16,8 @@ console.log("BRANCH-ORDER-OK");
 node -e '
 import("./lib/profile.js").then((m) => {
   const fail = (w) => { console.log("FAIL: " + w); process.exit(1); };
-  const mk = (over) => ({ words: { feel: { status: "candidate", source: "tap", he: null, taps: 1,
-    firstSeen: "2026-01-01T00:00:00.000Z", lastSeen: "2026-01-01T00:00:00.000Z", nominations: 1, ...over } } });
+  const mk = (over) => { const p = m.defaultProfile(); p.words.feel = { status: "candidate", source: "tap", he: null, taps: 1,
+    firstSeen: "2026-01-01T00:00:00.000Z", lastSeen: "2026-01-01T00:00:00.000Z", nominations: 1, ...over }; return p; };
   let p = mk({});
   m.applyQuizAnswer(p, { lemma: "feel", correct: false, sessionId: "s-1", now: "2026-06-01T00:00:00.000Z" });
   let e = p.words.feel;

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { defaultProfile, validateProfile, applyQuizAnswer, markWordKnown, migrateWordKeys } from '../lib/profile.js';
+import { knownLemmaSet } from '../lib/vocab.js';
 
 // Phase 3 / QZ-12, QZ-14. applyQuizAnswer is the strike state machine; markWordKnown
 // learns to clear quiz keys on a re-claim; migrateWordKeys learns to merge the six
@@ -325,4 +326,71 @@ test('migrateWordKeys: idempotent on a real merge -- running it twice changes no
   assert.deepStrictEqual(profile.words, once, 'running it twice must change nothing');
   assert.equal(profile.words.feel.quizRight, 6, 'sum did not double-count');
   assert.equal(validateProfile(profile).ok, true);
+});
+
+// 11. B2 + B5 -- a candidate answered wrong.
+test('applyQuizAnswer: a candidate answered WRONG returns to learning with its clock reset, counts the answer, and never touches the strike machinery', () => {
+  const profile = defaultProfile();
+  profile.words.dog = baseWordEntry({
+    status: 'candidate',
+    lastSeen: '2026-01-01T00:00:00.000Z',
+    nominations: 1,
+  });
+  const now = '2026-03-01T00:00:00.000Z';
+
+  applyQuizAnswer(profile, { lemma: 'dog', correct: false, sessionId: 's1', now });
+
+  const entry = profile.words.dog;
+  assert.equal(entry.status, 'learning');
+  assert.equal(entry.lastSeen, now, 'the promotion clock resets');
+  assert.equal(entry.lastQuizAt, now);
+  assert.equal(entry.quizWrong, 1);
+  assert.ok(!('strikes' in entry), 'strike machinery not entered');
+  assert.ok(!('lastStrikeSession' in entry), 'no strike session armed');
+  assert.equal(entry.nominations, 1, 'nominations untouched');
+  assert.equal(validateProfile(profile).ok, true);
+
+  // NEGATIVE CONTROL: a known word answered wrong once in a new session is
+  // still known with strikes === 1 -- the one-wrong rule must not leak into her claims.
+  const profile2 = defaultProfile();
+  profile2.words.cat = baseWordEntry({ status: 'known' });
+  applyQuizAnswer(profile2, { lemma: 'cat', correct: false, sessionId: 's1', now });
+  assert.equal(profile2.words.cat.status, 'known');
+  assert.equal(profile2.words.cat.strikes, 1);
+  assert.equal(validateProfile(profile2).ok, true);
+});
+
+// 12. B2 + B5 -- a candidate answered right.
+test('applyQuizAnswer: a candidate answered RIGHT becomes known, clears strike bookkeeping, and leaves lastSeen alone', () => {
+  const profile = defaultProfile();
+  profile.words.dog = baseWordEntry({
+    status: 'candidate',
+    lastSeen: '2026-01-01T00:00:00.000Z',
+    strikes: 2,
+    needsReview: true,
+    lastStrikeSession: 'old-session',
+    nominations: 2,
+  });
+  const now = '2026-03-01T00:00:00.000Z';
+
+  applyQuizAnswer(profile, { lemma: 'dog', correct: true, sessionId: 's1', now });
+
+  const entry = profile.words.dog;
+  assert.equal(entry.status, 'known');
+  assert.ok(!('strikes' in entry), 'strikes deleted');
+  assert.ok(!('needsReview' in entry), 'needsReview deleted');
+  assert.ok(!('lastStrikeSession' in entry), 'lastStrikeSession deleted');
+  assert.equal(entry.lastSeen, '2026-01-01T00:00:00.000Z', 'a pass must not move lastSeen');
+  assert.equal(entry.quizRight, 1);
+  assert.equal(entry.nominations, 2, 'nominations untouched');
+  assert.equal(knownLemmaSet(profile).has('dog'), true);
+  assert.equal(validateProfile(profile).ok, true);
+
+  // NEGATIVE CONTROL: a learning word answered right is still learning
+  // (QZ-12 row 1: never promotes) -- proves the branch keys on candidate exactly.
+  const profile2 = defaultProfile();
+  profile2.words.cat = baseWordEntry({ status: 'learning' });
+  applyQuizAnswer(profile2, { lemma: 'cat', correct: true, sessionId: 's1', now });
+  assert.equal(profile2.words.cat.status, 'learning');
+  assert.equal(validateProfile(profile2).ok, true);
 });

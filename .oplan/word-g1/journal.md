@@ -311,3 +311,37 @@ STEP 2.1 the hand-derived candidate transcript, written BEFORE the code (ORCHEST
   tokens: orchestrator-only step.
   commit: (this commit)
   accepted: 2026-07-28
+
+## INTERVENTION #1 (phase 2) — step 2.2 stopped-with-question (2026-07-28)
+
+The executor (Sonnet) implemented the frozen branch verbatim, then stopped correctly: the
+frozen validation's live probe built its fixture as a bare `{ words: {...} }` object, which
+`validateProfile` rejects for six missing top-level keys NO MATTER what applyQuizAnswer does —
+the probe could never pass any implementation. Orchestrator verified: bare fixture → ok:false
+(version/learner/skills missing...); defaultProfile()-based → ok:true. Reason class: bad-spec
+(a frozen validation contradicting reality). Planner AND both verification layers missed it;
+the executor's stop-rule caught it — the third bad-spec catch of the run, third different
+layer. RULING: mk() rebuilt on m.defaultProfile() in plan.md + validate-2.2.sh (inline AMENDED
+note). Re-dispatched to the same executor. interventions=1 (phase 2).
+
+STEP 2.2 B2 + B5's clock reset — the candidate branch in applyQuizAnswer
+  tier: WORKER (Sonnet)
+  did: lib/profile.js: frozen candidate branch inserted verbatim BEFORE the strike machinery.
+       tests/profile-quiz-answer.test.js: knownLemmaSet import + 2 flat tests (wrong path with
+       known-word negative control; right path with learning-word negative control), fixtures
+       on defaultProfile(). Ledger 293.
+  surprises: FAIL-FIRST mutation (iii) (branch moved below the correct-block) broke test 12,
+    not test 11 as the packet predicted — sound mechanical reason (the wrong path still reaches
+    the branch); placement still proven to matter. Flagged, not silently reconciled.
+  deviations: none
+  validation_first_try: no (first attempt hit the bad-spec probe fixture — INTERVENTION #1;
+    passed first try after the ruling)
+  retries: 1 (pre-question) + 0 (post-ruling)
+  escalations: 0
+  tokens: worker=59266+77542=136808, checker=40274, orchestrator_delta=unavailable
+  interventions: 1 (bad-spec: frozen probe fixture could never validate; ruled and amended)
+  fail-first: (i) lastSeen-reset deleted -> not ok 11; (ii) condition widened to !== 'known' ->
+    not ok 12 (+expected collateral 1,3); (iii) branch below correct-block -> not ok 12
+  audit: match / high (whitespace nit = diff-alignment illusion; bytes as contracted)
+  commit: (this commit)
+  accepted: 2026-07-28
