@@ -518,12 +518,12 @@ export async function render(container, ctx) {
     const questionsHtml = chapter.questions.map((q) => renderQuestion(chapter, q)).join("");
     const doneAll = allQuestionsCorrect(chapter);
     const qs = chapterQuizState(quizState, chapter.n);
-    const stage = afterChapterStage({ doneAll, quizDone: qs.done, lemmaCount: lemmas.length });
-    const quizHtml = stage === "quiz" ? `<div class="reader-quiz-slot"></div>` : "";
-    const celebrateHtml = stage === "celebrate"
+    const chapterStage = afterChapterStage({ doneAll, quizDone: qs.done, lemmaCount: lemmas.length });
+    const quizHtml = chapterStage === "quiz" ? `<div class="reader-quiz-slot"></div>` : "";
+    const celebrateHtml = chapterStage === "celebrate"
       ? `<img class="celebrate-image" src="/assets/celebration.webp" alt="" />`
       : "";
-    const continueHtml = stage === "celebrate"
+    const continueHtml = chapterStage === "celebrate"
       ? `<button class="btn btn-primary" type="button" data-action="continue-story">המשך הסיפור</button>`
       : "";
 
