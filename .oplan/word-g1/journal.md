@@ -101,3 +101,26 @@ STEP 1.2 candidate legal; B4 merge precedence; nominations field
   audit: match / high
   commit: (this commit)
   accepted: 2026-07-28
+
+STEP 1.3 promoteToCandidate — the G1 rule with the B5 cap
+  tier: WORKER (Sonnet)
+  did: lib/profile.js: vocab import + frozen promoteToCandidate block appended (two constants
+       exported). tests/profile-promote-candidate.test.js: 4 flat pure tests (threshold+negative,
+       inflection+clock, known/candidate untouched + knownLemmaSet gate, cap+idempotence).
+  surprises: worker fixture bug on first inflection test (quiet=1, fixed); worker wiped its own
+    uncommitted edits with `git checkout --` mid-mutation-testing and rewrote from its backup.
+  deviations: none claimed — but the rewrite left ONE contract drift: raw curly quotes in the
+    regex class instead of the frozen ‘’ escapes. AUDIT CAUGHT IT (mismatch #1).
+    Orchestrator applied the one-character-class fix directly (scripted, counted exactly 1
+    occurrence), re-ran the full frozen validation + a live curly-apostrophe probe
+    (CURLY-NORMALISATION-OK), and the re-audit returned match/high (codepoint dump: no
+    non-ASCII left in the appended block).
+  validation_first_try: no (worker retried once on its fixture; orchestrator validation passed
+    both runs)
+  retries: 1 (worker) + 1 fix cycle (orchestrator, post-audit)
+  escalations: 0
+  tokens: worker=118235, checker=40516+45639, orchestrator_delta=unavailable
+  interventions: 0 (the fix followed a first-mismatch audit verdict, logged here)
+  audit: mismatch (curly-quote drift) -> fixed -> match / high
+  commit: (this commit)
+  accepted: 2026-07-28

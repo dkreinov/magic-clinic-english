@@ -1,4 +1,4 @@
-CURRENT: phase 1 "G1 candidate engine — status, promoter, badge, deployed", next step 1.3
+CURRENT: phase 1 "G1 candidate engine — status, promoter, badge, deployed", next step 1.4
 PLAN: .oplan/word-g1/plan.md (phase 1 in full, reviewed: ship/0 findings; phases 2-3 skeletons)
 JOURNAL: journal.md · BRIEFING: briefing.md · STATUS: STATUS.md · DESIGN: design.md (SIGNED,
   byte-copy of .oplan/word-quiz/night/growth-amended-DRAFT.md) · FIELD GUIDE:
