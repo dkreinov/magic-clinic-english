@@ -1,57 +1,46 @@
-CURRENT: phase 1 "Sunrise Parchment re-skin + chores", next step 1.7 — THE OWNER LOOK (human
-  gate; the only open item). Steps 1.1-1.6 accepted; criteria 1-8 of 9 verified green; the v14
-  Sunrise Parchment shell IS LIVE at dpl_FMjbqEfc6HismJpjezr6ynKgWKNf
-  (english-app-three-tan.vercel.app). Outgoing (rollback target) recorded FIRST:
-  dpl_Geaj9sXRPP8KSt9uZTBMQnSDFCSr (magic-vet-v13). Rollback (code only):
+CURRENT: **THE RUN IS COMPLETE (2026-07-28).** Phase 1 closed, all 9 criteria met (C9 via the
+  owner's verbatim words + the audit the owner delegated to the orchestrator). The app is LIVE
+  in Sunrise Parchment at dpl_HUjmYpAvumkWDXxsjkZiQzY7GRTn (magic-vet-v15,
+  english-app-three-tan.vercel.app) with SELF-UPDATE: app.js reloads the page once on SW
+  controllerchange; sw.js already had skipWaiting+clients.claim. Live bytes md5-proven against
+  the worktree (/, /styles.css, /sw.js, /app.js), health exact, /api/chapter 401.
+
+ROLLBACK LADDER (code only, newest first), command:
   `"$(npm prefix -g)/vercel" rollback https://english-d0roovfpq-dkreinovs-projects.vercel.app --yes`
-  Step 1.7 protocol (frozen in plan.md): ask the owner to open the app (force reload if still
-  brown — the old v13 SW serves the old shell until v14 activates) and to comment on the 5 known
-  residues: nav shadow (styles.css:324), artwork bottom fade onto cream (mask 74%->88% is the
-  one-number fix), dark icon plate, cream flatness without grain (B2 was OUT), softer card lift.
-  Approval -> record quote verbatim, close phase (promote the field-guide candidate in journal.md,
-  write the phase-close metrics block, print the two reports). Complaint-but-usable -> record, do
-  NOT roll back, stop for a decision. Unusable -> roll back immediately, record.
-  NOTE step 1.1 was amended mid-step: tests/api-translate.test.js added (postdates the chore
-  packet; owned 6 of the 48 APP_CODE failures — no cross-file interference existed). Phase write
-  set is 14 files (criterion 7, verified exact).
-ACCEPTED: step 1.1 — 1a916f3 · step 1.2 — 9f03b97 · step 1.3 — c15b6cf · step 1.4 — 76c2bc2 · step 1.5 — 674c7ad · step 1.6 — deploy-only (no repo change), DEPLOY-OK
+  v14 = dpl_FMjbqEfc6HismJpjezr6ynKgWKNf (Sunrise Parchment, no auto-reload)
+  v13 = dpl_Geaj9sXRPP8KSt9uZTBMQnSDFCSr (the old dark theme)
 
-RUN SCOPE (owner-decided; sources in the predecessor record):
-  1. D29 Sunrise Parchment re-skin — owner chose option 03 on 2026-07-28. Scope frozen at
-     .oplan/word-quiz/night/visual-design-NOTES.md ("OWNER DECISION D29" + section 3 recipe):
-     :root token swap in public/styles.css, the 4 pinned background hexes in
-     tests/background.test.js, index.html color-scheme/theme-color (03 is a LIGHT option, so
-     recipe step 4 applies), contrast 52/52 re-proof, CACHE bump v13 -> v14, deploy, owner look.
-     Exact token values live in .oplan/word-quiz/night/visual-design-OPTIONS.html (option 03).
-  2. Chore PACKET 1 (withOpenGate in 6 test files, 42 call sites) and PACKET 2 (rename
-     renderChapter's local `stage` shadow) from .oplan/word-quiz/night/post-close-chores.md.
-     Packet line numbers were verified at commit 5db1d10; tree is now at 3c2aefd — RE-VERIFY
-     line numbers before dispatching (the packet file itself requires this).
-  3. PACKET 3 is ALREADY DONE — verified 2026-07-28 by the orchestrator: all three pointers
-     (field-guide/index.md:54, plan.md:1731, phase-state.md:29) already cite
-     .oplan/word-audio/phase-state.md:55-66. No work. PACKET 4 is dispositions only — no work.
+ACCEPTED: 1.1 — 1a916f3 (withOpenGate ×7 files; packet was stale, api-translate added by
+  intervention) · 1.2 — 9f03b97 (chapterStage rename) · 1.3 — c15b6cf (:root swap + 4 pins) ·
+  1.4 — 76c2bc2 (light PWA chrome + manifest) · 1.5 — 674c7ad (CACHE v14) · 1.6 — deploy v14,
+  DEPLOY-OK · 1.7 — owner: "I've opened and refreshed the app and it is now ligt." + delegated
+  visual audit (4 KEEP, 1 FIX) · 1.8 — 265dc86 (auto-reload + warm nav shadow + CACHE v15),
+  deployed, DEPLOY-V15-OK, sandbox-proven no reload loop.
 
-PRECONDITIONS VERIFIED 2026-07-28 by the orchestrator, this session:
-  git clean at 3c2aefd · npm test = # pass 282 / # fail 0 ·
-  node scripts/check-contrast.mjs | grep -c '^PASS' = 52 ·
-  live deployment magic-vet-v13 (dpl_Geaj9sXRPP8KSt9uZTBMQnSDFCSr); rollback (code only):
-  `"$(npm prefix -g)/vercel" rollback https://english-d0roovfpq-dkreinovs-projects.vercel.app --yes`
+PLAN: plan.md (incl. the step-1.8 addendum) · JOURNAL: journal.md (complete, incl. the phase
+  metrics block) · BRIEFING: briefing.md · FIELD GUIDE: field-guide/index.md (59/40, justified
+  in the journal; lesson 11 = packet FILE-COVERAGE staleness).
+PREDECESSOR RECORD: .oplan/word-quiz/ · deploy recipe: .oplan/word-audio/phase-state.md:55-66.
 
-PLAN: plan.md (not yet written) · JOURNAL: journal.md · BRIEFING: briefing.md
-PREDECESSOR RECORD: .oplan/word-quiz/ — phase-state.md is the summary; its "THINGS MOST LIKELY
-  TO BITE" carries over verbatim. Deploy recipe: .oplan/word-audio/phase-state.md:55-66.
-FIELD GUIDE: field-guide/index.md (inherited copy of .oplan/word-quiz/field-guide/index.md).
+STATE OF THE TREE: HEAD 9cd18b2 clean · ledger 282/0 (also under APP_CODE=dummy — the harness
+  gap is CLOSED, all 8 handler-test files gated) · contrast 52 · shell magic-vet-v15 ·
+  `.data/profile.json` absent · sandbox server STOPPED (restart:
+  `DATA_DIR='C:\Users\dkreinov\english-app-sandbox' npm run dev`).
 
-FROZEN CONTRACTS IN FORCE (inherited from word-quiz, see its plan.md):
-  QZ-1..QZ-24 as amended — notably QZ-22 (PRECACHE list exact; any change to a precached file
-  needs a CACHE version bump in the same phase) and tests/background.test.js pinning the 4
-  background paint hexes (the re-skin must move them in lockstep with styles.css).
-  APP_CODE must never enter the orchestrator's shell (dummy values inside test subshells are
-  fine — packet 1's own validation uses APP_CODE=dummy). Her live profile sits in Vercel Blob
-  behind APP_CODE — never probe it outside a sanctioned, subshell-isolated read.
-  Contrast anchor is `grep -c '^PASS'` = 52 · ledger counts FLAT top-level test() only ·
-  `LC_ALL=C sort` in frozen comparisons · hash FILES, never `$(curl ...)` output.
+FROZEN CONTRACTS IN FORCE: QZ-1..QZ-24 as amended (word-quiz plan.md) · QZ-22 PRECACHE exact +
+  CACHE bump same phase (honored twice: v14, v15) · background.test.js pins the 4 SUNRISE hexes
+  now (#ffe9c9/#f3e4fb/#dff4ee/#ffe4b5) · shell.test.js pins v15 + manifest #fff4e2/#fff8ec ·
+  contrast anchor `grep -c '^PASS'` = 52 · APP_CODE never in the orchestrator's shell ·
+  never probe the live profile · never `GET /api/profile` (a read that writes).
 
-OPEN QUESTIONS: step 1.7 — does Sunrise Parchment stay? — THE OWNER must answer (her verbatim
-  words go in the journal; the 5 residue questions are listed above and in plan.md step 1.7).
-BLOCKED: no — waiting on the owner's look, everything else done.
+THINGS MOST LIKELY TO BITE NEXT RUN:
+  · The learner's phone still holds the pre-v15 shell: her FIRST open may show the old skin
+    once (no listener in the cached page); every open after that self-updates. Do not misread
+    that first open as a failed deploy.
+  · validate/step-1.6.sh pins v14 — stale for any future deploy; write a fresh check per
+    deploy (the v15 one is inline in journal.md).
+  · Two cosmetic KEEPs are recorded owner-accepted-by-delegation, not owner-seen: icon dark
+    plate, artwork fade. If she dislikes either, the fixes are scoped in the word-quiz night
+    notes (mask 74%→88%; icon = asset regen, bigger).
+
+OPEN QUESTIONS: none. BLOCKED: no — complete.
