@@ -574,3 +574,30 @@ tokens: planner=176417 · reviewer=120539. Execution mode: AUTONOMOUS (owner opt
 handoff prompt) — briefing printed, no go-ahead wait. Owner questions of the phase (asked at
 the close, not blocking): D27 rider for the phase-3 capture; off-list step scheduling; who
 runs the weekly top-up.
+
+$BASE (phase 3) = 5a90a7f (recorded before step 3.1; the planning commit is .oplan-only).
+
+STEP 3.1 the top-up list becomes an executable, tested rule
+  tier: WORKER (Sonnet)
+  did: scripts/quiz-topup.mjs NEW (frozen header verbatim, four-flag CLI, frozen unwrap,
+       excluded-qz8 -> off-manifest by direct membership -> covered/NEED, banned = exclusions
+       ∩ bank, frozen TOPUP header + DROP/NEED/BANNED blocks bare-sorted, exit 0 iff banned=0).
+       tests/quiz-topup.test.js NEW: 5 flat tests (frozen names), mkdtemp fixtures, spawnSync
+       of the real CLI. Ledger 303.
+  surprises: fail-first mutation (i) also flipped tests 2/3/5 (they pin exact pool= counts) —
+    expected collateral, honestly flagged.
+  deviations: none
+  validation_first_try: yes
+  retries: 0
+  escalations: 0
+  tokens: worker=71938+79324=151262, checker=43684+45389=89073, orchestrator_delta=unavailable
+  interventions: 0
+  fail-first: (i) pool restricted to known-only -> test 1 failed (+3 collateral);
+    (ii) off-manifest filter deleted -> test 5 failed (NEED ghost instead of DROP); both
+    reverted md5-identical
+  audit: MISMATCH (1st) — two unrequested defensive extras (CLI arg-error branches; listBank
+    swallowing ENOENT = fail-open empty bank). Reworked by the same worker to the bare frozen
+    contract; re-audit: match / high. (The fail-open finding is exactly field-guide 2's class —
+    the auditor layer caught what validation could not.)
+  commit: 038f4f6
+  accepted: 2026-07-28
