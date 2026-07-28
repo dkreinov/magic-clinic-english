@@ -199,3 +199,38 @@ Before executing:
    the chat above the paste — record it in the journal before anything else; KEEP is the
    default until answered.
 --- END HANDOFF PROMPT ---
+
+=== PHASE 3 — PLAN IN PLAIN WORDS (2026-07-28) ===
+WHAT WE ARE BUILDING: the weekly batch of new practice questions currently only covers words
+she claimed herself. A word the app nominated ("almost known") gets no question, so it can
+never be confirmed — the exact deadlock the signed design calls B7. This phase changes the
+rule to "her words PLUS the app's nominations", makes that rule a small tested tool instead of
+a sentence in an old document, and — only if her real data demands it — writes the missing
+questions, has them attacked by two blind checkers, and ships them at v18 after your approval.
+
+LIKELY TWIST, said up front: there is probably nothing to generate today. All 12 words she
+knows already have questions, and the app has nominated 0 words so far. If so, the phase
+closes early with the tool, the proof, and the skip-list — that is a GOOD outcome, not a
+failure, and you can overturn it in one line if you want the phase held open instead.
+
+  3.1 Build the tool that derives the weekly list under the NEW rule, with five tests —
+      because a rule that only exists as prose does not run next Tuesday.
+  3.2 Fix the one line in the growth document that still teaches the old rule.
+  3.3 Copy her live word collection to a safe folder — no copy exists anywhere right now,
+      and this same copy is the only honest source of the list.
+  3.4 Run the tool on that copy and write down the answer: how many words need questions,
+      and every skipped word with its reason. 0 → close here. Over 25 → stop and show you
+      the cost first.
+  3.5-3.8 (only if needed) Write the questions; two separate helpers, blind to each other,
+      try to break every one; every flag is decided in writing; fixes re-checked.
+  3.9 (only if needed) You see every new question exactly as she will — hint hidden behind
+      the button, answer unmarked — and nothing ships until you say yes.
+  3.10-3.12 (only if needed) Cache bump to v18, ship with byte-proof, read her collection
+      back and prove nothing was lost.
+
+WHAT WE ARE NOT DOING: words with no audio clip ("off-list") stay skipped — loudly, on a
+written list — until their own small step; no visual changes; no new styling; nothing touches
+the four fragile CRLF files.
+BIGGEST RISK: a new question that marks her wrong for being right — no machine can catch it,
+which is why two blind passes AND your eyes stand in front of the deploy.
+=== END ===

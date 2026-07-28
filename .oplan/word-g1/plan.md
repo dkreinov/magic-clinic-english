@@ -2608,3 +2608,703 @@ PLAIN PLAN: for the human, no jargon — one line per step:
   server, the full suite green at 298 with and without the entry-code gate, contrast still 52, BOTH
   screen transcripts (the old one and the new hand-written one) matching exactly, and her word
   collection read back from production with zero words lost and every status change accounted for.
+
+---
+
+# PHASE 3 IN FULL (planned 2026-07-28 by a fresh planner — Opus, files only, read-only mandate;
+# supersedes the PHASE 3 SKELETON above. Orchestrator verification: all measured claims re-run
+# against the tree at 4f12820 and CONFIRMED before review — bank 62/84, both transcripts diff
+# EMPTY, g1 expected file 1 commit, exclusions 37, growth.md 637 lines LF w/ old rule at :111,
+# manifest 2254, quiz-bank pin >=50 at :128, shell pin v17 at :58, public/ byte-unchanged
+# e786273..HEAD, WORD_STATUSES includes 'candidate' at lib/profile.js:14.)
+#
+# ORCHESTRATOR RULING ON THE PLANNER'S BLOCKER 1 (2026-07-28, autonomous mode): the frozen
+# default is ACCEPTED as written — B7 is delivered when (a) the top-up rule is an executable,
+# tested, committed script covering known ∪ candidate; (b) the inverted completeness criterion
+# is proven `missing=0 banned=0` against her real captured profile; (c) every dropped word is
+# reported with its reason. Items are the operation's OUTPUT, not its definition; N = 0 closes
+# the phase on criteria 1-11. Put to the owner in the close report, overturnable in one line.
+# RECORD-GAP rulings: QZ-22 read per the signed §10 (bump on ANY public/ change) — confirmed;
+# no deploy if no public/ file moves — confirmed; off-list scheduling + weekly recurrence =
+# owner questions at the close.
+
+**PHASE 3: weekly top-ups cover candidates (slice c) — B7(a)**
+
+**GOAL:** The weekly top-up operation stops deriving its word list from `known` alone. It derives it from `known ∪ candidate`, on-manifest words only, and that rule becomes an executable, tested, committed thing (`scripts/quiz-topup.mjs`) rather than prose in a closed run's plan file. Every word the operation drops is printed with its reason. Whatever items that list demands are generated, adversarially vetted under the D28/QZ-24 sentence-only bar, owner-approved in the hint form, shipped at `magic-vet-v18`, and her live data is read back intact. G1's deadlock (a candidate with no item can never pass) is closed as a rule, and closed in fact for every candidate she has today.
+
+**ACCEPTANCE CRITERIA** (mechanical, re-runnable by the orchestrator from a clean tree; criteria 5/6/12/13 need `$BK`, so the D27 deletion happens strictly AFTER this re-run — the word-quiz precedent, `.oplan/word-quiz/plan.md:1484-1485`)
+
+1. `npm test` → `# pass 303` and `# fail 0`. Ledger 298 → **303**: exactly 5 new FLAT top-level `test()` calls, all in the NEW file `tests/quiz-topup.test.js`; no other test file's count moves. **Baseline MEASURED by this planner today at `4f12820`: `npm test` printed `# pass 298 / # fail 0`, `1..293`; `grep -c '^test('` over `tests/*.js` sums to 293; `tests/dev-server.test.js` holds exactly 5 `t.test(` subtests. 293 + 5 = 298 CONFIRMED.**
+2. `APP_CODE=dummy npm test` → `# pass 303` / `# fail 0`. The five new tests are pure: no handler, no `DATA_DIR`, no `APP_CODE`.
+3. `node scripts/check-contrast.mjs` exits 0, prints `ALL PASS`, and `grep -c '^PASS'` = **52** (never bare `grep -c PASS`, which returns 53). **No CSS is added by this phase at all.**
+4. `node scripts/check-quiz-bank.mjs` exits 0, prints `QUIZ BANK OK: <F> files, <M> items` with `F >= 62` and `M >= 84` (the bank never shrinks below what word-quiz phase 6 shipped — MEASURED today: 62 files, 84 items, 19 multi-sense), and prints neither `QUIZ BANK FAILED` nor `RULE-11 PENDING`.
+5. **THE COMPLETENESS CRITERION, INVERTED AGAIN (B7).** `node scripts/quiz-topup.mjs --profile "$BK"` exits 0 and its first line matches `TOPUP known=* candidate=* pool=* dropped=* covered=* missing=0 banned=0`. Measured against **her captured profile**, never the manifest (the word-audio true-but-irrelevant-invariant mistake). `$BK` is THIS phase's capture from step 3.3 and is frozen as the criterion's input: a word she claims between the capture and the close is next week's top-up, not a failure of this one.
+6. **EVERY DROPPED WORD IS REPORTED WITH ITS REASON (B7's rider).** `.oplan/word-g1/topup-2-dropped.txt` exists; every line matches `^DROP [a-z']+ (excluded-qz8|off-manifest)$`; the number of lines equals the header's `dropped=` value; and every `off-manifest` word is named to the owner in the close report as the deferred off-list step.
+7. **BOTH FROZEN TRANSCRIPTS STILL DIFF EMPTY.** `node .oplan/word-quiz/quiz-transcript.mjs` vs `.oplan/word-quiz/quiz-transcript-expected.txt`, and `node .oplan/word-g1/g1-transcript.mjs` vs `.oplan/word-g1/g1-transcript-expected.txt`; and `git log --oneline -- .oplan/word-g1/g1-transcript-expected.txt | wc -l` = **1**. **All three VERIFIED by this planner today** (both diffs empty, one commit) — so they are real regression guards for this phase, not decoration.
+8. **THE WRITE SET** over `$BASE..HEAD` (`$BASE` = `git rev-parse HEAD` recorded immediately before 3.1; `.oplan/**` excluded from every changed-set check), `LC_ALL=C sort`, **zero file deletions**, is EXACTLY:
+   `docs/growth.md scripts/quiz-topup.mjs tests/quiz-topup.test.js`
+   plus, **if and only if N > 0**: `public/sw.js tests/shell.test.js` and one `public/quiz/<lemma>.json` per word in `.oplan/word-g1/topup-2-words.txt`.
+9. **QZ-22.** If any file under `public/` changed, `public/sw.js` line 1 is `const CACHE = "magic-vet-v18";`, `grep -rln 'magic-vet-v17' --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=.oplan .` returns nothing, and `PRECACHE` is byte-unchanged. If no `public/` file changed, `public/sw.js` is byte-unchanged at v17 and **there is no deploy**.
+10. **THE D25 CAPTURE EXISTS AND IS PROVEN** before any deploy: `BACKUP OK bytes=… words=… known=… candidate=…`, ≥200 bytes, parseable, non-empty `words` map, `validateProfile(prof).ok`. It lives in `C:/Users/dkreinov/english-app-backups/`, outside the repo; only SHA-256 + counts enter the workspace, never contents.
+11. `.data/profile.json` absent, and `git status --porcelain` filtered to non-`.oplan/` paths is EMPTY after every step. No byte of her profile anywhere inside the repo.
+12. **IF DEPLOYED:** `DEPLOY-V18-OK` — `git diff --name-only --diff-filter=ACMR 4f12820..HEAD -- public/ | LC_ALL=C sort` equals the expected list; every enumerated file md5 live == **WORKTREE**; live `/sw.js` names v18 and not v17; `/api/health` returns exactly `{"ok":true,"data":{"status":"up","version":1}}`; unauthenticated `GET /api/chapter` → 401; and the control pair flips (one new `/quiz/<lemma>.json` 404 pre-deploy → 200 + parseable non-empty array post-deploy) while `/quiz/zzzznotaword.json` stays 404.
+13. **IF DEPLOYED:** `READBACK OK words=<n> candidates=<c>`, zero keys lost, every status change activity-explained, reported to the owner.
+14. **HUMAN GATE (only if items were generated):** the owner approves every new/changed item in the D28 hint form; their verbatim answer goes in the journal. No deploy before it.
+
+**DEPENDS ON**
+
+- Phase 2's `candidate` status reaching production and being resolvable: `lib/profile.js:14` `WORD_STATUSES = ['known','learning','candidate']`, the candidate branch in `applyQuizAnswer` (`:462`), `pickCandidateWords`, live at `magic-vet-v17` / `dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw` (`phase-state.md:1-5`, `journal.md:483-494`). Without it a generated item for a candidate would still be unaskable.
+- Phase 2's read-back, which is the only measured statement of what her profile holds: **20 words, 12 known, 0 candidates** (`journal.md:496-500`). This is the input the whole phase sizes itself against.
+- The D27 rider precedent and the fact that **no capture of her profile exists right now** (`journal.md:527-533`, `phase-state.md:29-35`). Phase 3 must take its own before anything else touches production.
+- The frozen subshell capture (`.oplan/word-quiz/plan.md:1573-1586`), the read-back block as amended by phase 1 (`.oplan/word-g1/plan.md:2448-2493`), the deploy recipe (`.oplan/word-audio/phase-state.md:55-66`), and the item contracts QZ-1 / QZ-2 / QZ-24 (`.oplan/word-quiz/plan.md:51-225`, `:1644-1651`).
+
+**SKELETON CHANGES** (reality vs. the skeleton written before phase 2 ran)
+
+[REDACTED: her vocabulary -- D27/R-F3-5, counts only]
+2. **Because of (1), the phase's durable deliverable moves from "items" to "the operation".** The skeleton treated the inverted criterion as a one-off check. But the *reason* B7 exists is that the top-up operation's word list lived as prose in a closed run's plan (`.oplan/word-quiz/plan.md:394` — "take the words with `status: "known"`") and prose does not run next Tuesday. Phase 3 therefore commits `scripts/quiz-topup.mjs` + tests as its unconditional core. That is what makes B7 true next week, not just today.
+3. **`tests/quiz-bank.test.js` needs no change — the skeleton's cited `>= 50` pin is already relaxed.** Word-quiz step 6.4 did it; `tests/quiz-bank.test.js:128` reads `assert.ok(Number(ok[1]) >= 50, …)`. Removed from the file list.
+4. **The adversarial question in the skeleton is the obsolete one.** The skeleton says "two blind adversarial passes"; word-quiz 6.6's frozen question was *"does any of these eight satisfy BOTH the gloss AND the sentence?"*. **D28 superseded that bar.** Under QZ-24 the gloss is a hidden hint, so the binding question for any NEW item is the strictly stricter sentence-only one: *"IGNORING the gloss entirely, does any of the 8 distractors fit the sentence?"* (`.oplan/word-quiz/plan.md:1646-1647`). Frozen as such. The gloss rules 11 and 13 still bind and are mechanical (the gate enforces them).
+5. **`scripts/build-item-bank.js` is irrelevant.** The skeleton listed it; it is the one-time OpenAI generator for `data/placement-items.json` (the *placement* bank), not the quiz bank. `scripts/build-item-review.js` likewise builds `docs/item-bank-review.html` for the placement bank. Quiz items are written by a WORKER AGENT directly as JSON — no API call, no runtime LLM (QZ-4). Both scripts are non-goals.
+6. **A small truth-fix to `docs/growth.md` is added.** Its section 2 still says the bank is grown "in weekly top-ups derived from the words she has claimed" (line 111) — the exact sentence B7 overturns. Left alone, the signed document keeps teaching the rule that caused the deadlock. Corrected additively and dated, following the word-quiz 6.4 precedent (`.oplan/word-quiz/plan.md:1556-1559`).
+7. **No sandbox visual gate.** Phase 2 needed one because it changed the child's screen. This phase changes data files and a cache string only. Explicit non-goal.
+
+---
+
+### STEP 3.1: the top-up list becomes an executable, tested rule
+
+**goal:** `node scripts/quiz-topup.mjs --profile <capture>` derives the weekly top-up list from `known ∪ candidate`, applies QZ-8 and the manifest filter in that order, reports every dropped word with its reason, and reports any bank file that exists for an excluded word. Five flat tests prove the B7 property and its negative controls against fixtures — never against her data.
+
+**files:** `scripts/quiz-topup.mjs` (NEW), `tests/quiz-topup.test.js` (NEW). No others, at all.
+
+**commands:** none — direct file creation.
+
+**contracts (frozen here and now):**
+
+*Header comment — the first eight lines of `scripts/quiz-topup.mjs`, verbatim:*
+```
+// The weekly quiz top-up list. B7 (docs/growth.md section 8, signed 2026-07-28):
+// the top-up covers `known` UNION `candidate`, on-manifest words only.
+// Filters, in this order: QZ-8's 37 excluded words, then words absent from
+// public/audio/words/index.json (QZ-1 rule 12 makes an item impossible for them,
+// and they have no clip either -- B7's off-list rider defers them to their own step),
+// then words that already have public/quiz/<lemma>.json.
+// Every dropped word is printed with its reason. This script never writes anything.
+// Usage: node scripts/quiz-topup.mjs --profile /c/Users/<you>/english-app-backups/profile-<ts>.json
+```
+
+*CLI (frozen):* `node scripts/quiz-topup.mjs --profile <path> [--dir <bank-dir>] [--manifest <path>] [--exclusions <path>]`. Defaults: `--dir` = `public/quiz`, `--manifest` = `public/audio/words/index.json`, `--exclusions` = `.oplan/word-quiz/qz8-exclusions.txt` (both defaults are tracked files — VERIFIED with `git ls-files`). `--profile` is REQUIRED; if absent print exactly `TOPUP FAILED: --profile is required` and exit **2**.
+
+*Reading (frozen):* parse `--profile` as JSON, then unwrap the API envelope with exactly this expression, quoted from the frozen read-back block (`.oplan/word-g1/plan.md:2460`):
+```js
+const prof = env && env.data ? env.data : env;
+```
+If `!prof || typeof prof.words !== 'object' || prof.words === null || Object.keys(prof.words).length === 0` → print `TOPUP FAILED: no words map`, exit **2**. **The script does NOT call `validateProfile`** — step 3.3 already proved that, and a fixture no implementation could satisfy is exactly intervention #1's bad-spec class (`journal.md:315-325`). Fixtures may therefore be minimal `{ "words": { … } }` objects. `--manifest` is a JSON array of strings (MEASURED today: 2254 entries). `--exclusions` is one word per line, trimmed, blank lines skipped. The bank is `readdirSync(dir)` filtered to `.json`, basenames without the extension.
+
+*Computation (frozen):* `pool` = every key of `prof.words` whose `.status` is `'known'` or `'candidate'`. For each pool word, in this order: excluded → `DROP <w> excluded-qz8`; else not in the manifest **by direct membership, never through any transform** (QZ-1 rule 12, quoted: *"`answer` must itself be a manifest word — `allowed.has(answer)`, checked directly and not via any transform … every one of them FAILS OPEN"*) → `DROP <w> off-manifest`; else bank has `<w>` → covered; else → `NEED <w>`. `banned` = the set intersection of exclusions and the bank → `BANNED <w>`.
+
+*Output (frozen, stdout, exactly this order):*
+```
+TOPUP known=<K> candidate=<C> pool=<P> dropped=<D> covered=<V> missing=<M> banned=<B>
+```
+then every `DROP` line, then every `NEED` line, then every `BANNED` line — each block sorted with a bare `.sort()` (no comparator; codepoint order, which equals `LC_ALL=C` for lowercase ASCII lemmas). `P = K + C` and `D + V + M = P`.
+
+*Exit code (frozen):* **0 iff `B === 0`**; otherwise print a final line `TOPUP FAILED: <B> banned file(s)` and exit **1**. **`missing > 0` is NOT an error** — before generation it is the work list, and an exit-1-on-missing script could never pass step 3.4. Completeness is gated by criterion 5's `missing=0`, not by the exit code.
+
+*The script never writes any file, never touches the network, never uses `Math.random()`.*
+
+*The five tests (frozen names, all FLAT top-level `test()`, no subtests):*
+1. `the pool is known union candidate: a candidate with no item is NEED, a learning word is not`
+2. `a covered word is not NEED: missing=0 and exit 0 on a fully covered profile`
+3. `a QZ-8 excluded word is dropped with reason excluded-qz8 and never appears as NEED`
+4. `an existing bank file for a QZ-8 word is BANNED and the script exits 1`
+5. `an off-manifest word is dropped with reason off-manifest and is not counted as missing`
+
+Every test builds fixtures under `mkdtempSync(path.join(tmpdir(), 'quiz-topup-'))` and spawns the real CLI with `spawnSync(process.execPath, [scriptPath, '--profile', p, '--dir', d, '--manifest', m, '--exclusions', e], { encoding: 'utf8' })` — the house pattern from `tests/quiz-bank.test.js`, whose own comment is the binding reason and is quoted here: *"Fixtures live in an OS temp dir, never in public/quiz/ … os.tmpdir() is read inside node on purpose -- Git Bash's /tmp is not node's, and handing node a /c/Users/... path yields C:\c\Users\..."*
+
+*Fail-first (mandatory, field guide 2 — report both):* (i) restrict the pool to `status === 'known'` only → test 1 must fail; (ii) delete the off-manifest filter → test 5 must fail. Revert both byte-identically and prove it with `git diff --stat` empty.
+
+**validation (frozen):**
+```bash
+set -o pipefail
+cd /c/Users/dkreinov/claude/english-app || exit 1
+out=$(npm test 2>&1) || { echo "FAIL: npm test exited non-zero"; exit 1; }
+p=$(printf '%s\n' "$out" | grep -c '^# pass 303$') || p=0
+f=$(printf '%s\n' "$out" | grep -c '^# fail 0$') || f=0
+[ "$p" = "1" ] || { echo "FAIL: ledger is not 303"; exit 1; }
+[ "$f" = "1" ] || { echo "FAIL: suite not green"; exit 1; }
+flat=$(grep -c '^test(' tests/quiz-topup.test.js) || flat=0
+[ "$flat" = "5" ] || { echo "FAIL: quiz-topup.test.js has $flat flat tests, expected 5"; exit 1; }
+sub=$(grep -c 't\.test(' tests/quiz-topup.test.js) || sub=0
+[ "$sub" = "0" ] || { echo "FAIL: subtests are forbidden"; exit 1; }
+w=$(node scripts/quiz-topup.mjs 2>&1); rc=$?
+[ "$rc" = "2" ] || { echo "FAIL: no --profile must exit 2, got $rc"; exit 1; }
+case "$w" in "TOPUP FAILED: --profile is required") ;; *) echo "FAIL: usage line = [$w]"; exit 1;; esac
+files=$(git status --porcelain | awk '$NF !~ /^\.oplan\// {print $NF}' | LC_ALL=C sort | tr '\n' ' ')
+[ "$files" = "scripts/quiz-topup.mjs tests/quiz-topup.test.js " ] || { echo "FAIL: write set = [$files]"; exit 1; }
+[ ! -f .data/profile.json ] || { echo "FAIL: .data/profile.json exists"; exit 1; }
+echo STEP-3.1-OK
+```
+
+**non-goals:** reading her real profile (fixtures only) · calling `validateProfile` · writing any file from the script · resolving lemmas through `resolveLemma` (rule 12 is direct membership, deliberately) · a `--sample`/review mode · touching `tests/quiz-bank.test.js` (its `>= 50` pin is already relaxed) · any change under `public/`.
+
+**tier:** WORKER — pattern-following, fully specified, fixture-driven.
+
+**depends on:** `$BASE` recorded.
+
+---
+
+### STEP 3.2: the signed document stops teaching the old rule
+
+**goal:** `docs/growth.md` no longer says the top-up list is "the words she has claimed", by an additive dated correction that leaves the signed body otherwise untouched.
+
+**files:** `docs/growth.md`. No others.
+
+**commands:** none — one direct edit.
+
+**contracts:** insert EXACTLY these four lines (one blank, then three content lines) immediately AFTER line 111. **Pure ASCII: no em dash, no Hebrew, no `\u` escape** — field guide 8's hazard is avoided by construction, not by care.
+```
+- CORRECTION (2026-07-28, word-g1 phase 3, B7 accepted): the top-up list is no longer
+  "the words she has claimed". It is `known` UNION `candidate`, on-manifest words only,
+  minus the 37 QZ-8 exclusions. Derived by `node scripts/quiz-topup.mjs --profile <capture>`.
+```
+Line count 637 → **641** (MEASURED today: 637, LF endings, no CR). Nothing else in the file moves; the `STATUS`/sign-off block and section 10 stay byte-unchanged. Precedent quoted: *"growth.md gets an additive, dated, five-line correction ONLY (beside line 114) … Gated on per-line greps + `wc -l` … + `--numstat` `5 0`"* (`.oplan/word-quiz/plan.md:1556-1559`).
+
+**validation (frozen):**
+```bash
+set -o pipefail
+cd /c/Users/dkreinov/claude/english-app || exit 1
+n=$(wc -l < docs/growth.md | tr -d ' ')
+[ "$n" = "641" ] || { echo "FAIL: growth.md is $n lines, expected 641"; exit 1; }
+ns=$(git diff --numstat -- docs/growth.md | awk '{print $1" "$2}')
+[ "$ns" = "4 0" ] || { echo "FAIL: numstat = [$ns], expected '4 0'"; exit 1; }
+grep -qxF -- '- CORRECTION (2026-07-28, word-g1 phase 3, B7 accepted): the top-up list is no longer' docs/growth.md || { echo "FAIL: correction line 1 missing"; exit 1; }
+grep -qxF -- '  "the words she has claimed". It is `known` UNION `candidate`, on-manifest words only,' docs/growth.md || { echo "FAIL: correction line 2 missing"; exit 1; }
+grep -qxF -- '  minus the 37 QZ-8 exclusions. Derived by `node scripts/quiz-topup.mjs --profile <capture>`.' docs/growth.md || { echo "FAIL: correction line 3 missing"; exit 1; }
+a=$(sed -n '111p' docs/growth.md)
+case "$a" in "  weekly top-ups derived from the words she has claimed"*) ;; *) echo "FAIL: line 111 moved: [$a]"; exit 1;; esac
+b=$(grep -c '^\[x\] Approved' docs/growth.md) || b=0
+[ "$b" = "1" ] || { echo "FAIL: the sign-off block moved"; exit 1; }
+files=$(git status --porcelain | awk '$NF !~ /^\.oplan\// {print $NF}' | LC_ALL=C sort | tr '\n' ' ')
+[ "$files" = "docs/growth.md " ] || { echo "FAIL: write set = [$files]"; exit 1; }
+echo STEP-3.2-OK
+```
+
+**non-goals:** rewriting section 8 B7 (it is signed and already correct) · touching `STATUS:` or section 10 · touching `.oplan/word-g1/design.md` (the signed source of the copy — it is a record, not a live document) · editing `.oplan/word-quiz/plan.md` (a closed run's record is never rewritten).
+
+**tier:** WORKER — a three-line quoted edit with a per-line gate.
+
+**depends on:** nothing (write set disjoint from 3.1; may run before or after it, but commit after 3.1 to keep the ledger check clean).
+
+---
+
+### STEP 3.3: the D25 capture — her live profile, before anything else
+
+**goal:** A timestamped, proven copy of her live profile exists outside the repo. It is both the safety net for any deploy this phase makes and the ONLY source of the top-up word list. **There is no captured copy of her profile in existence right now** (`journal.md:527-533`) — this step is the first thing that touches production.
+
+**files:** none in the repo except one appended line in `.oplan/word-g1/backup-receipt.txt` (SHA-256 + counts ONLY, never contents).
+
+**commands: THE CAPTURE COMMAND IS FROZEN — this exact form, no improvisation at run time.** Source `.oplan/word-quiz/plan.md:1573-1586`, reused verbatim by phase 1 (1.8/1.10) and phase 2 (2.9/2.11):
+```bash
+set -o pipefail
+mkdir -p /c/Users/dkreinov/english-app-backups   # Git-Bash path form -- a Windows-style path here creates a stray repo file (field guide 4)
+BK="/c/Users/dkreinov/english-app-backups/profile-$(date +%Y%m%d-%H%M%S).json"
+code=$( ( set -a; . ./.env; set +a
+          curl -s --ssl-no-revoke -H "x-app-code: $APP_CODE" \
+               -o "$BK" -w '%{http_code}' \
+               https://english-app-three-tan.vercel.app/api/profile ) )
+case "$code" in 200) ;; 401) echo "FAIL: 401 - local .env APP_CODE != production (stop, owner supplies it out of band)"; exit 1;;
+                *) echo "FAIL: GET -> $code"; exit 1;; esac
+[ -z "${APP_CODE:-}" ] || { echo "FAIL: APP_CODE leaked into this shell"; exit 1; }
+```
+Why this exact form, quoted: *"The subshell `( set -a; . ./.env; set +a; curl ... )` is the load-bearing part: `.env` is sourced INSIDE the parentheses so `APP_CODE` dies with the subshell — `isAuthorized` is open only when it is UNSET, and a leak silently 401s the whole suite for the rest of the phase; the post-assertion proves it did not leak. `$APP_CODE` is never echoed, never logged."* Stated openly, unchanged: this GET can rewrite her file into sorted-key order — byte-identical to what her own app does on every load.
+
+**validation (frozen; run in the SAME shell, `$BK` still bound):**
+```bash
+set -o pipefail
+cd /c/Users/dkreinov/claude/english-app || exit 1
+node -e '
+const fs = require("fs");
+const p = process.argv[1];
+const raw = fs.readFileSync(p, "utf8");
+if (raw.length < 200) { console.log("FAIL: capture is " + raw.length + " bytes"); process.exit(1); }
+let env; try { env = JSON.parse(raw); } catch (e) { console.log("FAIL: unparseable"); process.exit(1); }
+const prof = env && env.data ? env.data : env;
+if (!prof || typeof prof.words !== "object" || Object.keys(prof.words).length === 0) { console.log("FAIL: empty words map"); process.exit(1); }
+import("./lib/profile.js").then((m) => {
+  const v = m.validateProfile(prof);
+  if (!v.ok) { console.log("FAIL: " + JSON.stringify(v.errors)); process.exit(1); }
+  const keys = Object.keys(prof.words);
+  const known = keys.filter((k) => prof.words[k].status === "known").length;
+  const cand  = keys.filter((k) => prof.words[k].status === "candidate").length;
+  console.log("BACKUP OK bytes=" + raw.length + " words=" + keys.length + " known=" + known + " candidate=" + cand);
+});
+' "$BK" || exit 1
+sha=$(sha256sum "$BK" | awk '{print $1}')
+printf "phase3 capture %s sha256=%s\n" "$BK" "$sha" >> .oplan/word-g1/backup-receipt.txt
+inside=$(git status --porcelain | awk '$NF !~ /^\.oplan\// {print $NF}' | tr '\n' ' ')
+[ -z "$inside" ] || { echo "FAIL: repo is dirty outside .oplan: $inside"; exit 1; }
+[ ! -f .data/profile.json ] || { echo "FAIL: .data/profile.json exists"; exit 1; }
+echo STEP-3.3-OK
+```
+
+**contracts:** destination `C:/Users/dkreinov/english-app-backups/` (D27) · capture-only, **there is no restore path**; `vercel rollback` restores CODE only · only SHA-256 + counts ever enter the workspace · never `vercel env` · never probe the live profile outside this read and 3.12's · `APP_CODE` must never enter the orchestrator's shell. **THE D27 RIDER, restated for this phase:** the owner has now answered "delete" twice, at the phase-1 and phase-2 closes, each time about that phase's own capture. The record's own ruling stands (`journal.md:479-480`, `plan.md:2347-2352`, word-g1 RECORD GAP 4): *"as last run" is not assumed to be a standing order.* The safe default here is **KEEP-until-answered**; the question goes in the phase-3 close report; the deletion happens strictly AFTER 3.12 and the criteria re-run; and the journal states plainly that the safety net ends there.
+
+**non-goals:** any restore tooling · reading her profile for any other purpose · deploying · deriving the list (that is 3.4).
+
+**tier:** ORCHESTRATOR — touches the live system and a secret.
+
+**depends on:** 3.1 and 3.2 committed (the script must exist before 3.4 consumes the capture; and the capture is taken as late as is convenient but before any deploy).
+
+---
+
+### STEP 3.4: derive the top-up list, and measure N
+
+**goal:** The list of words that need items — `known ∪ candidate`, filtered — is written down, along with every dropped word and its reason, and N is measured. This is the step that decides whether the rest of the phase runs at all.
+
+**files:** `.oplan/word-g1/topup-2-words.txt` (NEW), `.oplan/word-g1/topup-2-dropped.txt` (NEW). Nothing outside `.oplan/`.
+
+**commands:** the validation block below is the whole step.
+
+**validation (frozen; run in the SAME shell as 3.3, `$BK` still bound):**
+```bash
+set -o pipefail
+cd /c/Users/dkreinov/claude/english-app || exit 1
+[ -n "${BK:-}" ] && [ -f "$BK" ] || { echo "FAIL: \$BK not bound to an existing capture"; exit 1; }
+case "$BK" in /c/Users/dkreinov/claude/english-app/*) echo "FAIL: the capture is inside the repo"; exit 1;; esac
+x=$(wc -l < .oplan/word-quiz/qz8-exclusions.txt | tr -d ' ')
+[ "$x" = "37" ] || { echo "FAIL: exclusions file holds $x words, expected 37"; exit 1; }
+rep=$(node scripts/quiz-topup.mjs --profile "$BK"); rc=$?
+[ "$rc" = "0" ] || { echo "FAIL: topup script exit $rc"; printf '%s\n' "$rep"; exit 1; }
+head=$(printf '%s\n' "$rep" | head -1)
+case "$head" in "TOPUP known="*" banned=0") ;; *) echo "FAIL: header = [$head]"; exit 1;; esac
+printf '%s\n' "$rep" | grep '^NEED ' | awk '{print $2}' | LC_ALL=C sort > .oplan/word-g1/topup-2-words.txt || true
+printf '%s\n' "$rep" | grep '^DROP ' | LC_ALL=C sort > .oplan/word-g1/topup-2-dropped.txt || true
+N=$(wc -l < .oplan/word-g1/topup-2-words.txt | tr -d ' ')
+m=$(printf '%s\n' "$head" | sed -n 's/.* missing=\([0-9]*\) .*/\1/p')
+[ "$N" = "$m" ] || { echo "FAIL: NEED lines=$N but header says missing=$m"; exit 1; }
+d=$(wc -l < .oplan/word-g1/topup-2-dropped.txt | tr -d ' ')
+dh=$(printf '%s\n' "$head" | sed -n 's/.* dropped=\([0-9]*\) .*/\1/p')
+[ "$d" = "$dh" ] || { echo "FAIL: DROP lines=$d but header says dropped=$dh"; exit 1; }
+bad=$(grep -vcE '^DROP [a-z'"'"']+ (excluded-qz8|off-manifest)$' .oplan/word-g1/topup-2-dropped.txt) || bad=0
+[ "$bad" = "0" ] || { echo "FAIL: $bad malformed DROP lines"; exit 1; }
+[ "$N" -le 25 ] || { echo "STOP: N=$N exceeds 25 - put the projected cost to the owner (D23 measured ~276k tokens for 25 words) before generating"; exit 1; }
+inside=$(git status --porcelain | awk '$NF !~ /^\.oplan\// {print $NF}' | tr '\n' ' ')
+[ -z "$inside" ] || { echo "FAIL: repo dirty outside .oplan: $inside"; exit 1; }
+echo "STEP-3.4-OK N=$N"
+```
+
+**contracts / the three-way gate (frozen, from the word-quiz B4 precedent `.oplan/word-quiz/plan.md:1563-1565`):**
+- **N = 0** → a GOOD outcome, recorded, not a failure. Steps 3.5-3.12 are SKIPPED. Nothing under `public/` changes, so **no CACHE bump and no deploy** (criterion 9's second branch). The phase closes on criteria 1-11 plus the drop report. B7 is delivered as a rule that now runs, and as a proof that every word she has claimed or the app has nominated already has an item.
+- **0 < N ≤ 25** → proceed to 3.5.
+- **N > 25** → STOP, put the projected cost to the owner (D23: ~11k tokens/word at that batch size, ~276k for 25), and do not generate before an answer.
+- `$BK` must survive until the phase-close criteria re-run. The D27 deletion is strictly after it.
+
+**non-goals:** generating anything · "fixing" a dropped word by adding it to the manifest (that is B7's deferred off-list step, which needs a clip AND an `index.json` change imported by `api/profile.js:6` — a real blast radius, explicitly deferred) · re-reading her profile.
+
+**tier:** ORCHESTRATOR — consumes the live capture.
+
+**depends on:** 3.1 (the script) and 3.3 (`$BK`).
+
+---
+
+### STEP 3.5: generate the items  [runs only if N > 0]
+
+**goal:** One `public/quiz/<lemma>.json` per word in `.oplan/word-g1/topup-2-words.txt`, every one green under `scripts/check-quiz-bank.mjs`.
+
+**files:** `public/quiz/<lemma>.json` for each word in `topup-2-words.txt` — and nothing else. Never an existing bank file. Never a file for any of the 37.
+
+**commands:** `node scripts/check-quiz-bank.mjs`, run by the worker until green.
+
+**contracts — ALL QUOTED VERBATIM IN THE PACKET (field guide 9: naming a frozen contract without quoting it is a hole):**
+- **QZ-1, rules 1-13** — `.oplan/word-quiz/plan.md:51-155`, including the file shape, the exactly-five-keys rule, rule 4's residue hardening, rule 8's `posSetFor` with the load-bearing `== null` guard and the numeral fold, rule 10's resolved-lemma test, rule 11 (the gloss must be in her vocabulary), rule 12 (`answer` is a manifest word, checked directly), rule 13 (the gloss must not name any of the item's own distractors).
+- **QZ-2, the generation rules** — `.oplan/word-quiz/plan.md:157-225`, in full, including D21 same-class distractors, "the sentence must do the disambiguating work", **THE PIN TEST** (*"a coordinated clause is NOT a pin … only `so`, `so that`, `so … that`, `because`, `… enough to`, purpose infinitives, and verb/argument selection actually constrain the blank"*), the blank-is-never-the-first-word rule, **the irregular-forms list** (`:203-211`, all 29 lemmas / 42 forms), the rule-7-vs-rule-4 asymmetry, and **THE ALLOWED VOCABULARY IS NOT ORDINARY ENGLISH** (`:216-222` — `after`, `children`, `men`, `women`, `feet` are ABSENT).
+- **QZ-24, the sentence-only bar** — `.oplan/word-quiz/plan.md:1644-1651`: *"every distractor of every item in the whole bank must be WRONG in the sentence alone."* This REPLACES D22's always-shown-gloss shield, which D28 removed. The gloss rules 11 and 13 still bind because the gloss is still learner-facing, on demand.
+- **The 37 exclusions** — `.oplan/word-quiz/qz8-exclusions.txt`, quoted in full.
+- **QZ-2's stop-and-ask backstop, quoted:** *"If a word cannot be given an age-appropriate sentence, STOP and return the question. Do not guess."* If a word admits no legal item, the worker stops; the orchestrator rules, removes the word from `topup-2-words.txt` with a written reason, and REPORTS it. Precedent, quoted: *"fan[1] DELETED — 7 of 8 options flagged; phase-1's frozen lesson applied: SHIP FEWER ITEMS RATHER THAN A LEAKY ONE."*
+- Batches of **≤ 10 words, sequential**, each validated and accepted before the next is dispatched (the word-quiz 1.3/6.5 form).
+- **You MUST run the gate on your own work before returning, and iterate until it is green.**
+
+**validation (frozen):**
+```bash
+set -o pipefail
+cd /c/Users/dkreinov/claude/english-app || exit 1
+g=$(node scripts/check-quiz-bank.mjs) || { echo "FAIL: gate red"; printf '%s\n' "$g"; exit 1; }
+case "$g" in *"QUIZ BANK OK:"*) ;; *) echo "FAIL: gate output = [$g]"; exit 1;; esac
+case "$g" in *"RULE-11 PENDING"*) echo "FAIL: RULE-11 PENDING"; exit 1;; esac
+case "$g" in *"QUIZ BANK FAILED"*) echo "FAIL: gate reports failures"; exit 1;; esac
+miss=""
+while read -r w; do [ -f "public/quiz/$w.json" ] || miss="$miss $w"; done < .oplan/word-g1/topup-2-words.txt
+[ -z "$miss" ] || { echo "FAIL: no item file for:$miss"; exit 1; }
+banned=""
+while read -r w; do [ -f "public/quiz/$w.json" ] && banned="$banned $w"; done < .oplan/word-quiz/qz8-exclusions.txt
+[ -z "$banned" ] || { echo "FAIL: item file exists for excluded word(s):$banned"; exit 1; }
+got=$(git status --porcelain | awk '$NF !~ /^\.oplan\// {print $NF}' | LC_ALL=C sort | tr '\n' ' ')
+exp=$(while read -r w; do echo "public/quiz/$w.json"; done < .oplan/word-g1/topup-2-words.txt | LC_ALL=C sort | tr '\n' ' ')
+[ "$got" = "$exp" ] || { echo "FAIL: write set = [$got] expected [$exp]"; exit 1; }
+t=$(npm test 2>&1 | grep -c '^# fail 0$') || t=0
+[ "$t" = "1" ] || { echo "FAIL: suite not green"; exit 1; }
+echo STEP-3.5-OK
+```
+
+**non-goals:** touching any existing bank file · re-vetting the existing 84 items (word-quiz 6b.3 swept all of them and the bank has not moved since — MEASURED today: 62 files, 84 items) · any CSS, UI, test or `sw.js` change · a paid API call or a runtime LLM (QZ-4) · adding a word to `public/audio/words/index.json`.
+
+**tier:** WORKER (fresh instance per batch is acceptable; all contracts are in the packet).
+
+**depends on:** 3.4 with `N > 0`.
+
+---
+
+### STEP 3.6: two blind adversarial passes over the new items  [runs only if 3.5 ran]
+
+**goal:** Two independent readers, blind to each other, answer one frozen question about every distractor of every new item. MEASURED basis, quoted from the record: *"a single pass finds only about half the leaks, and two passes agreed on 53% of each other's findings"* — which is why N = 2 and not 1.
+
+**files:** none. **Each worker writes nothing**; it returns its verdict block in its final message, and the orchestrator saves the two blocks to `$HOME/g1-review/passA.txt` and `$HOME/g1-review/passB.txt` (outside the repo — never write scratch into the repo, field guide 4).
+
+**commands:** none for the workers.
+
+**contracts:**
+- **THE FROZEN QUESTION, quoted from QZ-24 (`.oplan/word-quiz/plan.md:1646-1647`):** *"IGNORING the gloss entirely, does any of the 8 distractors fit the sentence?"* Asked per distractor, over all eight, for every item. This and only this. (The pre-D28 question — *"does any of these eight satisfy BOTH the gloss AND the sentence?"* — is obsolete for new items: D28 hid the gloss behind רמז, so the child who never presses it faces the sentence bare.)
+- Scope: every item in every file this phase created. **Not** the pre-existing 84.
+- Verdict format, one line per finding or per clean item, first token `<lemma>[<index>]`:
+  `<lemma>[<i>] <distractor> FITS` or `<lemma>[<i>] CLEAN`
+- The two workers are FRESH instances, dispatched in parallel, neither shown the other's output nor the generating worker's reasoning.
+
+**validation (frozen):**
+```bash
+set -o pipefail
+cd /c/Users/dkreinov/claude/english-app || exit 1
+ITEMS=$(node -e 'const fs=require("fs");let n=0;for(const w of fs.readFileSync(".oplan/word-g1/topup-2-words.txt","utf8").split(/\r?\n/).filter(Boolean)) n+=JSON.parse(fs.readFileSync("public/quiz/"+w+".json","utf8")).length;console.log(n)')
+[ "$ITEMS" -ge 1 ] || { echo "FAIL: no new items to vet"; exit 1; }
+for f in "$HOME/g1-review/passA.txt" "$HOME/g1-review/passB.txt"; do
+  [ -s "$f" ] || { echo "FAIL: $f is missing or empty"; exit 1; }
+  n=$(awk '{print $1}' "$f" | LC_ALL=C sort -u | wc -l | tr -d ' ')
+  [ "$n" = "$ITEMS" ] || { echo "FAIL: $f covers $n of $ITEMS items"; exit 1; }
+  bad=$(grep -vcE '^[a-z'"'"']+\[[0-9]+\] ([a-z'"'"']+ FITS|CLEAN)$' "$f") || bad=0
+  [ "$bad" = "0" ] || { echo "FAIL: $f has $bad malformed verdict lines"; exit 1; }
+done
+inside=$(git status --porcelain | awk '$NF !~ /^\.oplan\// {print $NF}' | tr '\n' ' ')
+[ -z "$inside" ] || { echo "FAIL: repo dirty: $inside"; exit 1; }
+echo "STEP-3.6-OK items=$ITEMS"
+```
+
+**non-goals:** fixing anything (the passes only report) · agreeing with each other · sweeping the existing 84 items · seeing each other's output.
+
+**tier:** WORKER ×2, fresh and blind.
+
+**depends on:** 3.5 (`STEP-3.5-OK`).
+
+---
+
+### STEP 3.7: adjudicate the union and write the record  [runs only if 3.6 ran]
+
+**goal:** The union of both passes' flags is adjudicated one by one, in writing, and the rework list is fixed.
+
+**files:** `.oplan/word-g1/topup-2-adversarial.txt` (NEW). Nothing outside `.oplan/`.
+
+**commands:** none — the orchestrator writes the record.
+
+**contracts:** the file follows the frozen shape of `.oplan/word-quiz/topup-1-adversarial.txt`, with these exact section headers, in this order:
+```
+PASS A FLAGS:
+PASS B FLAGS:
+UNION:
+DISPOSITIONS:
+KEPT, with reasons:
+```
+Every union flag gets exactly one disposition: `REWORK` (with the fix) or `KEPT` (with a written reason) — **one disposition LINE per union flag `<lemma>[<i>] <distractor>`, never several flags combined onto a shared line** (plan-review amendment #1: the validation counts lines at per-distractor granularity; the word-quiz precedent file combined them and would false-FAIL here). A single-pass flag may be kept, but never silently — the reason is written. Deleting a leaky item is a legitimate disposition and the precedent is quoted in the record: *"SHIP FEWER ITEMS RATHER THAN A LEAKY ONE."* The agreement rate is recorded (historical: 53% at word-quiz phase 1, 100% at 6.6).
+
+**validation (frozen):**
+```bash
+set -o pipefail
+cd /c/Users/dkreinov/claude/english-app || exit 1
+F=.oplan/word-g1/topup-2-adversarial.txt
+[ -s "$F" ] || { echo "FAIL: $F missing or empty"; exit 1; }
+for h in "PASS A FLAGS:" "PASS B FLAGS:" "UNION:" "DISPOSITIONS:" "KEPT, with reasons:"; do
+  grep -qF -- "$h" "$F" || { echo "FAIL: missing section [$h]"; exit 1; }
+done
+u=$(cat "$HOME/g1-review/passA.txt" "$HOME/g1-review/passB.txt" | grep ' FITS$' | awk '{print $1" "$2}' | LC_ALL=C sort -u | wc -l | tr -d ' ')
+n=$(grep -cE '^ *[a-z'"'"']+\[[0-9]+\] .* (REWORK|KEPT)' "$F") || n=0
+[ "$n" = "$u" ] || { echo "FAIL: $u union flags but $n dispositions"; exit 1; }
+echo "STEP-3.7-OK union=$u"
+```
+
+**non-goals:** editing any bank file (that is 3.8) · overruling a both-pass flag without a written reason · re-running the passes.
+
+**tier:** ORCHESTRATOR — adjudication is a judgement the manager owns.
+
+**depends on:** 3.6 (`STEP-3.6-OK`).
+
+---
+
+### STEP 3.8: rework the flagged items  [runs only if 3.7 produced any REWORK]
+
+**goal:** Every `REWORK` disposition is applied; the gate is green; nothing else moved.
+
+**files:** only the `public/quiz/<lemma>.json` files named `REWORK` in `topup-2-adversarial.txt`.
+
+**commands:** `node scripts/check-quiz-bank.mjs` until green.
+
+**contracts:** the same QZ-1 rules 1-13 + QZ-2 + QZ-24 block quoted at 3.5, quoted again in this packet. A fix may re-pin the sentence or swap the distractor; rules 11 and 13 still bind (a re-pinned gloss must not name a surviving distractor — this exact trap fired at word-quiz 6.6, where the orchestrator's own fix text used `schoolwork`, not a manifest word, and rule 11 caught it). **The stop-rule applies:** if a frozen fix is impossible (e.g. it would exceed rule 5's 14-word ceiling — this happened at 6b.4 and the worker correctly refused), STOP and return the question; do not rewrite the contract silently.
+
+**validation (frozen):**
+```bash
+set -o pipefail
+cd /c/Users/dkreinov/claude/english-app || exit 1
+g=$(node scripts/check-quiz-bank.mjs) || { echo "FAIL: gate red"; printf '%s\n' "$g"; exit 1; }
+case "$g" in *"QUIZ BANK OK:"*) ;; *) echo "FAIL: gate output = [$g]"; exit 1;; esac
+case "$g" in *"RULE-11 PENDING"*|*"QUIZ BANK FAILED"*) echo "FAIL: [$g]"; exit 1;; esac
+got=$(git status --porcelain | awk '$NF !~ /^\.oplan\// {print $NF}' | LC_ALL=C sort | tr '\n' ' ')
+exp=$(while read -r w; do echo "public/quiz/$w.json"; done < .oplan/word-g1/topup-2-words.txt | LC_ALL=C sort | tr '\n' ' ')
+[ "$got" = "$exp" ] || { echo "FAIL: write set = [$got] expected [$exp]"; exit 1; }
+t=$(npm test 2>&1 | grep -c '^# fail 0$') || t=0
+[ "$t" = "1" ] || { echo "FAIL: suite not green"; exit 1; }
+echo STEP-3.8-OK
+```
+(This step runs before 3.5's files are committed, so the expected write set is still the full generated list.)
+
+**non-goals:** touching an unflagged item · touching a pre-existing bank file · changing a gloss in a way that names a surviving distractor.
+
+**tier:** WORKER.
+
+**depends on:** 3.7.
+
+---
+
+### STEP 3.9: HUMAN GATE — the owner approves every new item, in the D28 hint form  [runs only if items exist]
+
+**goal:** The owner sees every new or changed item exactly as she will see it, and explicitly approves. No deploy before it. Quoted from the record of what this gate is: *"a rebuilt review page in the HINT style (gloss behind a click, as she will see it) covering every item CHANGED since the owner last looked, plus the sweep summary; explicit approval."*
+
+**files:** none in the repo. The page is written to `$HOME/g1-review/topup-2-review.html` — a self-contained HTML file OUTSIDE the repo. **Never into `docs/`** (`docs/item-bank-review.html` belongs to the placement bank and its generator `scripts/build-item-review.js`; both are untouched).
+
+**contracts (frozen, because the record describes this page only in prose — see RECORD GAPS 2):** one card per item, in the child's presentation:
+- the sentence with the blank, LTR;
+- the eight options plus the answer, shuffled, **with the answer NOT marked** — the owner reads it as she would;
+- a `רמז` control that reveals the gloss on click (the D28 form; the gloss is never shown up front);
+- a "show answer" control that reveals which option is correct;
+- **every item is enumerated — never `--sample`.** The stride trap is quoted as the reason: at 80 items, `--sample 50` once showed only the alphabetically-first 50, *"and the owner would have reviewed words beginning a-q and signed off on the whole bank."*
+- Below the cards: the adversarial summary (per-pass flag counts, agreement rate, every disposition, every KEPT-with-reason), the honest limits statement (*"no mechanical gate can see a distractor that also fits"*), **and the drop report** — every `off-manifest` word from `topup-2-dropped.txt`, named, with the plain statement that those words cannot be quizzed until B7's deferred off-list step gives them a clip and a manifest entry.
+
+**validation:** not mechanical by nature — this is a human gate. The mechanical part:
+```bash
+set -o pipefail
+cd /c/Users/dkreinov/claude/english-app || exit 1
+P="$HOME/g1-review/topup-2-review.html"
+[ -s "$P" ] || { echo "FAIL: review page missing"; exit 1; }
+ITEMS=$(node -e 'const fs=require("fs");let n=0;for(const w of fs.readFileSync(".oplan/word-g1/topup-2-words.txt","utf8").split(/\r?\n/).filter(Boolean)) n+=JSON.parse(fs.readFileSync("public/quiz/"+w+".json","utf8")).length;console.log(n)')
+c=$(grep -c 'class="item"' "$P") || c=0
+[ "$c" = "$ITEMS" ] || { echo "FAIL: page shows $c of $ITEMS items"; exit 1; }
+d=$(wc -l < .oplan/word-g1/topup-2-dropped.txt | tr -d ' ')
+if [ "$d" != "0" ]; then grep -qF 'off-manifest' "$P" || { echo "FAIL: drop report missing from the page"; exit 1; }; fi
+echo STEP-3.9-READY
+```
+The gate itself passes only on the owner's explicit approval, recorded VERBATIM in the journal.
+
+**non-goals:** proceeding on silence · a partial review · showing the answer marked · writing anything into the repo.
+
+**tier:** ORCHESTRATOR + OWNER.
+
+**depends on:** 3.8 (or 3.7 if no rework was needed).
+
+---
+
+### STEP 3.10: CACHE bump v17 → v18 — the last code change  [runs only if any `public/` file changed]
+
+**goal:** QZ-22 satisfied, after every `public/` file this phase touches has stopped moving.
+
+**files:** `public/sw.js`, `tests/shell.test.js`. No others.
+
+**commands:** none — two one-line edits.
+
+**contracts:** QZ-22 as the **SIGNED design §10** states it, quoted: *"Any change under `public/` ships with a `sw.js` `CACHE` bump in the same phase, per QZ-22"* — and as `phase-state.md:41` restates it for this phase: *"QZ-22 (next CACHE bump = v18 in phase 3 IF public/ moves)"*. `public/sw.js` line 1 becomes exactly `const CACHE = "magic-vet-v18";`. `tests/shell.test.js:58`'s `assert.ok(sw.includes('magic-vet-v17'))` moves to `'magic-vet-v18'` in lockstep. **`PRECACHE` is byte-unchanged** — `public/quiz/*.json` is DATA and stays OUT, quoted from QZ-22's own text: *"`public/quiz/*.json` is DATA and stays OUT (QZ-7)"*, and `shell.test.js` compares the array with `deepStrictEqual`, so a stray edit fails loudly. Ledger does not move: **303**.
+
+**validation (frozen):**
+```bash
+set -o pipefail
+cd /c/Users/dkreinov/claude/english-app || exit 1
+l=$(head -1 public/sw.js | tr -d '\r')
+[ "$l" = 'const CACHE = "magic-vet-v18";' ] || { echo "FAIL: sw.js line 1 = [$l]"; exit 1; }
+r=$(grep -rln 'magic-vet-v17' --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=.oplan . | tr '\n' ' ')
+[ -z "$r" ] || { echo "FAIL: v17 still named in: $r"; exit 1; }
+p=$(git diff -- public/sw.js | grep -c '^[+-]' ) || p=0
+[ "$p" = "4" ] || { echo "FAIL: sw.js diff touched $p lines, expected 4 (header pair + the one line)"; exit 1; }
+out=$(npm test 2>&1) || { echo "FAIL: npm test non-zero"; exit 1; }
+a=$(printf '%s\n' "$out" | grep -c '^# pass 303$') || a=0
+b=$(printf '%s\n' "$out" | grep -c '^# fail 0$') || b=0
+[ "$a$b" = "11" ] || { echo "FAIL: ledger not 303/0"; exit 1; }
+got=$(git status --porcelain | awk '$NF !~ /^\.oplan\// {print $NF}' | LC_ALL=C sort | tr '\n' ' ')
+[ "$got" = "public/sw.js tests/shell.test.js " ] || { echo "FAIL: write set = [$got]"; exit 1; }
+echo STEP-3.10-OK
+```
+
+**non-goals:** touching `PRECACHE` · adding `public/quiz/` to `PRECACHE` · any other `sw.js` change · normalising line endings (`sw.js` is LF; the four `public/*.js` modules are CRLF — one normalisation turns the deploy's md5 proof into a whole-file hunt).
+
+**tier:** WORKER.
+
+**depends on:** 3.9 approved; all bank files final.
+
+---
+
+### STEP 3.11: deploy to production  [runs only if any `public/` file changed]
+
+**goal:** `magic-vet-v18` live on the canonical alias; the outgoing deployment recorded as the rollback target BEFORE deploying; every changed `public/` file proven live in BYTES.
+
+**files:** none in the repo. Scratch ONLY at `$HOME/g1-deploy3/`.
+
+**commands** (orchestrator's shell, in order — recipe `.oplan/word-audio/phase-state.md:55-66`, field guide 10):
+1. `mkdir -p $HOME/g1-deploy3`
+2. **Pre-deploy control measurement**, before anything is uploaded: `curl -s --ssl-no-revoke -o /dev/null -w '%{http_code}' https://english-app-three-tan.vercel.app/quiz/<FIRSTNEW>.json` must be **404**, where `<FIRSTNEW>` is the first line of `topup-2-words.txt`. Record it.
+3. `"$(npm prefix -g)/vercel" inspect https://english-app-three-tan.vercel.app 2>&1 | tee $HOME/g1-deploy3/outgoing.txt` — **HARD STOP** if the reported id is not `dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw`. Record the id AND **the url exactly as `inspect` reports it**; do NOT construct it from the deployment name (a constructed url once pointed at the wrong deployment). Write the rollback line into `phase-state.md` verbatim BEFORE deploying and re-confirm after.
+4. `"$(npm prefix -g)/vercel" deploy --prod --yes` — **once**, output to a file. If the output is truncated, read the file; do not re-invoke (phase 1 deployed twice for exactly that reason).
+5. Record the new deployment id and the upload size.
+
+**validation (frozen):**
+```bash
+set -o pipefail
+cd /c/Users/dkreinov/claude/english-app || exit 1
+D="$HOME/g1-deploy3"; mkdir -p "$D"
+U=https://english-app-three-tan.vercel.app
+got=$(git diff --name-only --diff-filter=ACMR 4f12820..HEAD -- public/ | LC_ALL=C sort | tr '\n' ' ')
+exp=$( { echo public/sw.js; while read -r w; do echo "public/quiz/$w.json"; done < .oplan/word-g1/topup-2-words.txt; } | LC_ALL=C sort | tr '\n' ' ')
+[ "$got" = "$exp" ] || { echo "FAIL: public/ enumeration = [$got] expected [$exp]"; exit 1; }
+check() { a=$(md5sum "$1" | awk '{print $1}'); b=$(md5sum "$2" | awk '{print $1}'); [ "$a" = "$b" ] || { echo "FAIL: $1 md5 worktree=$a live=$b"; exit 1; }; }
+i=0
+for f in $got; do
+  i=$((i+1))
+  curl -s --ssl-no-revoke -o "$D/f$i" "$U/${f#public/}" || { echo "FAIL: fetch $f"; exit 1; }
+  check "$f" "$D/f$i"
+done
+curl -s --ssl-no-revoke -o "$D/sw.js" "$U/sw.js" || { echo "FAIL: fetch /sw.js"; exit 1; }
+n=$(grep -cF 'magic-vet-v18' "$D/sw.js") || n=0; [ "$n" -ge 1 ] || { echo "FAIL: live sw.js is not v18"; exit 1; }
+n=$(grep -cF 'magic-vet-v17' "$D/sw.js") || n=0; [ "$n" = "0" ] || { echo "FAIL: live sw.js still names v17"; exit 1; }
+curl -s --ssl-no-revoke -o "$D/health" "$U/api/health" || { echo "FAIL: fetch /api/health"; exit 1; }
+h=$(cat "$D/health")
+[ "$h" = '{"ok":true,"data":{"status":"up","version":1}}' ] || { echo "FAIL: health payload = $h"; exit 1; }
+code=$(curl -s --ssl-no-revoke -o "$D/chapter" -w '%{http_code}' "$U/api/chapter")
+[ "$code" = "401" ] || { echo "FAIL: /api/chapter -> $code (expected 401)"; exit 1; }
+FN=$(head -1 .oplan/word-g1/topup-2-words.txt)
+code=$(curl -s --ssl-no-revoke -o "$D/new.json" -w '%{http_code}' "$U/quiz/$FN.json")
+[ "$code" = "200" ] || { echo "FAIL: /quiz/$FN.json -> $code (expected 200; it was 404 pre-deploy)"; exit 1; }
+node -e 'const a=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));if(!Array.isArray(a)||a.length<1){console.log("FAIL: new item not a non-empty array");process.exit(1)}' "$D/new.json" || exit 1
+code=$(curl -s --ssl-no-revoke -o /dev/null -w '%{http_code}' "$U/quiz/zzzznotaword.json")
+[ "$code" = "404" ] || { echo "FAIL: negative control /quiz/zzzznotaword.json -> $code (expected 404)"; exit 1; }
+[ -s "$D/outgoing.txt" ] || { echo "FAIL: no recorded outgoing deployment"; exit 1; }
+echo DEPLOY-V18-OK
+```
+`4f12820` is frozen as the enumeration base: **VERIFIED by this planner today** — `git diff --name-only e786273..HEAD -- public/` is EMPTY, and `e786273`'s `public/` bytes were md5-proven live at phase-2 step 2.10 (`journal.md:491-492`). `--diff-filter=ACMR` is load-bearing: bank files are **ADDED**, and a modified-only enumeration would silently skip md5-verifying this deploy's actual payload. Hash FILES, never `$(curl …)` output — command substitution strips trailing newlines and has already produced one false failure here. md5 against the **WORKTREE**, never a git blob.
+
+**contracts:** `vercel` is off PATH — always `"$(npm prefix -g)/vercel"` · `curl` needs `--ssl-no-revoke` on this machine · ROLLBACK (code only, back to v17) uses the url `vercel inspect` reported for `dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw`, written into `phase-state.md` verbatim before deploying.
+
+**non-goals:** NEVER request `/api/profile` here (a GET creates one; the sanctioned read is 3.12) · never `vercel env` · never a browser on production · never the real `APP_CODE` in this shell · no manual alias or promote · no deploy before `inspect` has recorded the outgoing id.
+
+**tier:** ORCHESTRATOR — touches the live system.
+
+**depends on:** 3.10 and criteria 1-11 green.
+
+---
+
+### STEP 3.12: her data, read back and proven intact  [runs only if 3.11 ran]
+
+**goal:** The one check ever run against her real data: nothing she collected was lost, and every status that moved is mechanically explained.
+
+**files:** none in the repo except an appended counts-only line in `.oplan/word-g1/backup-receipt.txt`.
+
+**commands:** the SAME frozen subshell capture form as 3.3, writing to `$HOME/g1-deploy3/live-readback.json`; `$BK` from 3.3 must still exist.
+
+**validation (frozen):**
+```bash
+set -o pipefail
+cd /c/Users/dkreinov/claude/english-app || exit 1
+LB="$HOME/g1-deploy3/live-readback.json"
+code=$( ( set -a; . ./.env; set +a
+          curl -s --ssl-no-revoke -H "x-app-code: $APP_CODE" \
+               -o "$LB" -w '%{http_code}' \
+               https://english-app-three-tan.vercel.app/api/profile ) )
+case "$code" in 200) ;; *) echo "FAIL: GET -> $code"; exit 1;; esac
+[ -z "${APP_CODE:-}" ] || { echo "FAIL: APP_CODE leaked into this shell"; exit 1; }
+node -e '
+const fs = require("fs");
+const un = (p) => { const e = JSON.parse(fs.readFileSync(p, "utf8")); return e && e.data ? e.data : e; };
+const back = un(process.argv[1]), live = un(process.argv[2]);
+import("./lib/profile.js").then((m) => {
+  const fail = (w) => { console.log("FAIL: " + w); process.exit(1); };
+  const v = m.validateProfile(live); if (!v.ok) fail(JSON.stringify(v.errors));
+  const bk = Object.keys(back.words), lk = new Set(Object.keys(live.words));
+  if (Object.keys(live.words).length < bk.length) fail("live has fewer words");
+  const lost = bk.filter((k) => !lk.has(k));
+  if (lost.length) fail("keys LOST: " + lost.join(","));
+  const ACT = ["taps", "lastSeen", "lastQuizAt", "quizRight", "quizWrong", "nominations"];
+  const report = [];
+  for (const k of bk) {
+    const b = back.words[k], l = live.words[k];
+    if (l.status === b.status) continue;
+    const moved = ACT.some((f) => JSON.stringify(b[f]) !== JSON.stringify(l[f]));
+    if (!moved) fail("status change with NO activity evidence: " + k + " " + b.status + " -> " + l.status);
+    if (b.status === "learning" && l.status === "candidate") {
+      if (l.nominations !== ((b.nominations || 0) + 1)) fail("G1 nomination without nominations+1: " + k);
+    }
+    report.push(k + " " + b.status + " -> " + l.status);
+  }
+  const cand = Object.keys(live.words).filter((k) => live.words[k].status === "candidate");
+  console.log("READBACK OK words=" + Object.keys(live.words).length + " candidates=" + cand.length);
+  console.log("STATUS CHANGES (report to the owner): " + (report.length ? report.join(" | ") : "none"));
+});
+' "$BK" "$LB" || exit 1
+echo STEP-3.12-OK
+```
+The ACT list and the `learning→candidate ⇒ nominations+1` clause are phase 1's amendment to the word-quiz criterion-10 rule (`.oplan/word-quiz/plan.md:1512-1516`), carried over unchanged. All transitions this phase can newly cause are already covered by ACT.
+
+**contracts:** any lost key, or a status change with no activity evidence → **STOP, roll back code with 3.11's rollback command, tell the owner** · never write her profile bytes into the repo · the D27 deletion happens only AFTER this step, after the criteria re-run, and only once the owner has answered the close-report question; the journal records that the safety net ends there.
+
+**non-goals:** "fixing" her data · re-running the deploy · reading her profile again · asserting that a candidate exists — `candidates=0` is a legitimate outcome and was the measured one at both prior closes.
+
+**tier:** ORCHESTRATOR — touches the live system and a secret.
+
+**depends on:** 3.11 (`DEPLOY-V18-OK`) and 3.3's `$BK`.
+
+---
+
+**RISKS**
+
+- **N = 0 is the most likely outcome, and it looks like "the phase did nothing".** MEASURED: her 12 `known` words all have item files; candidates were 0 at the phase-2 read-back and G1 first runs at her next chapter generation. Noticed at 3.4, which prints `N=`. It is a *good* outcome — B7's rule is what ships — but it must be reported plainly and not dressed up. Deliberately NOT an acceptance criterion in either direction.
+- **A candidate that is an off-list glossed word gets dropped, and stays deadlocked.** This is the exact case B7's rider defers. It fails LOUDLY (a `DROP <w> off-manifest` line) rather than silently, and criterion 6 forces it into the close report. But the deadlock for that word persists until someone builds the off-list step — which nothing schedules (see RECORD GAPS 4).
+- **A new item marks her wrong for being right.** The single worst outcome this feature has. No mechanical gate can see it — that is stated in the record and restated on the review page. The whole mitigation is: QZ-2's pin test at generation, two blind passes at the QZ-24 sentence-only bar, orchestrator adjudication, and the owner's eyes. Historically one pass finds about half.
+- **The capture GET rewrites her profile into sorted-key order.** Known, stated openly, byte-identical to what her own app does on every load. It would surface at 3.12 as `meta.updatedAt` movement, which is reported, not failed.
+- **`$BK` deleted too early makes criteria 5, 6, 12 and 13 unre-runnable.** The D27 rider is sequenced strictly after the close re-run, exactly as phases 1 and 2 executed it.
+- **`APP_CODE` leaking into the orchestrator's shell** silently 401s the entire suite for the rest of the phase. The frozen subshell plus its post-assert is the only mitigation, and it is used in both 3.3 and 3.12.
+- **Ledger drift.** Any accidental extra `test()` fails every later step's validation. 3.1 pins 303 and forbids subtests; 3.5/3.8/3.10 re-check `# fail 0` and 3.10 re-checks 303.
+- **A worker normalising a CRLF file** would turn 3.11's md5 proof into a whole-file diff hunt. No step in this phase is permitted to touch the four CRLF modules at all; the write sets forbid it.
+- **The QZ-22 scope ambiguity** (see RECORD GAPS 1) — resolved conservatively toward bumping. The failure mode of the wrong choice is one wasted cache invalidation, not a defect; the failure mode of the other direction is a frozen contract broken.
+- **`grep -q` under `pipefail`** and locale-dependent `sort` — avoided throughout: every validation captures to a variable and matches with `case`/`[ ]`, every frozen comparison uses `LC_ALL=C`, and the only `grep -q` calls read FILES, never pipes.
+- **Nomination rate is still UNMEASURED**, so the token cost of a future top-up remains an estimate. The B3 quota (one candidate per sitting) is the throttle if it runs hot. This phase measures the first real data point (`candidate=` in 3.3's `BACKUP OK` line) and it should be recorded.
+
+**BLOCKERS**
+
+1. **What "B7 delivered" means when N = 0 — genuinely undecided in the record.** `design.md §8 B7` and the skeleton both describe B7 in terms of items being generated; nothing says what closes the phase when there is nothing to generate, and this is now the likely case. **I expected this in `.oplan/word-g1/design.md §8 B7` or the skeleton at `plan.md:1033-1047`; it is in neither.** **FROZEN DEFAULT so execution is not stalled:** B7 is delivered when (a) the operation covers `known ∪ candidate` as an executable, tested rule, and (b) the inverted completeness criterion is proven `missing=0 banned=0` against her real captured profile, and (c) every dropped word is reported. Items are the operation's *output*, not its definition. **The owner can overturn this in one line** — e.g. "no, phase 3 does not close until at least one candidate item ships", which would park the phase until she generates a chapter.
+
+**RECORD GAPS**
+
+1. **QZ-22's scope is stated two different ways.** The SIGNED `design.md §10` and `phase-state.md:41` say **any** change under `public/` triggers the bump; the current field guide lesson 7 says any **precached-file** change, and QZ-22's own text (`.oplan/word-quiz/plan.md:1051-1055`) puts `public/quiz/*.json` explicitly OUT of `PRECACHE`. Bank files are not precached, so functionally no bump is needed. Resolved in favour of the signed §10 and the orchestrator's own frozen-contracts list: **bump if any `public/` file changes.** Cost of the stricter reading: two lines and one cache invalidation. One line for the owner to overrule.
+2. **The D28 owner-review page has no committed generator and no frozen spec.** The record describes it only in prose (`.oplan/word-quiz/plan.md:1665-1667`, `journal.md:1393-1394`); the actual page from 6b.5 was scratch and does not survive. `scripts/build-item-review.js` is the *placement* bank's tool and is not it. Frozen in step 3.9 (self-contained HTML outside the repo, one card per item, gloss behind רמז, answer unmarked, every item enumerated — never `--sample`). Worked around, not blocking.
+3. **Nothing in the record says whether phase 3 deploys when nothing under `public/` changed.** Decided here: **no deploy** — there is no payload, and §10's bump rule does not fire. The capture at 3.3 still happens because it is the only source of the word list.
+4. **B7's deferred off-list step has no owner, no phase and no trigger.** The signed text says *"treat off-list words as their own small step"*; `design.md §9` orders ten parked items and that step is in none of them. Not blocking (this phase reports those words), but it is real deferred work that currently nobody is scheduled to do. **Owner question for the close report: when do off-list glossed words get a clip and a manifest entry, and who runs it?**
+5. **The weekly top-up itself has no scheduler.** D23 says "weekly"; nothing says who runs it or when. This phase makes it a one-command operation (`node scripts/quiz-topup.mjs --profile <capture>`), which is the most that can be done from inside the repo, but the recurrence remains a human habit. Named here so it is not assumed.
+6. **The planner could not know her profile's current contents** (read-only mandate; the sanctioned read is an execution-time action). Everything about N is inferred from the phase-2 read-back — 20 words, 12 known, 0 candidates — plus the MEASURED fact that all 12 known words already have item files. Step 3.4 establishes the truth mechanically before anything is generated.
+7. **Phase-2 planner prose slip, noted for consistency and not repeated:** `journal.md:306-308` records that the phase-2 plan's prose said "55 lines" for a 59-line frozen block. This plan pins no line count it has not measured; every number here (298, 293, 5, 52, 62, 84, 37, 2254, 637, 4f12820, both empty transcript diffs, the single expected-file commit) was measured by running the command today.
+
+---
+
+**PLAIN PLAN:**
+
+  3.1 Write a small tool that works out which words still need a practice question — and change the rule it uses: from "words she said she knows" to "words she said she knows, plus words the app thinks she almost knows". Add five tests that prove it, including one that would catch the old rule sneaking back — because right now that rule only exists as a sentence in an old document, and a sentence doesn't run itself next week.
+  3.2 Fix the one line in her growth document that still teaches the old rule — because leaving it there is how we got this problem in the first place.
+  3.3 Copy her live word collection to a safe folder outside the project — because there is no copy of it anywhere right now, and because that copy is also the only way to see which words need questions.
+  3.4 Run the new tool on that copy and write down the answer: which words need questions, and which words we had to skip and exactly why. If the list is empty, that is good news and the phase stops here. If it is longer than 25 words, we stop and show you the cost first.
+  3.5 Write the missing practice questions, one file per word, checked by the existing automatic gate until it is green — because a nominated word with no question can never be confirmed, and that is the hole this whole phase exists to close.
+  3.6 Have two separate helpers, neither knowing what the other found, try to break every new question by finding a wrong option that actually fits the sentence — because one checker finds only about half of these, measured.
+  3.7 Go through everything both helpers flagged, decide each one in writing, and keep the record — because "we looked at it" is not evidence.
+  3.8 Fix the questions that need fixing, and re-run the gate.
+  3.9 Show you every new question the way she will actually see it — meaning hidden behind the hint button, answer not marked — plus the list of words we had to skip and why. Nothing ships until you say yes.
+  3.10 Bump the app's cache version to v18 — because otherwise her phone may keep serving the old set of files.
+  3.11 Ship it, and prove the exact bytes we wrote are the bytes on the server; also prove a brand-new question file went from "not there" to "there", and that a made-up one is still "not there".
+  3.12 Read her collection back and prove nothing was lost and every change is explainable — the only time this phase touches her real data.
+  DONE WHEN: the app knows that "words she almost knows" belong in the weekly question top-up — proved by a tool with tests, not by a sentence in a document — and, measured against her real collection, every word she has claimed or the app has nominated either has a practice question or is on a written list of skipped words with the reason next to it. If any questions had to be written, they are live at v18, byte-proven on the server, approved by you, and her collection read back with nothing lost.

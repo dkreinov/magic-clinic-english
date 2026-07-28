@@ -1,34 +1,31 @@
 # STATUS — word-g1 (photograph of now, 2026-07-28)
 
-PHASE 2 IS DONE AND LIVE (magic-vet-v17). The quiz can now DECIDE about an "almost known"
-word: each practice round reserves its first question for one such word; a right answer makes
-it properly known, a wrong answer sends it back to learning with a kinder message written for
-a word she never claimed (עוד לא — נמשיך ללמוד את המילה הזאת) and restarts its promotion
-clock so it cannot bounce straight back. Words she claimed herself keep their old rules to
-the letter — proven by a screen-transcript that must match byte-for-byte, and it does.
+PHASE 3 IS PLANNED AND STARTING (autonomous mode, per your handoff). The goal: the weekly
+batch of new practice questions must stop covering only words she claimed and start covering
+words the app nominated ("almost known") too — otherwise a nominated word with no question can
+never be confirmed. The plan survived a fresh reviewer ("ship", one small wording rule fixed).
 
-Proof, not hope: all 298 tests pass (with and without the entry-code gate), colour contrast
-unchanged (52), BOTH screen transcripts (old and the new hand-written one) diff empty, the
-exact bytes we wrote are live on the server (all five changed files md5-proven), and her word
-collection was read back after the deploy — 20 words, nothing lost, nothing changed.
+The plan's headline discovery: there is probably NOTHING to generate right now. All 12 words
+she knows already have questions, and the app has nominated 0 words so far (it first runs when
+she next makes a story chapter). So the lasting deliverable is the RULE itself as a small
+tested tool (`scripts/quiz-topup.mjs`) that anyone can run next week — plus, only if her live
+data demands it, new question files vetted by two blind checkers and approved by you before
+anything ships.
 
 ```mermaid
 flowchart LR
     A[Phase 1 DONE<br/>engine + badge] --> B[Phase 2 DONE<br/>quiz decides candidates<br/>LIVE v17]
-    B --> C[Phase 3 NEXT<br/>weekly quiz items<br/>cover candidates]
+    B --> C[Phase 3 RUNNING<br/>top-up tool + tests<br/>items only if needed]
 ```
 
-She still has 0 "almost known" words — expected: the nominating engine first runs the next
-time she generates a story chapter; the quiz slot correctly stays empty until then. Phase 3
-closes the last gap: a nominated word with no quiz question can never pass, so the weekly
-item top-ups must start covering candidates too.
-
-The pre-deploy backup of her profile was DELETED at your instruction (given after the close
-report). Said plainly: no copy of her collection exists anywhere until phase 3 takes its own
-backup before its first deploy. Only the checksum record remains.
+Steps in flight: 3.1 the tool + 5 tests · 3.2 fix the one line in the growth document that
+still teaches the old rule · 3.3 back up her live collection (no copy exists right now — this
+comes before anything touches production) · 3.4 measure how many words need questions (likely
+0; if 0 the phase closes there, no deploy) · 3.5-3.12 only if needed: write items, two blind
+adversarial passes, your approval in the hint form, cache bump to v18, deploy, read-back.
 
 Rollback (code only, back to v16): `"$(npm prefix -g)/vercel" rollback
 https://english-g80h5gnd9-dkreinovs-projects.vercel.app --yes`
 
-Next: phase 3 — plan first with fresh eyes, then execute; recommended in a fresh session
-(paste the handoff prompt from the briefing).
+Questions waiting for you at the close (nothing blocks): keep or delete this phase's backup;
+when the skipped "off-list" words get their audio + manifest entry; who runs the weekly top-up.

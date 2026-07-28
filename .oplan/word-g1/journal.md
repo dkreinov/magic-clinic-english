@@ -531,3 +531,46 @@ receipt: 58870a1b…cd51c2); the backups folder is empty again. Stated plainly: 
 of her profile now exists — the safety net for the phase-2 deploy has ended; phase 3's own D25
 capture will precede its first profile-writing deploy. backup-receipt.txt keeps only sha256 +
 counts (never contents), retained as the record.
+
+## PHASE 3 PLANNING (2026-07-28)
+
+Fresh session (phase-boundary /clear per the handoff). Baseline re-verified by the orchestrator
+before planning: git clean at 4f12820 · npm test 298/0 · contrast grep -c '^PASS' = 52 (via
+node scripts/check-contrast.mjs; piping npm test gives 0 — the gate is its own script) · live
+/sw.js line 1 = magic-vet-v17. Frozen contracts re-acknowledged. D27: answered and executed at
+the phase-2 close (nothing pending; NO capture of her profile exists).
+
+Fresh planner (Opus, files only, read-only mandate) returned the full 12-step phase-3 plan now
+in plan.md ("PHASE 3 IN FULL"): 14 acceptance criteria; 3.1-3.2 WORKER (quiz-topup.mjs as the
+executable B7 rule + 5 flat tests -> ledger 303; growth.md 4-line dated correction 637->641),
+3.3-3.4 ORCHESTRATOR (D25 capture — the only copy of her profile; derive the list, measure N
+with a 0/<=25/>25 three-way gate), 3.5-3.12 CONDITIONAL on N>0 (generate under QZ-1/QZ-2/QZ-24,
+two blind adversarial passes at the sentence-only bar, orchestrator adjudication, D28 hint-form
+owner gate, CACHE v18, deploy, read-back). Central planner finding: N is very likely 0 — all
+12 of her known words already have bank files (verified per-file) and candidates were 0 at the
+phase-2 read-back; the phase's durable deliverable is therefore the OPERATION as a tested
+script, items only if the capture demands them.
+
+BLOCKER 1 (what "B7 delivered" means when N=0) RULED by the orchestrator: frozen default
+ACCEPTED — B7 = executable tested rule + missing=0 banned=0 proven against her captured
+profile + every drop reported; items are output, not definition. Owner can overturn in one
+line (close report). RECORD GAPS: 7, all worked around in the plan; QZ-22 read per signed §10
+(bump on ANY public/ change); no deploy if public/ never moves; off-list scheduling and weekly
+recurrence go to the owner at the close.
+
+ORCHESTRATOR VERIFICATION of the planner's claims against the tree: ALL CONFIRMED — bank
+62/84 (gate green), both transcripts diff EMPTY, g1 expected file exactly 1 commit,
+exclusions 37, growth.md 637 lines with the old rule verbatim at :111, manifest 2254,
+quiz-bank pin >=50 at :128, shell pin v17 at :58, public/ byte-unchanged e786273..HEAD,
+WORD_STATUSES includes candidate at lib/profile.js:14, all 12 known words have bank files.
+
+PLAN REVIEW (Sonnet, fresh): VERDICT ship. Findings: one fragility note (3.7's disposition
+count assumes one line per flagged distractor; the word-quiz precedent file combined lines).
+AMENDED into the 3.7 contract before execution (plan-review amendment #1). The reviewer
+independently re-ran the baseline numbers, the 3.10 diff arithmetic (synthetic edit -> 4
+lines), and spot-checked every quoted contract: no misquote found.
+
+tokens: planner=176417 · reviewer=120539. Execution mode: AUTONOMOUS (owner opt-in in the
+handoff prompt) — briefing printed, no go-ahead wait. Owner questions of the phase (asked at
+the close, not blocking): D27 rider for the phase-3 capture; off-list step scheduling; who
+runs the weekly top-up.
