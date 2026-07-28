@@ -5,8 +5,11 @@ NOTICE by itself that she is learning a word. A word she looked up once, then me
 later chapters without looking it up, gets marked "almost knows it" (כמעט יודעת). That guess
 never changes her stories — only a quiz pass (phase 2) or her own claim makes it count.
 
-Phase 1 is PLANNED and APPROVED (fresh planner + independent review: ship, zero findings).
-Execution is starting now, in autonomous mode. Nothing has been built yet.
+Phase 1 is executing (autonomous mode). Step 1.1 is DONE: the signed growth document is now
+the document of record (docs/growth.md, byte-proven against the signed source; one stale
+"awaiting signature" line in the source's tail was replaced by an honest "signed and copied"
+note — logged, and the owner can overrule). Next: step 1.2, teaching the profile the new
+"almost known" status.
 
 ```mermaid
 flowchart LR

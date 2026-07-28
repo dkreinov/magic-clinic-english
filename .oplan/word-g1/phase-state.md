@@ -1,4 +1,4 @@
-CURRENT: phase 1 "G1 candidate engine — status, promoter, badge, deployed", next step 1.1
+CURRENT: phase 1 "G1 candidate engine — status, promoter, badge, deployed", next step 1.3
 PLAN: .oplan/word-g1/plan.md (phase 1 in full, reviewed: ship/0 findings; phases 2-3 skeletons)
 JOURNAL: journal.md · BRIEFING: briefing.md · STATUS: STATUS.md · DESIGN: design.md (SIGNED,
   byte-copy of .oplan/word-quiz/night/growth-amended-DRAFT.md) · FIELD GUIDE:
@@ -7,7 +7,8 @@ JOURNAL: journal.md · BRIEFING: briefing.md · STATUS: STATUS.md · DESIGN: des
 BASE: cab71306532413363ac5e6998d21beb44043613f (workspace committed; every changed-set check
   in plan.md runs against this, .oplan/** excluded)
 
-ACCEPTED: (none yet)
+ACCEPTED: 1.1 — 29df011 (growth.md signed, 637 lines; intervention #1: source tail 642-643
+  replaced by frozen post-copy note — plan.md amended, owner may overrule)
 
 FROZEN CONTRACTS IN FORCE: the signed design §10 · QZ-12/QZ-17/QZ-18 amended ONLY as the design
   specifies (none amended in phase 1) · QZ-22 CACHE bump per precached change (v15 → v16 at 1.6)

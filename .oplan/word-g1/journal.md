@@ -83,3 +83,21 @@ STEP 1.1 docs/growth.md becomes the signed document of record
   audit: match / high (byte-identical reconstruction, 41064 bytes)
   commit: (this commit)
   accepted: 2026-07-28
+
+STEP 1.2 candidate legal; B4 merge precedence; nominations field
+  tier: WORKER (Sonnet)
+  did: lib/profile.js: WORD_STATUSES + candidate; STATUS_RANK; nominations validator;
+       rank-based status merge; nominations max-merge. tests/profile-candidate-schema.test.js:
+       3 flat tests (schema, rank+max+idempotence, pre-G1 guard).
+  surprises: none
+  deviations: none
+  validation_first_try: yes
+  retries: 0
+  escalations: 0
+  tokens: worker=56645, checker=35736, orchestrator_delta=unavailable
+  interventions: 0
+  fail-first: mutation (d) known-wins -> test 2 FAILED; mutation (e) Math.min -> test 2 FAILED;
+    both reverted byte-identically (worker pasted both failing lines)
+  audit: match / high
+  commit: (this commit)
+  accepted: 2026-07-28
