@@ -164,3 +164,8 @@ the loudest answer to "dull". 02 has the most personality. 04 is the calmest to 
 - **The mockups are not the running app.** They reproduce the real markup, classes, tokens, images
   and background recipe, but they are a static page. The honest confirmation is to apply one option
   to `styles.css` on a branch and look at it on a phone.
+
+## OWNER DECISION D29 (2026-07-28): Sunrise Parchment chosen.
+To be built as its own small phase AFTER phase 6 closes (its boundary gate forbids code changes
+now). Scope per the night analysis: :root token swaps + the four pinned background hexes in
+tests/background.test.js + contrast 52/52 re-proof + CACHE bump v13->v14 + deploy + owner look.
