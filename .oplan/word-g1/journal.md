@@ -407,5 +407,27 @@ STEP 2.5 the merge at the call sites — one candidate per sitting
   fail-first: each view reverted to the old single line -> ONLY that file's new test failed
     (not ok 12 in each, # pass 11 # fail 1); both restored, cmp-confirmed byte-identical
   audit: match / high
+  commit: ef7396c
+  accepted: 2026-07-28
+
+STEP 2.6 the child's experience end to end — episode 6
+  tier: WORKER (Sonnet, FRESH — did not write 2.2-2.5; adversarial mandate)
+  did: tests/quiz-experience.test.js: imports extended exactly as contracted; ONE flat episode-6
+       test through the REAL handler + REAL quiz component: G1 nominates 3, quota asks lantern
+       first, wrong answer -> soft line + clock reset + re-nomination BLOCKED (the B5 property
+       nothing else proves), right answer -> pebble truly known, kettle with no item = silence
+       with untouched counters. Ledger 298.
+  surprises: FAIL-FIRST (wasCandidate threading commented out) broke TWO tests, not one — the
+    new episode AND 2.4's unit test, which covers the same threading. Genuine overlapping
+    coverage, honestly flagged; the mutation IS caught and nothing unrelated breaks.
+  deviations: none
+  validation_first_try: yes
+  retries: 0
+  escalations: 0
+  tokens: worker=125492, checker=39576, orchestrator_delta=unavailable
+  interventions: 0
+  fail-first: single-file # pass 5 / # fail 1; full suite # pass 296 / # fail 2 (episode 6 +
+    the overlapping 2.4 test); quiz.js restored, git diff --stat empty
+  audit: match / high
   commit: (this commit)
   accepted: 2026-07-28

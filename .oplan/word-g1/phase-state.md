@@ -1,6 +1,7 @@
-CURRENT: phase 2 "candidates enter the quiz (slice b)", EXECUTING. Next step: 2.6 (episode 6,
-  FRESH adversarial worker). BASE (phase 2) = 558a5bc. Ledger now 297. Interventions: 1 (2.2
-  bad-spec probe fixture, ruled + amended). QZ-25 in force; both transcripts green.
+CURRENT: phase 2 "candidates enter the quiz (slice b)", EXECUTING. Next step: 2.7 (CACHE bump
+  v17 — LAST code change). BASE (phase 2) = 558a5bc. Ledger now 298 (the phase target).
+  Interventions: 1 (2.2 bad-spec probe fixture, ruled + amended). QZ-25 in force; both
+  transcripts green.
 ACCEPTED (phase 2): 2.1 — dbe5a4f (transcript gate, proven RED pre-code) · 2.2 — 0621b1e
   (candidate branch; ledger 293) · 2.3 — d077dcc (quota export; ledger 294) · 2.4 — b83b538
   (soft line; ledger 295; audit mismatch ruled cosmetic — contract-quoted indent) · 2.5 —

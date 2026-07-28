@@ -15,8 +15,10 @@ import { Readable } from 'node:stream';
 
 import profileHandler from '../api/profile.js';
 import { startQuiz } from '../public/quiz.js';
-import { pickQuizWords } from '../public/quiz-core.js';
+import { pickQuizWords, pickCandidateWords, knownSetFromProfile } from '../public/quiz-core.js';
 import { knownLemmaSet } from '../lib/vocab.js';
+import { loadProfile, saveProfile } from '../lib/store.js';
+import { defaultProfile, promoteToCandidate } from '../lib/profile.js';
 
 // ---- harness, copied verbatim per the packet ----
 
@@ -288,5 +290,156 @@ test('episode 5: pickQuizWords asks the struck word first, then the flagged one,
 
     const order = pickQuizWords(profile);
     assert.deepStrictEqual(order, [A, B, D, C], 'strikes first, then flagged, then never-quizzed, then quizzed');
+  }))
+);
+
+// ---- episode 6: G1 nominates, the quota asks ONE candidate first, a wrong
+// answer takes it back kindly with the clock reset, a right answer makes it
+// known, and a candidate with no bank item is silence (B3/B5/D23/D24) ----
+
+test('episode 6: G1 nominates, the quota asks ONE candidate first, one wrong answer takes it back kindly with the clock reset, one right answer makes it known, and a candidate with no item is silence', () =>
+  withOpenGate(() => withTempDataDir(async () => {
+    const SOFT_DEMOTION_LINE =
+      '\u05E2\u05D5\u05D3 \u05DC\u05D0 \u2014 \u05E0\u05DE\u05E9\u05D9\u05DA \u05DC\u05DC\u05DE\u05D5\u05D3 \u05D0\u05EA \u05D4\u05DE\u05D9\u05DC\u05D4 \u05D4\u05D6\u05D0\u05EA';
+    const HARD_DEMOTION_LINE =
+      '\u05D4\u05DE\u05D9\u05DC\u05D4 \u05D4\u05D6\u05D0\u05EA \u05D7\u05D5\u05D6\u05E8\u05EA \u05DC\u05DC\u05DE\u05D9\u05D3\u05D4, \u05E0\u05DC\u05DE\u05D3 \u05D0\u05D5\u05EA\u05D4 \u05E9\u05D5\u05D1 \u05D9\u05D7\u05D3';
+
+    const p = defaultProfile();
+    const learning = (lastSeen) => ({ status: 'learning', source: 'tap', he: null, taps: 1,
+      firstSeen: '2026-01-01T00:00:00.000Z', lastSeen });
+    p.words.lantern = learning('2026-01-03T00:00:00.000Z');
+    p.words.pebble  = learning('2026-01-02T00:00:00.000Z');
+    p.words.kettle  = learning('2026-01-01T00:00:00.000Z');
+    p.story.chapters = [
+      { n: 1, text: 'The lantern and the pebble and the kettle were here.', generatedAt: '2026-02-01T00:00:00.000Z' },
+      { n: 2, text: 'The lantern and the pebble and the kettle were here again.', generatedAt: '2026-03-01T00:00:00.000Z' },
+    ];
+    promoteToCandidate(p);
+    await saveProfile(p);
+    const post = makeRealPost();
+    await post({ action: 'mark-known', lemma: 'basket', source: 'tap' });
+    await post({ action: 'mark-known', lemma: 'ladder', source: 'tap' });
+
+    // ---- sitting 1: the wrong answer ----
+
+    const profile = await getProfile();
+    for (const lemma of ['lantern', 'pebble', 'kettle']) {
+      assert.strictEqual(profile.words[lemma].status, 'candidate', `${lemma} must be nominated by G1`);
+      assert.strictEqual(profile.words[lemma].nominations, 1, `${lemma} must show exactly one nomination`);
+    }
+
+    const candidateLemmas = pickCandidateWords(profile, 1);
+    assert.deepStrictEqual(candidateLemmas, ['lantern'], 'the quota is one, and the most recent lastSeen wins');
+
+    const lemmas = candidateLemmas.concat(pickQuizWords(profile, 20));
+    assert.strictEqual(lemmas[0], 'lantern', 'the candidate must lead the sitting');
+    assert.strictEqual(
+      lemmas.filter((l) => l === 'lantern' || l === 'pebble' || l === 'kettle').length,
+      1,
+      'exactly one candidate may reach the sitting'
+    );
+
+    const container = makeContainer();
+    const session = await startQuiz(container, {
+      lemmas,
+      knownSet: knownSetFromProfile(profile),
+      candidateSet: new Set(candidateLemmas),
+      count: 4,
+      load: async (lemma) => makeItem(lemma),
+      post,
+    });
+    assert.strictEqual(session.questions[0].lemma, 'lantern', 'the candidate must be asked first');
+
+    await session.answer(session.questions[0].item.distractors[0]);
+
+    assert.ok(container.innerHTML.includes(SOFT_DEMOTION_LINE), 'a candidate must be told the soft line');
+    assert.ok(!container.innerHTML.includes(HARD_DEMOTION_LINE), 'a candidate must NEVER be told the hard cry-wolf line');
+
+    const profile2 = await getProfile();
+    const lantern2 = profile2.words.lantern;
+    assert.strictEqual(lantern2.status, 'learning', 'a wrong answer must return the candidate to learning');
+    assert.strictEqual(lantern2.quizWrong, 1, 'the wrong-answer counter must move');
+    assert.strictEqual('strikes' in lantern2, false, 'the candidate path must never touch strikes');
+    assert.notStrictEqual(lantern2.lastSeen, '2026-01-03T00:00:00.000Z', "B5's clock must move");
+    assert.strictEqual(knownLemmaSet(profile2).has('lantern'), false, 'lantern must have left knownLemmaSet');
+
+    // THE LOOP IS CLOSED: the two chapters are now older than the reset clock,
+    // so G1 cannot re-nominate lantern on the next generation -- the property
+    // B5 exists for.
+    promoteToCandidate(profile2);
+    assert.strictEqual(
+      profile2.words.lantern.status,
+      'learning',
+      'the reset clock must block an immediate re-nomination'
+    );
+
+    // ---- sitting 2: the right answer ----
+
+    const profile3 = await getProfile();
+    assert.deepStrictEqual(pickCandidateWords(profile3, 1), ['pebble'], 'pebble is now the most recent candidate');
+
+    const container2 = makeContainer();
+    const session2 = await startQuiz(container2, {
+      lemmas: ['pebble'],
+      knownSet: knownSetFromProfile(profile3),
+      candidateSet: new Set(['pebble']),
+      count: 1,
+      load: async (lemma) => makeItem(lemma),
+      post,
+    });
+    await session2.answer(session2.questions[0].item.answer);
+
+    assert.ok(!container2.innerHTML.includes(SOFT_DEMOTION_LINE), 'a right answer must not render the soft line');
+    assert.ok(!container2.innerHTML.includes(HARD_DEMOTION_LINE), 'a right answer must not render the hard line');
+
+    const profile4 = await getProfile();
+    const pebble2 = profile4.words.pebble;
+    assert.strictEqual(pebble2.status, 'known', 'a right answer promotes the candidate to known');
+    assert.strictEqual(knownLemmaSet(profile4).has('pebble'), true, 'pebble must now be in knownLemmaSet');
+    assert.strictEqual(pebble2.quizRight, 1, 'the right-answer counter must move');
+    assert.strictEqual('strikes' in pebble2, false, 'the candidate path must never touch strikes');
+    assert.strictEqual(pebble2.nominations, 1, 'nominations must be untouched by the promotion');
+
+    // ---- sitting 3: the missing item is silence (D23) ----
+
+    const candidateLemmas3 = pickCandidateWords(profile4, 1);
+    assert.deepStrictEqual(candidateLemmas3, ['kettle'], 'kettle is the only remaining candidate');
+
+    const calls3 = [];
+    const realPost3 = makeRealPost();
+    const post3 = async (body) => { calls3.push(body); return realPost3(body); };
+    const load3 = async (lemma) => (lemma === 'kettle' ? null : makeItem(lemma));
+
+    const knownWords3 = pickQuizWords(profile4, 20);
+    const lemmas3 = candidateLemmas3.concat(knownWords3);
+
+    const container3 = makeContainer();
+    const session3 = await startQuiz(container3, {
+      lemmas: lemmas3,
+      knownSet: knownSetFromProfile(profile4),
+      candidateSet: new Set(candidateLemmas3),
+      count: lemmas3.length,
+      load: load3,
+      post: post3,
+    });
+
+    const askedLemmas = session3.questions.map((q) => q.lemma);
+    assert.ok(!askedLemmas.includes('kettle'), 'a candidate with no bank item must not consume a question slot');
+    for (const w of knownWords3) {
+      assert.ok(askedLemmas.includes(w), `${w} must still be asked`);
+    }
+
+    for (let i = 0; i < session3.questions.length; i++) {
+      await session3.answer(session3.questions[i].item.answer);
+      session3.next();
+    }
+    assert.ok(!calls3.some((c) => c.lemma === 'kettle'), 'kettle must never be posted about');
+
+    const profile5 = await getProfile();
+    const kettle2 = profile5.words.kettle;
+    assert.strictEqual(kettle2.status, 'candidate', 'kettle must remain a candidate, untouched by the sitting');
+    assert.strictEqual('lastQuizAt' in kettle2, false, 'kettle must gain no lastQuizAt key');
+    assert.strictEqual('quizRight' in kettle2, false, 'kettle must gain no quizRight key');
+    assert.strictEqual('quizWrong' in kettle2, false, 'kettle must gain no quizWrong key');
   }))
 );
