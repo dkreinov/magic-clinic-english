@@ -599,5 +599,5 @@ STEP 3.1 the top-up list becomes an executable, tested rule
     swallowing ENOENT = fail-open empty bank). Reworked by the same worker to the bare frozen
     contract; re-audit: match / high. (The fail-open finding is exactly field-guide 2's class —
     the auditor layer caught what validation could not.)
-  commit: 038f4f6
+  commit: 07ea2b4 (journal folded into the step commit by amend; this is the final hash)
   accepted: 2026-07-28
