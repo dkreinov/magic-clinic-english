@@ -25,8 +25,8 @@ test('manifest.webmanifest parses and has expected fields', () => {
   assert.strictEqual(manifest.display, 'standalone');
   assert.strictEqual(manifest.dir, 'rtl');
   assert.strictEqual(manifest.lang, 'he');
-  assert.strictEqual(manifest.background_color, '#241305');
-  assert.strictEqual(manifest.theme_color, '#2e1806');
+  assert.strictEqual(manifest.background_color, '#fff4e2');
+  assert.strictEqual(manifest.theme_color, '#fff8ec');
   assert.strictEqual(manifest.icons[0].src, '/icons/icon.svg');
 });
 
