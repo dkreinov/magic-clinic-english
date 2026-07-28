@@ -163,3 +163,17 @@ STEP 1.5 the third badge + surviving claim button (B6 i/ii)
   audit: match / high (CRLF + \u escapes confirmed at byte level)
   commit: (this commit)
   accepted: 2026-07-28
+
+STEP 1.6 CACHE bump v15 -> v16
+  tier: WORKER (Sonnet)
+  did: public/sw.js:1 CACHE = magic-vet-v16; tests/shell.test.js:58 pin moved in lockstep.
+  surprises: none
+  deviations: none
+  validation_first_try: yes
+  retries: 0
+  escalations: 0
+  tokens: worker=31201, checker=25166, orchestrator_delta=unavailable
+  interventions: 0
+  audit: match / high
+  commit: (this commit)
+  accepted: 2026-07-28
