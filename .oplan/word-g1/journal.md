@@ -124,3 +124,21 @@ STEP 1.3 promoteToCandidate — the G1 rule with the B5 cap
   audit: mismatch (curly-quote drift) -> fixed -> match / high
   commit: (this commit)
   accepted: 2026-07-28
+
+STEP 1.4 api/chapter.js call site
+  tier: WORKER (Sonnet)
+  did: api/chapter.js: import + frozen 4-line comment + promoteToCandidate(p) before
+       generateChapter. tests/api-chapter.test.js: ONE appended end-to-end test
+       (learning->candidate persisted through the handler; ledger 290).
+  surprises: none
+  deviations: none
+  validation_first_try: yes
+  retries: 0
+  escalations: 0
+  tokens: worker=42646, checker=46873, orchestrator_delta=unavailable
+  interventions: 0
+  fail-first: call commented out -> sole failure "not ok 9 - POST generate promotes a quiet
+    learning word to candidate and saves it"; restored byte-identically
+  audit: match / high
+  commit: (this commit)
+  accepted: 2026-07-28

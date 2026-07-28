@@ -1,6 +1,6 @@
 import { sendJson, readJsonBody } from '../lib/http.js';
 import { loadProfile, saveProfile } from '../lib/store.js';
-import { defaultProfile } from '../lib/profile.js';
+import { defaultProfile, promoteToCandidate } from '../lib/profile.js';
 import { generateChapter } from '../lib/story.js';
 import { chatJSON } from '../lib/openai.js';
 import band1 from '../data/band1.json' with { type: 'json' };
@@ -43,6 +43,11 @@ export default async function handler(req, res) {
     sendJson(res, 400, { ok: false, error: 'learner required' });
     return;
   }
+
+  // G1 (docs/growth.md section 5). The profile is already loaded here and is
+  // about to be saved below, so no new load or save is needed. A candidate is
+  // invisible to buildAllowedSet, so this cannot change the chapter generated.
+  promoteToCandidate(p);
 
   const r = await generateChapter({ profile: p, band1, band2, chat: chatJSON });
   if (!r.ok) {

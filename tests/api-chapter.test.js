@@ -296,3 +296,35 @@ test('fixture sanity: GOOD_TEXT verifies against the real allowed set', async ()
   const v = verifyChapter(chapter, allowed);
   assert.strictEqual(v.ok, true, JSON.stringify(v.errors));
 });
+
+test('POST generate promotes a quiet learning word to candidate and saves it', async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
+    const p = defaultProfile();
+    p.placement.completed = true;
+    p.learner.heroineName = 'מיקה';
+    p.learner.petName = 'לונה';
+    p.words.dragon = {
+      status: 'learning', source: 'tap', he: null, taps: 1,
+      firstSeen: '2026-01-01T00:00:00.000Z', lastSeen: '2026-01-01T00:00:00.000Z',
+    };
+    p.story.chapters = [
+      { n: 1, text: 'The dragon came.',  generatedAt: '2026-02-01T00:00:00.000Z' },
+      { n: 2, text: 'The dragons slept.', generatedAt: '2026-03-01T00:00:00.000Z' },
+    ];
+    await saveProfile(p);
+
+    setTransport(async () => goodChapterFixture());
+    try {
+      const req = createPostReq({ action: 'generate' });
+      const res = createMockRes();
+      await chapterHandler(req, res);
+      assert.strictEqual(res.statusCode, 200);
+      const stored = await loadProfile();
+      assert.strictEqual(stored.words.dragon.status, 'candidate');
+      assert.strictEqual(stored.words.dragon.nominations, 1);
+      assert.strictEqual(stored.story.chapters.length, 3);
+    } finally {
+      resetTransport();
+    }
+  }));
+});
