@@ -615,22 +615,29 @@ that have items. Revisit after a month of the parent view.
 
 ## 12. Sign-off
 
-Date: ______________
+Date: 2026-07-28
 
 **The document**
 
-[ ] Approved — build sections 5 and 8 next run, in the order in section 9.
+[x] Approved — build sections 5 and 8 next run, in the order in section 9.
+    (Signed by the owner in chat, 2026-07-28: "Q2. accept" — after the three owner-taste items
+    (B2 one-wrong demotion, B6's Hebrew strings, B6's visible claim button) were read out to
+    them explicitly. Order amended by the owner the same day: see
+    .oplan/word-g1/phase-state.md — gamification is the story-integrated "magic clinic",
+    NOT streak-pressure mechanics.)
 
 **The seven proposals** — tick to accept as written, or write an override on the line.
 
 | | Proposal | Accept | Override |
 |---|---|---|---|
-| B1 | Amend first, then sign — this draft is the amendment | [ ] | ______________ |
-| B2 | One wrong answer demotes a candidate | [ ] | ______________ |
-| B3 | At most one candidate per quiz session, existing comparator inside the tier | [ ] | ______________ |
-| B4 | Merge precedence `known` > `candidate` > `learning` | [ ] | ______________ |
-| B5 | Reset the clock on demotion, cap automatic nominations at 2 per word | [ ] | ______________ |
-| B6 | Third badge `כמעט יודעת`, claim button stays visible, softer demotion line | [ ] | ______________ |
-| B7 | Top-ups cover `known` ∪ `candidate`; off-list words as their own later step | [ ] | ______________ |
+| B1 | Amend first, then sign — this draft is the amendment | [x] | (accepted as written, 2026-07-28) |
+| B2 | One wrong answer demotes a candidate | [x] | (accepted as written, 2026-07-28) |
+| B3 | At most one candidate per quiz session, existing comparator inside the tier | [x] | (accepted as written, 2026-07-28) |
+| B4 | Merge precedence `known` > `candidate` > `learning` | [x] | (accepted as written, 2026-07-28) |
+| B5 | Reset the clock on demotion, cap automatic nominations at 2 per word | [x] | (accepted as written, 2026-07-28) |
+| B6 | Third badge `כמעט יודעת`, claim button stays visible, softer demotion line | [x] | (accepted as written, 2026-07-28) |
+| B7 | Top-ups cover `known` ∪ `candidate`; off-list words as their own later step | [x] | (accepted as written, 2026-07-28) |
 
-Signed: ______________
+Signed: the owner, via chat ("Q2. accept"), recorded verbatim by the orchestrator, 2026-07-28.
+STATUS note: this document is now SIGNED. The first step of the word-g1 run copies this text
+over docs/growth.md (per the header note), which still reads AWAITING-OWNER-SIGN-OFF until then.
