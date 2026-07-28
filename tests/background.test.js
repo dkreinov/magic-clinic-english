@@ -11,10 +11,10 @@ const publicDir = path.join(root, 'public');
 
 test('styles.css defines the four background paint tokens with their frozen values', () => {
   const css = readFileSync(path.join(publicDir, 'styles.css'), 'utf8');
-  assert.ok(css.includes('--color-bg-top: #361d08;'));
-  assert.ok(css.includes('--color-bg-glow-violet: #321f1a;'));
-  assert.ok(css.includes('--color-bg-glow-teal: #282416;'));
-  assert.ok(css.includes('--color-bg-glow-amber: #331f0c;'));
+  assert.ok(css.includes('--color-bg-top: #ffe9c9;'));
+  assert.ok(css.includes('--color-bg-glow-violet: #f3e4fb;'));
+  assert.ok(css.includes('--color-bg-glow-teal: #dff4ee;'));
+  assert.ok(css.includes('--color-bg-glow-amber: #ffe4b5;'));
 });
 
 test('body background-image is composed only of the frozen background paint layers', () => {
