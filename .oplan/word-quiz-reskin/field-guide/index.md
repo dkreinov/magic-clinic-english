@@ -57,3 +57,7 @@
     list (api-translate.test.js, born phase 6, owned 6 of the "48" the packet had explained
     away as cross-file interference). Re-verify a packet's file ENUMERATION against the current
     tree — grep for the defect PATTERN, don't trust the packet's list.
+12. VISUAL GATES ARE SELF-SERVED (owner directive 2026-07-28): the orchestrator audits in the
+    SANDBOX browser (hard-reload past the stale localhost SW first) with screenshots/zoom, fixes
+    objective defects, records verdicts — the owner is asked only for taste calls on things they
+    explicitly chose. Never a browser on production.
