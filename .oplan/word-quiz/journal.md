@@ -1406,3 +1406,54 @@ lost, ZERO status changes, and meta.updatedAt DID NOT MOVE (her file was already
 the read wrote nothing).
 OUTSTANDING: gate B (the owner's phone check) and 6.12 close (criteria re-run, field guide,
 reports, then the D27 backup deletion AFTER the gate-B yes).
+
+## THE NIGHT SHIFT (2026-07-27 → 28) and GATE B. PHASE 6 IS CLOSED.
+
+While gate B waited overnight, the owner commissioned five planning/design documents (no code —
+the phase boundary forbade it): the signable growth-doc rewrite (found G1's off-list-words hole),
+the second-profile design (recommends a separate deployment — credential boundary over a code
+branch), the parent-view design (caught my own impossible example numbers), four evidence-backed
+post-close chore packets (48/282 tests MEASURED failing under an exported APP_CODE), and the
+visual options page (palettes sampled from the art, all four directions 52/52 contrast-measured).
+All in `.oplan/word-quiz/night/`, each committed as it landed. Night tokens: 606745 (awk).
+**D29 (owner, 2026-07-28): Sunrise Parchment** is the chosen visual direction — queued as its own
+post-run work with the chore packets.
+
+GATE B: the owner first saw the OLD cached shell (no launcher — the exact stale-cache trap the
+checklist's reopen-twice step exists for), refreshed, then: **"I see it now, work well."**
+Approved on the owner's own judgment of the live app in a real browser — the run's only
+real-browser observation, and it passed.
+
+PHASE 6 CLOSED
+  criteria: ALL GREEN at the close re-run — ledger 282/0 · bank 62/84 · completeness-vs-her-
+    claims (capture #1) with 37 exclusions honored · boundary over 0b47649..HEAD (allowlist incl.
+    the 6b files) with zero deletions · contrast 52 · .data absent · live v13 + auth gate ·
+    QZ-21 transcript DIFF EMPTY · gate A superseded-and-passed as 6b.5 (D28 form) · gate B passed
+    → PHASE-6-ALL-CRITERIA-OK printed.
+  steps: 6.1-6.10 + 6b.1-6b.5 + 6.11-6.12; escalations: 0; stalled dispatches: 2 (both left a
+    clean tree; re-dispatch succeeded — crash-only held).
+  interventions: the run's biggest was the OWNER's own D28 at gate A — the machinery absorbed a
+    design reversal mid-deploy-phase with nothing lost: 6b planned, reviewed (6 findings fixed),
+    executed, re-gated, all inside the phase.
+  content: 12 top-up words / 14→13 items · 2 gloss-and-sentence leaks caught by agreeing blind
+    passes · 58 sentence-only flags swept, 11 items re-worked, fan[1] deleted (ship fewer than
+    leaky), 3 flags kept with written reasons.
+  deploy: dpl_Geaj9sXRPP8KSt9uZTBMQnSDFCSr · 67 files md5-verified live==worktree · her profile
+    read back INTACT (20 words, zero loss, updatedAt unmoved).
+  D27 EXECUTED at the close, after gate B and after the criteria re-run: both backup files
+    DELETED (folder verified empty). From this moment there is no captured copy of her profile;
+    the live data was proven intact while the net still existed.
+  tokens (awk): planner=178411 · plan-reviewer legs=405326 (cumulative-per-leg figures as
+    reported by the harness; may double-count within the resumed agent) · workers=637442 ·
+    checkers=61143 · phase total=1282322 · night service=606745.
+  cost / orchestrator_context: unavailable in this harness.
+  field guide: 54/40 + the recipe-pointer fix (line 54); standing justification holds.
+  record chores done at close: the three broken deploy-recipe pointers fixed (field guide done
+    here; plan.md and phase-state pointers corrected in the close commit).
+
+THE RUN'S REMAINING TRUTH, stated at the width of the evidence: the quiz is LIVE and the owner
+has seen it working; every word she has claimed has an approved item; the correction loop D1
+asked for exists end to end. NOT yet observed by anyone: Mika herself using it, and the demotion
+line on a real screen (three sittings needed — the transcript remains its evidence). Deferred
+with owner decisions: G1 (awaits the amended doc's signature), the second profile, the parent
+view, Sunrise Parchment (D29), and the four chore packets — all staged in night/.

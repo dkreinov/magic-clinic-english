@@ -1728,7 +1728,7 @@ first look at the deployed app is the run's ONLY real-browser check — every UI
 repo is a string returned by a function, so CSS/RTL layout defects are invisible until then.
 
 
-The recipe in `.oplan/word-audio/journal.md`: record the outgoing deployment via `vercel inspect`
+The recipe in `.oplan/word-audio/phase-state.md:55-66` (pointer corrected at the phase-6 close; the journal never held it): record the outgoing deployment via `vercel inspect`
 FIRST; `"$(npm prefix -g)/vercel" deploy --prod --yes`; md5 live vs WORKTREE for every changed
 `public/` file; live `/sw.js` carries the new CACHE; a 401 probe on `/api/profile` proves the
 function bundled; spot-check `/quiz/<lemma>.json` with a 404 negative control. Watch deploy size.

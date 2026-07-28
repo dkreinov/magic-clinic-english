@@ -1,62 +1,46 @@
 # STATUS — word-quiz (W5b)
 
-**Where we are: THE QUIZ IS LIVE.** Deployed 2026-07-27 20:22 with your approval, in the hint
-form you chose (D28). Her profile survived untouched — proven by reading it back: all 20 words,
-every status unchanged, not even the last-modified stamp moved. One thing remains: **your phone
-check** (the checklist is in the chat), then the phase closes and — as you asked — the backup
-files are deleted.
+**THE RUN IS COMPLETE. The quiz is live, you have seen it working, and Mika's data came through
+untouched.** The backups were deleted at the close, as you asked — after her live profile was
+read back and proven intact (all 20 words, nothing changed).
 
-## What got built this phase
+## What this run delivered
 
-Mika now gets asked. After every chapter she answers four quick questions — the word's meaning on
-top, a sentence with a gap, six words she can read or hear. There is also a "בואי נתרגל מילים"
-button in המילים שלי. Get a word wrong on three separate sittings and it goes back to
-"learning" — and a kind line TELLS her so. Nothing is deployed yet; her app is unchanged until
-phase 6.
+She claims a word → within a chapter or two the app asks her about it — sentence first, meaning
+behind a רמז button (your choice), six options she can hear. Right answers build confidence;
+wrong on three separate sittings sends the word kindly back to learning and the story re-teaches
+it. Every word she has claimed has an approved question; two independent reviewers plus you
+checked every one.
 
 ```mermaid
 flowchart LR
-    A["chapter done"] --> B["4 questions<br/>meaning + sentence + 6 words"]
-    B -->|right| C["slate wiped<br/>on to the story"]
-    B -->|"wrong, 3rd<br/>separate sitting"| D["word back to learning<br/>and she is TOLD"]
-    E["בואי נתרגל מילים<br/>button"] --> B
+    A["she claims a word"] --> B["the quiz asks her<br/>(hint behind רמז)"]
+    B -->|right| C["hers, confirmed"]
+    B -->|"wrong ×3 sittings"| D["back to learning,<br/>told kindly"]
+    D --> A
 ```
 
-## Progress
+## What is staged next (nothing running; your word starts any of them)
 
-| Phase | What | State |
-|---|---|---|
-| 1 | item format, checker, 50-word pilot | done — you approved it |
-| 2 | the bank | grows weekly on demand; FIRST top-up is now a phase-6 requirement |
-| 3 | profile: strikes and demotion | done — you approved the transcript |
-| 4 | the quiz screens | done — you approved the screens |
-| 5 | automatic promotion | deferred by you to a future run (design doc first) |
-| 6 | deploy (backup + first top-up + your first real look) | **LIVE — waiting only on your phone check** |
+| Work | State |
+|---|---|
+| **Sunrise Parchment re-skin (your D29)** | scoped and ready — token swaps, one test file, re-prove contrast, deploy |
+| 4 small code chores | evidence-backed packets ready (biggest: 48 tests fail today if the access code is exported in a shell) |
+| Automatic promotion (G1) | signable design draft ready — read `night/growth-amended-DRAFT.md` |
+| Second profile for your tests | design ready — recommends a separate deployment (structurally can't touch her data) |
+| Parent view | design ready — built on data that already records |
+| Weekly top-up | due whenever she claims new words |
 
-## What the checking machinery caught this phase (all fixed before anything shipped)
+## Honest notes
 
-- The plan itself: the after-chapter quiz would have run once and then never again (chapter 2
-  onward) — caught by the plan reviewer before any code existed.
-- An invisible blank line quietly added to the words page — caught by a checker, rejected, fixed.
-- A test that would have stayed green while the app showed the "word taken back" message on every
-  wrong answer — caught by a checker; the test now proves the message stays silent until the
-  real third strike.
-- Eight deliberate sabotage runs against the finished code: every one was caught by a test. An
-  independent helper who never saw the code being written could not make it misbehave.
+- The demotion message has never been seen on a real screen (it needs three separate bad
+  sittings) — its evidence remains the hand-derived transcript you approved.
+- Your local sandbox (safe play, her exact flow) restarts with:
+  `DATA_DIR='C:\Users\dkreinov\english-app-sandbox' npm run dev`
+- No backups exist anymore; the next deploy that touches profile fields should take a fresh one.
 
-## What needs you
+## What it cost
 
-Nothing right now. You chose deploy-first; automatic promotion waits for its design doc. The
-next thing you will see is the deploy plan in plain words — and the deploy itself will need you
-at two points: the backup of her profile happens before anything ships, and you take the first
-real look at the app afterwards.
-
-## Honest limits
-
-- No screen has rendered in a real browser this whole run — the tests check the text and
-  structure, not the look. Your first look at the deployed app is the real look.
-- Until the first bank top-up runs, the quiz only knows the 50 pilot words.
-
-## What it costs
-
-**No money.** No paid API, no live AI call in the app.
+No money — no paid API anywhere. Agent work across the whole run: roughly 4.6M tokens of
+helpers/checkers/planners (phase 6 + its night shift alone: ~1.9M), all logged per step in the
+journal.

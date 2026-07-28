@@ -119,6 +119,34 @@ NEEDS YOU AT: reading the new questions (gate A), the go-moment before the deplo
 phone check (gate B).
 === END ===
 
+## THE RUN CLOSED (2026-07-28) — the plain report
+
+=== PHASE 6 — PLAIN REPORT (and the run's last) ===
+WHAT WE SET OUT TO DO: get the quiz into Mika's hands without risking the one file holding
+everything she has collected.
+WHAT WE ACTUALLY DID: froze what was live and how to undo it · copied her profile out twice and
+proved both copies · wrote questions for every word she has claimed · you reshaped the design at
+the gate (the hint), so the screen was rebuilt and every wrong option in all 84 questions was
+re-checked to the stricter sentence-alone bar · two questions were re-worked at your first
+review, eleven more after the hint change, one meaning was deleted rather than shipped leaky ·
+deployed in one act · verified 67 files byte-for-byte · read her real profile back: nothing
+lost, nothing changed · you looked at it on a real screen and said it works well · deleted the
+backups, as you instructed.
+WHAT WE FOUND OUT: the "dull" feeling had a measurable cause (the background matches none of the
+art's own colors — fixed by your Sunrise Parchment choice, ready to build) · the promotion
+feature's design has a real hole (its target words have no audio or questions) · with the access
+code exported in a shell, 48 of our own 282 tests fail today · a first look at a deployed app is
+always a fight with the cache — you hit exactly the trap the checklist warns about.
+WHAT WENT WRONG: nothing that reached her. Two helper crashes left clean trees; my own mistakes
+(a 17-word sentence, a swallowed heading, wrong example arithmetic) were each caught by the
+machinery or the helpers before landing.
+WHAT IT COST: no money; ~1.9M helper tokens for the phase + night shift, logged per step.
+WHERE WE ARE NOW: the quiz is live; the record is complete; five decided-or-decidable next steps
+are staged in night/.
+WHAT HAPPENS NEXT: your word starts any of: the Sunrise Parchment re-skin (D29, first in line),
+the chore packets, the growth-doc signature, the second profile, the parent view.
+=== END PLAIN REPORT ===
+
 ## The morning digest (night of 2026-07-27) — five documents waiting in .oplan/word-quiz/night/
 
 All five night jobs finished and are committed. Nothing in the app, the tests, or the live site

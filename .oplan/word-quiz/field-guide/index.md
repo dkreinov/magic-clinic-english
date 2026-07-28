@@ -51,4 +51,4 @@
    ask in the report what was read outside the packet. Phase 3's A3 and A4 were contradictions found
    only while WRITING the packets, after two full plan-review rounds had passed that plan.
 10. DEPLOY: `"$(npm prefix -g)/vercel" deploy --prod --yes`, but `vercel inspect` FIRST to record the
-    outgoing id+url — the only rollback target. Full recipe and rollback: the word-audio journal.
+    outgoing id+url — the only rollback target. Full recipe and rollback: .oplan/word-audio/phase-state.md:55-66 (NOT that run's journal — corrected at the phase-6 close).

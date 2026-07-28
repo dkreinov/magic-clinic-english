@@ -1,71 +1,51 @@
-CURRENT: **PHASE 4 CLOSED 2026-07-27. ALL ELEVEN CRITERIA MET — the owner read the three-screen
-  transcript and approved ("yes approve, go ahead"), with the unchecked things stated alongside.**
-  Offered deploy-first explicitly, the owner did not take it; the plan's order stands.
-  **D26 (owner, 2026-07-27): DEPLOY FIRST.** Phase 5 (G1) is DEFERRED to its own future run,
-  gated on growth.md being amended per the brief and SIGNED — the fresh planner found it
-  unsigned and G1 unimplemented (verified; see journal "PHASE 5 PLANNING", which also holds the
-  conditional plan + 7 blockers for that future run).
-  **PHASE 6 IS PAUSED MID-EXECUTION BY OWNER DECISION D28 (2026-07-27, at gate A).** Steps
-  6.1-6.6 are DONE (baseline frozen · capture #1 proven, 12 known words · top-up list derived ·
-  bank pin relaxed + growth.md corrected · 12 files / 14 items generated, gate green · two blind
-  adversarial passes, 2 leaks found and fixed). NOTHING IS DEPLOYED. At gate A the owner
-  reversed D22's presentation: the gloss becomes a HIDDEN HINT (see design.md D28). Gate A's
-  approval was therefore never given in the old form and is superseded.
-  NEXT ACTION: **execute the 6b re-work (planned, under review): hint-button card + a
-  sentence-only re-vet of ALL 85 bank items + re-worked leaky items + a fresh owner gate**, then
-  resume at 6.8 (fresh backup → deploy). ROLLBACK TARGET unchanged:
-  `"$(npm prefix -g)/vercel" rollback https://english-d0roovfpq-dkreinovs-projects.vercel.app --yes`
-  (id dpl_4b6XjMSa2HRUN4a2s48cdsT6u2Z1) — restores CODE ONLY.
-  CAPTURE #1 sha256 58870a1b… remains valid as the top-up seed; capture #2 still happens at 6.8.
-  Six steps accepted: 4.1 1aabd37 · 4.2 2159560 (A7) · 4.3 70ac7c1 (A8) · 4.4 93847b8 ·
-  4.5 e4147aa · 4.6 90112d1.
-  Ledger 257 -> 264 -> 272 -> 274 -> 277 -> 277 -> **282**, `# fail 0`. Contrast 52 ALL PASS.
-  Bank untouched (50 files / 71 items). Shell at magic-vet-v13, both quiz modules precached.
-  `.data/profile.json` absent. Exactly the 11 expected files across `5db1d10..HEAD`, none
-  deleted (criterion 6 under A9: `LC_ALL=C sort` — locale collation broke the frozen comparison
-  with both sides EQUAL; instrument fixed, property untouched).
-  QZ-21: transcript vs hand-derived expectation DIFF EMPTY, at 4.2 acceptance AND at the gate.
-  8 mutations run (4.2, 4.6), all caught. The independent 4.6 agent found NO defect.
-  THREE AMENDMENTS this phase, all logged in plan.md beside what they amend:
-  **A7** (4.2) — options wrapper div + no-bind done screen: spec imprecision, accepted.
-  **A8** (4.3) — the auditor caught a REAL byte-identity breach (whitespace line in renderList);
-  rejected, fixed by same-line concatenation, re-audited match.
-  **A9** (gate) — criterion 6 needs `LC_ALL=C sort`; bare sort collates by locale.
-  KNOWN WART, recorded: renderChapter's local `stage` shadows the view's outer `stage`
-  (reader.js). Harmless today; a future reader.js edit should rename one of them.
+CURRENT: **THE RUN IS COMPLETE (2026-07-28). ALL PHASES CLOSED.** Phase 1 (item format + pilot,
+  re-closed after audit, owner approved) · phase 2 cancelled as a phase (D23 — weekly top-up
+  operation) · phase 3 (strikes/demotion, owner approved the QZ-16 transcript) · phase 4 (the
+  quiz surface, owner approved the QZ-21 screens) · phase 5 DEFERRED by D26 (G1 awaits the
+  amended growth doc's signature; the conditional plan + 7 blockers live in the journal) ·
+  phase 6 (backup → first top-up → the D28 hint pivot mid-phase → deploy → her data proven
+  intact → gate B passed: "I see it now, work well") — PHASE-6-ALL-CRITERIA-OK.
+  **THE QUIZ IS LIVE** at deployment dpl_Geaj9sXRPP8KSt9uZTBMQnSDFCSr (magic-vet-v13).
+  Rollback (code only): `"$(npm prefix -g)/vercel" rollback
+  https://english-d0roovfpq-dkreinovs-projects.vercel.app --yes`.
+  **D27 EXECUTED: both profile backups DELETED at the close** (owner's rider). No captured copy
+  of her profile exists; the live copy was read back intact (20 words, zero loss) first.
 
-CARRY INTO PHASE 5/6 — what phase 4 learned that no phase-4 test can enforce:
-  · **The quiz is INERT until the first top-up runs** — the bank holds only the 50 pilot words.
-    The first top-up is a PHASE 6 criterion (run it before or with the deploy).
-  · **No phase has rendered in a real browser.** The owner's first look at the deployed app is
-    the run's only CSS/RTL check. Phase 6 must say so at its gate.
-  · Phase 5 (candidate status) touches `WORD_STATUSES` and promotion — quiz-core's
-    `pickQuizWords` filters on `status === 'known'` EXACTLY; a new `candidate` status is
-    invisible to the quiz until phase 5 decides otherwise. That is currently CORRECT per D12
-    (a candidate must pass a quiz to become known — phase 5 will need its own entry point).
-  · `docs/growth.md`'s "nothing ever demotes" line is now FALSE in the code but the doc edit is
-    deliberately deferred to phase 6 (QZ-13).
+NEXT WORK, staged and owner-decided, none dispatched:
+  · **D29: Sunrise Parchment re-skin** (owner chose 2026-07-28) — scope in
+    night/visual-design-NOTES.md: :root token swaps, 4 pinned hexes in tests/background.test.js,
+    contrast 52/52 re-proof, CACHE v13→v14, deploy, owner look.
+  · **4 chore packets** in night/post-close-chores.md (APP_CODE harness fix — 48/282 failures
+    measured under an exported code; reader.js stage-shadow rename; pointer fixes now partly
+    done; dispositions for the rest).
+  · Awaiting owner decisions, drafts ready in night/: the signable growth rewrite (G1),
+    second-profile design, parent-view design.
+  · The weekly top-up operation (plan.md PHASE 2): words she claims → items → gate → owner →
+    deploy. First one due when new claims appear.
 
-PLAN: .oplan/word-quiz/plan.md — read top to bottom; amendments live beside what they amend.
-DESIGN: .oplan/word-quiz/design.md — FROZEN, D1-D25. Do not re-open.
-FIELD GUIDE: .oplan/word-quiz/field-guide/index.md (10 lessons, 54/40, justified in the journal)
-BRIEFING: .oplan/word-quiz/briefing.md — append-only, for the human.
-PREDECESSOR: .oplan/word-audio/ — its journal holds the deploy recipe + rollback for phase 6.
+PLAN: .oplan/word-quiz/plan.md · DESIGN: design.md (D1-D29) · JOURNAL: journal.md (complete
+  history incl. the night shift) · BRIEFING: briefing.md (the story, plain words) ·
+  FIELD GUIDE: field-guide/index.md (54/40, justified; recipe pointer fixed) ·
+  PREDECESSOR: .oplan/word-audio/ — deploy recipe + rollback at its phase-state.md:55-66.
 
-ACCEPTED (all phases): 1.1 · 1.2 · 1.3 (phase 1, re-closed after audit; owner approved) ·
-  3.1 18dbda1 · 3.2 b273c74 · 3.3 76eb416 · 3.4 f9760b2 · 3.5 521ae9b (phase 3, owner approved) ·
-  4.1 1aabd37 · 4.2 2159560 · 4.3 70ac7c1 · 4.4 93847b8 · 4.5 e4147aa · 4.6 90112d1 (phase 4,
-  criteria 1-10 green, owner gate pending).
+STATE OF THE TREE: ledger 282/0 · bank 62 files / 84 items (covers every word she has claimed,
+  37 exclusions honored) · contrast 52 · shell v13 with both quiz modules precached ·
+  `.data/profile.json` absent · owner sandbox at C:/Users/dkreinov/english-app-sandbox (seeded
+  profile + 1 chapter; server currently stopped — restart:
+  `DATA_DIR='C:\Users\dkreinov\english-app-sandbox' npm run dev`).
 
-FROZEN CONTRACTS IN FORCE: QZ-1..QZ-16 (phases 1-3, see plan.md) · QZ-17 (quiz-core six exports,
-  frozen comparator) · QZ-18 (quiz.js text-node order + frozen Hebrew + session/binding/demoted;
-  A7) · QZ-19 (phase-4 non-goals) · QZ-20 (ledger, now AT 282) · QZ-21 (the transcript pair in
-  this workspace) · QZ-22 (CACHE magic-vet-v13 + the exact 14-entry PRECACHE).
+FROZEN CONTRACTS IN FORCE: QZ-1..QZ-22 as amended (A1-A9, QZ-23 hint card, QZ-24 sentence-only
+  bar) — see plan.md, amendments beside what they amend. Key operational ones for future work:
+  QZ-8 (37 excluded words, never quizzed) · the top-up operation's contracts (QZ-1/2 + pin test
+  + QZ-24) · QZ-22 (PRECACHE exact; any precached change needs a CACHE bump same phase).
 
-THE THINGS MOST LIKELY TO BITE (unchanged, plus one):
-  · Her profile is LIVE in Vercel Blob behind APP_CODE — never probe; temp DATA_DIR always.
-  · isAuthorized is TRUE only when APP_CODE is UNSET — withOpenGate in every handler test.
-  · Contrast anchor: `grep -c '^PASS'` = 52. · Ledger counts FLAT top-level test() only.
-  · Frozen comparisons need `LC_ALL=C sort` (A9) and capture-and-case, never `| grep -q`.
+THE THINGS MOST LIKELY TO BITE (for the next run):
+  · Her profile is LIVE in Vercel Blob behind APP_CODE — never probe outside a sanctioned,
+    subshell-isolated read; APP_CODE must never enter the orchestrator's shell.
+  · isAuthorized is TRUE only when APP_CODE is UNSET — 6 test files still lack withOpenGate
+    (packet 1 fixes it).
+  · Contrast anchor `grep -c '^PASS'` = 52 · ledger counts FLAT top-level test() only ·
+    `LC_ALL=C sort` in frozen comparisons · hash FILES, never `$(curl ...)` output ·
+    tests/background.test.js pins 4 background hexes (the D29 re-skin must move them in lockstep).
 
-OPEN QUESTIONS: none. BLOCKED: no.
+OPEN QUESTIONS: none for this run. BLOCKED: no — complete.
