@@ -206,3 +206,16 @@ STEP 1.8 D25 capture (ORCHESTRATOR)
   D27 rider: owner NOT yet asked mid-run (autonomous mode; deletion is a close-time action) —
     the question goes in the phase-close report; default until answered: KEEP the backup.
   STEP-1.8-OK.
+
+STEP 1.9 deploy v16 (ORCHESTRATOR)
+  did: vercel inspect BEFORE deploy: live id = dpl_HUjmYpAvumkWDXxsjkZiQzY7GRTn (hard stop
+    passed), its true deployment url = english-2wkxdnp9g-dkreinovs-projects.vercel.app —
+    recorded in ~/g1-deploy/outgoing.txt; this CORRECTS the inherited rollback line, which
+    pointed at english-d0roovfpq (v14's url). Deploy: TWO invocations both completed (the
+    first call's output was truncated by tail, misread as guidance; both built identical
+    HEAD bytes) — live is the newest: dpl_9yj3HbhU7p5ZNAGQHUeTCvM2D3Dc
+    (english-g80h5gnd9), aliased to english-app-three-tan.vercel.app.
+  validation: DEPLOY-V16-OK — public/ enumeration since 265dc86 exactly sw.js+views/words.js;
+    both md5 live==worktree; live sw v16, no v15; health byte-exact; /api/chapter 401.
+  ROLLBACK (code only, corrected):
+    "$(npm prefix -g)/vercel" rollback https://english-2wkxdnp9g-dkreinovs-projects.vercel.app --yes
