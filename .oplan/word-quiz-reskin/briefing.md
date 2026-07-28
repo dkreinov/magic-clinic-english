@@ -77,3 +77,30 @@ WHAT HAPPENS NEXT: only the owner's look. She should open the app (force a reloa
 looks brown) and tell us what she thinks — including the five spots we deliberately left in
 their old style (bottom-bar shadow, picture fade, dark icon, plain cream, softer card lift).
 Her words close the phase; each complaint is a one-line follow-up.
+
+## 2026-07-28 — the owner looked, delegated the eye-check, and asked for self-updating; done
+
+The owner opened the app and said, verbatim: "I've opened and refreshed the app and it is now
+ligt." They asked two things: audit the visuals myself (it's visual, after all), and make the
+refresh automatic — "she will forget to refresh".
+
+The eye-check, done in the practice sandbox so the real site stayed untouched: the browser
+itself made the case for the second request — it showed the OLD brown app, because it was
+holding last week's saved copy. Exactly the trap she would fall into. After forcing it past the
+stale copy: the new look holds up on all three screens. Of the five watch-spots, four look
+right and stay (the picture fade reads like watercolour on paper; the dark app icon has charm;
+the cream isn't flat; the cards sit well). One was real: a grey smudge above the bottom bar,
+left over from the dark theme. Fixed — it is now a warm amber edge.
+
+The self-updating app: it turned out half the machinery already existed — new versions already
+install and take over immediately; the only missing piece was one small instruction in the
+page: "when a new version takes over, reload yourself once." Added, tested in the sandbox
+(page stable, no reload loops — the failure mode that would actually hurt), published as v15,
+and proven live byte-for-byte. From now on, publishing a new look or feature reaches an open
+app within seconds, on its own.
+
+The one honest limit: her phone's current saved copy is from before this fix, so her FIRST
+open may still show brown once while the phone updates itself in the background; from the next
+open onward it is cream forever, and no one ever needs to refresh again.
+
+The run is complete: chores done, repaint live, self-update live, records written.

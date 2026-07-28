@@ -52,3 +52,8 @@
    only while WRITING the packets, after two full plan-review rounds had passed that plan.
 10. DEPLOY: `"$(npm prefix -g)/vercel" deploy --prod --yes`, but `vercel inspect` FIRST to record the
     outgoing id+url — the only rollback target. Full recipe and rollback: .oplan/word-audio/phase-state.md:55-66 (NOT that run's journal — corrected at the phase-6 close).
+11. A ready-to-dispatch packet frozen at commit X goes stale in FILE COVERAGE, not just line
+    numbers: a file born after X can carry the very defect the packet fixes and be in nobody's
+    list (api-translate.test.js, born phase 6, owned 6 of the "48" the packet had explained
+    away as cross-file interference). Re-verify a packet's file ENUMERATION against the current
+    tree — grep for the defect PATTERN, don't trust the packet's list.

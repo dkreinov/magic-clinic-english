@@ -158,3 +158,64 @@ commit X goes stale in FILE COVERAGE, not just line numbers — a file created a
 (api-translate.test.js, born in phase 6) can carry the same defect the packet fixes and be in
 nobody's list. Re-verify a packet's file ENUMERATION against the current tree, not only its
 line numbers. (Caught live by the executor escalation rule; cost one round-trip.)
+
+## 2026-07-28 — step 1.7: the owner looked
+
+OWNER, verbatim: "I've opened and refreshed the app and it is now ligt." [light] Plus two
+directives: (1) "cant you audit this part yourself? it is visual" — the five-residue visual
+audit is delegated to the orchestrator (browser, SANDBOX only — production stays untouched);
+(2) make the refresh automatic — "she will forget to refresh" → new step: service-worker
+auto-activation (skipWaiting + clients.claim + controllerchange reload), CACHE v15, deploy.
+
+STEP 1.8 SW auto-reload + warm nav shadow + CACHE v15 (owner-directed addition)
+  tier: WORKER (Sonnet)
+  did: app.js controllerchange listener with refreshing guard + reload; styles.css:324 nav
+    shadow warm-toned (visual-audit residue 1); sw.js CACHE v15; shell.test.js pin v15.
+  surprises: none
+  deviations: none
+  validation_first_try: yes
+  retries: 0
+  escalations: 0
+  tokens: worker=31736, checker=26481, orchestrator_delta=unavailable
+  interventions: 0
+  commit: 265dc86
+  accepted: 2026-07-28
+  audit: match, CONFIDENCE high
+  NOTE sw.js already had skipWaiting+clients.claim — the page-side reload was the only missing
+  piece. Honest limit, told to the owner: her currently-cached page predates the listener, so
+  the FIRST open after this deploy still shows the old skin once; every deploy after that
+  auto-applies within seconds of opening.
+
+VISUAL AUDIT (1.7, delegated by the owner): run in the SANDBOX browser (localhost:3000,
+  production untouched). Chrome had the OLD v13 SW for localhost serving the brown shell — a
+  live demonstration of the exact stale-cache problem the owner asked to fix. After hard
+  reload: Sunrise Parchment renders correctly on home/reader/words at desktop width.
+  Verdicts: (1) nav shadow grey haze — FIX (done in 1.8) · (2) artwork fade = watercolour
+  bleed, KEEP · (3) icon dark plate, KEEP (style stays) · (4) cream not flat (corner glows
+  work), KEEP · (5) card lift fine, KEEP.
+
+## 2026-07-28 — v15 deployed; auto-reload live; PHASE 1 CLOSED
+
+STEP 1.8 deploy (orchestrator): outgoing recorded FIRST (dpl_FMjbqEfc6HismJpjezr6ynKgWKNf,
+v14) -> deployed dpl_HUjmYpAvumkWDXxsjkZiQzY7GRTn, aliased to english-app-three-tan.vercel.app.
+DEPLOY-V15-OK: live /, /styles.css, /sw.js, /app.js md5 == worktree; live sw = magic-vet-v15;
+live app.js contains the controllerchange listener; health exact; /api/chapter 401.
+NOTE: the frozen step-1.6.sh printed "FAIL: live sw.js is not v14" against v15 — correct
+behaviour of a stale pin, not a defect; superseded by the inline v15 check above.
+Sandbox proof: page stable across an SW update cycle + reload, NO reload loop; nav shadow
+renders warm (screenshot audit). Rollback ladder (newest first): v14 = dpl_FMjbqEfc...,
+v13 = dpl_Geaj9sXRPP8KSt9uZTBMQnSDFCSr.
+
+PHASE 1 CLOSED
+  steps: 8 (1.1-1.5, 1.8 workers; 1.6, v15 deploy orchestrator; 1.7 human/delegated audit)
+  first-try passes: 7/8 (1.1 failed first: stale packet coverage, not worker error)
+  escalations: 0
+  interventions: 2 (both 1.1: unanswered-question -> api-translate ruled in; bad-spec -> "7
+    tests" count fixed by the auditor)
+  cost: tokens worker=263658, checker=237039, planner=107930, plan-review=159389;
+    $ = unavailable from harness
+  orchestrator_context: unavailable (harness /context not queryable mid-run)
+  field_guide: 59/40 — inherited 54 (justified by word-quiz) + 5 for lesson 11; kept because
+    the file-enumeration/line-number distinction cost a live round-trip and compresses no further
+  C9 CLOSED: owner verbatim "I've opened and refreshed the app and it is now ligt." + audit
+  delegated to orchestrator; five-residue verdicts recorded above (1 FIX done in 1.8, 4 KEEP).

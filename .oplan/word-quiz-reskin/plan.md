@@ -299,3 +299,60 @@ depends on: 1.6 (DEPLOY-OK).
   worker steps.
 - Uncommitted carry-over: each step's changed-set check enforces commit-between-steps.
 - APP_CODE: only ever `APP_CODE=dummy` inside validation subshells. Never export the real one.
+
+---
+
+## ADDENDUM (2026-07-28, owner-directed in chat): STEP 1.8 + amended 1.7 gate
+
+The owner delegated the 1.7 visual audit to the orchestrator ("cant you audit this part
+yourself? it is visual") and confirmed the deploy reads light on their device ("I've opened and
+refreshed the app and it is now ligt"). Orchestrator ran the audit in the SANDBOX (browser on
+localhost:3000, production untouched): residues 2/3/4/5 KEEP, residue 1 (nav shadow) FIX.
+New owner requirement: automatic refresh — "she will forget to refresh".
+
+### STEP 1.8: SW auto-reload + warm nav shadow + CACHE v15  [tier: WORKER]
+
+goal: An open page reloads itself once when a new service worker takes control (no manual
+  refresh ever again); the bottom-nav shadow matches the warm palette; one CACHE bump covers
+  both precached edits (QZ-22).
+files (modify only): public/app.js, public/styles.css, public/sw.js, tests/shell.test.js
+commands: none — direct file edits.
+validation: bash .oplan/word-quiz-reskin/validate/step-1.8.sh (prints AUTOREFRESH-OK)
+contracts:
+  public/app.js — the block at lines 55-59
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js");
+      });
+    }
+  becomes exactly
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js");
+      });
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+      });
+    }
+  (the `refreshing` guard prevents reload loops; sw.js already does skipWaiting+clients.claim,
+  verified — this is the only missing piece).
+  public/styles.css:324
+    box-shadow: 0 -1px 0 rgba(253, 227, 162, 0.10), 0 -2px 14px rgba(0, 0, 0, 0.5);
+  becomes
+    box-shadow: 0 -1px 0 rgba(150, 104, 47, 0.12), 0 -2px 14px rgba(120, 78, 30, 0.18);
+  (the warm family of --shadow-soft; visual-audit finding, residue 1).
+  public/sw.js:1 v14 -> `const CACHE = "magic-vet-v15";` · tests/shell.test.js:58 pins v15.
+non-goals: the PRECACHE array · sw.js handlers · :root tokens · any other shadow/glow ·
+  registration URL or timing · no new tests (282) · icon untouched (residue 3 KEEP) ·
+  mask stops untouched (residue 2 KEEP).
+tier: WORKER — verbatim block replacement + three literal edits.
+depends on: 1.6 (deployed v14); followed by orchestrator deploy (v15, same frozen recipe) and
+  a sandbox browser re-check of the auto-reload behaviour.
+
+### Amended 1.7 gate record
+Owner words (verbatim, journal 2026-07-28): "I've opened and refreshed the app and it is now
+ligt." + delegation of the visual audit. Audit verdicts: fade KEEP, icon KEEP, cream KEEP,
+card-lift KEEP, nav shadow FIX (in 1.8). C9 closes on this delegated audit + the owner's words.
