@@ -1,7 +1,7 @@
-CURRENT: phase 2 "candidates enter the quiz (slice b)", CODE FROZEN at v17 (2.7 done — last
-  code change). Next step: 2.8 (orchestrator sandbox visual gate). BASE (phase 2) = 558a5bc.
-  Ledger 298. Interventions: 1 (2.2 bad-spec probe fixture, ruled + amended). QZ-25 in force;
-  both transcripts green.
+CURRENT: phase 2 "candidates enter the quiz (slice b)", CODE FROZEN at v17; visual gate 2.8
+  PASSED 5/5 (screenshots in ~/g1-scratch). Next step: 2.9 (D25 capture — NOTE: no profile
+  backup exists anywhere until this runs). BASE (phase 2) = 558a5bc. Ledger 298.
+  Interventions: 1 (2.2 bad-spec probe fixture, ruled + amended).
 ACCEPTED (phase 2): 2.1 — dbe5a4f (transcript gate, proven RED pre-code) · 2.2 — 0621b1e
   (candidate branch; ledger 293) · 2.3 — d077dcc (quota export; ledger 294) · 2.4 — b83b538
   (soft line; ledger 295; audit mismatch ruled cosmetic — contract-quoted indent) · 2.5 —

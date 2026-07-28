@@ -443,5 +443,29 @@ STEP 2.7 CACHE bump v16 -> v17 — LAST code change
   tokens: worker=29826, checker=25024, orchestrator_delta=unavailable
   interventions: 0
   audit: match / high (the 4-line diff quoted whole in the packet)
-  commit: (this commit)
+  commit: e786273
   accepted: 2026-07-28
+
+STEP 2.8 sandbox visual gate (ORCHESTRATOR, self-served per owner directive / field guide 12)
+  did: sandbox profile backed up to ~/g1-scratch/sandbox-profile-p2.bak; fixture camp=candidate
+    (nominations 1), 11 known; dev server on the sandbox DATA_DIR; Playwright browser; full
+    sitting played: quiz started from המילים שלי, camp WAS question 1 of 4, answered WRONG
+    (hotel), then 3 known words answered right; screenshots archived:
+    ~/g1-scratch/step28-q1-camp.jpeg, step28-softline.jpeg, step28-after-words.jpeg.
+  surprises: a STALE dev server (PID 19068, default DATA_DIR, Test/Rexi fixture) was already
+    holding port 3000 — killed; my diagnostic GET /api/profile against it was answered from ITS
+    DATA_DIR (not .data — .data/ stayed empty, profile.json absent, verified). Lesson noted:
+    check the port BEFORE starting the sandbox server.
+  VERDICTS (all recorded from the screenshots + accessibility tree):
+    (1) PASS — the soft line renders on ONE line, legible, correct RTL (em dash intact), quiet
+        secondary styling under the teal feedback, no overflow, no collision with הלאה.
+    (2) PASS — the claimed-word line המילה הזאת חוזרת ללמידה... is NOWHERE on the screen.
+    (3) PASS — camp was the FIRST question of the sitting and the ONLY candidate in it
+[REDACTED: her vocabulary -- D27/R-F3-5, counts only]
+    (4) PASS — everything else on the card unchanged from v16: progress line, prompt, LTR
+        sentence, רמז then revealed gloss, six options with speakers, כמעט! feedback, הלאה.
+    (5) PASS — after the sitting המילים שלי shows camp with the amber לומדת badge AND its claim
+        button, sorted first (the reset clock made it most recent); every other row unchanged.
+  taste items for the owner: none new (the soft line reuses the existing demotion styling).
+  sandbox profile RESTORED byte-from-backup (12/12 known); server stopped; port 3000 free;
+  repo clean; .data/profile.json absent. STEP-2.8-RECORDED.
