@@ -26,10 +26,10 @@ ROLLBACK LADDER (code only, newest first — urls exactly as `vercel inspect` re
 
 STATE OF THE TREE: HEAD clean at the close commit · ledger 303/0 (also APP_CODE=dummy) ·
   contrast 52 · shell magic-vet-v17 (live AND worktree — no bump, public/ never moved) ·
-  .data/profile.json absent · her profile captured at
-  C:/Users/dkreinov/english-app-backups/profile-20260728-195804.json (sha256 in
-  backup-receipt.txt) — currently the ONLY copy of her profile; D27 rider OPEN, default KEEP,
-  run recommends KEEP.
+  .data/profile.json absent · phase-3 backup DELETED at owner
+  instruction (D27 rider answered post-close; sha256-verified against the receipt first).
+  NO captured copy of her profile exists; the next run's own D25 capture must precede any
+  profile-writing deploy.
 
 FROZEN CONTRACTS IN FORCE (for any future run): signed design §10 · both transcripts (QZ-21 +
   g1) must diff EMPTY forever; expected files committed ONCE, never edited · QZ-22: next
@@ -41,7 +41,6 @@ FROZEN CONTRACTS IN FORCE (for any future run): signed design §10 · both trans
   DEFERRED, unowned, unscheduled · QZ-1/QZ-2/QZ-24 + D28 hint-form owner gate bind any future
   item generation.
 
-OPEN QUESTIONS (owner, none blocking): D27 rider for profile-20260728-195804.json
-  (delete/keep — default KEEP; run recommends KEEP) · off-list step: when + who ·
-  weekly top-up: whose habit.
+OPEN QUESTIONS (owner, none blocking): off-list step: when + who · weekly top-up: whose
+  habit. (D27 rider: answered "delete" at the close; executed.)
 BLOCKED: no — the run is complete.

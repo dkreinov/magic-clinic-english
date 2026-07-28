@@ -688,3 +688,12 @@ PHASE 3 CLOSED (2026-07-28) — PHASE-3-ALL-CRITERIA-OK (criteria 1-11 re-run fr
     candidates) are ALL DELIVERED. Slice c shipped no bytes to production because production
     already satisfied it; the rule that keeps it true is now executable and tested. No
     phase 4 exists in this run; the parked items live in design.md §9 for future runs.
+
+D27 RIDER ANSWERED (owner, 2026-07-28, in chat after the phase-3 close report): "delete".
+Executed strictly AFTER the criteria re-run, as the rider requires: the phase-3 capture
+profile-20260728-195804.json is DELETED (pre-delete sha256 verified identical to the receipt:
+58870a1b0595...); the backups folder is empty again. Stated plainly: NO captured copy of her
+profile now exists — the next run's own D25 capture must precede any profile-writing deploy.
+backup-receipt.txt keeps only sha256 + counts (never contents), retained as the record.
+(Note: this capture's sha256 equals the phase-2 capture's — her profile did not change
+between the two reads, consistent with candidates=0 and no chapter generated.)
