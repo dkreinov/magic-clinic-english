@@ -50,3 +50,36 @@ reviewer=111105. Execution mode: AUTONOMOUS (owner opt-in in the handoff prompt)
 printed, no go-ahead wait. The one owner question of the phase (D27 delete-at-close rider) is
 asked at step 1.8 per the seed; if unanswered, the SAFE default is KEEP the backup and put the
 deletion decision in the close report.
+
+## INTERVENTION #1 — step 1.1 stopped-with-question (2026-07-28)
+
+The executor (Sonnet) stopped correctly: the frozen contract said "copy source lines 9-643
+verbatim" while the frozen validation forbids the string AWAITING-OWNER-SIGN-OFF — and source
+line 643 contains it (the closing STATUS note describes the PRE-copy world: "…which still reads
+AWAITING-OWNER-SIGN-OFF until then"). Planner and plan reviewer both missed it; the escalation
+rule caught it at the cost of one round trip. Reason class: bad-spec (contradictory contract).
+
+ORCHESTRATOR RULING (same category as Record Gap #1, the header): the source's closing 2-line
+STATUS note (lines 642-643) is self-referential wrapper text, not signed content. The copy is
+now lines 9-641 (through the "Signed: the owner…" line, every signed decision intact) plus a
+frozen 1-line post-copy note. docs/growth.md = 637 lines. plan.md step 1.1 and acceptance
+criterion 5 amended. One line for the owner to overrule, as with the header.
+
+Worker left a clean tree (reverted before stopping). Re-dispatched to the same executor with
+the amended contract. interventions=1 (bad-spec).
+
+STEP 1.1 docs/growth.md becomes the signed document of record
+  tier: WORKER (Sonnet)
+  did: docs/growth.md rewritten programmatically: frozen 3-line SIGNED header +
+       design.md lines 9-641 byte-for-byte + frozen 1-line closing STATUS note; 637 lines.
+  surprises: source line 643 contained AWAITING-OWNER-SIGN-OFF (see INTERVENTION #1).
+  deviations: none (amended contract followed verbatim)
+  validation_first_try: no (first attempt hit the spec contradiction; passed first try after
+    the ruling)
+  retries: 2 (1 pre-question, 1 post-ruling)
+  escalations: 0
+  tokens: worker=35890+38564=74454, checker=58733, orchestrator_delta=unavailable
+  interventions: 1 (bad-spec: contradictory frozen contract, ruled and amended)
+  audit: match / high (byte-identical reconstruction, 41064 bytes)
+  commit: (this commit)
+  accepted: 2026-07-28

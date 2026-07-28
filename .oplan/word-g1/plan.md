@@ -29,9 +29,9 @@ ACCEPTANCE CRITERIA (mechanical, re-runnable by the orchestrator from a clean tr
 4. `public/sw.js` line 1 is `const CACHE = "magic-vet-v16";` and
    `grep -rn 'magic-vet-v15' --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=.oplan .`
    returns nothing. `PRECACHE` is byte-unchanged.
-5. `docs/growth.md` = the frozen 3-line SIGNED header + `.oplan/word-g1/design.md` from its line 9
-   on, byte-for-byte (638 lines). No `AWAITING-OWNER-SIGN-OFF` and no `DRAFT-FOR-SIGNATURE` anywhere
-   in it.
+5. `docs/growth.md` = the frozen 3-line SIGNED header + `.oplan/word-g1/design.md` lines 9-641
+   byte-for-byte + the frozen 1-line closing STATUS note (637 lines; amended at intervention #1).
+   No `AWAITING-OWNER-SIGN-OFF` and no `DRAFT-FOR-SIGNATURE` anywhere in it.
 6. The phase's whole write set over `$BASE..HEAD` (`$BASE` = `git rev-parse HEAD` recorded by the
    orchestrator immediately before step 1.1) is EXACTLY these 10 files, zero deletions, `LC_ALL=C
    sort`:
@@ -129,8 +129,13 @@ SKELETON CHANGES (how reality differs from the seed's slice description, and why
 
 ### STEP 1.1: `docs/growth.md` becomes the signed document of record  [tier: WORKER]
 
-goal: `docs/growth.md` holds the SIGNED amendment: a frozen 3-line header followed by
-  `.oplan/word-g1/design.md` lines 9-643 byte-for-byte. The suite does not move.
+goal: `docs/growth.md` holds the SIGNED amendment: a frozen 3-line header, then
+  `.oplan/word-g1/design.md` lines 9-641 byte-for-byte, then a frozen 1-line closing STATUS
+  note replacing the source's self-referential 2-line note (lines 642-643). The suite does not
+  move. [AMENDED at intervention #1 — the source's line 643 contains the literal string
+  AWAITING-OWNER-SIGN-OFF, which the negative check rightly forbids; the executor stopped on
+  the contradiction. The closing note, like the header, is wrapper text about the pre-copy
+  world, not signed content.]
 
 files (modify only): `docs/growth.md`
 
@@ -150,14 +155,17 @@ const HEAD = [
   "",
   "STATUS: SIGNED 2026-07-28 by the owner (section 12). Copied verbatim from the signed source .oplan/word-quiz/night/growth-amended-DRAFT.md (from its line 9 on) by the word-g1 run."
 ].join("\n");
+const TAIL = "STATUS note: this document is now SIGNED. The word-g1 run copied it over docs/growth.md on 2026-07-28; this file IS the signed document of record.";
 if (doc.slice(0, 3).join("\n") !== HEAD) { console.log("FAIL: header block"); process.exit(1); }
-if (doc.slice(3).join("\n") !== src.slice(8).join("\n")) { console.log("FAIL: body != signed source from line 9"); process.exit(1); }
+if (doc.slice(3, 636).join("\n") !== src.slice(8, 641).join("\n")) { console.log("FAIL: body != signed source lines 9-641"); process.exit(1); }
+if (doc[636] !== TAIL) { console.log("FAIL: closing STATUS note"); process.exit(1); }
+if (doc.length !== 638 || doc[637] !== "") { console.log("FAIL: trailing shape"); process.exit(1); }
 const whole = doc.join("\n");
 if (whole.indexOf("AWAITING-OWNER-SIGN-OFF") >= 0) { console.log("FAIL: AWAITING-OWNER-SIGN-OFF survives"); process.exit(1); }
 if (whole.indexOf("DRAFT-FOR-SIGNATURE") >= 0) { console.log("FAIL: DRAFT-FOR-SIGNATURE survives"); process.exit(1); }
 console.log("GROWTH-BODY-OK");
 ' || exit 1
-lines=$(wc -l < docs/growth.md); [ "$lines" = "638" ] || { echo "FAIL: $lines lines, expected 638"; exit 1; }
+lines=$(wc -l < docs/growth.md); [ "$lines" = "637" ] || { echo "FAIL: $lines lines, expected 637"; exit 1; }
 out=$(npm test 2>&1) || { echo "FAIL: suite"; printf "%s\n" "$out" | tail -25; exit 1; }
 case "$out" in *"# pass 282"*) ;; *) echo "FAIL: ledger not 282"; printf "%s\n" "$out" | tail -12; exit 1;; esac
 case "$out" in *"# fail 0"*) ;; *) echo "FAIL: suite has failures"; exit 1;; esac
@@ -174,11 +182,17 @@ contracts (FROZEN, quoted verbatim):
 
   STATUS: SIGNED 2026-07-28 by the owner (section 12). Copied verbatim from the signed source .oplan/word-quiz/night/growth-amended-DRAFT.md (from its line 9 on) by the word-g1 run.
   ```
-  Line 4 onward = `.oplan/word-g1/design.md` lines 9-643, unmodified, in order, ending with a single
-  trailing newline. Line 4 is therefore EMPTY and line 5 is
-  `## What changed from the unsigned version and why (read this first)`.
-  Discarded: source lines 1-8 only (title, blank, `STATUS: DRAFT-FOR-SIGNATURE`, blank, and the
-  four-line `>` blockquote beginning `> This file is a PROPOSAL for what`).
+  Lines 4-636 = `.oplan/word-g1/design.md` lines 9-641, unmodified, in order. Line 4 is
+  therefore EMPTY and line 5 is
+  `## What changed from the unsigned version and why (read this first)`; line 636 is the
+  `Signed: the owner, via chat ("Q2. accept"), …` line.
+  Line 637 (the last line, single trailing newline after it) is EXACTLY:
+  ```
+  STATUS note: this document is now SIGNED. The word-g1 run copied it over docs/growth.md on 2026-07-28; this file IS the signed document of record.
+  ```
+  Discarded: source lines 1-8 (title, blank, `STATUS: DRAFT-FOR-SIGNATURE`, blank, the four-line
+  `>` blockquote beginning `> This file is a PROPOSAL for what`) and source lines 642-643 (the
+  old 2-line STATUS note, which described the pre-copy world and contains the forbidden string).
 
 non-goals: `.oplan/word-g1/design.md` and `.oplan/word-quiz/night/growth-amended-DRAFT.md` are the
   SIGNED SOURCE — never edit either · `design.md` (project root) and `docs/visual-design.md` stay
