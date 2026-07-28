@@ -1,31 +1,33 @@
 # STATUS — word-g1 (photograph of now, 2026-07-28)
 
-PHASE 3 IS PLANNED AND STARTING (autonomous mode, per your handoff). The goal: the weekly
-batch of new practice questions must stop covering only words she claimed and start covering
-words the app nominated ("almost known") too — otherwise a nominated word with no question can
-never be confirmed. The plan survived a fresh reviewer ("ship", one small wording rule fixed).
+THE RUN IS COMPLETE. All three slices are delivered: the nominating engine and badge
+(phase 1), the quiz that decides nominations (phase 2, live at v17), and now phase 3 — the
+weekly question top-up covers nominated words too, delivered as a small tested tool
+(`scripts/quiz-topup.mjs`) instead of a sentence in a document.
 
-The plan's headline discovery: there is probably NOTHING to generate right now. All 12 words
-she knows already have questions, and the app has nominated 0 words so far (it first runs when
-she next makes a story chapter). So the lasting deliverable is the RULE itself as a small
-tested tool (`scripts/quiz-topup.mjs`) that anyone can run next week — plus, only if her live
-data demands it, new question files vetted by two blind checkers and approved by you before
-anything ships.
+Phase 3 shipped NOTHING to production, on purpose and by measurement: her live collection
+(captured fresh: 20 words, 12 known, 0 nominated) already has a question for every word the
+new rule covers — `missing=0`, nothing skipped, nothing banned. The app stays at v17; there
+was nothing to deploy. The rule that keeps this true next week now runs as one command with
+five tests behind it (suite 303/0, all other anchors unchanged: contrast 52, both frozen
+screen-transcripts still match byte-for-byte).
 
 ```mermaid
 flowchart LR
-    A[Phase 1 DONE<br/>engine + badge] --> B[Phase 2 DONE<br/>quiz decides candidates<br/>LIVE v17]
-    B --> C[Phase 3 RUNNING<br/>top-up tool + tests<br/>items only if needed]
+    A[Phase 1 DONE<br/>engine + badge] --> B[Phase 2 DONE<br/>quiz decides<br/>LIVE v17]
+    B --> C[Phase 3 DONE<br/>top-up rule proven<br/>nothing to ship]
 ```
 
-Steps in flight: 3.1 the tool + 5 tests · 3.2 fix the one line in the growth document that
-still teaches the old rule · 3.3 back up her live collection (no copy exists right now — this
-comes before anything touches production) · 3.4 measure how many words need questions (likely
-0; if 0 the phase closes there, no deploy) · 3.5-3.12 only if needed: write items, two blind
-adversarial passes, your approval in the hint form, cache bump to v18, deploy, read-back.
+Two things went wrong and were caught by the machinery, not by luck: a worker added an
+uninvited fallback that would have silently treated a missing question folder as "no
+questions needed" (the checker caught it; removed), and an edit invisibly rewrote a whole
+document's line endings in a way git hides (a byte-level check caught it; redone cleanly).
 
-Rollback (code only, back to v16): `"$(npm prefix -g)/vercel" rollback
-https://english-g80h5gnd9-dkreinovs-projects.vercel.app --yes`
+A fresh backup of her collection exists at
+`C:/Users/dkreinov/english-app-backups/profile-20260728-195804.json`. It is currently the
+ONLY copy of her profile anywhere. Recommendation: KEEP it (nothing was deployed, but the
+next run will want a starting net). Your call, as before.
 
-Questions waiting for you at the close (nothing blocks): keep or delete this phase's backup;
-when the skipped "off-list" words get their audio + manifest entry; who runs the weekly top-up.
+WAITING ON YOU (nothing blocks): 1) keep or delete that backup; 2) "off-list" glossed words
+still have no audio clip and no path to a quiz question — that deferred step has no owner or
+date; 3) the weekly top-up is one command now, but nobody is scheduled to run it.

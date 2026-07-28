@@ -1,4 +1,4 @@
-# Field guide — word-g1 (re-cut at the phase-2 close, 14 lessons → 12) (budget: 40 lines)
+# Field guide — word-g1 (amended at the phase-3 close: lesson 4 grew the autocrlf trap) (budget: 40 lines)
 
 1. A FORMAT GATE IS NOT A CONTENT GATE — bitten three times. Gate what the CHILD experiences
    (phase 3 gated `knownLemmaSet`, not `status`). If no gate can see the failure, add a human one.
@@ -18,7 +18,10 @@
    (`quiz-core.js`/`quiz.js`/`views/words.js`/`views/reader.js` are CRLF, `sw.js` LF — one
    normalisation turns the deploy's md5 proof into a whole-file hunt); `curl` needs
    `--ssl-no-revoke`; `vercel` via `"$(npm prefix -g)/vercel"`; Git Bash `/tmp` is NOT node's;
-   never write scratch into the repo.
+   never write scratch into the repo. core.autocrlf=true makes DISK endings unstable: checkout
+   materialises CRLF, an Edit-tool insert CRLF'd a whole LF file, and `git diff` normalises so
+   the damage is INVISIBLE to any git-based gate — edit LF files byte-preservingly (python
+   `newline=''`) and verify endings with an `rb` byte count, never grep/`file`.
 5. `npm test` = bare `node --test` + the contrast gate; every new test is a FLAT top-level
    `test()`; pin the exact cumulative ledger per step (298 at the phase-2 close = 293 flat + 5
    subtests in dev-server.test.js). Contrast anchor = `grep -c '^PASS'` = 52 (bare `PASS` gives

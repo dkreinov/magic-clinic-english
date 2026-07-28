@@ -234,3 +234,36 @@ the four fragile CRLF files.
 BIGGEST RISK: a new question that marks her wrong for being right — no machine can catch it,
 which is why two blind passes AND your eyes stand in front of the deploy.
 === END ===
+
+=== PHASE 3 — PLAIN REPORT (2026-07-28) ===
+WHAT WE SET OUT TO DO: make the weekly batch of new practice questions cover the words the
+app nominates, not just the words she claims — so a nominated word can actually be confirmed.
+WHAT WE ACTUALLY DID:
+  - Built the list-making rule as a small tool with five tests (the suite grew 298 -> 303),
+    instead of leaving it as a sentence in an old planning document.
+  - Fixed the one line in the growth document that still taught the old rule (dated, additive).
+  - Backed up her live word collection (20 words, 12 known, 0 nominated) to a safe folder —
+    no copy existed anywhere before this.
+  - Ran the tool on that backup and measured the answer: ZERO words need new questions.
+    Every word she has claimed or the app could nominate already has one. So nothing was
+    generated, nothing was deployed, and the app stays exactly as it was (v17).
+WHAT WE FOUND OUT:
+  - The bank was already complete under the NEW rule — the deadlock this phase closes is
+    real in design but empty in fact today, because the nominating engine has not yet run
+    (she has not generated a story chapter since it shipped).
+  - A helper added an uninvited "safety" fallback that would have silently reported "no
+    questions needed" if the question folder were mistyped — the checker caught it.
+  - An ordinary file edit invisibly rewrote a whole document's line endings; the tool we
+    agreed on could not see it (git hides that class of change on this machine) — a
+    byte-level check caught it and the edit was redone with a method that cannot do that.
+WHAT WENT WRONG: those two catches cost one rework and one retry; nothing reached the
+  saved record or production.
+WHAT IT COST: about 644,000 tokens of helper work this phase (planner 176k, plan-checker
+  121k, workers 223k, checkers 124k); dollar figures unavailable in this session; wall-clock
+  one sitting.
+WHERE WE ARE NOW: the whole word-g1 run is COMPLETE — engine, badge, quiz decision, and the
+  top-up rule, all delivered and proven. Production untouched today, still v17.
+WHAT HAPPENS NEXT: three small questions wait for you (keep or delete the new backup — we
+  recommend KEEP, it is the only copy; who/when for the deferred no-audio words; who runs
+  the weekly top-up command). Nothing is blocked.
+=== END PLAIN REPORT ===

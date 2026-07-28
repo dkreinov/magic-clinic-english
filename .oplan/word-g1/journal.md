@@ -648,3 +648,43 @@ STEP 3.4 derive the top-up list, measure N (ORCHESTRATOR)
     no CACHE bump (QZ-22's second branch), NO DEPLOY — v17 stays live. The phase closes on
     criteria 1-11.
   STEP-3.4-OK N=0.
+
+PHASE 3 CLOSED (2026-07-28) — PHASE-3-ALL-CRITERIA-OK (criteria 1-11 re-run from clean tree;
+  12-14 N/A by the frozen three-way gate: N=0, no items, no public/ change, NO DEPLOY — v17
+  stays live)
+  steps: 4 executed (3.1-3.2 WORKER, 3.3-3.4 ORCHESTRATOR) + 8 SKIPPED (3.5-3.12, per the
+    N=0 branch decided at plan time, not improvised)
+  worker first-try validation: 3.1 yes (but audit mismatch #1: two unrequested defensive
+    extras incl. a fail-open empty-bank fallback — reworked to the bare contract, re-audit
+    match/high); 3.2 no (attempt #1 CRLF'd the whole file on disk, invisible to the frozen
+    git-based validation; caught by the orchestrator's raw byte check, redone byte-preserving,
+    retry 1)
+  escalations: 0 · interventions: 0 · audits: 2/2 accepted after one rework cycle
+  THE PHASE'S MEASURED ANSWER: TOPUP known=12 candidate=0 pool=12 dropped=0 covered=12
+    missing=0 banned=0 — B7's inverted completeness criterion holds against her real captured
+    profile. The deadlock-closing RULE is delivered as scripts/quiz-topup.mjs + 5 tests
+    (ledger 303); the bank needed nothing today because G1 has still never produced a
+    candidate (she has not generated a chapter since the engine shipped).
+  cost: worker=223235 tok (151262+71973), checker=124149 tok (89073+35076),
+    planner+reviewer=296956 tok (176417+120539) — grand 644340 tokens (computed by python,
+    journal rule). Dollar figures: unavailable (no per-model pricing readout this session).
+    Wall-clock: one session, same day as phases 1-2.
+  orchestrator_context: unavailable (no programmatic /context readout)
+  field_guide: 52/40 — lesson 4 grew the autocrlf trap (checkout materialises CRLF; git diff
+    normalises so no git-based gate can see it; byte-preserving edits + rb byte counts are
+    the only defence). Justified over budget: the trap cost a retry THIS phase and the
+    command/verification pair cannot compress without losing the defence.
+  D27 rider: owner question OPEN for the phase-3 capture (profile-20260728-195804.json,
+    sha256 in backup-receipt.txt): delete or keep? KEEP is the default until answered — and
+    NOTE: with no deploy this phase, this capture is currently the ONLY copy of her profile;
+    the run recommends KEEP.
+  OWNER QUESTIONS AT THE CLOSE (none blocking, none assumed): (1) the D27 rider above;
+    (2) off-list glossed words (no clip, no manifest entry) remain deferred by B7's rider
+    with NO owner, phase, or trigger scheduled — when do they get their clip + manifest
+    entry, and who runs it? (3) the weekly top-up now runs as ONE command
+    (node scripts/quiz-topup.mjs --profile <capture>) but nothing schedules it — whose habit
+    is it?
+  RUN STATUS: word-g1's three slices (a: engine+badge, b: quiz decides, c: top-ups cover
+    candidates) are ALL DELIVERED. Slice c shipped no bytes to production because production
+    already satisfied it; the rule that keeps it true is now executable and tested. No
+    phase 4 exists in this run; the parked items live in design.md §9 for future runs.
