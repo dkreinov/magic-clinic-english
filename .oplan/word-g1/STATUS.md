@@ -23,10 +23,9 @@ time she generates a story chapter; the quiz slot correctly stays empty until th
 closes the last gap: a nominated word with no quiz question can never pass, so the weekly
 item top-ups must start covering candidates too.
 
-ONE QUESTION FOR THE OWNER: her profile was backed up before this deploy
-(C:/Users/dkreinov/english-app-backups/profile-20260728-175238.json). Delete it now, as you
-chose last time, or keep it? It is KEPT until you say (your "delete it now" was about the
-phase-1 file; I did not assume it was a standing order).
+The pre-deploy backup of her profile was DELETED at your instruction (given after the close
+report). Said plainly: no copy of her collection exists anywhere until phase 3 takes its own
+backup before its first deploy. Only the checksum record remains.
 
 Rollback (code only, back to v16): `"$(npm prefix -g)/vercel" rollback
 https://english-g80h5gnd9-dkreinovs-projects.vercel.app --yes`

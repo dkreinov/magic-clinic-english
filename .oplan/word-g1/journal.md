@@ -523,3 +523,11 @@ PHASE 2 CLOSED (2026-07-28) — PHASE-2-ALL-CRITERIA-OK (12/12, re-run from clea
     money-costing traps each and compress no further without losing the command or the trigger.
   D27 rider: owner question OPEN for the phase-2 capture (asked in the close report; backup
     KEPT until answered): delete profile-20260728-175238.json or keep it?
+
+D27 RIDER ANSWERED (owner, 2026-07-28, in chat at the phase-2 close): "delete". Executed
+strictly AFTER the read-back and the 12/12 criteria re-run, as the rider requires: the phase-2
+capture profile-20260728-175238.json is DELETED (pre-delete sha256 verified identical to the
+receipt: 58870a1b…cd51c2); the backups folder is empty again. Stated plainly: NO captured copy
+of her profile now exists — the safety net for the phase-2 deploy has ended; phase 3's own D25
+capture will precede its first profile-writing deploy. backup-receipt.txt keeps only sha256 +
+counts (never contents), retained as the record.

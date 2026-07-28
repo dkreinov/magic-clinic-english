@@ -28,10 +28,11 @@ ROLLBACK LADDER (code only, newest first — urls exactly as `vercel inspect` re
 
 STATE OF THE TREE: HEAD clean at the close commit · ledger 298/0 (also APP_CODE=dummy) ·
   contrast 52 · shell magic-vet-v17 · .data/profile.json absent (an EMPTY .data/ dir predates
-  this run) · sandbox restored (12/12 known) + server stopped, port 3000 free · her profile
-  BACKUP EXISTS and is KEPT pending the owner's answer:
-  C:/Users/dkreinov/english-app-backups/profile-20260728-175238.json (sha256 in
-  backup-receipt.txt; contents never in the repo).
+  this run) · sandbox restored (12/12 known) + server stopped, port 3000 free · phase-2 backup
+  DELETED at owner instruction (D27 rider answered at the close; executed post-readback);
+  receipt (sha256+counts only) retained. Former path:
+  C:/Users/dkreinov/english-app-backups/profile-20260728-175238.json. NO captured copy of her
+  profile exists until phase 3's own D25 capture.
 
 FROZEN CONTRACTS IN FORCE: signed design §10 · QZ-12 amended ONLY by the candidate branch
   (known rows byte-frozen) · QZ-17 amended ONLY by the pickCandidateWords export (comparator
@@ -43,7 +44,7 @@ FROZEN CONTRACTS IN FORCE: signed design §10 · QZ-12 amended ONLY by the candi
   B2/B3/B4/B5/B6 are ALL LIVE; B7 = phase 3 (top-ups cover known ∪ candidate, on-manifest
   words only; off-list words explicitly deferred by B7's rider).
 
-OPEN QUESTIONS: D27 rider for the PHASE-2 capture — delete or keep
-  profile-20260728-175238.json? Asked in the close report; default until answered: KEEP.
+OPEN QUESTIONS: none — the D27 rider was answered by the owner at the close ("delete");
+  executed after the criteria re-run.
 BLOCKED: no — phase 2 complete; phase 3 awaits a fresh session (context hygiene) or owner
   go-ahead to continue in this one.
