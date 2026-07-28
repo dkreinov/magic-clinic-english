@@ -43,3 +43,37 @@ plan checks every line letter-for-letter, not just "the checks pass".
 
 Execution mode: autonomous (per the handoff), so work starts without waiting; the owner's look at
 the end is the one human gate.
+
+## 2026-07-28 — phase 1 executed and published; waiting only on the owner's eyes
+
+WHAT WE SET OUT TO DO: repaint the app in the owner's chosen "Sunrise Parchment" look, fix two
+old code warts, publish once, then have the owner look.
+
+WHAT WE ACTUALLY DID: all of it. The test-harness fix (with a twist — see below), the variable
+rename, the 19-colour repaint with the readability check at 52 out of 52, the light-mode phone
+chrome including the install card, the cache label bump to v14, and the publish — with the old
+version's id written down first, and the live files proven byte-for-byte identical to ours.
+
+WHAT WE FOUND OUT: the old checklist for the test-harness fix was written before the last run's
+final phase — and that phase had quietly added a NEW test file with the very same bug. The
+checklist said "six files"; the truth was seven. The helper doing the work noticed its results
+did not add up, stopped, and asked instead of guessing — exactly what the stop-and-ask rule is
+for. The checklist's own explanation of its numbers ("interference between files") turned out to
+be wrong: the missing file explained everything. One more catch: the checker caught the manager
+writing "wrap 7 tests" about a file that has only 6 — the instructions were corrected on the
+record, the work itself was right.
+
+WHAT WENT WRONG: nothing that reached the app. The publish command was accidentally run twice
+(the second run only re-published the same bytes; harmless, noted honestly in the journal).
+
+WHAT IT COST: about 15-20 minutes of wall-clock work end to end; roughly three-quarters of a
+million tokens of helper/checker work across 9 hired agents (planner, plan reviewer, 5 doers,
+4 checker passes) — in money, on the order of a couple of dollars.
+
+WHERE WE ARE NOW: the new look is live. Same 282 tests green, plus they now also pass on any
+machine with the secret code switched on. Her saved words untouched.
+
+WHAT HAPPENS NEXT: only the owner's look. She should open the app (force a reload if it still
+looks brown) and tell us what she thinks — including the five spots we deliberately left in
+their old style (bottom-bar shadow, picture fade, dark icon, plain cream, softer card lift).
+Her words close the phase; each complaint is a one-line follow-up.

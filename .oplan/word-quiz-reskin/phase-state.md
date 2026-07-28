@@ -1,10 +1,20 @@
-CURRENT: phase 1 "Sunrise Parchment re-skin + chores", next step 1.6 (deploy — orchestrator). Plan at plan.md (reviewer
-  SHIP; B1 IN / B2 OUT / B3 alias confirmed-at-deploy). Frozen validation at validate/step-1.*.sh.
-  Execution mode: AUTONOMOUS (owner opted in via the handoff prompt, 2026-07-28).
+CURRENT: phase 1 "Sunrise Parchment re-skin + chores", next step 1.7 — THE OWNER LOOK (human
+  gate; the only open item). Steps 1.1-1.6 accepted; criteria 1-8 of 9 verified green; the v14
+  Sunrise Parchment shell IS LIVE at dpl_FMjbqEfc6HismJpjezr6ynKgWKNf
+  (english-app-three-tan.vercel.app). Outgoing (rollback target) recorded FIRST:
+  dpl_Geaj9sXRPP8KSt9uZTBMQnSDFCSr (magic-vet-v13). Rollback (code only):
+  `"$(npm prefix -g)/vercel" rollback https://english-d0roovfpq-dkreinovs-projects.vercel.app --yes`
+  Step 1.7 protocol (frozen in plan.md): ask the owner to open the app (force reload if still
+  brown — the old v13 SW serves the old shell until v14 activates) and to comment on the 5 known
+  residues: nav shadow (styles.css:324), artwork bottom fade onto cream (mask 74%->88% is the
+  one-number fix), dark icon plate, cream flatness without grain (B2 was OUT), softer card lift.
+  Approval -> record quote verbatim, close phase (promote the field-guide candidate in journal.md,
+  write the phase-close metrics block, print the two reports). Complaint-but-usable -> record, do
+  NOT roll back, stop for a decision. Unusable -> roll back immediately, record.
   NOTE step 1.1 was amended mid-step: tests/api-translate.test.js added (postdates the chore
   packet; owned 6 of the 48 APP_CODE failures — no cross-file interference existed). Phase write
-  set is now 14 files (criterion 7).
-ACCEPTED: step 1.1 — 1a916f3 · step 1.2 — 9f03b97 · step 1.3 — c15b6cf · step 1.4 — 76c2bc2 · step 1.5 — 674c7ad
+  set is 14 files (criterion 7, verified exact).
+ACCEPTED: step 1.1 — 1a916f3 · step 1.2 — 9f03b97 · step 1.3 — c15b6cf · step 1.4 — 76c2bc2 · step 1.5 — 674c7ad · step 1.6 — deploy-only (no repo change), DEPLOY-OK
 
 RUN SCOPE (owner-decided; sources in the predecessor record):
   1. D29 Sunrise Parchment re-skin — owner chose option 03 on 2026-07-28. Scope frozen at
@@ -42,5 +52,6 @@ FROZEN CONTRACTS IN FORCE (inherited from word-quiz, see its plan.md):
   Contrast anchor is `grep -c '^PASS'` = 52 · ledger counts FLAT top-level test() only ·
   `LC_ALL=C sort` in frozen comparisons · hash FILES, never `$(curl ...)` output.
 
-OPEN QUESTIONS: none
-BLOCKED: no
+OPEN QUESTIONS: step 1.7 — does Sunrise Parchment stay? — THE OWNER must answer (her verbatim
+  words go in the journal; the 5 residue questions are listed above and in plan.md step 1.7).
+BLOCKED: no — waiting on the owner's look, everything else done.
