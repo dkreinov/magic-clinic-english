@@ -1,21 +1,27 @@
 # STATUS — word-trophies (photograph of now, 2026-07-29)
 
-PHASE 1 IS RUNNING. You said GO; the run is in autonomous mode inside phase 1 and will pause
-when the phase closes. Steps 1.1-1.4 of 5 are done and saved: her profile format now has a
-"trophies" box (empty by default), with rules that reject malformed trophy data and accept
-future trophies an older app version has never heard of. The test that would catch every
-planted bug was watched failing and passing — all on the first try.
+PHASE 1 IS DONE. The trophy engine is fully built, tested, and saved — and it is invisible
+by design: nothing she can see has changed, nothing was deployed, her live profile was
+never touched or read. Production still runs v17.
+
+What her profile can now do (once a later phase ships it): carry a trophies box; count the
+8 signed achievements exactly as you approved them; stamp a date on any newly earned
+bronze/silver/gold at the two moments the server already saves her profile — and never
+un-stamp, rewrite, or invent one. Every rule was proven by breaking the code on purpose
+(15 planted bugs across the phase, each caught by exactly the test that guards it).
 
 ```mermaid
 flowchart LR
-    S11[1.1 schema DONE] --> S12[1.2 counting rules DONE]
-    S12 --> S13[1.3 award function DONE]
-    S13 --> S14[1.4 wiring DONE]
-    S14 --> S15[1.5 phase close + records<br/>RUNNING NEXT]
+    P1[Phase 1 ENGINE<br/>DONE - 4 steps + close] --> P2[Phase 2 artwork<br/>NEXT - needs your GO]
+    P2 -.-> P3[Phase 3 the screen<br/>+ celebration]
+    P3 -.-> P4[Phase 4 ship<br/>capture, deploy, read-back]
 ```
 
-Nothing she can see has changed and nothing was deployed: production stays at v17, her live
-profile untouched, the app's pages byte-identical. The suite grew 303 -> 328 tests, all
-green, on the way to 328 by the end of the phase.
+The suite grew 303 -> 328 tests, all green. One plan defect was caught mid-run by a helper
+who stopped and asked instead of guessing (the plan's own "break it on purpose" check was
+impossible as written) — fixed as a written amendment, exactly how the machinery is meant
+to work.
 
-WAITING ON YOU: nothing right now. The next stop is the phase-1 close report.
+WAITING ON YOU: say GO to plan phase 2 (the 9 trophy artworks via ChatGPT web, each needing
+your approval) — or tell me to pause here. Recommended: /clear first and resume with the
+handoff prompt in the phase report; this session's memory is heavily used.

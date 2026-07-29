@@ -1,4 +1,4 @@
-# Field guide — word-g1 (amended at the phase-3 close: lesson 4 grew the autocrlf trap) (budget: 40 lines)
+# Field guide — word-g1 (amended: word-trophies phase-1 close widened lessons 4 and 8) (budget: 40 lines; at 57 because the two new traps are commands+mechanisms that do not compress — justification in word-trophies journal)
 
 1. A FORMAT GATE IS NOT A CONTENT GATE — bitten three times. Gate what the CHILD experiences
    (phase 3 gated `knownLemmaSet`, not `status`). If no gate can see the failure, add a human one.
@@ -21,7 +21,10 @@
    never write scratch into the repo. core.autocrlf=true makes DISK endings unstable: checkout
    materialises CRLF, an Edit-tool insert CRLF'd a whole LF file, and `git diff` normalises so
    the damage is INVISIBLE to any git-based gate — edit LF files byte-preservingly (python
-   `newline=''`) and verify endings with an `rb` byte count, never grep/`file`.
+   `newline=''`) and verify endings with an `rb` byte count, never grep/`file`. GIT-MEDIATED
+   COPIES TOO: `git archive`, `git stash`, a fresh clone or worktree re-apply autocrlf and
+   silently flip EVERY file's endings — a byte comparison inside such a copy is meaningless;
+   only the working tree you measured is evidence (measured live, word-trophies phase 1).
 5. `npm test` = bare `node --test` + the contrast gate; every new test is a FLAT top-level
    `test()`; pin the exact cumulative ledger per step (298 at the phase-2 close = 293 flat + 5
    subtests in dev-server.test.js). Contrast anchor = `grep -c '^PASS'` = 52 (bare `PASS` gives
@@ -31,10 +34,12 @@
 7. Before touching a view/style/data file, grep `tests/` for exact-shape assertions (the `CACHE`
    string, the `PRECACHE` array, class names, Hebrew strings) — append beside a frozen thing,
    never replace it. Any precached-file change ships a `CACHE` bump the same phase (QZ-22).
-8. HEBREW IS BIDI + SHELLS EAT ESCAPES: never retype Hebrew and never copy it from terminal
-   output — EXTRACT it from its source file by script; `\uXXXX` collapses through `bash -e` (bit
-   three times in three costumes; a 2.4 worker self-caught typing raw Hebrew). Write scripts to
-   FILES and verify the WRITTEN BYTES (codepoint dump). In test files Hebrew is `\u` escapes only.
+8. HEBREW IS BIDI + ESCAPES COLLAPSE IN ANY TRANSPORT: never retype Hebrew and never copy it
+   from terminal output — EXTRACT it from its source file by script. ANY backslash through ANY
+   transport is at risk: `bash -e`, quoted heredocs, regex `\\d`, and JSON strings (an agent
+   packet is JSON — `\uXXXX` in it DECODES to the raw glyph in transit; caused a false-positive
+   audit, word-trophies phase 1: double the backslashes or ship evidence as byte counts). Write
+   scripts to FILES and verify the WRITTEN BYTES (codepoint dump). In test files `\u` only.
 9. A packet that NAMES a frozen contract without QUOTING it is a hole — and a frozen VALIDATION
    can itself be the bug: this run's three bad-specs (self-referential wrapper text, a
    forbidden-string tail, a probe fixture that could never validate) were each caught by a

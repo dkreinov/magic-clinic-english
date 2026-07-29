@@ -258,3 +258,51 @@ STEP 1.4 the two call sites (T2 wiring)
     byte confirmation of the one attested item.
   commit: 3d19efb
   accepted: 2026-07-29T14:42:36Z
+
+PHASE 1 CLOSED (2026-07-29)
+  steps: 4 executed + this close, first-try passes: 3/4 (1.2 retried once internally on the
+    DELS gate; 1.4's stop was a plan defect, not a worker failure)
+  escalations: 0
+  interventions: 1 (step 1.4, bad-spec -> plan amendment #3)
+  cost: tokens (harness usage readouts) worker=521192, checker=209175, subagent total=730367;
+    dollar figures unavailable; orchestrator_context: unavailable this session
+  field_guide: 53/40 lines pre-close (inherited word-g1 guide; overflow justification
+    logged at word-g1); grew this close by the two RECORD-GAP amendments — see below
+  ALL 13 ACCEPTANCE CRITERIA RE-VERIFIED ON THE COMMITTED TREE:
+    1-2. npm test 328 reported / 0 fail / plan 1..323, identical under APP_CODE=dummy
+    3. flat ledger 323 (298 + 25 new)
+    4. contrast 52 exactly
+    5. public/ digest 2362 74e736d7d83b22a24945eae87cb9fe33 unchanged; no public/ writes
+    6-7. QZ-21 and G1 transcripts diff EMPTY
+    8. .data/profile.json absent
+    9. write set vs BASE 1a30012 exactly: api/chapter.js, api/profile.js, lib/profile.js,
+       tests/profile.test.js (+ new tests/trophies.test.js); porcelain clean
+    10. zero files deleted; deleted-line budget exactly 2 (the two import lines);
+        lib+tests deletions 0
+    11. endings: lib 0/719 · api/profile 0/146 · api/chapter 67/0 · profile.test 0/138 ·
+        trophies.test 0/586
+    12. trophies.test.js 0 raw non-ASCII, 0 nested constructs
+    13. awardTrophies( exactly 1 in api/profile.js, 1 in api/chapter.js, 0 in placement,
+        0 under public/
+    (Note: the step-1.4 script's HEAD-relative APIDEL/PORC clauses read 0/clean on the
+    committed tree — expected commit artifacts, criterion 9's own wording anticipates this;
+    the phase-level measurement vs BASE is what is recorded above.)
+  FOR PHASE 2/3 TO CONSUME: final ledger 323 flat / 328 reported · contrast anchor still 52
+    · CACHE still magic-vet-v17, QZ-22's next bump still v18, UNUSED (public/ untouched all
+    phase) · public/ digest unchanged · NO D25 capture exists and none was made (phase 4
+    makes one before deploy) · awardTrophies will award on the FIRST real POST after deploy
+    (the free backfill, T9): on her profile as last measured (12 known, 0 candidates)
+    'known' bronze lands immediately and 'proven' stays locked, exactly as T3's honesty
+    note says — an expectation, unverified until phase 4's read-back · SK-1..SK-6 plus
+    amendment #3 stand as amendments to the signed design · phase-3 handoff: RECORD GAP 1
+    (chapter response carries no profile — celebration source needs a ruling), risk 1
+    (days/streak metrics non-monotonic — render progress from the metric, never a stored
+    high-water mark, never as a loss).
+  LESSONS PROMOTED (plan RECORD GAPS 5 and 6, now amended into the field guide):
+    lesson 4 widened — git-mediated copies (archive/stash/clone/worktree) re-apply
+    autocrlf and silently flip every ending; byte checks in such a copy are meaningless.
+    lesson 8 widened — escape collapse is ANY backslash through ANY transport: bash -e,
+    quoted heredocs, and now JSON agent packets (a backslash-u escape in a JSON string
+    DECODES to the raw glyph in transit — it produced this phase's audit false positive).
+  tokens at boundary: orchestrator context size unavailable (harness readout not exposed
+    mid-session); subagent totals above.
