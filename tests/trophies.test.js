@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert';
 import { defaultProfile, validateProfile } from '../lib/profile.js';
 import { TROPHY_CATALOG, TROPHY_TIERS } from '../lib/profile.js';
+import { awardTrophies } from '../lib/profile.js';
 
 const NOW = '2026-01-01T00:00:00.000Z';
 
@@ -212,4 +213,104 @@ test('a value that is not a well-formed ISO date never becomes an active day', (
 
   profile.words.g = { lastSeen: '2026-01-01T09:00:00.000Z' };
   assert.strictEqual(daysEntry.metric(profile), 1);
+});
+
+test('awardTrophies awards a tier exactly at its threshold and writes no key for an unearned trophy', () => {
+  const p = { words: Object.fromEntries(Array.from({ length: 5 }, (_, i) => ['w' + i, { status: 'known' }])) };
+  awardTrophies(p, '2026-06-01T09:00:00.000Z');
+  assert.deepStrictEqual(p.trophies, { known: { bronze: '2026-06-01T09:00:00.000Z' } });
+
+  const p2 = { words: Object.fromEntries(Array.from({ length: 4 }, (_, i) => ['w' + i, { status: 'known' }])) };
+  awardTrophies(p2, '2026-06-01T09:00:00.000Z');
+  assert.deepStrictEqual(p2.trophies, {});
+});
+
+test('awardTrophies is idempotent: a second call with a different now changes nothing', () => {
+  const p = { words: Object.fromEntries(Array.from({ length: 5 }, (_, i) => ['w' + i, { status: 'known' }])) };
+  awardTrophies(p, '2026-06-01T09:00:00.000Z');
+  const snapshot = structuredClone(p.trophies);
+  awardTrophies(p, '2027-01-01T09:00:00.000Z');
+  assert.deepStrictEqual(p.trophies, snapshot);
+});
+
+test('awardTrophies never regresses: a fabricated higher tier survives a metric below every threshold', () => {
+  const p = { words: {} };
+  p.trophies = { known: { gold: '2020-01-01T09:00:00.000Z' } };
+  awardTrophies(p, '2026-06-01T09:00:00.000Z');
+  assert.deepStrictEqual(p.trophies.known, { gold: '2020-01-01T09:00:00.000Z' });
+});
+
+test('awardTrophies never rewrites an existing tier timestamp', () => {
+  const p = { words: Object.fromEntries(Array.from({ length: 30 }, (_, i) => ['w' + i, { status: 'known' }])) };
+  p.trophies = { known: { bronze: '2020-01-01T09:00:00.000Z' } };
+  awardTrophies(p, '2026-06-01T09:00:00.000Z');
+  assert.strictEqual(p.trophies.known.bronze, '2020-01-01T09:00:00.000Z');
+  assert.strictEqual(p.trophies.known.silver, '2026-06-01T09:00:00.000Z');
+  assert.strictEqual(p.trophies.known.gold, '2026-06-01T09:00:00.000Z');
+});
+
+test('awardTrophies leaves an unknown trophy id and a non-object trophies value untouched', () => {
+  const pa = { words: {} };
+  pa.trophies = { ghostTrophy: { bronze: '2020-01-01T09:00:00.000Z' } };
+  awardTrophies(pa, '2026-06-01T09:00:00.000Z');
+  assert.deepStrictEqual(pa.trophies, { ghostTrophy: { bronze: '2020-01-01T09:00:00.000Z' } });
+
+  const pb = { words: Object.fromEntries(Array.from({ length: 5 }, (_, i) => ['w' + i, { status: 'known' }])) };
+  pb.trophies = 'oops';
+  awardTrophies(pb, '2026-06-01T09:00:00.000Z');
+  assert.strictEqual(pb.trophies, 'oops');
+});
+
+test('awardTrophies mutates nothing outside profile.trophies and returns the same object', () => {
+  const p = { words: Object.fromEntries(Array.from({ length: 5 }, (_, i) => ['w' + i, { status: 'known' }])) };
+  const clone = structuredClone(p);
+  const result = awardTrophies(p, NOW);
+  assert.strictEqual(result, p);
+  delete clone.trophies;
+  const stripped = structuredClone(p);
+  delete stripped.trophies;
+  assert.deepStrictEqual(stripped, clone);
+});
+
+test('every profile awardTrophies produces still passes validateProfile', () => {
+  const p1 = defaultProfile(NOW);
+  awardTrophies(p1, NOW);
+  assert.deepStrictEqual(validateProfile(p1), { ok: true, errors: [] });
+
+  const p2 = defaultProfile(NOW);
+  for (let i = 0; i < 5; i++) {
+    p2.words['w' + i] = { status: 'known', source: 'tap', he: null, taps: 1, firstSeen: NOW, lastSeen: NOW };
+  }
+  awardTrophies(p2, NOW);
+  assert.deepStrictEqual(validateProfile(p2), { ok: true, errors: [] });
+
+  const p3 = defaultProfile(NOW);
+  p3.story.chapters = Array.from({ length: 40 }, (_, i) => ({
+    generatedAt: '2026-01-' + String((i % 27) + 1).padStart(2, '0') + 'T09:00:00.000Z',
+  }));
+  for (let i = 0; i < 30; i++) {
+    p3.words['w' + i] = {
+      status: 'known',
+      source: 'tap',
+      he: null,
+      taps: 10,
+      firstSeen: NOW,
+      lastSeen: NOW,
+      nominations: 1,
+      quizRight: 10,
+      quizWrong: 5,
+    };
+  }
+  awardTrophies(p3, NOW);
+  assert.deepStrictEqual(validateProfile(p3), { ok: true, errors: [] });
+
+  const p4 = defaultProfile(NOW);
+  p4.trophies = { known: { gold: NOW } };
+  awardTrophies(p4, NOW);
+  assert.deepStrictEqual(validateProfile(p4), { ok: true, errors: [] });
+
+  const p5 = defaultProfile(NOW);
+  p5.trophies = { zzzFutureTrophy: { bronze: NOW } };
+  awardTrophies(p5, NOW);
+  assert.deepStrictEqual(validateProfile(p5), { ok: true, errors: [] });
 });
