@@ -176,3 +176,34 @@ STEP 1.2 the catalogue and its metrics (T3)
   auditor: match, confidence high, findings none
   commit: 344f0de
   accepted: 2026-07-29T13:30:34Z
+
+(run interlude 2026-07-29 ~13:30-13:50: owner ran /doctor between 1.2 and 1.3 — Claude Code
+health check; changes touched only ~/.claude user config (skill overrides, plugin disables,
+auto permission mode), NOTHING in this repo or run. Recorded so the timestamps make sense.)
+
+STEP 1.3 awardTrophies (T2)
+  tier: WORKER (Sonnet)
+  did: appended the frozen awardTrophies function verbatim at EOF of lib/profile.js (after
+    TROPHY_CATALOG); tests/trophies.test.js gained one NEW import line (awardTrophies) plus
+    7 flat tests (13 -> 20). Diff +35/-0 and +101/-0, addition-only.
+  surprises: fail-first mutations B and D each also broke one adjacent test beyond the one
+    mandated (documented as expected side effects: fixture 4's gold sits exactly at 30, and
+    deleting state breaks idempotence/rewrite tests too). Consistent, not contradictions.
+  deviations: none.
+  fail-first observed (evidence file HOME/trophies-val/step-1.3-failfirst.txt):
+    M1.3a -> "not ok 288" (idempotent) AND "not ok 290" (never rewrites) — both, as mandated
+    M1.3b -> "not ok 287" (exact-threshold) as mandated; 290 also failed (side effect above)
+    M1.3c -> "not ok 291" (unknown-id/non-object untouched) as mandated
+    M1.3d -> "not ok 289" (never regresses) as mandated; 288/290 also failed (side effects)
+    all restored; lib/profile.js stable at 26022 bytes CRLF=0 LF=719 after each restore.
+  validation_first_try: yes (worker first try; orchestrator clean re-run RC=0: 323/0 plain
+    and gated, plan 1..318, flat 318, contrast 52, digest unchanged, transcripts empty,
+    endings lib 0/719 · api/profile 0/142 · api/chapter 64/0 · profile.test 0/138 ·
+    trophies.test 0/316, DELS 0, PORC exact two-file set)
+  retries: 0
+  escalations: 0
+  tokens: worker=77287, checker=33820, orchestrator_delta=unavailable
+  interventions: 0
+  auditor: match, confidence high, findings none
+  commit: d848aa7
+  accepted: 2026-07-29T13:53:02Z
