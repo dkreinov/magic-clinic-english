@@ -74,3 +74,38 @@ production untouched at v17; no capture of her profile exists (correct until pha
 
 WHAT HAPPENS NEXT: your GO for phase 2 — the 9 trophy artworks (ChatGPT web, one chat,
 frozen style suffix, your approval per image). A fresh planner will plan it from the files.
+
+=== PHASE 2 PLAN IN PLAIN WORDS (2026-07-29) ===
+WHAT WE ARE DOING: the nine trophy pictures — eight trophies plus one shelf header — made
+in the app's own art style, each one approved by you before it enters the project.
+
+PHASE 2 — the artwork   [planned in full, reviewed, awaiting your GO]
+  What we do:  write nine exact picture requests, generate them in the one ChatGPT chat
+               that drew all the app's art, get your yes on each, shrink them for the web,
+               and record everything in the design document.
+  Why:         the trophies screen (phase 3) needs real pictures that look like they come
+               from the same world as the storybook art.
+  Done when:   nine approved pictures sit in the project as originals and as small web
+               copies, all provably different from each other and from every existing
+               picture, and not one other byte of the app has moved.
+  Steps:
+    2.1 write the nine picture requests into text files, each ending with the app's
+        official style paragraph copied out of the design document by a program (never
+        retyped) — because one retyped word would quietly break the family look.
+    2.2 generate the nine images one at a time in the same chat as always, and check each
+        is square, big enough, and genuinely new — because reusing the chat is what keeps
+        the style consistent, and a checksum catches accidental duplicates.
+    2.3 show you all nine (a contact sheet plus each one alone); record your yes/no per
+        image, tied to the exact file's fingerprint — so the picture you approved is
+        provably the picture that ships. A "no" goes back for regeneration.
+    2.4 a small build script shrinks the nine into fast web versions — a script, not hand
+        work, so anyone can rebuild identical files later.
+    2.5 write the nine requests and the new picture list into the visual design document —
+        so a tenth trophy can be made without asking anyone.
+    2.6 re-run every check and write the notes the next phase starts from.
+WHAT WE ARE NOT DOING: no app code, no tests moved, no cache-version change (the one bump
+happens in phase 3, where the signed design puts it — your GO ratifies this), no deploy,
+no touching her profile, no paid image API — the free ChatGPT web chat only.
+BIGGEST RISK: the nine images drifting apart in style. Nothing automatic can see that —
+which is exactly why you look at all nine side by side before anything is committed.
+=== END ===

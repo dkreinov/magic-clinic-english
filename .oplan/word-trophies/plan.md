@@ -778,3 +778,545 @@ exit $RC
 - **Step 1.5** — Re-run every check on the finished tree and write down what happened, what changed from the signed design and why, and what phase 2 and 3 need to know. *Why: the next person starts from files, not from memory.*
 
 **DONE WHEN:** the full suite passes at 323 flat tests (328 reported) both with and without the app code set, the contrast gate still reports 52, both frozen transcripts still print exactly their committed expected text, nothing under `public/` has moved by a single byte, no local profile file exists, and only the five intended files changed — with a recorded failure observed for every mutation that should break a test.
+
+---
+
+# WORD-TROPHIES — PHASE 2 IN FULL (planned 2026-07-29 by a fresh planner — Opus, files only;
+# the planner measured its claims: suffix 388 bytes md5 51b97a774dc52aa272850bb686c22188,
+# sw.js md5 f16579d50af8b49a04e45a80975c6acf, exclusion digest == the phase-1 pin, sharp probe,
+# binary blob==disk probe, tests/ grep for asset assertions).
+#
+# ORCHESTRATOR VERIFICATION before review (2026-07-29, tree clean at 4966d89): suffix md5+388
+# CONFIRMED by independent extraction · sw.js md5 CONFIRMED · chat URL at docs/visual-design.md:266
+# CONFIRMED · exclusion digest 2362 74e736d7d83b22a24945eae87cb9fe33 CONFIRMED ·
+# scripts/optimize-placement.js precedent matches the frozen 2.4 script line-for-line · sharp OK
+# (heroine.png 1254x1254) · no .gitattributes · doc CRLF=0 LF=317 · briefing.md + STATUS.md read:
+# NO phase-2 owner instruction beyond the record (closes planner RECORD GAP 8).
+# P2-AMENDMENT #1 (orchestrator, pre-review): (a) the draft invoked §VAL-P2 as a CHILD bash and
+# then used its fail/$PORC/$RC in the tail — undefined there, so every tail would exit 0
+# unconditionally (the silent-pass class); each step validation is ONE script = §VAL-P2 verbatim +
+# the tail. (b) step 2.1 cleanliness check gains the standard .oplan/ filter. (c) step 2.6 opens
+# with BASE=<the phase-2 base hash recorded at go-ahead> so its diff-filter=D is runnable as frozen.
+
+PHASE 2: the assets (T6 artwork — 9 masters, 9 derivatives, owner-gated)
+
+GOAL: Nine owner-approved images exist as committed PNG masters under `assets/delight/trophies/` and as committed 640×640 webp derivatives under `public/assets/trophies/`, produced through the free ChatGPT-web route in the one dedicated art chat with the FROZEN STYLE SUFFIX appended verbatim, reproducible by a committed script, and recorded in `docs/visual-design.md`. No app code, no test, no CSS, no CACHE bump, no deploy, no touch of her profile — the suite, the contrast anchor, both transcripts and every byte of `public/` outside the new trophies directory are exactly where phase 1 left them.
+
+ACCEPTANCE CRITERIA (mechanical, frozen; all re-run by the orchestrator at the close, step 2.6)
+
+1. `assets/delight/trophies/` contains exactly nine files — `chapters.png days.png streak.png known.png quizRight.png quizzer.png curious.png proven.png shelf-header.png` — each `format=png`, square (`width === height`), `width >= 1024`, and md5-distinct from each other, from all nine existing `assets/delight/*.png` masters, and from `assets/design-tests/dragon-clinic-test.png`.
+2. `public/assets/trophies/` contains exactly nine files with the same stems and `.webp`, each `format=webp` and exactly `640x640`, all md5-distinct from each other and from the eight existing `public/assets/*.webp`; re-running `node scripts/optimize-trophies.js` twice leaves the nine md5s unchanged (byte-reproducible).
+3. `.oplan/word-trophies/journal.md` carries, for each of the nine ids, a last-occurring line `TROPHY-ART <id>: APPROVED...` and a line `TROPHY-ART-MD5 <id> <md5>` whose md5 equals the committed master's bytes (GC-D8 bound to bytes, not to a memory).
+4. `public/` outside `public/assets/trophies/` is byte-identical to the phase-1 close: the exclusion digest equals **`2362 74e736d7d83b22a24945eae87cb9fe33`** (measured today; identical to the phase-1 pin), and the full recursive digest counts exactly **2371** files (2362 + 9).
+5. `public/sw.js` md5 = **`f16579d50af8b49a04e45a80975c6acf`** — `CACHE` stays `magic-vet-v17`, `PRECACHE` byte-unchanged, no bump this phase (see SKELETON CHANGES #3).
+6. Suite unmoved: `npm test` exits 0 with `# tests 328`, `# fail 0`, plan `1..323`; identical under `APP_CODE=dummy`; flat ledger `grep -h -c '^test(' tests/*.js` = **323**; `node scripts/check-contrast.mjs` exits 0 with `grep -c '^PASS'` = **52**.
+7. Both frozen transcripts diff EMPTY (`.oplan/word-quiz/quiz-transcript.mjs`, `.oplan/word-g1/g1-transcript.mjs`); `.data/profile.json` absent.
+8. Write set vs the phase base is exactly: nine new masters, nine new webps, new `scripts/optimize-trophies.js`, modified `docs/visual-design.md` — nothing else. Zero files deleted (`git diff --diff-filter=D --name-only <BASE>` empty) and `git diff --numstat <BASE> -- docs/visual-design.md` deletions = **0** (additive edit only).
+9. Binary integrity vs the autocrlf trap: for each of the 18 committed binaries, `md5(worktree file)` equals `md5(git cat-file blob HEAD:<path>)`; and `scripts/optimize-trophies.js` has CRLF=0 (LF only), byte-counted, never `git diff`.
+10. `docs/visual-design.md` contains, whitespace-normalized, each of the nine prompt bodies exactly once, plus the nine inventory rows naming `assets/delight/trophies/<id>.png`.
+11. No file under `lib/`, `api/`, `tests/`, `public/views/`, `public/*.js`, `public/styles.css` changed; `awardTrophies` call-site count unchanged (implied by criterion 6's unmoved suite).
+
+DEPENDS ON (all verified on disk today, tree clean at `4966d89`)
+
+| thing | source | verified |
+|---|---|---|
+| the 8 frozen trophy ids `chapters days streak known quizRight quizzer curious proven` | `lib/profile.js` `TROPHY_CATALOG` (phase 1 step 1.2, commit `344f0de`; journal "STEP 1.2") | imported and printed today |
+| `public/` byte pin `2362 74e736d7d83b22a24945eae87cb9fe33` | `phase-state.md:14`, journal "PHASE 1 CLOSED" criterion 5 | recomputed today: identical |
+| ledger 323 flat / 328 reported, contrast 52, transcripts empty, no `.data/profile.json` | `phase-state.md:13-17` | all four re-measured today: 328/0, plan 1..323, flat 323, 52 PASS, both diffs EMPTY, no profile |
+| `CACHE = magic-vet-v17` live AND in worktree; next bump v18, **unused** (phase 1 never touched `public/`) | `phase-state.md:15`, journal "FOR PHASE 2/3 TO CONSUME" | `public/sw.js:1` read; md5 pinned |
+| T6 artwork contract (9 images, masters path, ChatGPT WEB never the paid API, suffix verbatim, derivatives square/640, NOT precached, CSS-only tiers, GC-D8, md5-distinctness) | `design.md` §4 T6, SIGNED §8 | read |
+| FROZEN STYLE SUFFIX | `docs/visual-design.md` §6, heading `### FROZEN STYLE SUFFIX`, **lines 201-205** | extracted by script: 5 blockquote lines, joined by single spaces = **388 bytes, md5 `51b97a774dc52aa272850bb686c22188`** |
+| the art pipeline rules (ONE dedicated chat `https://chatgpt.com/c/6a632008-2d04-83ed-8557-370a2881a0dc`, one image at a time, blob-capture supersedes "newest in ~/Downloads", md5 distinctness) | `docs/visual-design.md` §7 | read |
+| the ORCHESTRATOR-RUN art-step precedent (mechanical checks, then owner verdict line, then integration) | `.oplan/band2-and-polish/plan.md` steps 2.5-2.6 | read |
+| the subdirectory derivative precedent | `scripts/optimize-placement.js` (SRC `assets/placement`, OUT `public/assets/placement`, one script per group) | read |
+| `sharp ^0.35.3` devDependency, installed and working | `package.json`, live probe | `sharp('assets/delight/heroine.png')` → `png 1254x1254`; webp read OK |
+| binary files are not autocrlf-normalized here (no `.gitattributes`, `core.autocrlf=true`) | live probe | `md5(disk) == md5(git cat-file blob HEAD:…)` for `heroine.png` and `heroine.webp` |
+| no test reads `assets/` or `public/assets/`; `shell.test.js` `listJsFiles` filters `.js`; `item-review.test.js` counts only html-referenced assets | grep of `tests/` (field-guide lesson 7 done before planning any file move) | read |
+
+Phase 1 produced nothing this phase blocks on beyond the eight ids and the frozen tree state — the engine and the artwork are independent. Nothing in phase 2 is already done: `assets/delight/trophies/` and `public/assets/trophies/` do not exist.
+
+SKELETON CHANGES
+
+**SK2-1 — "No code" is wrong by one build script.** Design §5 says phase 2 is "No code"; T6 says derivatives come "via the existing `scripts/optimize-assets.js` pipeline". `optimize-assets.js` cannot produce them: its `WIDTHS` map is flat, its single `mkdir(OUT)` never creates a subdirectory, and **re-running it would rewrite all eight existing `public/assets/*.webp`** (a different sharp build could change their bytes and break the digest pin — band2's plan already declared re-running it a non-goal for exactly this reason). The house pattern for a new asset group is a sibling script: `scripts/optimize-placement.js` is that precedent, byte-for-byte the same shape. **Frozen: a new `scripts/optimize-trophies.js` (source frozen in step 2.4), and `scripts/optimize-assets.js` is never run and never edited.** "The existing pipeline" is honoured as the recipe (sharp, `withoutEnlargement`, `webp quality 72 effort 4`), not as the literal file. This is build-time tooling, outside `public/`, outside the test ledger.
+
+**SK2-2 — the shelf-header is square, and it is named `shelf-header`.** T6 names no filename and carves out no aspect: it says nine assets, `<id>.png`, derivatives "square, width 640". Read literally, all nine are square. **Frozen: `assets/delight/trophies/shelf-header.png` → `public/assets/trophies/shelf-header.webp`, 640×640.** `shelf-header` cannot collide with any trophy id. Consequence phase 3 inherits: if the header must read as a band, that is `object-fit`/`aspect-ratio` in CSS, not a regeneration — T4 never places the header at all (see RECORD GAPS 1).
+
+**SK2-3 — this phase does NOT bump `CACHE`, and that is a decision, not an omission.** The record contains two readings. (a) word-g1's signed §10, restated in this run's frozen-contract list, says "public/ byte-frozen until a phase whose plan moves it (then v18)" — a literal reading demands v18 here. (b) This run's SIGNED design assigns the bump to phase 3: T4 says "PRECACHE += `/views/trophies.js`; CACHE v17 → v18 (QZ-22)", and T6 says trophy art is "NOT precached (art rule, §2(iv))", where §2(iv) states artwork is "runtime-fetched and never cached". **Frozen: phase 2 leaves `public/sw.js` byte-identical at v17 (acceptance criterion 5); the single v17→v18 bump lands in phase 3, where the signed design puts it, and covers this phase's `public/` addition as well as phase 3's own.** The reasons: QZ-22's failure mode is "returning devices serve the old shell forever", which is a **deploy**-time hazard, and neither phase 2 nor phase 3 deploys — phase 4 does, once, after the v18 bump exists; the trophy webps are never in `PRECACHE`, so no cache entry can go stale; and bumping here would make the signed T4 sentence false and force phase 3 to v19. Carried obligation, to be written into `phase-state.md` at the close: *phase 3's v18 bump is mandatory and now also covers phase 2's `public/assets/trophies/` addition.* If the orchestrator or owner rules the other way, the whole change is local: step 2.4 additionally edits `public/sw.js:1` to `magic-vet-v18` and `tests/shell.test.js:58`'s assertion string in lockstep, criterion 5 flips to the v18 md5, and phase 3's bump becomes a no-op.
+
+**SK2-4 — the `public/` frozen expectation becomes an EXCLUSION digest for this phase, and is re-pinned at the close.** The full-tree pin cannot survive a phase that adds files. **Frozen mechanism:** during phase 2 the gate is the same walker with `public/assets/trophies` skipped; measured today it returns exactly the phase-1 pin `2362 74e736d7d83b22a24945eae87cb9fe33`, so it is a real invariant and not a tautology, and it will still return that value after the nine webps land. At the close (2.6) the orchestrator computes the **full** digest (file count asserted = 2371) and writes it into `phase-state.md` as the new frozen pin phase 3 inherits, alongside the exclusion pin, which stays valid forever as "everything outside the trophies directory".
+
+**SK2-5 — binary files and the endings law.** There is no `.gitattributes` and `core.autocrlf=true`. Measured today on known-good binaries (`heroine.png`, `heroine.webp`): worktree md5 == blob md5, i.e. git's binary detection already keeps PNG/webp out of the clean filter. **Frozen: no `.gitattributes` is added** (adding one would re-normalize text files across the repo — precisely the lesson-4 hazard), and the protection is a *check*, not a config: criterion 9 compares each committed binary's worktree md5 against `git cat-file blob HEAD:<path>`. The only text file this phase creates, `scripts/optimize-trophies.js`, is LF-only (matching all three sibling scripts, byte-counted today at CRLF=0) and is byte-counted, never `git diff`-ed (lesson 4).
+
+**SK2-6 — T10 (the `docs/visual-design.md` §3 palette truth-fix) is NOT in this phase.** Design §5 never assigns T10 to a phase. It is a palette correction; phase 3 is the phase that works the palette (T7: three new tokens in `:root` plus their contrast pairs, moving the 52 anchor). **Frozen: phase 2's doc edit is confined to §6 (inventory + prompts) and §7 (one pipeline bullet); T10 is handed to phase 3** and recorded as such in `phase-state.md`. Doing both in one phase would put an unrelated palette rewrite into an artwork step's diff.
+
+**SK2-7 — no new test file, and the ledger stays 323/328.** T6's "md5-distinctness is asserted" is satisfied by the frozen validation commands (criteria 1-2), which the orchestrator re-runs in a clean state. A committed `tests/trophies-art.test.js` would move the ledger and force a re-pin of a number four other documents quote — for assets no shipping code references yet. **Frozen: the asset-existence/distinctness test belongs to phase 3**, where the view actually references `/assets/trophies/<id>.webp` and the ledger moves once for the whole screen. Recorded as a phase-3 obligation.
+
+**SK2-8 — the nine trophy images are objects, not characters (7+1), and carry no tier metal.** Design §6 names style drift across nine images as this phase's own risk. Characters drift; objects do not. **Frozen: the eight trophy prompts depict objects only, with no people; the shelf-header is the only prompt that carries a cast member (the teal baby dragon).** And because T6 makes tier differentiation CSS-only (ring colour + grayscale dim, T4), every prompt explicitly forbids a metal cup or medal — a gold-coloured trophy in the art would fight the bronze ring the CSS draws over it.
+
+---
+
+## §VAL-P2 — the frozen validation preamble (steps 2.2, 2.4, 2.5, 2.6 begin with this verbatim)
+
+The `sed`/`awk` lines below are copied byte-for-byte from `plan.md` §VAL-COMMON, which ran clean 30+ times in phase 1. **Deliver this to any executor as a FILE, never inline in a JSON packet** — its backslashes collapsed in transit twice in phase 1 (field-guide lesson 8).
+
+```bash
+#!/usr/bin/env bash
+set -o pipefail
+cd C:/Users/dkreinov/claude/english-app || { echo "FAIL: cannot cd to the repo"; exit 1; }
+RC=0
+fail() { echo "FAIL: $*"; RC=1; }
+
+# --- suite (plain) ---
+OUT="$(npm test 2>&1)"; STAT=$?
+case "$STAT" in 0) ;; *) fail "npm test exited $STAT";; esac
+TOTAL="$(printf '%s\n' "$OUT" | sed -n 's/^# tests \([0-9][0-9]*\).*$/\1/p')"
+FAILED="$(printf '%s\n' "$OUT" | sed -n 's/^# fail \([0-9][0-9]*\).*$/\1/p')"
+PLAN="$(printf '%s\n' "$OUT" | sed -n 's/^1\.\.\([0-9][0-9]*\).*$/\1/p')"
+case "$TOTAL"  in 328) ;; *) fail "expected 328 reported tests, got '$TOTAL'";; esac
+case "$FAILED" in 0)   ;; *) fail "expected 0 failures, got '$FAILED'";; esac
+case "$PLAN"   in 323) ;; *) fail "expected top-level plan 1..323, got '1..$PLAN'";; esac
+
+# --- suite (gated) ---
+GOUT="$(APP_CODE=dummy npm test 2>&1)"; GSTAT=$?
+case "$GSTAT" in 0) ;; *) fail "APP_CODE=dummy npm test exited $GSTAT";; esac
+GTOTAL="$(printf '%s\n' "$GOUT" | sed -n 's/^# tests \([0-9][0-9]*\).*$/\1/p')"
+GFAILED="$(printf '%s\n' "$GOUT" | sed -n 's/^# fail \([0-9][0-9]*\).*$/\1/p')"
+case "$GTOTAL"  in 328) ;; *) fail "APP_CODE=dummy: expected 328, got '$GTOTAL'";; esac
+case "$GFAILED" in 0)   ;; *) fail "APP_CODE=dummy: expected 0 failures, got '$GFAILED'";; esac
+
+# --- flat ledger (phase 2 adds no tests) ---
+FLAT="$(grep -h -c '^test(' tests/*.js | awk '{s+=$1} END{print s+0}')"
+case "$FLAT" in 323) ;; *) fail "expected 323 flat tests, got '$FLAT'";; esac
+
+# --- contrast anchor 52 (phase 2 adds no tokens) ---
+CON="$(node scripts/check-contrast.mjs 2>&1)"; CSTAT=$?
+case "$CSTAT" in 0) ;; *) fail "check-contrast exited $CSTAT";; esac
+PASSES="$(printf '%s\n' "$CON" | grep -c '^PASS')"
+case "$PASSES" in 52) ;; *) fail "contrast anchor moved: expected 52 PASS lines, got '$PASSES'";; esac
+
+# --- public/ OUTSIDE the trophies dir is byte-frozen (SK2-4; no backslashes: lesson 8) ---
+PUBX="$(node -e 'const fs=require("fs"),path=require("path"),crypto=require("crypto");const out=[];(function walk(d){for(const e of fs.readdirSync(d).sort()){const f=path.join(d,e);const p=f.split(path.sep).join("/");const s=fs.statSync(f);if(s.isDirectory()){if(p==="public/assets/trophies")continue;walk(f);}else out.push(p+" "+crypto.createHash("md5").update(fs.readFileSync(f)).digest("hex"));}})("public");console.log(out.length+" "+crypto.createHash("md5").update(out.join(String.fromCharCode(10))).digest("hex"));')"
+case "$PUBX" in "2362 74e736d7d83b22a24945eae87cb9fe33") ;; *) fail "public/ outside the trophies dir moved: expected '2362 74e736d7d83b22a24945eae87cb9fe33', got '$PUBX'";; esac
+
+# --- the service worker does not move this phase (SK2-3) ---
+SWMD5="$(md5sum public/sw.js | cut -d' ' -f1)"
+case "$SWMD5" in f16579d50af8b49a04e45a80975c6acf) ;; *) fail "public/sw.js moved: $SWMD5 (phase 2 does not bump CACHE)";; esac
+
+# --- both transcripts must diff EMPTY ---
+VD="$HOME/trophies-val"; mkdir -p "$VD"
+node .oplan/word-quiz/quiz-transcript.mjs > "$VD/qz.out" 2>&1 || fail "quiz-transcript.mjs exited non-zero"
+QZ="$(diff "$VD/qz.out" .oplan/word-quiz/quiz-transcript-expected.txt)"
+case "$QZ" in "") ;; *) fail "QZ-21 transcript moved";; esac
+node .oplan/word-g1/g1-transcript.mjs > "$VD/g1.out" 2>&1 || fail "g1-transcript.mjs exited non-zero"
+G1="$(diff "$VD/g1.out" .oplan/word-g1/g1-transcript-expected.txt)"
+case "$G1" in "") ;; *) fail "G1 transcript moved";; esac
+rm -f "$VD/qz.out" "$VD/g1.out"
+
+# --- her profile must never appear locally ---
+if [ -e .data/profile.json ]; then fail ".data/profile.json exists -- a local write leaked"; fi
+
+# --- write set (.oplan is the orchestrator record, never an executor write set) ---
+PORC="$(git status --porcelain -uall | awk '$NF !~ /^\.oplan\//' | LC_ALL=C sort)"
+```
+
+Per-step blocks continue from here with their own assertions on `$PORC` and their own checks, then `exit $RC`.
+
+## FROZEN CONTRACTS — in force for every step of this phase
+
+- **The nine filenames.** Masters `assets/delight/trophies/{chapters,days,streak,known,quizRight,quizzer,curious,proven,shelf-header}.png`; derivatives `public/assets/trophies/<same stem>.webp`. The eight stems are the `TROPHY_CATALOG` ids **exactly**, camelCase included (`quizRight.png`, not `quizright.png`) — phase 3 builds the src as `/assets/trophies/${id}.webp`. Nine, not 24: one image per trophy, tiers are CSS (T6, T4).
+- **The FROZEN STYLE SUFFIX**, extracted from `docs/visual-design.md` §6 (heading `### FROZEN STYLE SUFFIX`, lines 201-205 today), the five blockquote lines with `> ` stripped and joined by single spaces — **388 bytes, md5 `51b97a774dc52aa272850bb686c22188`**:
+  > Warm cozy cartoon illustration in exactly the same style, palette and rendering as the earlier girl-and-dragon clinic image in this chat: soft painterly 3D-cartoon look, warm golden lighting, wood-and-magic fantasy world, teal + violet + amber accents on warm cream. Aimed at an 11-year-old — charming and adventurous, not babyish. No text, no letters, no watermark, no frame or border.
+
+  It is **never retyped**: every prompt file is built by extracting it from the doc by script (step 2.1), and every gate verifies the tail bytes against that md5.
+- **The one chat.** `https://chatgpt.com/c/6a632008-2d04-83ed-8557-370a2881a0dc` ("Image Request Cartoon Style"), the free ChatGPT **web** route. Never a new chat, never the paid API, one generation at a time (`docs/visual-design.md` §7; delight-pass field-guide lessons 10-12).
+- **Capture.** Fetch the image blob in-page and click **exactly ONE** synthetic `<a download="trophy-<id>.png">`; never the Download control, never the "newest file in ~/Downloads" heuristic (that produced the 89-duplicate burst, `docs/visual-design.md` §7). Verify no file of that name exists in `C:/Users/dkreinov/Downloads` **before** the click; poll from the shell afterwards; do not re-click.
+- **Scratch lives outside the repo** (field-guide lesson 4): prompts at `$HOME/trophies-art/prompts/`, previews and contact sheets at `$HOME/trophies-art/preview/`, validation scratch at `$HOME/trophies-val/`. Nothing scratch is ever written under the repo.
+- **The owner gate (GC-D8)** is per asset and precedes integration. Verdict format, appended by the orchestrator to `journal.md`: `TROPHY-ART <id>: APPROVED` or `TROPHY-ART <id>: REJECTED - <reason>`; paired with `TROPHY-ART-MD5 <id> <md5>`. A regeneration appends a **new** pair; the last line for an id wins.
+- **Commits are the ORCHESTRATOR's, at acceptance** (plan amendment #2). No step's COMMANDS contain `git add`/`git commit`.
+- **Executor stop-rule (lesson 9).** Never silently "fix" a frozen command, a pinned md5 or a prompt. If a gate contradicts reality, STOP, report, wait for a ruling.
+
+---
+
+STEP 2.1: build the nine prompt files, suffix extracted verbatim
+  goal: Nine plain-text prompt files exist outside the repo, one per asset, each = the frozen ASCII body + one space + the FROZEN STYLE SUFFIX **bytes taken from `docs/visual-design.md`, never retyped**. The repo is untouched. These files are the only thing that ever gets pasted into the chat, and the only source step 2.5 records into the doc.
+  files: `$HOME/trophies-art/prompts/chapters.txt`, `days.txt`, `streak.txt`, `known.txt`, `quizRight.txt`, `quizzer.txt`, `curious.txt`, `proven.txt`, `shelf-header.txt` — CREATE. **Nothing inside the repository.**
+  commands:
+```bash
+mkdir -p "$HOME/trophies-art/prompts"
+# then one node script (written to $HOME/trophies-art/build-prompts.js and run with `node`,
+# NEVER a heredoc and never inline in a packet -- lesson 8) which:
+#   1. reads docs/visual-design.md, finds the line "### FROZEN STYLE SUFFIX", collects the
+#      following contiguous lines that begin "> ", strips the two-character "> " prefix,
+#      joins them with single spaces -> SUFFIX;
+#   2. asserts md5(SUFFIX) === "51b97a774dc52aa272850bb686c22188" and its byte length is 388,
+#      STOPPING if not (the doc moved -> escalate, do not adapt);
+#   3. writes each file as BODY + " " + SUFFIX, no trailing newline, LF-irrelevant (single line).
+node "$HOME/trophies-art/build-prompts.js"
+```
+  validation:
+```bash
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail && node -e '
+const fs=require("fs"),path=require("path"),crypto=require("crypto");
+const NL=String.fromCharCode(10);
+const L=fs.readFileSync("docs/visual-design.md","utf8").split(NL);
+const i=L.indexOf("### FROZEN STYLE SUFFIX");
+if(i<0) throw new Error("suffix heading not found in docs/visual-design.md");
+const acc=[];
+for(let j=i+1;j<L.length;j++){const t=L[j];if(t.indexOf("> ")===0)acc.push(t.slice(2));else if(acc.length)break;}
+const SUF=Buffer.from(acc.join(" "),"utf8");
+const SUF_MD5=crypto.createHash("md5").update(SUF).digest("hex");
+if(SUF_MD5!=="51b97a774dc52aa272850bb686c22188") throw new Error("the FROZEN STYLE SUFFIX in the doc changed: md5="+SUF_MD5);
+if(SUF.length!==388) throw new Error("suffix length "+SUF.length+", expected 388");
+const IDS=["chapters","days","streak","known","quizRight","quizzer","curious","proven","shelf-header"];
+const DIR=path.join(process.env.HOME,"trophies-art","prompts");
+const got=fs.readdirSync(DIR).sort().join(",");
+const want=IDS.map(x=>x+".txt").sort().join(",");
+if(got!==want) throw new Error("prompt dir holds ["+got+"], expected ["+want+"]");
+const bodies=new Set();
+for(const id of IDS){
+  const b=fs.readFileSync(path.join(DIR,id+".txt"));
+  if(b.length<=SUF.length+1) throw new Error(id+": file too short");
+  if(!b.slice(b.length-SUF.length).equals(SUF)) throw new Error(id+": does not end with the frozen suffix bytes");
+  if(b[b.length-SUF.length-1]!==32) throw new Error(id+": body and suffix must be joined by exactly one space");
+  const body=b.slice(0,b.length-SUF.length-1);
+  for(const x of body) if(x<32||x>126) throw new Error(id+": body byte "+x+" is not printable ASCII");
+  const s=body.toString("ascii");
+  if(s.indexOf("Square image (1:1): ")!==0) throw new Error(id+": body must start with the frozen opener");
+  if(bodies.has(s)) throw new Error(id+": duplicate prompt body");
+  bodies.add(s);
+}
+console.log("PROMPTS-OK 9 files, bodies pure ASCII and distinct, suffix verbatim "+SUF_MD5);
+' && [ -z "$(git status --porcelain | awk '$NF !~ /^.oplan//')" ] && echo STEP-2.1-OK   # P2-AMENDMENT #1b: .oplan is the orchestrator record
+```
+  contracts: **The nine prompt bodies, frozen, pure ASCII, each written as ONE line (no em-dashes, no curly quotes — the suffix is the only non-ASCII text in the file, and that arrives from the doc by extraction).**
+
+  - **chapters** — `Square image (1:1): a thick open storybook lying on a warm wooden table, a glowing winding path and two tiny floating islands rising up out of its open pages like a small magical world, warm amber glow from the pages, violet and teal sparkles drifting above it, completely blank pages with no writing of any kind, no people, no metal cup and no medal, the book centered with generous empty margin on all four sides, soft warm background.`
+  - **days** — `Square image (1:1): a small potted magical herb on a sunlit wooden windowsill, one stem showing three clear stages of growth from sprout to full glowing leaves, a little copper watering can beside the pot with one amber droplet caught in mid air, teal and violet leaf tips, no people, no metal cup and no medal, the plant centered with generous empty margin on all four sides, soft warm background.`
+  - **streak** — `Square image (1:1): a gentle arc of five small round paper lanterns strung along a cord, each lantern lit a little warmer and brighter than the one before it, tiny amber sparks travelling along the cord between them, violet and teal glass panes in the lanterns, no people, no metal cup and no medal, the arc of lanterns centered with generous empty margin on all four sides, soft warm background.`
+  - **known** — `Square image (1:1): a small rounded wooden treasure chest with brass corner fittings and its lid open, filled with glowing gem-like crystals in violet, teal and amber whose light spills onto the underside of the lid, three loose crystals resting on the wooden table in front of it, a wooden chest and not a glass jar, no people, no metal cup and no medal, the chest centered with generous empty margin on all four sides, soft warm background.`
+  - **quizRight** — `Square image (1:1): a round wooden practice target with concentric painted rings in violet, teal and amber, three slim glowing arrows clustered together dead center in the bullseye, faint rings of sparkle spreading outward from the hits, the target leaning against a warm wooden wall, no people, no metal cup and no medal, the target centered with generous empty margin on all four sides, soft warm background.`
+  - **quizzer** — `Square image (1:1): a well used brown leather apprentice satchel standing open on a wooden floor with practice gear spilling gently out of it, a rolled white bandage, a small wooden mortar and pestle, a coil of teal cord and a folded cloth, warm amber lamplight on the worn leather, violet and teal stitching along the flap, no people, no metal cup and no medal, the satchel centered with generous empty margin on all four sides, soft warm background.`
+  - **curious** — `Square image (1:1): a large round brass rimmed magnifying glass resting at an angle over a wooden table, its lens magnifying a single glowing violet paw print on the wood, tiny amber sparkles drifting up through the lens, soft teal reflections in the glass, no people, no metal cup and no medal, the magnifying glass centered with generous empty margin on all four sides, soft warm background.`
+  - **proven** — `Square image (1:1): a rolled parchment scroll tied with a teal ribbon and closed with a large glowing amber wax seal stamped with a paw print, resting on a warm wooden table with soft violet light around the seal, the parchment completely blank with no writing of any kind, no people, no metal cup and no medal, the scroll centered with generous empty margin on all four sides, soft warm background.`
+  - **shelf-header** — `Square image (1:1): a warm wooden shelf inside the magical veterinary clinic seen straight on, holding a row of small glowing keepsakes, a tiny paper lantern, a violet crystal, a ribboned scroll and a little potted sprout, a string of soft amber lights running along the front edge of the shelf, the same small teal baby dragon from this chat curled up asleep at one end of the shelf, violet and teal glow in the air around the objects, no signs and no labels of any kind, the shelf centered with generous empty margin above and below, soft warm background.`
+
+  Each body maps to its trophy's meaning (T3): chapters = adventures read; days = showing up and growing; streak = an unbroken run; known = the word hoard; quizRight = hitting the mark; quizzer = turning up to practise; curious = investigating words; proven = the app guessed and she proved it. Every body forbids people, metal cups and medals (SK2-8), demands generous margin (the card crops), and asks for the app's violet/teal/amber palette.
+  non-goals: do not open a browser; do not generate any image; do not write anything under the repo (not even a scratch file); do not edit `docs/visual-design.md` (step 2.5 records the prompts); do not translate anything into Hebrew — image prompts are English and the suffix forbids letters in the art; do not "improve" a body.
+  tier: WORKER — mechanical file construction with a byte-exact gate.
+  depends on: nothing (phase base = the phase-2 `$BASE` the orchestrator records before dispatch).
+
+STEP 2.2: generate the nine masters in the one chat and place them
+  goal: `assets/delight/trophies/` holds the nine PNG masters, each square, at least 1024 wide, and byte-distinct from every other asset in the repo — generated one at a time in the frozen chat from the step-2.1 prompt files. Not yet approved, not yet committed, no derivative.
+  files: `assets/delight/trophies/<id>.png` ×9 — CREATE. Staging in `C:/Users/dkreinov/Downloads` and previews in `$HOME/trophies-art/preview/` (outside the repo). Nothing else.
+  commands: **interactive — orchestrator + browser.** Per asset, in the frozen order `chapters, days, streak, known, quizRight, quizzer, curious, proven, shelf-header`:
+    1. Open the ONE dedicated chat `https://chatgpt.com/c/6a632008-2d04-83ed-8557-370a2881a0dc` (never a new chat; never the paid API).
+    2. Paste the whole of `$HOME/trophies-art/prompts/<id>.txt`. **Before sending, read the composer back and confirm it starts with `Square image (1:1):` and ends with `no frame or border.`** — the composer has been observed prepending stray em-dashes (delight-pass lesson 14).
+    3. Wait for the single image. One generation at a time — the chat serializes.
+    4. `ls "C:/Users/dkreinov/Downloads/trophy-<id>.png"` must be **absent**. Then capture with the blob method: fetch the image blob in-page and click **exactly one** synthetic `<a download="trophy-<id>.png">`. Do not re-click. Poll from the shell for the file.
+    5. `mv "C:/Users/dkreinov/Downloads/trophy-<id>.png" assets/delight/trophies/<id>.png`.
+    6. Run the frozen validation below; if it reports a duplicate or a wrong shape for this asset, delete it and regenerate (regenerate, never settle — design §6).
+  After all nine: record the nine `TROPHY-ART-MD5 <id> <md5>` lines printed by the validation into `journal.md` (orchestrator record), and render 320px previews plus one 3×3 contact sheet into `$HOME/trophies-art/preview/` for the step-2.3 gate.
+  validation:
+```bash
+# TAIL of the step single validation script, which BEGINS with §VAL-P2 verbatim in the SAME file (P2-AMENDMENT #1a -- a child bash cannot supply fail/$PORC/$RC to this tail)
+node --input-type=module -e '
+import sharp from "sharp";
+import { createHash } from "node:crypto";
+import { readFileSync, readdirSync } from "node:fs";
+const IDS=["chapters","days","streak","known","quizRight","quizzer","curious","proven","shelf-header"];
+const DIR="assets/delight/trophies";
+const got=readdirSync(DIR).sort().join(",");
+const want=IDS.map(x=>x+".png").sort().join(",");
+if(got!==want) throw new Error("master set is ["+got+"], expected ["+want+"]");
+const h=p=>createHash("md5").update(readFileSync(p)).digest("hex");
+const seen=new Map();
+for(const f of readdirSync("assets/delight")) if(f.endsWith(".png")) seen.set(h("assets/delight/"+f),"assets/delight/"+f);
+seen.set(h("assets/design-tests/dragon-clinic-test.png"),"assets/design-tests/dragon-clinic-test.png");
+const lines=[];
+for(const id of IDS){
+  const p=DIR+"/"+id+".png";
+  const m=await sharp(p).metadata();
+  if(m.format!=="png") throw new Error(p+" is "+m.format+", expected png");
+  if(m.width!==m.height) throw new Error(p+" is not square: "+m.width+"x"+m.height);
+  if(m.width<1024) throw new Error(p+" is only "+m.width+" wide, minimum 1024");
+  const d=h(p);
+  if(seen.has(d)) throw new Error(p+" is byte-identical to "+seen.get(d));
+  seen.set(d,p);
+  lines.push("TROPHY-ART-MD5 "+id+" "+d);
+}
+console.log(lines.join(String.fromCharCode(10)));
+console.log("MASTERS-OK 9 square png, all >=1024, all byte-distinct");
+' || fail "master gate failed"
+EXPECT='?? assets/delight/trophies/chapters.png
+?? assets/delight/trophies/curious.png
+?? assets/delight/trophies/days.png
+?? assets/delight/trophies/known.png
+?? assets/delight/trophies/proven.png
+?? assets/delight/trophies/quizRight.png
+?? assets/delight/trophies/quizzer.png
+?? assets/delight/trophies/shelf-header.png
+?? assets/delight/trophies/streak.png'
+case "$PORC" in "$EXPECT") ;; *) fail "write set wrong. got:
+$PORC";; esac
+exit $RC
+```
+  contracts: the nine filenames; the one chat URL; the blob-capture rule and the exactly-once click; `>= 1024` square PNG masters (the band2 app-icon precedent); md5-distinctness across the nine new masters, the nine existing `assets/delight/*.png` and the anchor `assets/design-tests/dragon-clinic-test.png` (the §7 duplicate-burst rule); the `TROPHY-ART-MD5` record line format.
+  non-goals: no derivative and no touch of `public/` (step 2.4 owns that, and only after the gate); no owner gate here (step 2.3); no edit to `docs/`, `scripts/`, `tests/`, `lib/`, `api/`; do not run `scripts/optimize-assets.js` — it would rewrite the eight existing webps and break the digest; do not touch or regenerate any existing master; do not open a second chat; no paid-API generation; do not upscale, crop, retouch or convert a downloaded image by hand — if it is not square or under 1024, regenerate.
+  tier: ORCHESTRATOR — browser-driven generation on the free web route is not dispatchable to a clean-context worker, and the capture rule is a one-shot manual action (band2 step 2.5 precedent).
+  depends on: 2.1 (the prompt files must exist and have passed their byte gate).
+
+STEP 2.3: the owner gate, GC-D8, bound to the bytes
+  goal: For each of the nine assets the owner has looked at the image and recorded a verdict, and the file on disk is byte-identical to the image that verdict was given about. Nothing may be integrated before this passes.
+  files: none in the repo. `journal.md` verdict lines are the orchestrator's record, written at this step's acceptance. Previews in `$HOME/trophies-art/preview/`.
+  commands: **interactive — orchestrator + owner.** Show the owner the 3×3 contact sheet and the nine individual previews (also at the sizes the screen will use, 160px and 320px — T4 renders one card per trophy). For each id record exactly one line: `TROPHY-ART <id>: APPROVED` or `TROPHY-ART <id>: REJECTED - <reason>`. A REJECTED asset goes back to step 2.2 for regeneration in the same chat, and its new bytes get a **new** `TROPHY-ART-MD5` line and a **new** verdict line appended (last line wins). The step is not finished until the last verdict for all nine reads APPROVED.
+  validation:
+```bash
+cd C:/Users/dkreinov/claude/english-app && set -o pipefail && node -e '
+const fs=require("fs"),crypto=require("crypto");
+const NL=String.fromCharCode(10);
+const IDS=["chapters","days","streak","known","quizRight","quizzer","curious","proven","shelf-header"];
+const J=fs.readFileSync(".oplan/word-trophies/journal.md","utf8").split(NL);
+const verdict=new Map(), md5s=new Map();
+for(const raw of J){
+  const t=raw.trim();
+  if(t.indexOf("TROPHY-ART-MD5 ")===0){
+    const p=t.slice(15).split(" ").filter(Boolean);
+    if(p.length===2) md5s.set(p[0],p[1]);
+  } else if(t.indexOf("TROPHY-ART ")===0){
+    const rest=t.slice(11); const i=rest.indexOf(": ");
+    if(i>0) verdict.set(rest.slice(0,i),rest.slice(i+2));
+  }
+}
+for(const id of IDS){
+  const v=verdict.get(id);
+  if(v===undefined) throw new Error("no owner verdict recorded for "+id);
+  if(v.indexOf("APPROVED")!==0) throw new Error(id+": last verdict is not APPROVED -> "+v);
+  const want=md5s.get(id);
+  if(!want) throw new Error("no TROPHY-ART-MD5 line recorded for "+id);
+  const got=crypto.createHash("md5").update(fs.readFileSync("assets/delight/trophies/"+id+".png")).digest("hex");
+  if(got!==want) throw new Error(id+": the file on disk ("+got+") is not the approved image ("+want+")");
+}
+console.log("GATE-OK 9 assets owner-approved, on-disk bytes match the approved images");
+' && echo STEP-2.3-OK
+```
+  contracts: GC-D8 is per asset and precedes integration (T6, `docs/visual-design.md` §8 DO-list); the verdict line format above; the last verdict for an id wins; the approval binds to an md5, not to a memory. On this step's acceptance the orchestrator commits the nine masters — message: `step 2.3: nine trophy masters (T6), owner-gated GC-D8 — assets/delight/trophies/, all square >=1024, md5-distinct`.
+  non-goals: do not "self-serve" this gate — GC-D8 names the owner and the design signature (§8, T6 row) makes it an owner gate, unlike the sandbox UI audits the field guide self-serves (lesson 11); do not adjust a rejected image in an editor; do not proceed to 2.4 on anything less than nine APPROVED lines; do not touch any file.
+  tier: ORCHESTRATOR — a human judgement with a recorded artifact.
+  depends on: 2.2 (nine masters on disk, nine `TROPHY-ART-MD5` lines recorded).
+
+STEP 2.4: the derivative script and the nine webps
+  goal: A committed, deterministic `scripts/optimize-trophies.js` turns the nine approved masters into nine 640×640 webps under `public/assets/trophies/`, and nothing else under `public/` moves by a byte.
+  files: `scripts/optimize-trophies.js` — CREATE (LF only). `public/assets/trophies/<id>.webp` ×9 — CREATE. Nothing else.
+  commands: `node scripts/optimize-trophies.js`
+  validation:
+```bash
+# TAIL of the step single validation script, which BEGINS with §VAL-P2 verbatim in the SAME file (P2-AMENDMENT #1a -- a child bash cannot supply fail/$PORC/$RC to this tail)
+node scripts/optimize-trophies.js > /dev/null || fail "optimize-trophies.js exited non-zero"
+H1="$(md5sum public/assets/trophies/*.webp | cut -d' ' -f1 | LC_ALL=C sort | tr '\n' ' ')"
+node scripts/optimize-trophies.js > /dev/null || fail "second optimize-trophies.js run exited non-zero"
+H2="$(md5sum public/assets/trophies/*.webp | cut -d' ' -f1 | LC_ALL=C sort | tr '\n' ' ')"
+case "$H1" in "$H2") ;; *) fail "derivatives are not byte-reproducible: $H1 vs $H2";; esac
+node --input-type=module -e '
+import sharp from "sharp";
+import { createHash } from "node:crypto";
+import { readFileSync, readdirSync } from "node:fs";
+const IDS=["chapters","days","streak","known","quizRight","quizzer","curious","proven","shelf-header"];
+const DIR="public/assets/trophies";
+const got=readdirSync(DIR).sort().join(",");
+const want=IDS.map(x=>x+".webp").sort().join(",");
+if(got!==want) throw new Error("derivative set is ["+got+"], expected ["+want+"]");
+const h=p=>createHash("md5").update(readFileSync(p)).digest("hex");
+const seen=new Map();
+for(const f of readdirSync("public/assets")) if(f.endsWith(".webp")) seen.set(h("public/assets/"+f),"public/assets/"+f);
+for(const id of IDS){
+  const p=DIR+"/"+id+".webp";
+  const m=await sharp(p).metadata();
+  if(m.format!=="webp") throw new Error(p+" is "+m.format+", expected webp");
+  if(m.width!==640||m.height!==640) throw new Error(p+" is "+m.width+"x"+m.height+", expected 640x640");
+  const d=h(p);
+  if(seen.has(d)) throw new Error(p+" is byte-identical to "+seen.get(d));
+  seen.set(d,p);
+}
+console.log("DERIVATIVES-OK 9 webp, all 640x640, all byte-distinct, reproducible");
+' || fail "derivative gate failed"
+ENDS="$(node -e 'const fs=require("fs");const b=fs.readFileSync("scripts/optimize-trophies.js");let c=0,l=0;for(let i=0;i<b.length;i++){if(b[i]===10){if(i>0&&b[i-1]===13)c++;else l++;}}console.log("scripts/optimize-trophies.js CRLF="+c+" LF="+l);')"
+echo "ENDINGS: $ENDS"
+case "$ENDS" in *"CRLF=0 "*) ;; *) fail "scripts/optimize-trophies.js must be LF-only: $ENDS";; esac
+EXPECT='?? public/assets/trophies/chapters.webp
+?? public/assets/trophies/curious.webp
+?? public/assets/trophies/days.webp
+?? public/assets/trophies/known.webp
+?? public/assets/trophies/proven.webp
+?? public/assets/trophies/quizRight.webp
+?? public/assets/trophies/quizzer.webp
+?? public/assets/trophies/shelf-header.webp
+?? public/assets/trophies/streak.webp
+?? scripts/optimize-trophies.js'
+case "$PORC" in "$EXPECT") ;; *) fail "write set wrong. got:
+$PORC";; esac
+exit $RC
+```
+  contracts: **the frozen source of `scripts/optimize-trophies.js` — write exactly this, LF endings, byte-preservingly (field-guide lesson 4):**
+```js
+import sharp from "sharp";
+import { mkdir } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const SRC = path.resolve(__dirname, "..", "assets", "delight", "trophies");
+const OUT = path.resolve(__dirname, "..", "public", "assets", "trophies");
+
+// The 8 signed trophy ids (lib/profile.js TROPHY_CATALOG) plus the shelf header.
+// Square masters in, square 640 derivatives out (design T6). NOT precached.
+const NAMES = [
+  "chapters",
+  "days",
+  "streak",
+  "known",
+  "quizRight",
+  "quizzer",
+  "curious",
+  "proven",
+  "shelf-header",
+];
+const WIDTH = 640;
+const QUALITY = 72;
+
+async function main() {
+  await mkdir(OUT, { recursive: true });
+  for (const name of NAMES) {
+    const src = path.join(SRC, name + ".png");
+    const out = path.join(OUT, name + ".webp");
+    await sharp(src)
+      .resize({ width: WIDTH, withoutEnlargement: true })
+      .webp({ quality: QUALITY, effort: 4 })
+      .toFile(out);
+    console.log("wrote", out);
+  }
+}
+
+main().catch((err) => { console.error(err); process.exit(1); });
+```
+  This mirrors `scripts/optimize-placement.js` line for line (the subdirectory precedent) and keeps the frozen recipe of `optimize-assets.js` (quality 72, effort 4, `withoutEnlargement`). Commit at acceptance — message: `step 2.4: trophy webp derivatives (T6) — scripts/optimize-trophies.js, nine 640x640 webps, public/ otherwise byte-frozen`.
+  non-goals: do NOT run or edit `scripts/optimize-assets.js` (it would rewrite the eight existing webps and break the §VAL-P2 exclusion digest); do not add the trophies to its `WIDTHS`; do not add anything to `public/sw.js` `PRECACHE` and do not bump `CACHE` (SK2-3, T6: art is never precached); do not add an npm script; do not touch `tests/` (no test moves this phase, SK2-7); do not create a `.gitattributes`; do not hand-edit a webp; do not produce extra sizes, a sprite sheet, or per-tier variants (tiers are CSS, T4/T6).
+  tier: WORKER — a 30-line script copied from an in-repo precedent, with a fully mechanical gate.
+  depends on: 2.3 (GC-D8 APPROVED for all nine; masters committed).
+
+STEP 2.5: record the prompts and the inventory in docs/visual-design.md
+  goal: The doc that governs this app's art records what was made and exactly how, so the next run can reproduce or extend the set without asking anyone: nine inventory rows, nine verbatim prompts, and the one pipeline note about the new script.
+  files: `docs/visual-design.md` — MODIFY (LF, additive only; the file is CRLF=0 / LF=317 today).
+  commands: none — direct file edits.
+  validation:
+```bash
+# TAIL of the step single validation script, which BEGINS with §VAL-P2 verbatim in the SAME file (P2-AMENDMENT #1a -- a child bash cannot supply fail/$PORC/$RC to this tail)
+node -e '
+const fs=require("fs"),path=require("path");
+const NL=String.fromCharCode(10);
+const norm=s=>s.split(NL).join(" ").split(" ").filter(Boolean).join(" ");
+const doc=norm(fs.readFileSync("docs/visual-design.md","utf8"));
+const IDS=["chapters","days","streak","known","quizRight","quizzer","curious","proven","shelf-header"];
+const DIR=path.join(process.env.HOME,"trophies-art","prompts");
+for(const id of IDS){
+  const b=fs.readFileSync(path.join(DIR,id+".txt"));
+  const body=norm(b.slice(0,b.length-389).toString("ascii"));
+  let n=0,i=0;
+  for(;;){const k=doc.indexOf(body,i);if(k<0)break;n++;i=k+1;}
+  if(n!==1) throw new Error(id+": its prompt body appears "+n+" times in the doc, expected exactly 1");
+  if(doc.indexOf("assets/delight/trophies/"+id+".png")<0) throw new Error(id+": no inventory row naming assets/delight/trophies/"+id+".png");
+}
+if(doc.indexOf("scripts/optimize-trophies.js")<0) throw new Error("no pipeline note naming scripts/optimize-trophies.js");
+if(doc.indexOf("public/assets/trophies/")<0) throw new Error("the derivative path is not recorded");
+console.log("DOC-OK 9 prompts recorded verbatim, 9 inventory rows, pipeline note present");
+' || fail "doc gate failed"
+DOCDEL="$(git diff --numstat HEAD -- docs/visual-design.md | awk '{s+=$2} END{print s+0}')"
+case "$DOCDEL" in 0) ;; *) fail "docs/visual-design.md deleted $DOCDEL lines; the edit must be additive";; esac
+DENDS="$(node -e 'const fs=require("fs");const b=fs.readFileSync("docs/visual-design.md");let c=0,l=0;for(let i=0;i<b.length;i++){if(b[i]===10){if(i>0&&b[i-1]===13)c++;else l++;}}console.log("docs/visual-design.md CRLF="+c+" LF="+l);')"
+echo "ENDINGS: $DENDS"
+case "$DENDS" in *"CRLF=0 "*) ;; *) fail "docs/visual-design.md gained CRLF: $DENDS";; esac
+EXPECT=' M docs/visual-design.md'
+case "$PORC" in "$EXPECT") ;; *) fail "write set wrong. got:
+$PORC";; esac
+exit $RC
+```
+  contracts: three additive edits, all appended inside existing sections, nothing existing rewritten (the doc is FROZEN; T6 authorises exactly this recording, and §6's own "Per-asset generation prompts" is the precedent format).
+  - **Edit 1 — §6 Inventory**, immediately after the existing inventory table, a new sub-block headed `#### Trophies (word-trophies run, 2026-07-29)` with a nine-row table `| File (assets/delight/trophies/<name>.png) | Aspect | Dimensions | Used for |`, in the frozen order `chapters, days, streak, known, quizRight, quizzer, curious, proven, shelf-header`, Aspect = `square` for all nine, **Dimensions read from the files with sharp, not guessed**, "Used for" = `trophy card: <id>` for the eight and `trophies screen header` for `shelf-header`. Add one sentence: masters for this set live in the `trophies/` subdirectory of `assets/delight/`; derivatives are `public/assets/trophies/<id>.webp` at 640×640; the eight stems are the signed `TROPHY_CATALOG` ids in `lib/profile.js` and must not be renamed.
+  - **Edit 2 — §6 Per-asset generation prompts**, appended after the `app-icon` entry: `#### Trophy prompts (word-trophies run, 2026-07-29)` and the nine bullets `- **<id>**: "<body>" + SUFFIX`, each body **copied from `$HOME/trophies-art/prompts/<id>.txt`** (the bytes actually sent), wrapped for readability but otherwise unaltered. One sentence: each prompt was sent with the FROZEN STYLE SUFFIX appended verbatim, extracted from this document by script and verified by md5 `51b97a774dc52aa272850bb686c22188`.
+  - **Edit 3 — §7 Generation pipeline**, one appended bullet: trophy derivatives are produced by `scripts/optimize-trophies.js` (sharp, width 640, quality 72, effort 4) from `assets/delight/trophies/` into `public/assets/trophies/`; `scripts/optimize-assets.js` must NOT be re-run, because it rewrites all eight existing `public/assets/*.webp`; trophy art is NOT in `PRECACHE` (design §2(iv): artwork is runtime-fetched and never cached).
+  Commit at acceptance — message: `step 2.5: record the nine trophy prompts, inventory and derivative pipeline in docs/visual-design.md (T6)`.
+  non-goals: **do not touch §3** — the stale warm-dark palette table is T10's job and T10 belongs to phase 3 (SK2-6); do not touch the FROZEN STYLE SUFFIX text, §1, §2, §4, §5 or §8; do not delete or rewrite one existing line (deletions budget 0); do not add Hebrew; do not edit `README.md`, `design.md` or `.oplan/`; do not add a `CACHE`/`PRECACHE` claim.
+  tier: WORKER — a bounded additive edit with an exact-match gate.
+  depends on: 2.4 (the derivatives exist, so the pipeline note is true) and 2.1 (the prompt files are the source the gate diffs against — they must still be on disk).
+
+STEP 2.6: phase close
+  goal: Every phase acceptance criterion re-run on the committed tree; the new `public/` digest re-pinned; the record written for phase 3.
+  files: `.oplan/word-trophies/journal.md` — APPEND. `.oplan/word-trophies/phase-state.md` — REWRITE (orchestrator record; not an executor write set).
+  commands: §VAL-P2 plus the close block below; then the records commit.
+  validation:
+```bash
+# TAIL of the step single validation script, which BEGINS with §VAL-P2 verbatim in the SAME file (P2-AMENDMENT #1a -- a child bash cannot supply fail/$PORC/$RC to this tail)
+BASE=PHASE2_BASE_HASH   # P2-AMENDMENT #1c: substituted by the orchestrator from the go-ahead record before running
+# 1. the full public/ digest: count pinned, md5 RECORDED as the new frozen expectation
+PUBFULL="$(node -e 'const fs=require("fs"),path=require("path"),crypto=require("crypto");const out=[];(function walk(d){for(const e of fs.readdirSync(d).sort()){const f=path.join(d,e);const s=fs.statSync(f);if(s.isDirectory())walk(f);else out.push(f.split(path.sep).join("/")+" "+crypto.createHash("md5").update(fs.readFileSync(f)).digest("hex"));}})("public");console.log(out.length+" "+crypto.createHash("md5").update(out.join(String.fromCharCode(10))).digest("hex"));')"
+echo "NEW PUBLIC PIN: $PUBFULL"
+case "$PUBFULL" in "2371 "*) ;; *) fail "public/ file count is not 2362+9: $PUBFULL";; esac
+# 2. binaries survived autocrlf: worktree bytes == committed blob bytes
+node -e '
+const { execFileSync }=require("child_process");
+const fs=require("fs"),crypto=require("crypto");
+const IDS=["chapters","days","streak","known","quizRight","quizzer","curious","proven","shelf-header"];
+const paths=IDS.map(i=>"assets/delight/trophies/"+i+".png").concat(IDS.map(i=>"public/assets/trophies/"+i+".webp"));
+for(const p of paths){
+  const disk=crypto.createHash("md5").update(fs.readFileSync(p)).digest("hex");
+  const blob=crypto.createHash("md5").update(execFileSync("git",["cat-file","blob","HEAD:"+p],{maxBuffer:1<<28})).digest("hex");
+  if(disk!==blob) throw new Error(p+": worktree "+disk+" != blob "+blob+" (autocrlf mangled a binary)");
+}
+console.log("BINARY-OK 18 files, worktree bytes == committed blob bytes");
+' || fail "binary integrity gate failed"
+# 3. nothing deleted, nothing left uncommitted
+GONE="$(git diff --diff-filter=D --name-only "$BASE")"
+case "$GONE" in "") ;; *) fail "files were deleted: $GONE";; esac
+case "$PORC" in "") ;; *) fail "tree not clean at the close:
+$PORC";; esac
+exit $RC
+```
+  contracts: the record must state, for phase 3 and 4 to consume — the nine filenames and that the eight stems are the `TROPHY_CATALOG` ids exactly (camelCase `quizRight`); the derivative path `/assets/trophies/<id>.webp`, 640×640, **runtime-fetched, NOT precached**; **the new full `public/` pin `2371 <md5>` replaces `2362 74e736…`, and the exclusion pin `2362 74e736d7d83b22a24945eae87cb9fe33` remains valid forever as "public/ outside the trophies directory"**; that `CACHE` is still `magic-vet-v17` and **phase 3's v17→v18 bump is now mandatory and also covers this phase's `public/` addition** (SK2-3); that ledger 323 flat / 328 reported and contrast 52 did not move, so phase 3 starts from the same numbers phase 1 left; that **T10 is unassigned by §5 and is handed to phase 3** (SK2-6); that **no asset test exists yet and phase 3 must add one** when the view references the files (SK2-7); that the shelf-header is square and T4 never placed it, so phase 3 must decide its framing in CSS (SK2-2, RECORD GAP 1); that no D25 capture exists and none was made; and the nine `TROPHY-ART <id>: APPROVED` verdicts with their md5s. Commit message: `oplan: word-trophies PHASE 2 CLOSED — nine owner-gated trophy assets, masters + 640 webps, public/ re-pinned 2371, CACHE untouched at v17`.
+  non-goals: no deploy, no capture, no `CACHE` bump, no code change, no test change, no `public/` change beyond what 2.4 committed.
+  tier: ORCHESTRATOR — it re-runs the frozen gates in a clean state and writes the run record.
+  depends on: 2.1-2.5 all accepted.
+
+RISKS
+
+1. **Style drift across nine images** (design §6's own named risk). Nothing mechanical can see it. Noticed by: the GC-D8 gate on a 3×3 contact sheet, where drift is obvious side by side; mitigated by one chat, one generation at a time, the suffix verbatim, and objects-not-characters (SK2-8). Regenerate, never settle.
+2. **A duplicate or stale capture** — the 89-duplicate burst was exactly this. Would pass any per-file format check. Noticed by: md5-distinctness across the nine new masters, the nine existing masters and the anchor (step 2.2), repeated over the derivatives (step 2.4) — and by the pre-click absence check on `trophy-<id>.png`.
+3. **Approval drifting off the bytes** — an image approved, then regenerated, then integrated. Noticed by: step 2.3 comparing on-disk md5 against the recorded `TROPHY-ART-MD5` line; a regeneration that forgets to re-record fails the gate loudly.
+4. **`scripts/optimize-assets.js` run "helpfully"** — it would silently rewrite all eight existing webps, possibly with different bytes from a different sharp build. Noticed by: the §VAL-P2 exclusion digest, which covers every existing `public/assets/*.webp`. Declared a non-goal in steps 2.2 and 2.4.
+5. **autocrlf mangling a binary.** Measured today as not happening (`heroine.png`/`.webp` disk == blob), but the trap is invisible to `git diff` (lesson 4). Noticed by: the close-step blob-identity check over all 18 binaries.
+6. **A prompt reaching the composer altered** — em-dash injection (lesson 14), or an escape collapsing in a JSON packet (lesson 8, this run's own false-positive costume). Mitigated structurally: the bodies are pure ASCII, the only non-ASCII text (the suffix's em-dash) is never retyped but extracted from the doc and md5-verified, and the composer is read back before every send.
+7. **The frozen chat is gone or the free route refuses to generate.** Not testable from files. This is a STOP, not an adaptation — a new chat breaks the style-consistency rule that the whole asset library rests on (`docs/visual-design.md` §7, lesson 11). Escalate to the owner.
+8. **The webp derivatives are not byte-reproducible** across a future sharp upgrade, so a later re-run would move the `public/` digest. Noticed by: the run-twice determinism check now, and the fact that no future phase has any reason to re-run the script. Recorded, not engineered around.
+9. **Someone reads the `public/` exclusion digest as a licence to move other files under `public/`.** Noticed by: the digest itself — it covers everything except the nine new webps, and its expected value is the phase-1 pin unchanged.
+
+BLOCKERS
+
+**None.** Everything an executor needs is frozen above: the nine filenames, the nine full prompt bodies, the suffix's exact bytes and md5, the chat URL, the capture method, the master and derivative gates with their thresholds, the complete source of the new script, the doc edits, the per-step write sets and porcelain expectations, the CACHE decision with its fallback, and the digest mechanism. The two places where the record was silent — the shelf-header's filename/aspect and the `CACHE` question — are decided in SKELETON CHANGES with the citations, not guessed.
+
+RECORD GAPS
+
+1. **T4 never places the shelf-header.** T6 mandates a ninth "shelf-header" image; T4 describes the screen as "one card per trophy" and mentions no header. So the header's role, position and framing are unspecified by the signed design. Worked around: this phase produces it square (literal T6) and hands phase 3 the framing decision (CSS `object-fit`, not a regeneration). **Phase 3 must rule.**
+2. **T6 cites `docs/visual-design.md:190-195` for the FROZEN STYLE SUFFIX; the suffix is actually at lines 201-205** — the doc grew by the background-composition amendment after the design was written. Worked around by extracting via the `### FROZEN STYLE SUFFIX` heading and pinning the md5, so line drift can never silently deliver the wrong text.
+3. **QZ-22's scope is stated two ways, and this phase is the first to sit in the gap.** word-g1's signed §10 and this run's frozen-contract line say *any* `public/` change ships a bump; field-guide lesson 7 and design §2(iv)/T6 say precached files only, and art is never precached; this run's T4 explicitly assigns the single v18 bump to phase 3. Decided in SK2-3 (no bump here; phase 3's v18 covers both; no deploy before phase 4). One line for the orchestrator or owner to overrule, with the exact fallback written into SK2-3.
+4. **Design §5 assigns no phase to T10** (the `docs/visual-design.md` §3 palette truth-fix). Decided in SK2-6: phase 3, where the palette is worked. Recorded in the close so it cannot be lost.
+5. **Design §5 says phase 2 is "No code", and T6 says the derivatives come through `scripts/optimize-assets.js`** — both are false as written: that script structurally cannot write to a subdirectory, and re-running it would rewrite eight frozen files. Resolved in SK2-1 with the in-repo `optimize-placement.js` precedent. Recorded as an amendment, not silently fixed.
+6. **The record does not say how the owner reviews images** (GC-D8 says only "the owner approves every asset before integration"; the band2 precedent recorded a verdict line with no procedure). Frozen here as a contact sheet plus per-size previews, with the verdict bound to an md5. Note the tension with the standing self-serve-visual-audit habit: that habit is about auditing the *UI in the sandbox browser*, whereas GC-D8 is a signed **owner** gate on art (design §8, T6 row) — the record wins and the owner looks.
+7. **No test anywhere asserts that a referenced asset exists under `public/assets/`** (`item-review.test.js` only checks assets referenced by a docs page). Nothing mechanical would notice if a trophy webp were deleted. Deliberately left to phase 3, which introduces the references and can move the ledger once (SK2-7) — flagged so it is not forgotten.
+8. **`.oplan/word-trophies/STATUS.md` and `briefing.md` are named in `phase-state.md` but were not consulted** — `phase-state.md`, `plan.md`, `journal.md`, `design.md` and the field guide carried every fact this plan needed. If either holds an owner instruction about phase 2, it has not been folded in.
+
+PLAIN PLAN: for the human, no jargon — one line per step:
+  2.1 Write the nine picture requests into nine small text files, each one ending with the app's official "house style" paragraph copied straight out of the design document rather than typed again — because the style paragraph is what keeps all the app's pictures looking like one family, and a single retyped word would quietly break that.
+  2.2 In the one ChatGPT chat that has drawn every picture in this app, make the nine images one at a time and save them into the project — because using the same chat is the only thing that keeps the new trophies looking like they came from the same world as the storybook pictures; a check then confirms each one is square, large enough, and genuinely a new image rather than an accidental copy of another.
+  2.3 Show you all nine, and record your yes or no for each one, tied to the exact file — because you approve every new picture before it goes into the app, and tying the approval to the file means the picture you approved is provably the picture that ships.
+  2.4 Add a tiny build script that shrinks the nine approved pictures into small fast web versions, and run it — because the phone should download a small image, and a script (rather than hand work) means anyone can rebuild them later and get identical files.
+  2.5 Write the nine requests and the new picture list into the app's visual design document — because the next person, months from now, should be able to make a tenth trophy that matches without asking anyone what was done.
+  2.6 Re-run every check on the finished result and write down what changed, including the new "nothing in the public folder moved" fingerprint — because the next phase starts from these notes, not from anyone's memory.
+  DONE WHEN: nine trophy pictures you approved are in the project as full-size originals and as small web versions, all nine provably different from each other and from every picture already in the app; the app itself is untouched — same 328 tests passing, same colour check, same service worker, and not one other byte anywhere in the shipped folder has moved.

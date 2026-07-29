@@ -306,3 +306,51 @@ PHASE 1 CLOSED (2026-07-29)
     DECODES to the raw glyph in transit — it produced this phase's audit false positive).
   tokens at boundary: orchestrator context size unavailable (harness readout not exposed
     mid-session); subagent totals above.
+
+## PHASE 2 PLANNING (2026-07-29)
+
+Resumed in a fresh orchestrator session (Fable) from phase-state.md per the handoff prompt.
+Pre-flight re-verified before anything else: tree clean at 4966d89 · npm test 328/0, plan
+1..323 · contrast 52 · live sw.js CACHE magic-vet-v17 · english-app-backups/ empty (no D25
+capture — correct until phase 4) · no .data/profile.json. Frozen contracts re-acknowledged
+(phase-state list, verbatim).
+
+RECORD CORRECTION: design T6 cites docs/visual-design.md:190-195 for the FROZEN STYLE
+SUFFIX; the heading actually sits at :197, blockquote :201-205, and the doc has NOT changed
+since before the design was signed — the pin was simply off at signing. No doc edit; the
+plan extracts by heading and pins the bytes (388, md5 51b97a774dc52aa272850bb686c22188).
+
+Fresh planner (Opus, files only) returned the 6-step phase-2 plan now in plan.md: 11
+acceptance criteria, §VAL-P2 preamble, SK2-1..SK2-8, the 9 frozen prompt bodies, the frozen
+optimize-trophies.js source. BLOCKERS: none. RECORD GAPS: 8. Rulings adopted:
+  SK2-1 new sibling script; scripts/optimize-assets.js is never run or edited (it would
+        rewrite the eight frozen webps);
+  SK2-3 NO CACHE bump this phase — phase 3's single v17->v18 covers both additions; no
+        deploy happens before phase 4; explicit fallback written if overruled at GO;
+  SK2-4 public/ gate becomes an EXCLUSION digest (== the phase-1 pin, measured); full
+        digest re-pinned at the close (2371 files expected);
+  SK2-6 T10 (visual-design §3 truth-fix) handed to phase 3;
+  SK2-7 no new test this phase; ledger stays 323/328; phase 3 adds the asset test;
+  SK2-8 trophy images are objects, no people, no metal cups/medals (CSS draws the tier).
+
+ORCHESTRATOR VERIFICATION: suffix 388 bytes md5 51b97a... CONFIRMED by independent
+extraction · sw.js md5 f16579d50af8b49a04e45a80975c6acf CONFIRMED · chat URL at
+docs/visual-design.md:266 CONFIRMED · exclusion digest == phase-1 pin CONFIRMED ·
+optimize-placement.js precedent matches the frozen 2.4 source line-for-line · sharp probe
+OK · no .gitattributes · doc CRLF=0 LF=317 · briefing.md + STATUS.md read: no phase-2
+owner instruction beyond the record (closes planner RECORD GAP 8).
+
+P2-AMENDMENT #1 (orchestrator, pre-review): (a) the draft invoked §VAL-P2 as a CHILD bash
+then used its fail/$PORC/$RC in the tails — undefined there, every tail would exit 0
+unconditionally (the silent-pass class); each step validation is ONE script = §VAL-P2
+verbatim + the tail. (b) step 2.1's cleanliness check gains the .oplan/ filter. (c) step
+2.6 opens with BASE=<recorded at go-ahead>.
+
+PLAN REVIEW (Sonnet, fresh): VERDICT ship, findings NONE — and it independently re-measured
+every pin (suite, contrast, sw.js md5, exclusion digest, suffix bytes, the 9+8 asset
+counts, prompt-body ASCII purity, and that "delight-pass lesson 14" cites that run's own
+guide, not this run's).
+
+tokens: planner=169339 · reviewer=95583. AWAITING: owner GO for phase-2 execution — the GO
+also ratifies (or overrules, fallback in SK2-3) the no-CACHE-bump decision. $BASE (phase 2)
+recorded at go-ahead.
