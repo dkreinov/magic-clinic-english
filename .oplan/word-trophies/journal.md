@@ -378,3 +378,75 @@ Read-only: NO prompt sent, NO image generated, the one chat NOT polluted, repo u
   - NOT tested: generation itself. Deliberate — the nine prompt files do not exist yet (step
     2.1) and a stray test prompt would pollute the one chat the whole art library's style
     consistency rests on. First real generation in 2.2 answers it; a bad result is a regenerate.
+
+## PHASE 2 EXECUTION OPENED (2026-07-29)
+
+OWNER GO given after the nine prompt bodies were read back to him in plain words (one line per
+picture, before any generation). Mode: AUTONOMOUS WITHIN PHASE -- the orchestrator runs 2.1..2.6
+without a per-step go-ahead, EXCEPT step 2.3 (GC-D8), where it stops and the owner judges every
+image. SK2-3 RATIFIED by the same GO: no CACHE bump this phase; phase 3's single v17->v18 covers
+this phase's public/ addition too.
+
+$BASE (phase 2) = fe1f78ab1d9e0b92d4d53208f117fa65f4c71c37 (fe1f78a).
+
+PRE-FLIGHT re-measured at the GO, all green: HEAD fe1f78a, tree clean; npm test 328 reported /
+0 fail / plan 1..323; flat ledger 323; contrast 52 PASS; public/sw.js md5
+f16579d50af8b49a04e45a80975c6acf with CACHE = "magic-vet-v17"; public/ exclusion digest
+2362 74e736d7d83b22a24945eae87cb9fe33; both transcripts diff EMPTY; no .data/profile.json;
+english-app-backups/ empty (no D25 capture -- correct until phase 4); assets/delight/trophies/
+and public/assets/trophies/ both absent; FROZEN STYLE SUFFIX extracts to 388 bytes md5
+51b97a774dc52aa272850bb686c22188 (heading now at line 197).
+
+P2-NOTE #1 (orchestrator ruling, executor stop-rule honoured -- escalated, ruled, logged).
+plan.md:989's cleanliness check reads awk '$NF !~ /^.oplan//' -- its backslashes had already
+collapsed in transport when P2-AMENDMENT #1b was written, so the command is a SYNTAX ERROR:
+  awk: cmd. line:2: $NF !~ /^.oplan//
+                                     ^ unexpected newline or end of string  (rc=1)
+Field-guide lesson 8 biting the fix that was meant to apply it. RULING: every phase-2 use of the
+.oplan filter is the §VAL-P2:919 form awk '$NF !~ /^\.oplan\//' (verified rc=0 today; ran clean
+30+ times in phase 1). No behaviour change was intended by #1b and none is made. Not a licence to
+edit any other frozen command.
+
+P2-NOTE #2 (strengthening, within the frozen spec). Step 2.1 freezes the nine bodies in plan.md
+but its gate only checks shape (ASCII, opener, distinct, suffix bytes) -- a body that lost a word
+in transport would pass. Measured today: all nine bodies in plan.md are pure printable ASCII
+(0 non-ASCII bytes; lengths 437/398/396/442/410/451/393/399/557) and machine-extractable from
+their frozen bullet lines. RULING: build-prompts.js EXTRACTS each body from plan.md by script and
+the suffix from docs/visual-design.md by script -- neither is ever retyped, the same rule the
+suffix already lives under. The frozen file format (BODY + one space + SUFFIX) is unchanged.
+
+STEP 2.1 the nine prompt files (WORKER, dispatched with the packet + the gate as FILES)
+Nine files at $HOME/trophies-art/prompts/<id>.txt, each = BODY + one 0x20 + SUFFIX, no trailing
+newline. NOTHING written inside the repo (gate-verified). Per P2-NOTE #2 the worker's
+build-prompts.js EXTRACTED the suffix from docs/visual-design.md (by heading) and the nine bodies
+from plan.md (by bullet), hard-stopping unless md5/388 and 9 ids / pure ASCII / distinct / opener
+/ the nine declared lengths all held. Nothing retyped.
+
+  id            body  file  md5(file)
+  chapters       437   826  0a1a2fe9d963e5b222ff137e07a92431
+  days           398   787  8c42aec6c9cb2d83ae33c3c12bb07ea0
+  streak         396   785  67d713794e03d096795feffbc6ad8ac8
+  known          442   831  93a829a63a6913ab696a1b53648bf040
+  quizRight      410   799  fba77e64ab72b1d663a5cfce2b066715
+  quizzer        451   840  743e1a544cb818488a6621bd877f156b
+  curious        393   782  ea5e159ae274e17b6fac96a15659986a
+  proven         399   788  b8793616cd5e0743bc74c54b4cef2311
+  shelf-header   557   946  bc597004defba3ad7ed61bdc32c077cd
+  total 7384 bytes; every file = body + 1 + 388; every last byte is "." (od -c), no newline.
+
+ORCHESTRATOR AUDIT (independent, not a re-run of the worker's script): a second extractor that
+slices the plan bullets on their BACKTICK boundaries (rather than regex-capturing) rebuilt all
+nine expected buffers from docs/visual-design.md + plan.md and compared them to disk with
+Buffer.equals -- all nine byte-identical, all md5s reproduced independently, all distinct, no
+trailing newline. Frozen gate re-run by the orchestrator: PROMPTS-OK + STEP-2.1-OK. Repo dirty
+only in .oplan/word-trophies/journal.md (the orchestrator's own record). ACCEPTED.
+  Rationale for auditing in-thread rather than dispatching a fresh auditor: this step's
+  correctness is a byte comparison against frozen sources with no judgement content, and a second
+  extraction route is stronger evidence than a second agent re-running the same gate.
+
+CALIBRATION FOR STEP 2.2 (measured, worth knowing before the composer): the SUFFIX is 388 bytes
+but 386 CHARACTERS -- it contains one em-dash ("11-year-old (em-dash) charming"). So a prompt file
+is NOT pure ASCII overall; only the body is. The em-dash sits near the END of the paste, not the
+start, which is the opposite end from delight-pass lesson 14's observed composer em-dash
+prepending -- so a stray leading em-dash remains detectable by the mandated read-back
+("must start with Square image (1:1):").
