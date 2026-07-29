@@ -37,3 +37,9 @@ Baseline at open: word-g1 closed at 1027764 · suite 303/0 · contrast 52 · liv
 
 NEXT: design.md drafted by the orchestrator from the grill + codebase facts; OWNER SIGNS
 before phase-1 planning.
+
+OWNER DIRECTIVE (2026-07-29, mid-open): trophies must ship with ARTWORK in the same
+style as the app's existing images — real image assets, created for this run. Generation
+follows the standing owner preference: build-time assets via the free ChatGPT web route,
+never the paid API. The design must specify the asset pipeline (prompts, sizes, format,
+precache implications) as a first-class deliverable.
