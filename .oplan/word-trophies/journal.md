@@ -43,3 +43,18 @@ style as the app's existing images — real image assets, created for this run. 
 follows the standing owner preference: build-time assets via the free ChatGPT web route,
 never the paid API. The design must specify the asset pipeline (prompts, sizes, format,
 precache implications) as a first-class deliverable.
+
+## DESIGN SIGNED (2026-07-29)
+
+Hebrew audit (owner-requested) ran before signature, grounded against the live app strings
+(the app says TIRGUL everywhere, never HIDON; badge ladder lomedet -> kim'at yoda'at ->
+yoda'at). Outcome: 3 renames adopted — chapters = HARPATKANIT (she launches/reads adventures,
+does not tell them), quizRight = ALUFAT HA-TIRGUL (register consistency with the app's own
+word), proven = BE'EMET YODA'AT (echoes the badge ladder; MOKHIHA rejected as ambiguous —
+everyday sense "rebukes"); tab label = HA-GVI'IM SHELI (pattern-matches HA-MILIM SHELI).
+5 names kept as proposed. Owner also asked "better in English?" — ruled NO (reward must land
+in her strongest language; off-band unglossed English violates the app's own vocabulary
+discipline; bidi risk), recorded in design §7.
+
+Owner signed all §8 rows 2026-07-29 ("ok go") with the audit edits. Design STATUS: SIGNED.
+NEXT: phase 1 (the engine) — fresh planner (Opus, files only), review, briefing, go-ahead.

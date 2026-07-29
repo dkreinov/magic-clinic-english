@@ -1,6 +1,7 @@
 # Design — word-trophies
 
-STATUS: DRAFT — awaiting owner signature (§8). Nothing in this run executes before it.
+STATUS: SIGNED by the owner, 2026-07-29 ("ok go"), incorporating the Hebrew-audit renames
+(three trophy names + the tab label). The audit itself is recorded in journal.md.
 
 ## 1. What this document is
 
@@ -85,14 +86,14 @@ action already uses.
 
 | id | Hebrew name | metric (derivation, all existing fields) | bronze/silver/gold |
 |---|---|---|---|
-| chapters | מספרת הרפתקאות | story.chapters.length | 5 / 15 / 40 |
+| chapters | הרפתקנית | story.chapters.length | 5 / 15 / 40 |
 | days | מתמידה | distinct calendar days across chapters[].generatedAt ∪ words[].lastQuizAt ∪ words[].lastSeen | 3 / 10 / 30 |
 | streak | רצף קסום | longest run of CONSECUTIVE days within the 'days' set | 2 / 4 / 7 |
 | known | אוצרת מילים | count of words with status 'known' | 5 / 15 / 30 |
-| quizRight | אלופת החידון | sum of words[].quizRight | 10 / 40 / 100 |
+| quizRight | אלופת התרגול | sum of words[].quizRight | 10 / 40 / 100 |
 | quizzer | מתאמנת אמיצה | sum of quizRight + quizWrong (showing up counts, even when wrong) | 20 / 60 / 150 |
 | curious | בלשית מילים | sum of words[].taps | 25 / 75 / 200 |
-| proven | מוכיחה | words with nominations ≥ 1 AND status 'known' (the app guessed, she proved it) | 1 / 5 / 15 |
+| proven | באמת יודעת | words with nominations ≥ 1 AND status 'known' (the app guessed, she proved it) | 1 / 5 / 15 |
 
 Honesty notes: she has 12 known today → אוצרת מילים bronze lands on the first award pass
 (deliberate — the day-one shelf must not be empty); 'proven' stays 0 until G1 nominates
@@ -102,7 +103,7 @@ earned-forever (a broken streak changes nothing shown — never-regress).
 
 ### T4 — the screen
 Route `/trophies` in ROUTES; `public/views/trophies.js` (export render(container, ctx));
-4th nav tab in index.html, DOM order AFTER המילים שלי, label `גביעים`, inline currentColor SVG
+4th nav tab in index.html, DOM order AFTER המילים שלי, label `הגביעים שלי`, inline currentColor SVG
 trophy icon drawn to match the three existing (24×24, stroke ~1.6, fill-opacity 0.15).
 Screen = one card per trophy: artwork image, name, current tier shown as a colored ring/frame,
 progress toward the next tier as plain text (e.g. 12 מתוך 15) — no progress-bar component, no
@@ -184,17 +185,19 @@ ASCII where possible, byte-preserving edit. Requires owner approval because the 
   tuning instrument; tuning DOWN a threshold never revokes an earned trophy (never-regress).
 
 ## 7. Open questions folded into the signature
-(a) The 8 Hebrew names + thresholds in T3 — approve or edit. (b) Nav label גביעים — approve or
-supply another. (c) T10 doc correction — approve. (d) Anything to cut from the catalogue?
+ANSWERED AT SIGNATURE (2026-07-29): (a) names approved WITH the audit renames (הרפתקנית,
+אלופת התרגול, באמת יודעת); thresholds approved as provisional. (b) tab label = הגביעים שלי
+(pattern-matches המילים שלי). (c) T10 approved. (d) nothing cut. Also ruled: names stay
+HEBREW — English names rejected (off-band vocabulary, register clash, bidi risk).
 
 ## 8. Sign-off
 | item | decision | signed |
 |---|---|---|
-| T1-T2 schema + server awarding | as written | [ ] |
-| T3 catalogue: 8 names + thresholds (provisional, tune-later) | as written / edited | [ ] |
-| T4 screen + 4th tab גביעים | as written | [ ] |
-| T5 celebration, no sound v1 | as written | [ ] |
-| T6 artwork: 9 assets, ChatGPT web, GC-D8 per-asset gate | as written | [ ] |
-| T7 three tier tokens + anchor move | as written | [ ] |
-| T8 capture/read-back extension | as written | [ ] |
-| T10 visual-design.md dated correction | as written | [ ] |
+| T1-T2 schema + server awarding | as written | [x] 2026-07-29 |
+| T3 catalogue: 8 names + thresholds (provisional, tune-later) | edited: 3 audit renames | [x] 2026-07-29 |
+| T4 screen + 4th tab הגביעים שלי | as written + label edit | [x] 2026-07-29 |
+| T5 celebration, no sound v1 | as written | [x] 2026-07-29 |
+| T6 artwork: 9 assets, ChatGPT web, GC-D8 per-asset gate | as written | [x] 2026-07-29 |
+| T7 three tier tokens + anchor move | as written | [x] 2026-07-29 |
+| T8 capture/read-back extension | as written | [x] 2026-07-29 |
+| T10 visual-design.md dated correction | as written | [x] 2026-07-29 |
