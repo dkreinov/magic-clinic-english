@@ -17,6 +17,10 @@
 # planner pins assumed bare 1-line inserts; a correct implementation would have failed the
 # frozen gate (the bad-spec class, caught at plan time). (b) VAL-COMMON transcript scratch
 # moved outside the repo (HOME/trophies-val). (c) PORC gains the standard .oplan/ filter.
+# AMENDMENT #2 (after plan review, fix-first, findings 1-4): step COMMANDS no longer contain
+# git add/commit — commits are the ORCHESTRATOR's, at acceptance, with the messages the plan
+# recorded (house practice; also moots the missing-git-add findings); VAL-COMMON's DELS gate
+# widened to include tests/trophies.test.js, matching criterion 10.
 
 # PHASE 1: the engine
 
@@ -151,8 +155,8 @@ if [ -f tests/trophies.test.js ]; then
 fi
 
 # --- deletion budget ---
-DELS="$(git diff --numstat HEAD -- lib/profile.js tests/profile.test.js | awk '{s+=$2} END{print s+0}')"
-case "$DELS" in 0) ;; *) fail "lib/profile.js + tests/profile.test.js deleted $DELS lines; budget is 0";; esac
+DELS="$(git diff --numstat HEAD -- lib/profile.js tests/profile.test.js tests/trophies.test.js | awk '{s+=$2} END{print s+0}')"
+case "$DELS" in 0) ;; *) fail "lib/profile.js + tests/profile.test.js + tests/trophies.test.js deleted $DELS lines; budget is 0";; esac
 GONE="$(git diff --diff-filter=D --name-only HEAD)"
 case "$GONE" in "") ;; *) fail "files were deleted: $GONE";; esac
 
@@ -307,8 +311,7 @@ cd C:/Users/dkreinov/claude/english-app
 node --check lib/profile.js
 npm test
 APP_CODE=dummy npm test
-git add lib/profile.js tests/profile.test.js tests/trophies.test.js
-git commit -m "step 1.1: trophies schema (T1) — defaultProfile trophies:{}, validateProfile optional block, TROPHY_TIERS; ledger 301 flat / 306 reported"
+# COMMIT (orchestrator, at acceptance — workers never run git writes): "step 1.1: trophies schema (T1) — defaultProfile trophies:{}, validateProfile optional block, TROPHY_TIERS; ledger 301 flat / 306 reported"
 ```
 
 **MANDATED FAIL-FIRST (run BEFORE the commit; restore after each):**
@@ -474,8 +477,8 @@ export const TROPHY_CATALOG = [
 
 All expected numbers above were produced by running the frozen implementation in an isolated prototype; if the executor's run disagrees, that is a STOP, not a number to adjust.
 
-**COMMANDS:** `node --check lib/profile.js`; `npm test`; `APP_CODE=dummy npm test`;
-`git commit -m "step 1.2: trophy catalogue (T3) — 8 signed ids/thresholds + metric derivations; ledger 311 flat / 316 reported"`
+**COMMANDS:** `node --check lib/profile.js`; `npm test`; `APP_CODE=dummy npm test`.
+(COMMIT at orchestrator acceptance: "step 1.2: trophy catalogue (T3) — 8 signed ids/thresholds + metric derivations; ledger 311 flat / 316 reported")
 
 **MANDATED FAIL-FIRST:**
 - **M1.2a** — change `days` bronze from `3` to `4` in `TROPHY_CATALOG`. `'TROPHY_CATALOG and TROPHY_TIERS are exactly the signed catalogue'` must fail. Restore.
@@ -550,8 +553,8 @@ export function awardTrophies(profile, now = new Date().toISOString()) {
 6. `'awardTrophies mutates nothing outside profile.trophies and returns the same object'` — `structuredClone` the profile, delete `trophies` from both clone and result, `deepStrictEqual`; and `strictEqual(awardTrophies(p, NOW), p)`.
 7. `'every profile awardTrophies produces still passes validateProfile'` — run it over five fixtures (empty, partial, all-gold, fabricated-higher-tier, unknown-id) and assert `deepStrictEqual(validateProfile(p), { ok: true, errors: [] })` each time.
 
-**COMMANDS:** `node --check lib/profile.js`; `npm test`; `APP_CODE=dummy npm test`;
-`git commit -m "step 1.3: awardTrophies (T2) — pure, idempotent, never-regress; ledger 318 flat / 323 reported"`
+**COMMANDS:** `node --check lib/profile.js`; `npm test`; `APP_CODE=dummy npm test`.
+(COMMIT at orchestrator acceptance: "step 1.3: awardTrophies (T2) — pure, idempotent, never-regress; ledger 318 flat / 323 reported")
 
 **MANDATED FAIL-FIRST:**
 - **M1.3a** — change `if (tier in earned) continue;` to `if (false) continue;`. Tests 2 (idempotence) and 4 (no rewrite) must BOTH fail. Restore.
@@ -674,8 +677,8 @@ becomes
    The two question `prompt`s must DIFFER (use `Q` and `Q + Q`) and the four `options` must be distinct — `verifyChapter` (`lib/story.js:101-113`) rejects a non-Hebrew prompt or option and requires 4 distinct strings. After writing the file, dump the codepoints of these lines and confirm they decode to U+05D0–U+05EA before running anything (lesson 8).
 5. `'awardTrophies is wired at exactly the two designed call sites and nowhere else'` — a source-needle test: read `api/profile.js`, `api/chapter.js`, `api/placement.js`, `api/translate.js`, `api/health.js` and every `.js` under `public/` (reuse `tests/shell.test.js:32-44`'s `listJsFiles`); assert exactly one occurrence of `awardTrophies(` **as a call** in `api/profile.js`, exactly one in `api/chapter.js`, **zero** in `api/placement.js` (the T2 non-goal — placement awards land on the next action), zero in the other handlers, and zero anywhere under `public/` (T2: "Never client-side"). Also assert `api/chapter.js`'s call sits AFTER the substring `p.story.chapters.push(r.chapter);` (SK-1, gated in source as well as in behaviour).
 
-**COMMANDS:** `node --check api/profile.js`; `node --check api/chapter.js`; `npm test`; `APP_CODE=dummy npm test`;
-`git commit -m "step 1.4: wire awardTrophies at the two save moments (T2, SK-1); ledger 323 flat / 328 reported"`
+**COMMANDS:** `node --check api/profile.js`; `node --check api/chapter.js`; `npm test`; `APP_CODE=dummy npm test`.
+(COMMIT at orchestrator acceptance: "step 1.4: wire awardTrophies at the two save moments (T2, SK-1); ledger 323 flat / 328 reported")
 
 **MANDATED FAIL-FIRST:**
 - **M1.4a** — move `awardTrophies(p);` in `api/chapter.js` from after the push to immediately after `promoteToCandidate(p);` (T2's literal wording). Test 4 must fail. **Measured in the prototype: post-push → `trophy keys: ["chapters"]`; pre-push → `trophy keys: []`.** Restore.
