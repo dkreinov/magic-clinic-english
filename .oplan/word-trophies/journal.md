@@ -143,3 +143,36 @@ STEP 1.1 the schema (T1)
   auditor: match, confidence high, findings none
   commit: f5212c5
   accepted: 2026-07-29T13:04:10Z
+
+STEP 1.2 the catalogue and its metrics (T3)
+  tier: WORKER (Sonnet)
+  did: appended frozen trophies block (trophyDay/wordEntries/chapterList/activeDays/
+    longestStreak/countNum/TROPHY_CATALOG) at EOF of lib/profile.js; added a NEW import line
+    for TROPHY_CATALOG/TROPHY_TIERS in tests/trophies.test.js (original import untouched,
+    addition-only diff) plus the 10 flat metric tests. Diff +94/-0 and +163/-0.
+  surprises: first attempt edited the existing import line in place and tripped the frozen
+    DELS==0 gate (git counts a changed line as delete+add); fixed by adding a separate
+    import line — the deletion budget effectively mandates addition-only diffs.
+  deviations: none (the separate import line is within the packet's "or add to it" option).
+  fail-first observed (evidence file HOME/trophies-val/step-1.2-failfirst.txt):
+    M1.2a -> "not ok 4 - TROPHY_CATALOG and TROPHY_TIERS are exactly the signed catalogue"
+    M1.2b -> "not ok 11 - the days metric..." AND "not ok 12 - the streak metric..."
+             (test 13 also failed as an unmandated side effect — consistent: it relies on
+             lastSeen feeding activeDays)
+    M1.2c -> "not ok 12 - the streak metric..."
+    M1.2d -> "not ok 13 - a value that is not a well-formed ISO date..."
+    all restored; lib/profile.js byte count stable at CRLF=0 LF=684 throughout.
+  validation_first_try: no (worker retried once — the import-line DELS trip above; the
+    orchestrator's own clean re-run passed first try: RC=0, 316/0 plain+gated, plan 1..311,
+    flat 311, contrast 52, digest unchanged, transcripts empty, endings lib 0/684 ·
+    api/profile 0/142 · api/chapter 64/0 · profile.test 0/138 · trophies.test 0/215,
+    DELS 0, PORC exact two-file set)
+  retries: 1
+  escalations: 0
+  tokens: worker=72635, checker=38756, orchestrator_delta=unavailable
+  interventions: 0
+  report-format note: worker prefixed one line before STATUS (logged per §9; first offence,
+    not re-dispatched)
+  auditor: match, confidence high, findings none
+  commit: 344f0de
+  accepted: 2026-07-29T13:30:34Z
