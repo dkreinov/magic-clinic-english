@@ -58,3 +58,36 @@ discipline; bidi risk), recorded in design §7.
 
 Owner signed all §8 rows 2026-07-29 ("ok go") with the audit edits. Design STATUS: SIGNED.
 NEXT: phase 1 (the engine) — fresh planner (Opus, files only), review, briefing, go-ahead.
+
+## PHASE 1 PLANNING (2026-07-29)
+
+Fresh planner (Opus, files only, read-only-of-the-repo; measured its claims in an isolated
+scratch prototype) returned the 5-step phase-1 plan now in plan.md: 13 acceptance criteria,
+a shared VAL-COMMON validation preamble (suite plain+gated, flat ledger, contrast 52, a
+public/ byte DIGEST pin 2362/74e736d7..., both transcripts, per-file CRLF/LF byte pins, raw
+non-ASCII gate on the new test file), SK-1..SK-6 skeleton refinements — notably SK-1: T2's
+literal "after promoteToCandidate" position is WRONG (measured: awarding pre-push misses the
+new chapter; frozen to immediately-before-saveProfile, post-push) and SK-3: the Hebrew names
+stay OUT of lib (view-layer data, phase 3, extracted never retyped). Ledger plan:
+298 -> 301 -> 311 -> 318 -> 323 flat (306/316/323/328 reported). BLOCKERS: none.
+RECORD GAPS: 7 (biggest for later phases: api/chapter.js returns NO profile, so T5's
+celebration-from-chapter-response needs a phase-3 ruling).
+
+ORCHESTRATOR VERIFICATION: digest, endings (142/64/137/558), every quoted anchor, harness
+files, GOOD_TEXT:91, bytes-unchanged GET test — ALL CONFIRMED. AMENDMENT #1 (pre-review):
+(a) 1.4/criterion-11 ending pins 143->146, 65->67 — the frozen edits insert COMMENTED blocks
+and the planner pinned bare 1-line inserts; a correct implementation would have failed the
+frozen gate (bad-spec, caught at plan time, word-g1's 2.3 class); (b) transcript scratch out
+of the repo; (c) PORC .oplan filter (whose backslash promptly collapsed in transit and was
+re-fixed — lesson 8, costume N+1).
+
+PLAN REVIEW (Sonnet, fresh): VERDICT fix-first — 4 findings, all validation-class, zero
+undecided: steps 1.2/1.3/1.4 ended in git commit with no git add (verified failing in a
+scratch repo), and VAL-COMMON's DELS gate was narrower than criterion 10. AMENDMENT #2:
+step COMMANDS lose git entirely (commits are the orchestrator's at acceptance, house
+practice), DELS widened. Re-review not required: both fixes are the reviewer's own
+prescriptions applied verbatim.
+
+tokens: planner=193144 · reviewer=124760. Execution mode: NOT YET DECLARED — asked in the
+briefing (word-g1 ran autonomous by explicit owner opt-in; this run has none yet).
+$BASE (phase 1) = recorded at go-ahead, immediately before step 1.1.
