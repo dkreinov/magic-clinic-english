@@ -91,3 +91,55 @@ prescriptions applied verbatim.
 tokens: planner=193144 · reviewer=124760. Execution mode: NOT YET DECLARED — asked in the
 briefing (word-g1 ran autonomous by explicit owner opt-in; this run has none yet).
 $BASE (phase 1) = recorded at go-ahead, immediately before step 1.1.
+
+## PHASE 1 EXECUTION OPENED (2026-07-29)
+
+GO received (owner continuation prompt, fresh orchestrator session — Fable). Execution mode:
+AUTONOMOUS WITHIN PHASE 1 (the owner delegated the call in the continuation prompt; ruled by
+the orchestrator), with the standard pause at the phase-1 close — phase 2 needs a fresh
+planner and the owner's per-asset art gate regardless, and the skill forbids self-initiated
+continuous mode across phases.
+
+Baseline re-verified in this session before any dispatch: tree clean at 1a30012 · npm test
+303 pass / 0 fail · contrast grep -c '^PASS' = 52 · live /sw.js on the canonical alias
+(english-app-three-tan.vercel.app) opens with CACHE = "magic-vet-v17" · .data/profile.json
+absent · C:/Users/dkreinov/english-app-backups/ empty (no D25 capture exists — correct; one
+is made only in phase 4, before deploy).
+
+FROZEN CONTRACTS RE-ACKNOWLEDGED (phase-state.md list, in force verbatim): word-g1
+phase-state:34-42 (transcripts diff empty forever · QZ-22 next bump v18 · contrast anchor 52
+· APP_CODE subshell rules · never probe the live profile) · signed design T1-T10 · plan pins
+(ledger 298->301->311->318->323 flat, public/ digest 2362 74e736d7d83b22a24945eae87cb9fe33
+byte-frozen all phase, per-file CRLF/LF pins, frozen error strings, mandated fail-first per
+step, workers never run git writes — commits are the orchestrator's at acceptance).
+
+$BASE (phase 1) = 1a30012991130cf0032c1743d0448a4c509509ac
+
+STEP 1.1 the schema (T1)
+  tier: WORKER (Sonnet)
+  did: lib/profile.js — added export const TROPHY_TIERS after WORD_SOURCES; added trophies: {}
+    to defaultProfile between story/meta; added trophies validation block (4 frozen error
+    strings) before the meta block. tests/profile.test.js — inserted trophies: {} into the
+    schema-v1 pin. tests/trophies.test.js — created, 3 flat tests as specified.
+  surprises: none of substance (worker noted the orchestrator's own journal.md edit in
+    porcelain; the frozen .oplan filter excluded it as designed).
+  deviations: worker used python io.open(newline='') for all mutations instead of the Edit
+    tool, per the mandated byte-preserving rule — no content deviation.
+  fail-first observed (full evidence was in HOME/trophies-val/step-1.1-failfirst.txt):
+    M1.1a -> "not ok 1 - defaultProfile produces the expected schema-v1 shape" AND
+             "not ok 12 - defaultProfile carries an empty trophies map"; restored, all pass.
+    M1.1b -> "not ok 3 - validateProfile rejects a non-object trophies, a non-object trophy
+             entry, an unknown tier key, and an unparseable award timestamp"; restored, pass.
+    M1.1c -> "not ok 2 - validateProfile accepts an absent trophies key, an empty map,
+             unknown trophy ids, and all three tier keys"; restored, pass.
+  validation_first_try: yes (orchestrator re-ran the frozen block from its own copy: RC=0;
+    306/0 plain and gated, plan 1..301, flat 301, contrast 52, digest unchanged, transcripts
+    empty, endings lib 0/590 · api/profile 0/142 · api/chapter 64/0 · profile.test 0/138 ·
+    trophies.test 0/52, DELS 0, PORC exact)
+  retries: 0
+  escalations: 0
+  tokens: worker=64238, checker=31086, orchestrator_delta=unavailable
+  interventions: 0
+  auditor: match, confidence high, findings none
+  commit: f5212c5
+  accepted: 2026-07-29T13:04:10Z

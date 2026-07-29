@@ -1,29 +1,21 @@
 # STATUS — word-trophies (photograph of now, 2026-07-29)
 
-THE RUN IS PLANNED AND WAITING FOR YOUR GO. The design is signed (8 trophies, Hebrew names
-per the audit, stored in her profile, awarded only at the two moments the server already
-saves it, artwork in the app's style generated via ChatGPT web with your per-image approval).
-Phase 1 — the invisible engine — is planned in full (5 steps), survived a hostile review
-(2 amendment rounds: wrong line-count pins that would have failed correct work, and commit
-commands that could not run), and is frozen.
+PHASE 1 IS RUNNING. You said GO; the run is in autonomous mode inside phase 1 and will pause
+when the phase closes. Step 1.1 of 5 is done and saved: her profile format now has a
+"trophies" box (empty by default), with rules that reject malformed trophy data and accept
+future trophies an older app version has never heard of. The test that would catch every
+planted bug was watched failing and passing — all on the first try.
 
 ```mermaid
 flowchart LR
-    D[Design SIGNED] --> P1[Phase 1 PLANNED<br/>engine: schema + awarding<br/>WAITING FOR GO]
-    P1 -.-> P2[Phase 2 sketch<br/>artwork via ChatGPT web]
-    P2 -.-> P3[Phase 3 sketch<br/>the screen + celebration]
-    P3 -.-> P4[Phase 4 sketch<br/>capture, ship, read-back]
+    S11[1.1 schema DONE] --> S12[1.2 the 8 counting rules<br/>RUNNING NEXT]
+    S12 --> S13[1.3 the award function]
+    S13 --> S14[1.4 wire the 2 save moments]
+    S14 --> S15[1.5 phase close + records]
 ```
 
-Phase 1 changes nothing she can see and deploys nothing: it teaches the profile to carry
-trophies, writes the 8 counting rules exactly as signed, adds the award function (never
-removes, never rewrites, never invents), wires it at the two save moments, and grows the
-test suite 303 -> 328 with a watched failure for every rule. Production stays at v17; her
-live profile is not touched or read.
+Nothing she can see has changed and nothing was deployed: production stays at v17, her live
+profile untouched, the app's pages byte-identical. The suite grew 303 -> 306 tests, all
+green, on the way to 328 by the end of the phase.
 
-One design correction already earned: the signed wording put the chapter-time award BEFORE
-the new chapter is counted — measured, it would miss every chapter milestone at the moment
-it happens; the plan fixes the position and records it as an amendment (SK-1).
-
-WAITING ON YOU: say GO to start phase 1 — and whether this run may proceed phase-to-phase
-autonomously (like word-g1) or should pause for your go at each phase boundary.
+WAITING ON YOU: nothing right now. The next stop is the phase-1 close report.
