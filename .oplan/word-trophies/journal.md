@@ -207,3 +207,16 @@ STEP 1.3 awardTrophies (T2)
   auditor: match, confidence high, findings none
   commit: d848aa7
   accepted: 2026-07-29T13:53:02Z
+
+INTERVENTION (step 1.4, 2026-07-29, reason: bad-spec — the third of this project's line):
+worker stopped-with-question per the stop-rule instead of running mutation M1.4b as frozen.
+Finding, verified by the orchestrator against api/profile.js's GET flow: (a) M1.4b's
+companion clause (api-profile-quiz bytes-unchanged test "must fail too") is mechanically
+impossible — GET's two save decisions both precede the frozen insertion point, so no second
+disk write can ever occur; (b) test 3's literal fixture was a NO-OP DETECTOR (known.bronze
+already awarded, nothing else near threshold) — the mutation would award nothing and test 3
+could not fail either. RULING: plan AMENDMENT #3 — test 3's seed gains 3 dated pre-NOW
+chapters (earned-but-unawarded days/streak tiers); M1.4b's detector is test 3's RESPONSE
+assertion; companion clause dropped; byte assertion stays (it guards the migrateWordKeys
+resort trap). Worker's already-observed M1.4b failure under the strengthened fixture counts.
+Worker continued (same context) to M1.4c/M1.4d + the frozen validation, which is unchanged.

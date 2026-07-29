@@ -21,6 +21,20 @@
 # git add/commit — commits are the ORCHESTRATOR's, at acceptance, with the messages the plan
 # recorded (house practice; also moots the missing-git-add findings); VAL-COMMON's DELS gate
 # widened to include tests/trophies.test.js, matching criterion 10.
+# AMENDMENT #3 (execution, step 1.4, worker stop-with-question 2026-07-29, orchestrator
+# ruling): M1.4b as planned was wrong twice. (a) Its companion clause — that the
+# api-profile-quiz bytes-unchanged GET test "must fail too" — is IMPOSSIBLE at the frozen
+# insertion point: GET makes both of its save decisions (fresh-profile create; migration
+# rewrite) BEFORE line 33, so an awardTrophies inserted before sendJson can never cause a
+# second disk write; clause DROPPED. (b) Test 3's literal fixture (5 known + known.bronze
+# already awarded, nothing else near a threshold) was a NO-OP DETECTOR — the mutation would
+# award nothing and test 3 could not fail at all. FIX: test 3's seed also carries
+# story.chapters = 3 entries with valid distinct pre-NOW generatedAt days (earned-but-
+# unawarded days/streak tiers), and M1.4b's expected failure is test 3's RESPONSE assertion
+# (deepStrictEqual(parsed.data.trophies, { known: { bronze: NOW } }) — the mutation makes
+# extra tiers appear in the response). The byte assertion STAYS in test 3 (it guards the
+# migrateWordKeys-resort trap); it is just not M1.4b's detector. The bad-spec class again —
+# caught by the executor stop-rule (lesson 9), not by any earlier gate.
 
 # PHASE 1: the engine
 
@@ -662,7 +676,7 @@ becomes
 
 1. `'a threshold-crossing POST /api/profile awards through the real handler and persists the award'` — five `mark-known` POSTs (`dog`, `cat`, `light`, `fair`, `method`, `source: 'placement'`). After the FOURTH, `deepStrictEqual(parsed.data.trophies, {})`; after the FIFTH, `deepStrictEqual(Object.keys(parsed.data.trophies), ['known'])` and `deepStrictEqual(Object.keys(parsed.data.trophies.known), ['bronze'])`, and the value is a parseable date string. Then re-read `profile.json` from the temp dir and assert the same award is on disk. Prototype-confirmed.
 2. `'a POST /api/profile that 400s awards nothing and writes nothing to disk'` — after seeding 5 known words (award present), byte-snapshot `profile.json`, POST `{ action: 'nope' }` → 400 `'unknown action'`, and POST `{ action: 'word-tap' }` → 400; assert the file bytes are IDENTICAL both times.
-3. `'GET /api/profile never awards, even on a profile that has already earned trophies'` — write, by hand, a profile whose `words` keys are **already `LC_ALL=C` sorted on-manifest lemmas** `cat, dog, fair, light, method` (all `status: 'known'`) and whose `trophies` is `{ known: { bronze: NOW } }`. **Frozen note the executor must honour: `migrateWordKeys` re-sorts `profile.words` on every GET, so an unsorted seed rewrites the file and destroys the byte check.** GET → 200; assert file bytes unchanged; assert `deepStrictEqual(parsed.data.trophies, { known: { bronze: NOW } })` — no `silver`, no new trophy, even though 5 known would earn bronze. Prototype-confirmed (`bytes unchanged: true`).
+3. `'GET /api/profile never awards, even on a profile that has already earned trophies'` — write, by hand, a profile whose `words` keys are **already `LC_ALL=C` sorted on-manifest lemmas** `cat, dog, fair, light, method` (all `status: 'known'`) and whose `trophies` is `{ known: { bronze: NOW } }`. **AMENDED #3: the seed ALSO carries `story.chapters` = 3 entries with valid, distinct, pre-NOW `generatedAt` days — earned-but-unawarded `days`/`streak` tiers — because without them this fixture is a no-op detector and mutation M1.4b would be invisible.** **Frozen note the executor must honour: `migrateWordKeys` re-sorts `profile.words` on every GET, so an unsorted seed rewrites the file and destroys the byte check.** GET → 200; assert file bytes unchanged; assert `deepStrictEqual(parsed.data.trophies, { known: { bronze: NOW } })` — no `silver`, no `days`, no `streak`, no new trophy of any kind. Prototype-confirmed (`bytes unchanged: true`).
 4. `'POST /api/chapter awards after the new chapter is pushed, so the new chapter counts'` — seed `placement.completed = true`, both learner names, and **four** prior chapters all carrying `generatedAt: '2026-01-01T00:00:00.000Z'` (one day, so `days` stays at 2 and `chapters` is the only metric near a threshold). `setTransport` returns the frozen fixture (`GOOD_TEXT` copied verbatim from `tests/api-chapter.test.js:91`, glossary `hurt/old/happy`, two questions). Assert 200; `stored.story.chapters.length === 5`; `deepStrictEqual(Object.keys(stored.trophies), ['chapters'])`; `deepStrictEqual(Object.keys(stored.trophies.chapters), ['bronze'])`. `resetTransport()` in a `finally`.
    **The fixture's Hebrew is `\u` escapes ONLY** — every codepoint below already exists in `tests/api-chapter.test.js` and was extracted by script, not retyped:
    ```js
@@ -682,7 +696,7 @@ becomes
 
 **MANDATED FAIL-FIRST:**
 - **M1.4a** — move `awardTrophies(p);` in `api/chapter.js` from after the push to immediately after `promoteToCandidate(p);` (T2's literal wording). Test 4 must fail. **Measured in the prototype: post-push → `trophy keys: ["chapters"]`; pre-push → `trophy keys: []`.** Restore.
-- **M1.4b** — add `awardTrophies(p);` into the GET branch of `api/profile.js` (before `sendJson` at `:33`). Test 3 must fail on the byte comparison, and `tests/api-profile-quiz.test.js › an old-shape profile survives a real GET with its bytes unchanged` must fail too. Restore.
+- **M1.4b (AMENDED #3)** — add `awardTrophies(p);` into the GET branch of `api/profile.js` (before `sendJson` at `:33`). Test 3 must fail on its RESPONSE assertion — the seeded earned-but-unawarded tiers appear in `parsed.data.trophies`. (The original byte-comparison expectation and the api-profile-quiz companion clause were wrong: at that insertion point GET has already made both save decisions and disk bytes cannot change — found by the executor stop-rule at execution, orchestrator-ruled.) Restore.
 - **M1.4c** — move `awardTrophies(p);` in `api/profile.js` to AFTER `await saveProfile(p);`. Test 1's on-disk assertion must fail. Restore.
 - **M1.4d** — add `awardTrophies(p);` to `api/placement.js` before its `saveProfile` at `:76`. Test 5 must fail. Restore.
 
