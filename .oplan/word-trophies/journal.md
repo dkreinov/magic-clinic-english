@@ -354,3 +354,27 @@ guide, not this run's).
 tokens: planner=169339 · reviewer=95583. AWAITING: owner GO for phase-2 execution — the GO
 also ratifies (or overrules, fallback in SK2-3) the no-CACHE-bump decision. $BASE (phase 2)
 recorded at go-ahead.
+
+BROWSER-ROUTE SMOKE TEST (2026-07-29, orchestrator, pre-GO — owner asked for it)
+Read-only: NO prompt sent, NO image generated, the one chat NOT polluted, repo untouched
+(git status 0 changed files after the test).
+  - The frozen chat URL (docs/visual-design.md:266) loads and is logged in (Plus). Tab title
+    resolves to "Image Request Cartoon Style" — the name the doc records. Its last message
+    visibly ends with the FROZEN STYLE SUFFIX text: confirmation by content, not just by URL.
+  - Composer reachable: div#prompt-textarea, contenteditable=true — so step 2.2's mandated
+    "read the composer back before sending" is mechanically possible.
+  - CAPTURE PATH PROVEN END-TO-END against a known-good answer: in-page fetch of a chat image
+    returned a real PNG (magic 89 50 4e 47, content-type image/png, 1938670 bytes, 1254x1254);
+    ONE synthetic <a download> click landed a file whose md5 is cf091df541e3b15a49effcaf3680ae97
+    — BYTE-IDENTICAL to the committed assets/delight/app-icon.png. The step-2.2 capture rule
+    reproduces an existing committed master exactly. Test file deleted after verification.
+  - CALIBRATION FACT for step 2.2's gate: this chat's images come out 1254x1254 SQUARE, so the
+    frozen thresholds (square, width >= 1024) are calibrated to real output, not optimistically.
+  - NEW TRAP (for the field guide at the phase-2 close): the Chrome extension REDACTS image
+    src URLs and hex digests as "[BLOCKED: Cookie/query string data]" / "[BLOCKED: Base64
+    encoded data]". This is NOT a failure — the fetch happens inside the page, so the URL never
+    needs to be read out; and evidence must be shipped as byte COUNTS and shell-side md5, never
+    as an in-page digest string. (Same family as lesson 8: the transport mangles the evidence.)
+  - NOT tested: generation itself. Deliberate — the nine prompt files do not exist yet (step
+    2.1) and a stray test prompt would pollute the one chat the whole art library's style
+    consistency rests on. First real generation in 2.2 answers it; a bad result is a regenerate.
