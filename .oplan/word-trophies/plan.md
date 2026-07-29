@@ -156,7 +156,7 @@ case "$DELS" in 0) ;; *) fail "lib/profile.js + tests/profile.test.js deleted $D
 GONE="$(git diff --diff-filter=D --name-only HEAD)"
 case "$GONE" in "") ;; *) fail "files were deleted: $GONE";; esac
 
-PORC="$(git status --porcelain | awk '$NF !~ /^\.oplan\\//' | LC_ALL=C sort)"   # .oplan is the orchestrator record, never the executor write set
+PORC="$(git status --porcelain | awk '$NF !~ /^\.oplan\//' | LC_ALL=C sort)"   # .oplan is the orchestrator record, never the executor write set
 ```
 
 Per-step blocks continue from here with their own `case` assertions on `$TOTAL`, `$FAILED`, `$PLAN`, `$GTOTAL`, `$GFAILED`, `$FLAT`, `$ENDS`, `$PORC`, then `exit $RC`.
