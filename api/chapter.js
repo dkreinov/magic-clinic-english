@@ -1,6 +1,6 @@
 import { sendJson, readJsonBody } from '../lib/http.js';
 import { loadProfile, saveProfile } from '../lib/store.js';
-import { defaultProfile, promoteToCandidate } from '../lib/profile.js';
+import { defaultProfile, promoteToCandidate, awardTrophies } from '../lib/profile.js';
 import { generateChapter } from '../lib/story.js';
 import { chatJSON } from '../lib/openai.js';
 import band1 from '../data/band1.json' with { type: 'json' };
@@ -58,6 +58,9 @@ export default async function handler(req, res) {
   p.story.chapters.push(r.chapter);
   p.story.summarySoFar = r.summarySoFar;
   p.story.cliffhanger = r.chapter.cliffhanger;
+  // T2, refined (SK-1). AFTER the push, not after promoteToCandidate: awarding
+  // before the push sees one chapter fewer and misses the new chapter's day.
+  awardTrophies(p);
   await saveProfile(p);
 
   sendJson(res, 200, { ok: true, data: { chapter: r.chapter } });

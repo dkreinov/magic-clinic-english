@@ -1,6 +1,6 @@
 import { sendJson, readJsonBody } from '../lib/http.js';
 import { loadProfile, saveProfile } from '../lib/store.js';
-import { defaultProfile, applyWordTap, markWordKnown, setLearner, logCheck, migrateWordKeys, applyQuizAnswer } from '../lib/profile.js';
+import { defaultProfile, applyWordTap, markWordKnown, setLearner, logCheck, migrateWordKeys, applyQuizAnswer, awardTrophies } from '../lib/profile.js';
 import { isAuthorized, rejectUnauthorized } from '../lib/auth.js';
 import { resolveLemma } from '../public/lemma.js';
 import wordManifest from '../public/audio/words/index.json' with { type: 'json' };
@@ -137,6 +137,10 @@ export default async function handler(req, res) {
     return;
   }
 
+  // T2. The one place every POST action converges before its single write, so
+  // this is the one place awarding belongs -- the promoteToCandidate precedent
+  // (api/chapter.js). NEVER in GET: a read stays a read.
+  awardTrophies(p);
   await saveProfile(p);
   sendJson(res, 200, { ok: true, data: p });
 }

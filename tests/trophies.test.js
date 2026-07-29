@@ -314,3 +314,273 @@ test('every profile awardTrophies produces still passes validateProfile', () => 
   awardTrophies(p5, NOW);
   assert.deepStrictEqual(validateProfile(p5), { ok: true, errors: [] });
 });
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { readdirSync, statSync } from 'node:fs';
+import { Readable } from 'node:stream';
+import { fileURLToPath } from 'node:url';
+import profileHandler from '../api/profile.js';
+import chapterHandler from '../api/chapter.js';
+import { loadProfile, saveProfile } from '../lib/store.js';
+import { setTransport, resetTransport } from '../lib/openai.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// ---- T2 wiring harness helpers (copied pattern from tests/api-profile-post.test.js:9-60) ----
+function withTempDataDir(fn) {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'english-app-trophies-'));
+  const originalDataDir = process.env.DATA_DIR;
+  const originalBlobToken = process.env.BLOB_READ_WRITE_TOKEN;
+  process.env.DATA_DIR = tmpDir;
+  delete process.env.BLOB_READ_WRITE_TOKEN;
+  return Promise.resolve()
+    .then(() => fn(tmpDir))
+    .finally(() => {
+      if (originalDataDir === undefined) delete process.env.DATA_DIR;
+      else process.env.DATA_DIR = originalDataDir;
+      if (originalBlobToken === undefined) delete process.env.BLOB_READ_WRITE_TOKEN;
+      else process.env.BLOB_READ_WRITE_TOKEN = originalBlobToken;
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+}
+
+function withOpenGate(fn) {
+  const original = process.env.APP_CODE;
+  delete process.env.APP_CODE;
+  return Promise.resolve()
+    .then(fn)
+    .finally(() => {
+      if (original !== undefined) process.env.APP_CODE = original;
+    });
+}
+
+function createMockRes() {
+  return {
+    statusCode: undefined,
+    headers: undefined,
+    body: undefined,
+    writeHead(status, headers) {
+      this.statusCode = status;
+      this.headers = headers;
+    },
+    end(body) {
+      this.body = body;
+    },
+  };
+}
+
+function createGetReq() {
+  return { method: 'GET' };
+}
+
+function createPostReq(bodyObj) {
+  const raw = typeof bodyObj === 'string' ? bodyObj : JSON.stringify(bodyObj);
+  const req = Readable.from([Buffer.from(raw, 'utf8')]);
+  req.method = 'POST';
+  return req;
+}
+
+function listJsFiles(dir) {
+  const entries = readdirSync(dir);
+  let files = [];
+  for (const entry of entries) {
+    const full = path.join(dir, entry);
+    if (statSync(full).isDirectory()) {
+      files = files.concat(listJsFiles(full));
+    } else if (entry.endsWith('.js')) {
+      files.push(full);
+    }
+  }
+  return files;
+}
+
+const Q = '\u05e9\u05d0\u05dc\u05d4';
+const OPTS = ['\u05d0', '\u05d1', '\u05d2', '\u05d3'];
+const GLOSS = [
+  { word: 'hurt',  he: '\u05e4\u05e6\u05d5\u05e2' },
+  { word: 'old',   he: '\u05d6\u05e7\u05df' },
+  { word: 'happy', he: '\u05e9\u05de\u05d7' },
+];
+
+function chapterFixture(text) {
+  return {
+    title: 'The Hurt Wing',
+    text,
+    cliffhanger: 'But then the wing did not heal.',
+    summarySoFar: 'The apprentice met a hurt dragon and a unicorn.',
+    glossary: GLOSS.map((g) => ({ word: g.word, he: g.he })),
+    questions: [
+      {
+        prompt: Q,
+        options: OPTS,
+        correctIndex: 0,
+        evidence: 'The dragon has a hurt wing and its tail is very little.',
+      },
+      {
+        prompt: Q + Q,
+        options: OPTS,
+        correctIndex: 1,
+        evidence: 'The unicorn has one horn and new feathers.',
+      },
+    ],
+  };
+}
+
+test('a threshold-crossing POST /api/profile awards through the real handler and persists the award', async () => {
+  await withOpenGate(() => withTempDataDir(async (tmpDir) => {
+    const words = ['dog', 'cat', 'light', 'fair', 'method'];
+    let parsed;
+    for (let i = 0; i < words.length; i++) {
+      const req = createPostReq({ action: 'mark-known', lemma: words[i], source: 'placement' });
+      const res = createMockRes();
+      await profileHandler(req, res);
+      assert.strictEqual(res.statusCode, 200);
+      parsed = JSON.parse(res.body);
+      if (i === 3) {
+        assert.deepStrictEqual(parsed.data.trophies, {});
+      }
+    }
+    assert.deepStrictEqual(Object.keys(parsed.data.trophies), ['known']);
+    assert.deepStrictEqual(Object.keys(parsed.data.trophies.known), ['bronze']);
+    assert.ok(!Number.isNaN(Date.parse(parsed.data.trophies.known.bronze)));
+
+    const profilePath = path.join(tmpDir, 'profile.json');
+    const onDisk = JSON.parse(fs.readFileSync(profilePath, 'utf8'));
+    assert.deepStrictEqual(onDisk.trophies, parsed.data.trophies);
+  }));
+});
+
+test('a POST /api/profile that 400s awards nothing and writes nothing to disk', async () => {
+  await withOpenGate(() => withTempDataDir(async (tmpDir) => {
+    const words = ['dog', 'cat', 'light', 'fair', 'method'];
+    for (const w of words) {
+      const req = createPostReq({ action: 'mark-known', lemma: w, source: 'placement' });
+      const res = createMockRes();
+      await profileHandler(req, res);
+      assert.strictEqual(res.statusCode, 200);
+    }
+
+    const profilePath = path.join(tmpDir, 'profile.json');
+    const seededParsed = JSON.parse(fs.readFileSync(profilePath, 'utf8'));
+    assert.deepStrictEqual(Object.keys(seededParsed.trophies), ['known']);
+    const snapshot = fs.readFileSync(profilePath);
+
+    const badActionReq = createPostReq({ action: 'nope' });
+    const badActionRes = createMockRes();
+    await profileHandler(badActionReq, badActionRes);
+    assert.strictEqual(badActionRes.statusCode, 400);
+    assert.strictEqual(JSON.parse(badActionRes.body).error, 'unknown action');
+    assert.ok(snapshot.equals(fs.readFileSync(profilePath)));
+
+    const badWordTapReq = createPostReq({ action: 'word-tap' });
+    const badWordTapRes = createMockRes();
+    await profileHandler(badWordTapReq, badWordTapRes);
+    assert.strictEqual(badWordTapRes.statusCode, 400);
+    assert.ok(snapshot.equals(fs.readFileSync(profilePath)));
+  }));
+});
+
+test('GET /api/profile never awards, even on a profile that has already earned trophies', async () => {
+  await withOpenGate(() => withTempDataDir(async (tmpDir) => {
+    const seeded = defaultProfile(NOW);
+    const lemmas = ['cat', 'dog', 'fair', 'light', 'method'];
+    for (const lemma of lemmas) {
+      seeded.words[lemma] = {
+        status: 'known',
+        source: 'placement',
+        he: null,
+        taps: 0,
+        firstSeen: NOW,
+        lastSeen: NOW,
+      };
+    }
+    seeded.trophies = { known: { bronze: NOW } };
+    // Also seed 'days'/'streak' right at their bronze thresholds (3 consecutive
+    // days via chapters, distinct from NOW) but NOT yet awarded, so a GET that
+    // wrongly called awardTrophies would visibly mint a new trophy key here --
+    // proving "GET never awards" rather than merely failing to disprove it.
+    seeded.story.chapters = [
+      { n: 1, text: 'One.', generatedAt: '2025-06-01T00:00:00.000Z' },
+      { n: 2, text: 'Two.', generatedAt: '2025-06-02T00:00:00.000Z' },
+      { n: 3, text: 'Three.', generatedAt: '2025-06-03T00:00:00.000Z' },
+    ];
+
+    const profilePath = path.join(tmpDir, 'profile.json');
+    fs.writeFileSync(profilePath, JSON.stringify(seeded, null, 2));
+    const before = fs.readFileSync(profilePath);
+
+    const req = createGetReq();
+    const res = createMockRes();
+    await profileHandler(req, res);
+    assert.strictEqual(res.statusCode, 200);
+
+    const after = fs.readFileSync(profilePath);
+    assert.ok(before.equals(after));
+
+    const parsed = JSON.parse(res.body);
+    assert.deepStrictEqual(parsed.data.trophies, { known: { bronze: NOW } });
+  }));
+});
+
+test('POST /api/chapter awards after the new chapter is pushed, so the new chapter counts', async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
+    const p = defaultProfile();
+    p.placement.completed = true;
+    p.learner.heroineName = 'Noa';
+    p.learner.petName = 'Sparky';
+    p.story.chapters = [1, 2, 3, 4].map((n) => ({
+      n,
+      text: 'Chapter ' + n + ' text.',
+      generatedAt: '2026-01-01T00:00:00.000Z',
+    }));
+    await saveProfile(p);
+
+    setTransport(async () => chapterFixture("She is an apprentice at the vet clinic for magical animals. Now a big dragon came into the clinic. The dragon has a hurt wing and its tail is very little. She saw a little unicorn too. The unicorn has one horn and new feathers. She took a potion and gave it to the dragon. The potion is good magic from an old wizard. Then a witch came with a new spell. She said the spell is to heal the wing. She and the vet did the spell again and again. The wing got new again and the dragon was good again. Her dog and cat and mom and dad were happy too."));
+    try {
+      const req = createPostReq({ action: 'generate' });
+      const res = createMockRes();
+      await chapterHandler(req, res);
+      assert.strictEqual(res.statusCode, 200, res.body);
+
+      const stored = await loadProfile();
+      assert.strictEqual(stored.story.chapters.length, 5);
+      assert.deepStrictEqual(Object.keys(stored.trophies), ['chapters']);
+      assert.deepStrictEqual(Object.keys(stored.trophies.chapters), ['bronze']);
+    } finally {
+      resetTransport();
+    }
+  }));
+});
+
+test('awardTrophies is wired at exactly the two designed call sites and nowhere else', () => {
+  const root = path.join(__dirname, '..');
+  const profileSrc = fs.readFileSync(path.join(root, 'api', 'profile.js'), 'utf8');
+  const chapterSrc = fs.readFileSync(path.join(root, 'api', 'chapter.js'), 'utf8');
+  const placementSrc = fs.readFileSync(path.join(root, 'api', 'placement.js'), 'utf8');
+  const translateSrc = fs.readFileSync(path.join(root, 'api', 'translate.js'), 'utf8');
+  const healthSrc = fs.readFileSync(path.join(root, 'api', 'health.js'), 'utf8');
+
+  function countCalls(src) {
+    const matches = src.match(/awardTrophies\(/g);
+    return matches ? matches.length : 0;
+  }
+
+  assert.strictEqual(countCalls(profileSrc), 1);
+  assert.strictEqual(countCalls(chapterSrc), 1);
+  assert.strictEqual(countCalls(placementSrc), 0);
+  assert.strictEqual(countCalls(translateSrc), 0);
+  assert.strictEqual(countCalls(healthSrc), 0);
+
+  const publicDir = path.join(root, 'public');
+  const publicFiles = listJsFiles(publicDir);
+  for (const f of publicFiles) {
+    assert.strictEqual(countCalls(fs.readFileSync(f, 'utf8')), 0, 'unexpected awardTrophies( in ' + f);
+  }
+
+  const pushIdx = chapterSrc.indexOf('p.story.chapters.push(r.chapter);');
+  const callIdx = chapterSrc.indexOf('awardTrophies(p);');
+  assert.ok(pushIdx >= 0, 'expected to find the chapters.push call');
+  assert.ok(callIdx >= 0, 'expected to find the awardTrophies(p) call');
+  assert.ok(pushIdx < callIdx, 'awardTrophies(p) must come after the chapters push (SK-1)');
+});
