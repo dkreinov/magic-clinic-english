@@ -220,3 +220,41 @@ chapters (earned-but-unawarded days/streak tiers); M1.4b's detector is test 3's 
 assertion; companion clause dropped; byte assertion stays (it guards the migrateWordKeys
 resort trap). Worker's already-observed M1.4b failure under the strengthened fixture counts.
 Worker continued (same context) to M1.4c/M1.4d + the frozen validation, which is unchanged.
+
+STEP 1.4 the two call sites (T2 wiring)
+  tier: WORKER (Sonnet)
+  did: api/profile.js — import +awardTrophies, awardTrophies(p) inserted immediately before
+    the single saveProfile in the POST tail (CRLF=0 LF=146). api/chapter.js — import
+    +awardTrophies, awardTrophies(p) after chapters.push, before saveProfile, CRLF preserved
+    (CRLF=67 LF=0). tests/trophies.test.js — +5 flat tests (20 -> 25) incl. the harness
+    copies, the chapter transport fixture (Hebrew as escape text only), and the source-
+    needle wiring test. api/placement.js byte-identical to HEAD after M1.4d's restore.
+  surprises: none beyond the intervention above (worker's discovery, pre-ruling).
+  deviations: test 3's fixture strengthening — ratified as plan amendment #3.
+  fail-first observed (evidence file HOME/trophies-val/step-1.4-failfirst.txt):
+    M1.4a (award pre-push) -> tests 24+25 failed (chapters trophy missing / order needle)
+    M1.4b (award in GET)   -> test 23 failed on the strengthened fixture (extra days/streak
+                              tiers appeared in the response); companion clause dropped (#3)
+    M1.4c (award after save) -> test 21 failed (on-disk trophies {} vs expected bronze)
+    M1.4d (award in placement) -> test 25 failed (1 !== 0 call-site count); placement
+                              restored byte-exact (git diff --numstat empty)
+  validation_first_try: yes post-ruling (the stop itself was a plan defect, not worker
+    error; orchestrator clean re-run RC=0: 328/0 both modes, plan 1..323, flat 323,
+    contrast 52, digest unchanged, transcripts empty, endings api/profile 0/146 ·
+    api/chapter 67/0 · lib 0/719 · profile.test 0/138 · trophies.test 0/586, lib/tests
+    DELS 0, APIDEL exactly 2, placement untouched, PORC exact three-file set)
+  retries: 0
+  escalations: 0
+  tokens: worker=147450+159582 (two segments around the stop), checker=37473+39123 (two
+    verdicts) + 28917 (independent byte-verifier), orchestrator_delta=unavailable
+  interventions: 1 (bad-spec — amendment #3, logged above)
+  audit trail: first verdict MISMATCH was a FALSE POSITIVE — the orchestrator's packet is a
+    JSON string and JSON decodes backslash-u sequences, so the file's escape TEXT reached
+    the auditor as rendered Hebrew glyphs (lesson 8, new costume: JSON transport). On
+    corrected evidence: match, confidence low (attested-not-verified). Per §10 a second
+    lens was dispatched — an independent tool-equipped verifier measured the bytes itself:
+    0 bytes >127, Hebrew as escape text on Q/OPTS/GLOSS, CRLF=0 LF=586, nested 0. Accepted
+    on the combined verdict: auditor line-by-line match on everything else + independent
+    byte confirmation of the one attested item.
+  commit: 3d19efb
+  accepted: 2026-07-29T14:42:36Z
