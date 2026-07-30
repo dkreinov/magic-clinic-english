@@ -662,3 +662,72 @@ and each one silently produced a NO-OP rather than an error.
 NOT DONE, DELIBERATELY: no deploy, no D25 capture, no CACHE bump, no test, no CSS, no app code,
 no touch of her profile. The eight carried obligations for phase 3 are enumerated in
 phase-state.md.
+
+## PHASE 3 PLANNING (2026-07-30)
+
+Owner asked for a fresh planner. Tree clean at 2ee5ca6 (then 86ae76e, see below).
+
+ORCHESTRATOR ERROR, recorded rather than buried: the first planner was dispatched with the
+read-only "Plan" agent type, which has NO Write tool. It could not write the draft file, returned
+the whole plan as its reply instead, and the reply was TRUNCATED -- everything before step 3.2's
+validation was lost. Nothing was damaged (the repo was untouched) but a full planning pass was
+wasted. The surviving tail's measurable claims were distilled into
+$HOME/trophies-art/PRIOR-PASS-FINDINGS.md, explicitly marked UNVERIFIED, and the briefing gained
+an addendum: write the file INCREMENTALLY, never return the plan text. LESSON: match the agent
+TYPE to the tools the job needs; a planner that must produce an artifact needs Write.
+
+Second pass (general-purpose, Opus, read-only of the repo) produced the plan now spliced into
+plan.md from the "# WORD-TROPHIES -- PHASE 3 IN FULL" header: 2154 lines, 7 steps, 18 new flat
+tests (ledger 323/328 -> 341 flat / 346 reported), contrast anchor 52 -> 58, 15 files touched,
+8 deleted lines. Zero raw Hebrew glyphs in the plan -- every Hebrew fact is carried as a DECIMAL
+codepoint sum, because the planner REPRODUCED LESSON 8 LIVE while drafting (four \u05XX escapes
+in a tool call arrived as raw glyphs).
+
+SK3-1..SK3-11 adopted. The load-bearing ones:
+  SK3-1 THE FIELD GUIDE IS WRONG. Lesson 4 says public/sw.js is LF; on disk it is CRLF=50 LF=0,
+        and styles.css (501) and index.html (81) are CRLF too, while app.js and lib/*.js are LF.
+        Both planning passes found this INDEPENDENTLY. Amend lesson 4 at the phase-3 close.
+  SK3-2 api/chapter.js:66 returns { ok: true, data: { chapter } } -- NO profile. Phase-1 RECORD
+        GAP 1 is therefore answered: the phone re-reads /api/profile at the earning moments; no
+        server change, and T5's "the chapter response returns a profile" is simply false.
+  SK3-5 anchor 58; hexes --color-bronze #a4622a, --color-silver #6f6a63, --color-gold #9a7200,
+        ratios verified by running a byte-copy of the real gate out-of-repo; five pins of "52"
+        enumerated plus eight decoys.
+  SK3-6 public/ cannot import lib/ (zero hits) -> metrics duplicated into the view, gated by an
+        agreement test over eight shared fixtures plus a copy-fidelity check.
+  SK3-8 NO Hebrew string is authored; all ten are extracted, with decimal codepoint sums pinned.
+  SK3-10 one overlay per pass, all earned tiers marked together, so the day-one backfill cannot
+        parade eight overlays at her.
+
+ORCHESTRATOR VERIFICATION before review (measured, not read): sw.js CRLF=50 LF=0 CONFIRMED, as
+were styles.css/index.html CRLF and app.js/lib LF · api/chapter.js:66 response shape CONFIRMED
+verbatim · zero public/->lib/ imports CONFIRMED · the five "52" pins CONFIRMED at quiz-ui:501,
+reader-ui:105, words-ui:161, visual-design:135, README:45 · flat ledger 323 and contrast 52
+CONFIRMED · STATUS.md and briefing.md READ: no phase-3 owner instruction beyond the record.
+The planner also caught an ORCHESTRATOR RECORD ERROR from the phase-2 close -- phase-state.md:9
+claimed a 66-line field guide when wc -l is 73. Corrected and committed at 86ae76e, together
+with a flag on lesson 4's false endings claim. (git diff 2ee5ca6..86ae76e = phase-state.md only.)
+
+PLAN REVIEW (Sonnet, fresh, read-only): VERDICT ship with fixes -- 0 blocking, 1 should-fix,
+2 nits. It independently re-measured the public/ digest, all 20 files' endings byte counts, the
+six contrast ratios (by hand AND by running a byte-copy of check-contrast.mjs), all ten Hebrew
+extraction lengths and codepoint sums, the ledger and deletion arithmetic, the .oplan awk
+filter's backslashes, the no-questions guard and the three celebration hook sites -- all matched.
+
+P3-AMENDMENT #1 (orchestrator, post-review, MANDATORY). The reviewer's should-fix, verified here
+independently and upgraded in severity: step 3.3's asset test used per-id fs.existsSync, and
+existsSync is CASE-BLIND on this machine --
+  fs.existsSync("public/assets/trophies/quizright.webp") === true  while the real file is
+  quizRight.webp
+whereas readdirSync returns the true spelling and is case-exact everywhere. This is not cosmetic:
+VERCEL SERVES FROM A CASE-SENSITIVE LINUX FILESYSTEM, so a mis-cased derivative would pass every
+local test and then 404 on her phone in phase 4 -- the exact bug the SK2-7 test exists to catch,
+invisible to the test as drafted. The test now MUST deepStrictEqual readdirSync(...).sort()
+against the nine exact filenames (subsuming the "exactly 9 files" assertion), with a new
+fail-first M3.3e that renames a file to lowercase and confirms the deepStrictEqual fails WHILE
+the old existsSync loop still passes -- proving the amendment is load-bearing.
+Nits fixed: styles.css z-index:100 cited at :412, actually :413; and the plan header now records
+that the tree moved 2ee5ca6 -> 86ae76e with a diff proving no measurement went stale.
+
+tokens: planner(lost pass) ~unknown · planner=277977 · reviewer=188875.
+AWAITING: owner go-ahead for phase-3 execution.
