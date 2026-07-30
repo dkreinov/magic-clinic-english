@@ -194,6 +194,25 @@ derivatives are generated later (a later phase) as `public/assets/*.webp`.
 | `words-treasure.png` | square | 1254×1254 | words empty state + collection header |
 | `app-icon.png` | square | 1254×1254 | PWA install icon + Android splash; derived to `public/icons/icon-192.png`, `icon-512.png`, `icon-maskable-512.png` by `scripts/build-icons.js` |
 
+#### Trophies (word-trophies run, 2026-07-29)
+
+| File (`assets/delight/trophies/<name>.png`) | Aspect | Dimensions | Used for |
+|---|---|---|---|
+| `assets/delight/trophies/chapters.png` | square | 1254×1254 | trophy card: chapters |
+| `assets/delight/trophies/days.png` | square | 1254×1254 | trophy card: days |
+| `assets/delight/trophies/streak.png` | square | 1254×1254 | trophy card: streak |
+| `assets/delight/trophies/known.png` | square | 1254×1254 | trophy card: known |
+| `assets/delight/trophies/quizRight.png` | square | 1254×1254 | trophy card: quizRight |
+| `assets/delight/trophies/quizzer.png` | square | 1254×1254 | trophy card: quizzer |
+| `assets/delight/trophies/curious.png` | square | 1254×1254 | trophy card: curious |
+| `assets/delight/trophies/proven.png` | square | 1254×1254 | trophy card: proven |
+| `assets/delight/trophies/shelf-header.png` | square | 1254×1254 | trophies screen header |
+
+Masters for this set live in the `trophies/` subdirectory of `assets/delight/`; derivatives are
+`public/assets/trophies/<id>.webp` at 640×640. The eight trophy stems are the signed
+`TROPHY_CATALOG` ids in `lib/profile.js` (camelCase included, e.g. `quizRight`) and must not be
+renamed — the trophies screen builds its image src as `/assets/trophies/${id}.webp`.
+
 ### FROZEN STYLE SUFFIX
 
 Appended verbatim to every image generation prompt (from plan.md):
@@ -257,6 +276,68 @@ Each prompt below is sent with the FROZEN STYLE SUFFIX appended.
   variant pads the artwork into the central 80% safe zone on `#2e1806` so an OS circle crop
   cannot clip the character's head.
 
+#### Trophy prompts (word-trophies run, 2026-07-29)
+
+Each prompt below was sent with the FROZEN STYLE SUFFIX appended verbatim, extracted from this
+document by script and verified by md5 `51b97a774dc52aa272850bb686c22188` (388 bytes).
+
+- **chapters**: "Square image (1:1): a thick open storybook lying on a warm wooden table, a
+  glowing winding path and two tiny floating islands rising up out of its open pages like a small
+  magical world, warm amber glow from the pages, violet and teal sparkles drifting above it,
+  completely blank pages with no writing of any kind, no people, no metal cup and no medal, the
+  book centered with generous empty margin on all four sides, soft warm background." + SUFFIX
+
+- **days**: "Square image (1:1): a small potted magical herb on a sunlit wooden windowsill, one
+  stem showing three clear stages of growth from sprout to full glowing leaves, a little copper
+  watering can beside the pot with one amber droplet caught in mid air, teal and violet leaf tips,
+  no people, no metal cup and no medal, the plant centered with generous empty margin on all four
+  sides, soft warm background." + SUFFIX
+
+- **streak**: "Square image (1:1): a gentle arc of five small round paper lanterns strung along a
+  cord, each lantern lit a little warmer and brighter than the one before it, tiny amber sparks
+  travelling along the cord between them, violet and teal glass panes in the lanterns, no people,
+  no metal cup and no medal, the arc of lanterns centered with generous empty margin on all four
+  sides, soft warm background." + SUFFIX
+
+- **known**: "Square image (1:1): a small rounded wooden treasure chest with brass corner fittings
+  and its lid open, filled with glowing gem-like crystals in violet, teal and amber whose light
+  spills onto the underside of the lid, three loose crystals resting on the wooden table in front
+  of it, a wooden chest and not a glass jar, no people, no metal cup and no medal, the chest
+  centered with generous empty margin on all four sides, soft warm background." + SUFFIX
+
+- **quizRight**: "Square image (1:1): a round wooden practice target with concentric painted rings
+  in violet, teal and amber, three slim glowing arrows clustered together dead center in the
+  bullseye, faint rings of sparkle spreading outward from the hits, the target leaning against a
+  warm wooden wall, no people, no metal cup and no medal, the target centered with generous empty
+  margin on all four sides, soft warm background." + SUFFIX
+
+- **quizzer**: "Square image (1:1): a well used brown leather apprentice satchel standing open on
+  a wooden floor with practice gear spilling gently out of it, a rolled white bandage, a small
+  wooden mortar and pestle, a coil of teal cord and a folded cloth, warm amber lamplight on the
+  worn leather, violet and teal stitching along the flap, no people, no metal cup and no medal,
+  the satchel centered with generous empty margin on all four sides, soft warm background." +
+  SUFFIX
+
+- **curious**: "Square image (1:1): a large round brass rimmed magnifying glass resting at an
+  angle over a wooden table, its lens magnifying a single glowing violet paw print on the wood,
+  tiny amber sparkles drifting up through the lens, soft teal reflections in the glass, no people,
+  no metal cup and no medal, the magnifying glass centered with generous empty margin on all four
+  sides, soft warm background." + SUFFIX
+
+- **proven**: "Square image (1:1): a rolled parchment scroll tied with a teal ribbon and closed
+  with a large glowing amber wax seal stamped with a paw print, resting on a warm wooden table
+  with soft violet light around the seal, the parchment completely blank with no writing of any
+  kind, no people, no metal cup and no medal, the scroll centered with generous empty margin on
+  all four sides, soft warm background." + SUFFIX
+
+- **shelf-header**: "Square image (1:1): a warm wooden shelf inside the magical veterinary clinic
+  seen straight on, holding a row of small glowing keepsakes, a tiny paper lantern, a violet
+  crystal, a ribboned scroll and a little potted sprout, a string of soft amber lights running
+  along the front edge of the shelf, the same small teal baby dragon from this chat curled up
+  asleep at one end of the shelf, violet and teal glow in the air around the objects, no signs and
+  no labels of any kind, the shelf centered with generous empty margin above and below, soft warm
+  background." + SUFFIX
+
 ## 7. Generation pipeline
 
 Source: `design.md` §7, plan.md GC-D7, and field-guide lessons 10–13
@@ -282,6 +363,11 @@ Source: `design.md` §7, plan.md GC-D7, and field-guide lessons 10–13
   element. This supersedes the "Download button → newest file in `~/Downloads`" instruction
   above in this section and in `design.md` §7. The `~/Downloads` heuristic is what produced the
   89-duplicate burst already recorded in this section.
+- Trophy derivatives are produced by `scripts/optimize-trophies.js` (sharp, width 640,
+  quality 72, effort 4) from `assets/delight/trophies/` into `public/assets/trophies/`.
+  `scripts/optimize-assets.js` must NOT be re-run: it rewrites all eight existing
+  `public/assets/*.webp` and would break the frozen `public/` digest. Trophy art is NOT in
+  `PRECACHE` — per design §2(iv) artwork is runtime-fetched and never cached.
 
 ## 8. Do and do-not rules
 

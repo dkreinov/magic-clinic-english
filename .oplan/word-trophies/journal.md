@@ -570,3 +570,34 @@ CRLF=0 via case "$ENDS" in *"CRLF=0 "*) but never asserts LF=39, so a truncated 
 CRLF=0 would pass that guard. Covered here by the worker's binary read-back and by the
 orchestrator's byte-identity audit, both of which pin LF=39 exactly. Recorded rather than
 silently patched (the gate is frozen); phase 3 may tighten it if it reuses this shape.
+
+STEP 2.5 record the prompts, inventory and pipeline in docs/visual-design.md (WORKER)
+Three additive inserts, spliced BY SCRIPT on bytes (no editor, LF only), anchored on unique
+EXISTING LINE CONTENT rather than line numbers: edit 1 after the app-icon inventory row (resolved
+195), edit 2 after the app-icon prompt's trailing paragraph (resolved 258), edit 3 as the last
+bullet of §7 (resolved 284). 86 lines added, 0 deleted; 19825 -> 25999 bytes; LF 317 -> 403,
+CRLF 0. The nine prompt bodies were NEVER retyped: the splice script read each
+$HOME/trophies-art/prompts/<id>.txt and dropped the last 389 bytes (one space + the 388-byte
+suffix), independently confirming the dropped tail md5s to 51b97a774dc52aa272850bb686c22188 on
+all nine and that byte 389-from-end is 0x20. Re-wrapping splits only on pre-existing spaces, so
+the whitespace-normalised text is character-identical.
+Frozen gate validate-2.5.sh exit 0: DOC-OK 9 prompts recorded verbatim, 9 inventory rows,
+pipeline note present; ENDINGS CRLF=0 LF=403; deletions 0; write set exactly " M
+docs/visual-design.md"; and every §VAL-P2 invariant held (328/0 both modes, flat 323, contrast
+52, exclusion digest, sw.js md5, transcripts EMPTY, no profile).
+
+ORCHESTRATOR AUDIT (independent of the worker's own assertions): the HEAD version of the doc was
+re-read via git show and EVERY one of its 318 lines was located in the new file IN ORDER and
+byte-identical (0 lost, 0 reordered, 0 altered) -- a stronger statement than "deletions == 0",
+which a rewrite-in-place could satisfy. Section 3 was extracted from both versions and compared
+whole: byte-identical, so T10 was not smuggled in (SK2-6). The nine bodies were re-derived from
+the prompt FILES and each found exactly once in the normalised doc, each with its
+assets/delight/trophies/<id>.png row. Endings re-counted on bytes: CRLF=0 LF=403. ACCEPTED.
+
+P2-NOTE #4 (packet defect, raised by the worker, orchestrator error). PACKET-2.5.md described the
+§7 "Superseded capture method" bullet as "currently the last content of the file". It is not --
+"## 8. Do and do-not rules" follows it. The placement INSTRUCTION ("append at the very end of
+section 7, after the Superseded capture method bullet") was unambiguous and independently
+anchored, so the worker executed it correctly and flagged the false aside instead of adapting
+around it -- the stop-rule behaving exactly as intended, and §8 was not touched (audit confirms).
+The error was the orchestrator's packet prose, not the plan.
