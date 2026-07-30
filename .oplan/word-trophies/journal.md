@@ -1190,3 +1190,67 @@ FOR PHASE 4 (ship) TO CONSUME
 
 NOT DONE, DELIBERATELY: no deploy, no fresh capture, no touch of her live profile, no server or
 lib change of any kind.
+
+## POST-CLOSE: OWNER REVIEW OF THE CELEBRATION (2026-07-30)
+
+The phase-3 close reported two open cosmetic calls. Shown the artifacts, the owner opened a wider
+question and made five rulings. Recorded here BEFORE any work, because two of them amend the
+SIGNED design.
+
+HOW THIS WAS PRESENTED (new standing instruction, now a memory): the owner works in a CLI and
+cannot see anything not put in front of him. His instruction: "we are in cli, open for me html
+always and show what you mean, then remove it." Three self-contained HTML pages were built into
+the scratchpad (never the repo), opened in his real browser via powershell Start-Process, and are
+to be deleted once decided. NOTE the trap that cost one round: cmd.exe start with a RELATIVE path
+did not open (cmd's cwd is not Git Bash's), and separately I verified the page in Playwright's own
+Chromium and then closed it -- so what he saw appear and vanish was my verification browser, not
+his. Use an ABSOLUTE path, and never close a browser he might be looking at.
+
+WHY THE CELEBRATION READ AS A LABEL (diagnosed, not guessed). Research plus reading the committed
+CSS: .trophy-celebrate-card is LITERALLY the .trophy-card shelf-tile recipe at 1.75x -- same
+--color-card, same --radius, same --shadow-soft, same gap -- and .trophy-name is 1rem/700 in BOTH
+the grid and the celebration. Zero type escalation between "one of eight in a grid" and "you just
+won this". It was assembled from shelf parts, so it read as a shelf item.
+
+OWNER RULINGS:
+  1. BACKDROP: yes -- and then superseded by ruling 2 (direction B carries its own scrim,
+     rgba(58,36,18,.72) = --color-ink at 72%, which is what he actually saw and approved; the
+     earlier standalone choice was rgba(46,24,6,.55)). SHIP WHAT HE SAW: B's .72.
+  2. CELEBRATION TREATMENT: DIRECTION B -- free-floating medallion (no card), scrim, radial glow
+     behind the artwork, drop-shadow lifting the medal, AND the slow rotating sunburst ray fan.
+     He chose the most celebratory of the four offered; the "too far?" probe was not too far.
+  3. ENTRANCE: yes, the ~320ms scale-up with one overshoot, name rising 120ms behind.
+     prefers-reduced-motion turns BOTH off and hides the rays entirely (a frozen pinwheel reads
+     as a bug). Note the existing reduced-motion block currently guards an animation that does
+     not exist -- it finally gets something to guard.
+  4. SOUND: REINSTATED. *** THIS REVERSES SIGNED DESIGN T9/T5. *** T5 says "No sound in v1 (the
+     grill's own cut order: sound first)" and T9 lists "No sound" among the non-goals. He was
+     shown that explicitly and chose to reverse it. Mechanism: SYNTHESISED via Web Audio for now
+     -- no asset, no file to ship/cache/license. Candidate chosen by ear from three played live
+     in the browser: #2, the RISING ARPEGGIO (C5-E5-G5-C6, ~85ms apart, short).
+     He also noted he has GEMINI PRO and I may generate real audio there the same free-web way I
+     used ChatGPT for images -- recorded as a memory; not used now, but it is the route if a
+     recorded sound is ever preferred over the synth.
+  5. MUTING: no app setting. Respect the device only. Stated honestly to him: on some phones a
+     silenced device still plays Web Audio, so this is NOT a reliable guarantee of silence.
+  6. THE SHELF DOES NOT CHANGE. Confirmed by showing it beside the celebration: a card is the
+     right container for a grid item; it was only wrong as a celebration.
+
+*** A HOLE FOUND WHILE PLANNING THIS, worth more than the feature ***
+tests/trophies-ui.test.js:701 is named "the celebration honours reduced motion, ADDS NO SOUND,
+and sits below the entry-code gate" and enforces it by forbidding the needles 'new Audio(',
+'<audio' and '.play('. WEB AUDIO USES NONE OF THOSE -- it is new AudioContext(), createOscillator()
+and osc.start(). So a Web Audio implementation would have shipped sound while that test kept
+passing and its name kept claiming otherwise. The same blind spot is in gate-3.4.sh:106 and
+gate-3.6a.sh:108, which grep only for 'new Audio(' / '<audio'.
+This is the SAME CLASS as the phase-3 defect the visual gate caught: a needle-based assertion that
+does not actually observe the property it claims. It must be rewritten to assert the real
+constraint -- no <audio> element and no Audio() object and no media asset, sound ONLY via Web
+Audio -- not merely re-pointed at new needles.
+
+PLAN: split into two gated steps rather than one, so the design-amending part is separable.
+  STEP 3.8 -- the celebration treatment: scrim, no card, glow, drop-shadow, rays, entrance
+    animation, type escalation, reduced-motion; plus the P3-NOTE #7 assertion hardening the owner
+    approved ("harden it", "now, before phase 4").
+  STEP 3.9 -- the sound: Web Audio rising arpeggio, no asset, no mute setting; and the honest
+    rewrite of the no-sound test into a no-media-element test.

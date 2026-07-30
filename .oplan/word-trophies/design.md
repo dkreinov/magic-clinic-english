@@ -201,3 +201,55 @@ HEBREW — English names rejected (off-band vocabulary, register clash, bidi ris
 | T7 three tier tokens + anchor move | as written | [x] 2026-07-29 |
 | T8 capture/read-back extension | as written | [x] 2026-07-29 |
 | T10 visual-design.md dated correction | as written | [x] 2026-07-29 |
+
+---
+
+## 9. AMENDMENT 2026-07-30 — the celebration moment (owner-approved, post-phase-3)
+
+Additive. Nothing signed above is rewritten; where this section conflicts with T5 or T9, THIS
+SECTION WINS, and the conflict is named explicitly below rather than left to be discovered.
+
+**A1 — the celebration is a free-floating medallion, not a card.** T5 says "ONE overlay (artwork
++ name + tier, one tap to dismiss)" and that stands unchanged. What changes is its construction.
+Phase 3 built the overlay out of shelf parts — the celebration card was the `.trophy-card` recipe
+at 1.75x with the name at the same 1rem/700 it uses in the grid — so it read as a list item
+rather than a reward. The amended treatment, chosen by the owner from four mocked directions:
+
+- a scrim over the whole screen, `--color-ink` at 72% (`rgba(58,36,18,.72)`);
+- NO card: the artwork floats, lifted by a `drop-shadow`, not a `box-shadow`;
+- a radial `--color-glow` behind the artwork (the token already exists);
+- a slow rotating sunburst ray fan behind the medallion, low alpha;
+- the name escalated to roughly 2x the grid size, in `--color-primary-ink` on the scrim;
+- an entrance: ~320ms scale-up with one small overshoot, the name rising ~120ms behind it.
+
+`prefers-reduced-motion: reduce` disables the entrance AND removes the rays entirely — a frozen
+ray fan reads as a rendering bug, not as a still image. The tier remains the ring and only the
+ring: **no tier word is authored** (SK3-8 stands), so the Hebrew inventory does not grow.
+
+**A2 — sound is REINSTATED. This reverses T5 and T9.** T5 states "No sound in v1 (the grill's own
+cut order: sound first)" and T9 lists "No sound" among the non-goals. The owner was shown that
+this was his own cut, and reversed it deliberately on 2026-07-30 after hearing three candidates
+played live. Frozen:
+
+- ONE short rising arpeggio at the earn moment, C5-E5-G5-C6, ~85ms apart, each note short;
+- **synthesised with Web Audio — no audio asset.** Nothing is downloaded, shipped, precached,
+  versioned or licensed. This is deliberate: the app has no audio-asset pipeline for anything but
+  word pronunciation, and a celebration sound does not justify inventing one;
+- it must be wrapped so that a blocked or unavailable AudioContext can NEVER break the
+  celebration, the screen, or the quiz — silence is an acceptable outcome, an exception is not;
+- **no mute setting.** The device's own volume/silent control is the only affordance. Recorded
+  honestly: on some phones a silenced device still plays Web Audio, so this is not a guarantee
+  of silence, and the owner accepted that trade rather than build a settings surface.
+- If a recorded sound is ever preferred to the synth, the route is the owner's Gemini Pro
+  subscription via the free web UI (the same shape as the ChatGPT image pipeline), and it would
+  then need an owner gate and a provenance/licensing note.
+
+**A3 — the no-sound test was never able to see sound.** `tests/trophies-ui.test.js` forbade the
+needles `new Audio(`, `<audio` and `.play(`. Web Audio uses none of them. So the test would have
+kept passing, under a name claiming there was no sound, while sound shipped. It is replaced by an
+assertion of the real constraint: **no media element and no `Audio()` object and no audio asset;
+sound only via Web Audio.** Same defect class as the phase-3 celebration-CSS bug — an assertion
+that names a property it does not actually observe.
+
+**A4 — the shelf is unchanged.** Explicitly confirmed with the owner against a mock: a card is the
+correct container for a grid item; it was only wrong as a celebration.
