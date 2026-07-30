@@ -3491,3 +3491,1906 @@ engine, the server and the frozen quiz files have not moved by a single byte; ex
 files changed, with exactly **8** deleted lines in the whole phase and none of them in the design
 document; nothing was deployed, no capture was taken, and your real profile was never touched.
 
+
+# WORD-TROPHIES — PHASE 4 "SHIP" IN FULL (draft)
+
+Planned 2026-07-30 by a fresh planner (Opus), **read-only of the repository and of production**.
+Nothing in the repository was changed by this pass. No authenticated request of any kind was made.
+`/api/profile` was never requested, in any form, by this planner.
+
+---
+
+## AMENDMENTS AFTER PLAN REVIEW (2026-07-30) — all applied below, none silent
+
+A fresh reviewer returned **ship with fixes: 2 blocking, 7 should-fix, 6 nits**
+(`C:/Users/dkreinov/trophies-art/PHASE-4-REVIEW.md`). Every finding was independently re-confirmed
+by the planner against the tree before being applied. **All fifteen are accepted; none is disputed.**
+
+| # | finding | what changed, and where |
+|---|---|---|
+| **P4-AMENDMENT #1** | **BLOCKING F1** — step 4.5 compared her capture **with itself**: `$BK` was the only path variable in the plan, and 4.5's instruction to reuse the frozen capture form "writing to `readback-1.json`" rebinds it, so `node … "$BK" "readback-1.json"` diffed one file against itself and `READBACK OK` printed for any input. | The capture path is now written to `capture-path.txt` in 4.2 and **never carried in a variable across a step boundary**. Steps 4.5/4.7 bind `C2`/`RB1`/`RB2` explicitly, refuse to run if any two are equal, **and the comparator itself now rejects being handed the same file twice** (`fs.realpathSync` guard, first thing it does). Self-test case 5 feeds it the same file twice and requires the refusal. |
+| **P4-AMENDMENT #2** | **BLOCKING F2** — four gated artifacts (`readback-1.log`, `readback-2.log`, the `readback R1`/`R2` receipt lines, `selftest/result.txt`) were produced by no command anywhere; the self-test — the plan's own stated mitigation for its risk 4 — existed only as a prose table. Lesson 9: a contract NAMED but not QUOTED. | Steps 4.5 and 4.7 now quote, in full: the six fixture JSON files, the self-test runner that emits `SELFTEST 6/6 AS REQUIRED`, the `tee` redirections that create both `.log` files, and the two `printf … >> backup-receipt.txt` receipt lines. Nothing is gated that is not produced. |
+| **P4-AMENDMENT #3** | should-fix **F3** — the two pre-authorised automatic rollbacks fired on a single unretried `curl`; one transient blip would roll back a good deploy with no human in the loop. | A failing URL is now **re-probed twice more, ≥10 s apart, and all three attempts must fail** before any automatic rollback. Anything that recovers on retry is recorded and reported, never rolled back on. Anything ambiguous escalates to the owner like everything else. |
+| **P4-AMENDMENT #4** | should-fix **F4** — the double-deploy detector was named three times and mechanised nowhere (`head -1` discarded every id after the first). | Step 4.3 now counts **distinct** `dpl_` ids with `sort -u` and fails on anything but 1. A written fallback also lands: if `deploy.log` carries no `dpl_` at all, the id is read from `incoming.txt` (the reviewer's unverifiable #2). |
+| **P4-AMENDMENT #5** | should-fix **F5** — the plan claimed §VAL-P4 prints `TOTAL=… PLAN=…`; measured, it prints only the `ENDINGS:` line. The planner described its hand-run rather than the written script — the exact failure that paragraph exists to close. | The `echo` the claim describes is now **in** the script, and the whole preamble was re-extracted from this file and re-run to confirm the printed output matches the prose byte-for-byte. |
+| **P4-AMENDMENT #6** | should-fix **F6** — 4.2's `2>&1 \| tee` put the capture, `$BK` and the frozen command's `exit 1` inside a subshell: `$BK` died before `cp`, and a 401 would no longer stop the step. | The pipe is gone. The capture runs directly (so its `exit 1` still exits the step), `$BK` is persisted to a file immediately, and only the proof block's output is `tee`d. |
+| **P4-AMENDMENT #7** | should-fix **F7** — SK4-2 clause 3 is weaker than stated: `saveProfile` stamps `meta.updatedAt`, and `api/profile.js:31` calls it **on the GET path** when `migrateWordKeys` changes anything, so the writer clause 3 detects may be **our own capture GET**. | SK4-2 says so explicitly, and a tier explained ONLY by clause 3 is now reported as *unexplained by any evidence of her activity* rather than "weakest clause fired". |
+| **P4-AMENDMENT #8** | should-fix **F8** — the self-test never exercised the **appearance** branch, which is the block most likely to run for real and the only one dereferencing `story.chapters` and `meta.updatedAt`. | Two fixtures added: an appearance with no evidence (must FAIL) and an appearance with a moved ACT field (must PASS and print `words=true`). The self-test is now 6 cases, and the gated string moved to `SELFTEST 6/6 AS REQUIRED`. |
+| **P4-AMENDMENT #9** | should-fix **F9** — step 4.3's success test was a case-insensitive `error\|failed` substring sweep over a build log (a false-alarm generator) standing in for the positive outcome; criterion 7's `Ready` and upload size were asserted by nothing. | The success markers are now asserted **positively** (a `https://` production URL in the log, and `Ready` in `incoming.txt`), the error sweep is demoted to a *reported observation*, and the upload size is extracted and recorded (record gap 8's "watch the deploy size"). |
+| **P4-AMENDMENT #10** | nit **N1** — three line citations off by one or two. | Corrected everywhere: the GET branch is `api/profile.js:20-35`; the service-worker block is `public/app.js:57-67`; the `controllerchange` handler is `public/app.js:62-66`. Re-measured today with `sed`. |
+| **P4-AMENDMENT #11** | nit **N2** — "the eight carried obligations": `phase-state.md:52-76` lists **seven**. | Corrected to seven. (The reviewer notes all seven are honoured; only the count was wrong, and it was inherited from the phase-3 record.) |
+| **P4-AMENDMENT #12** | nit **N3** — the close tail used `curl … \| grep -q` under `set -o pipefail`, the form field-guide lesson 6 records as a SIGPIPE trap. | Rewritten to `SW="$(curl …)"` + `case`. The reviewer measured it not misfiring today; it is fixed anyway, because "works at this file size" is not a contract. |
+| **P4-AMENDMENT #13** | nit **N4** — the PRECACHE sweep hard-coded the 15 URLs instead of parsing the deployed `sw.js`. | The list is now **derived from the fetched live `sw.js`**, with an assertion that the derivation yields exactly 15 entries. The hard-coded list survives only as the cross-check. |
+| **P4-AMENDMENT #14** | nit **N5** — criterion 2 claimed the BASE-vs-HEAD write-set check runs "at every step"; it ran only at 4.8. | The `git diff --name-only 678dbc8 HEAD` clause is now **in §VAL-P4**, so the claim is true at every step. |
+| **P4-AMENDMENT #15** | nit **N6** — the field guide's own lesson 5 still says ledger 298 and contrast anchor 52; measured today 344 flat / 349 reported and 58. Not in RECORD GAPS. | Added as record gap 9, with the recommendation that the close amends lesson 5. |
+
+**Two review corrections the planner accepts about the plan's own sources:** the tree is clean at
+`678dbc8` (the plan already said so); and the reviewer independently re-derived ~40 of §A/§B/§C/§D's
+numeric claims and found no error — those tables stand unchanged.
+
+---
+
+## WHAT THIS PLANNER MEASURED TODAY (nothing below is quoted from the record without re-measuring)
+
+Tree clean at **`678dbc8fade5eda2b005b4f6c3948e9f875f7c10`** (`git status --porcelain -uall` = 0
+lines), branch `master`.
+
+### A. The worktree (the thing the deploy will upload)
+
+| measured | command / method | result |
+|---|---|---|
+| suite, plain | `npm test` | `# tests 349`, `# fail 0`, plan `1..344` |
+| flat ledger | `grep -h -c '^test(' tests/*.js \| awk '{s+=$1} END{print s+0}'` | **344** (349 − 344 = 5 subtests in `dev-server.test.js`) |
+| suite, gated | `APP_CODE=dummy npm test` | `# tests 349`, `# fail 0` |
+| contrast anchor | `node scripts/check-contrast.mjs \| grep -c '^PASS'` | **58**, and `ALL PASS` |
+| `public/` full digest | the frozen walker | **`2372 25db383385172d14d512e8f3695bdd33`** — agrees with `phase-state.md:28` |
+| `public/sw.js` | `md5sum` | `d76f781dc49c5f629aba0f2dfe3304b6`, `sw.js:1` = `const CACHE = "magic-vet-v18";` |
+| `public/styles.css` | `md5sum` | `21386f241459f7cc8ca353e9571c0490` |
+| `public/index.html` | `md5sum` | `9976fb94ccda6eb5aa86d90335103337` |
+| `public/app.js` | `md5sum` | `bfa3a8837a2fcdcd1c85502e5f1a86fb` |
+| `public/views/trophies.js` | `md5sum` | `3e45fe68b6a1e03b3072a63121c98a24` |
+| `public/quiz.js` / `quiz-core.js` | `md5sum` | `69b6d71117cf776715374abc6f0abb02` / `9a2131be8b9d1b77c219f1e8c3482a71` (QZ-18 intact) |
+| line endings | an `rb` byte counter, never `grep`/`file`/`git diff` | `sw.js` CRLF=51 · `styles.css` CRLF=707 · `index.html` CRLF=90 · `app.js` LF=67 · `views/words.js` CRLF=289 · `views/reader.js` CRLF=767 · `views/trophies.js` LF=368 · `quiz.js` CRLF=346 · `quiz-core.js` CRLF=99 — **all `LF=0` or `CRLF=0` respectively; zero mixed files** |
+| both transcripts | `quiz-transcript.mjs`, `g1-transcript.mjs` diffed against their expected files | both **EMPTY** |
+| `.data/profile.json` | `test -e` | **absent** |
+| `PRECACHE` | read `public/sw.js:2-18` | **15 entries**, `"/views/trophies.js"` at `:15`, immediately after `"/views/words.js"`; **no trophy artwork path present** |
+| `install` handler | read `public/sw.js:20-27` | `cache.addAll(PRECACHE)` — **all-or-nothing**; see SK4-3 |
+| `controllerchange` auto-reload | read `public/app.js:57-67` | present: the page reloads once when a new SW takes control |
+| the nine webps on disk | `ls -la public/assets/trophies/` | nine files, 16124–39078 bytes, names `chapters curious days known proven quizRight quizzer shelf-header streak` (camelCase `quizRight` — case matters, SK4-4) |
+| art URL construction | read `public/views/trophies.js:173`, `:185`, `:265` | `/assets/trophies/${trophy.id}.webp` and `/assets/trophies/shelf-header.webp` |
+| `awardTrophies` call sites | `grep -rn` | `api/profile.js:143` (once), `api/chapter.js:63` (once), **zero** under `public/` |
+| `awardTrophies` body | read `lib/profile.js:698-719` | fills missing tier keys only; never deletes, never lowers; `TROPHY_CATALOG` = the 8 signed ids/thresholds, imported and printed |
+| **`GET /api/profile` never awards** | read `api/profile.js:20-35` | the GET path is `loadProfile` → `migrateWordKeys` → `sendJson`. **`awardTrophies` is on the POST path only (`:143`).** This is the single most important measurement in this plan — see **SK4-6** |
+| deploy payload vs the last public/-touching commit | `git diff --name-status e786273 HEAD -- public` | **16 paths**: 10 added (9 webps + `views/trophies.js`), 6 modified (`app.js`, `index.html`, `styles.css`, `sw.js`, `views/reader.js`, `views/words.js`) |
+| server payload | `git diff --name-status e786273 HEAD -- lib api data` | `M api/chapter.js`, `M api/profile.js`, `M lib/profile.js` — **this deploy is what turns awarding on** |
+| `vercel.json` | read | `{"cleanUrls": true}` — `/index.html` 308s to `/`; fetch the shell as `/` |
+| `.vercelignore` | `cat` | **does not exist** |
+| `vercel` CLI | `"$(npm prefix -g)/vercel" --version` | **56.5.0**, present at `C:\Users\dkreinov\AppData\Roaming\npm/vercel`; `npm prefix -g` = `C:\Users\dkreinov\AppData\Roaming\npm` |
+| `.env` carries `APP_CODE` | `grep -c '^APP_CODE=' .env` (count only — the value was never read, printed or expanded) | **1** |
+| the existing capture | `ls -la /c/Users/dkreinov/english-app-backups/` | one file, `profile-20260730-114016.json`, **13295 bytes** — matches the `phase-state.md:47-48` receipt |
+
+### B. Production, live, read-only and unauthenticated (2026-07-30)
+
+Every request below was a plain `curl --ssl-no-revoke` GET with no credentials.
+**`/api/profile` was not requested in any form.**
+
+| probe | result |
+|---|---|
+| `/sw.js` line 1 | `const CACHE = "magic-vet-v17";` — v17 is live, v18 is not |
+| `/api/health` | exactly `{"ok":true,"data":{"status":"up","version":1}}` (200, 46 bytes) |
+| `/api/chapter` unauthenticated | **401** — the function bundle loaded (the free proof, SK4-5) |
+| `/index.html` | **308** → `https://english-app-three-tan.vercel.app/` (`cleanUrls`) |
+| `/` | 200, 3069 bytes, CRLF=81 (the worktree `index.html` is 3737 bytes, CRLF=90) |
+| the 15 `PRECACHE` URLs | **14 return 200; `/views/trophies.js` returns 404** |
+| the nine `/assets/trophies/*.webp` | **all nine 404**, each `content-type: text/plain` |
+| `/assets/heroine.webp` (control) | 200, `content-type: image/webp`, 46696 bytes |
+
+### C. The md5-live-vs-WORKTREE method, proven working TODAY before it is relied on
+
+Field-guide lesson 10 says md5 the worktree, never a git blob. I verified the method actually
+holds on this deployment, on files the trophies run has **not** touched:
+
+| file | live md5 | worktree md5 | |
+|---|---|---|---|
+| `/quiz.js` | `69b6d71117cf776715374abc6f0abb02` | same | MATCH (CRLF=346 on disk — a git blob would have differed) |
+| `/quiz-core.js` | `9a2131be8b9d1b77c219f1e8c3482a71` | same | MATCH |
+| `/api.js` | `4736d80e95644e47186bf7a306b35113` | same | MATCH |
+| `/lemma.js` | `cf2855f8470edfd7cfc0b47f99a15a09` | same | MATCH |
+| `/manifest.webmanifest` | `f87885c02825d3467f462326f88b0da1` | same | MATCH |
+| `/assets/heroine.webp` | (binary) | — | MATCH |
+
+**The Vercel CLI uploads worktree bytes**: five CRLF/LF-sensitive text files and one binary all
+match byte-for-byte. The proof method is therefore sound *for this project on this machine*, and a
+post-deploy mismatch will mean a real problem rather than a transport artifact.
+
+### D. The seven files whose live md5 must CHANGE, measured today so the change is provable
+
+These currently differ from the worktree. After the deploy every one must MATCH. **This is the
+closest thing to fail-first evidence a deploy admits** (SK4-9): the assertion is measurably FALSE
+right now and must become TRUE.
+
+| path | live md5 today | worktree md5 (must become live) |
+|---|---|---|
+| `/sw.js` | `24aac5f1722dba9f72baa24e730e9567` | `d76f781dc49c5f629aba0f2dfe3304b6` |
+| `/styles.css` | `8442cbbe8931deb194e253c9581de711` | `21386f241459f7cc8ca353e9571c0490` |
+| `/app.js` | `0f0b63c850c4d38d88883f89bef7a73f` | `bfa3a8837a2fcdcd1c85502e5f1a86fb` |
+| `/views/words.js` | `e5858b30ade84799113bf4e96fd7cfe2` | `a9966ea69c3ac12cbc6c7be876631e71` |
+| `/views/reader.js` | `8505c68b82aaf7e7e289a2b4fcf30059` | `2b14690677e8191a0f140779349649f9` |
+| `/` (the shell) | `8f5837194c9b709edce0cc2f5db2828e` | `9976fb94ccda6eb5aa86d90335103337` |
+| `/views/trophies.js` | **404 (does not exist)** | `3e45fe68b6a1e03b3072a63121c98a24` |
+
+### E. What this planner could NOT measure, stated plainly
+
+1. **Anything behind `APP_CODE`.** Her live profile was not read. Every claim about its contents in
+   this plan is quoted from the 2026-07-30 capture receipt (`journal.md:735-792`) and is explicitly
+   marked **stale-by-design** — step 4.2 re-measures it.
+2. **`vercel inspect`.** It is an authenticated Vercel-account call and was not run. The outgoing
+   deployment id/url in this plan are quoted from the record (`.oplan/word-g1/phase-state.md:21`,
+   `journal.md:488`) as *candidates to be confirmed*, never as the rollback target. SK4-8 rules on this.
+3. **Whether the deploy succeeds, how large the upload is, or what the new deployment id will be.**
+4. **Anything about how the screen looks on her phone.** No browser was opened on production, and
+   none may be (field-guide lesson 11). SK4-3 says what replaces that and what it cannot replace.
+5. **Whether the awarding engine runs correctly inside a Vercel function.** It cannot be proven
+   without a write to her profile. SK4-6 is entirely about this hole.
+
+---
+
+# PHASE 4: ship
+
+**GOAL** (design §5: *"Phase 4 — ship: D25 capture, deploy, md5 proof, read-back with T8 rules"*).
+Put the committed tree in front of the child, once, safely: freeze the outgoing deployment and
+write its rollback command down BEFORE anything moves; take a fresh capture of her live profile
+with the frozen subshell; deploy exactly once; prove byte-for-byte that what production serves is
+the tree that 349 tests and a human browser session gated; prove the `magic-vet-v18` bump took
+effect; read her profile back under T8's rules extended to trophies; and hand the owner a written
+checklist for the one thing no machine here may do — look at it on a real device.
+
+**PHASE 4 CHANGES NO FILE IN THE REPOSITORY EXCEPT `.oplan/` RECORDS.** No source file, no test,
+no doc, nothing under `public/`. If a defect is found, the fix is a NEW gated step on a NEW plan,
+never an in-place edit inside a deploy phase (the phase-3 precedent at `journal.md:1298-1308`).
+
+**THIS PHASE IS DIFFERENT FROM THE THREE BEFORE IT.** Phases 1-3 touched only the working tree and
+every mistake was `git`-recoverable. Two things here are irreversible: **a bad deploy she opens**,
+and **any write to her live profile**. Therefore every step below carries an explicit
+`STOP IF …` clause and a named next action, and the phase has ONE rollback command, written into
+`phase-state.md` and committed *before* the deploy, not composed under pressure afterwards.
+
+---
+
+## ACCEPTANCE CRITERIA (mechanical — all re-run at the phase close, step 4.8)
+
+1. `STEP-4.1-OK` … `STEP-4.8-OK` all print (4.6 is a human gate and prints nothing).
+2. **The repository never moved.** `git diff --name-only 678dbc8 HEAD` filtered by
+   `awk '$NF !~ /^\.oplan\//'` is **EMPTY** at every step and at the close; `public/` is still
+   `2372 25db383385172d14d512e8f3695bdd33`; the tree is clean. **This clause is enforced inside
+   §VAL-P4 itself** (P4-AMENDMENT #14), so "at every step" is literally true rather than a claim
+   only the close checks.
+3. `npm test` → `# tests 349`, `# fail 0`, plan `1..344`; identical under `APP_CODE=dummy`;
+   flat ledger **344**; contrast `ALL PASS` with `grep -c '^PASS'` = **58**. Unchanged all phase.
+4. Both transcripts diff EMPTY; `.data/profile.json` absent; **no `profile-*.json` anywhere inside
+   the repository** at any point.
+5. **The outgoing deployment was frozen BEFORE the deploy**: `vercel inspect` was run first and its
+   id, url and commit recorded verbatim into `$HOME/trophies-deploy/outgoing.txt`, and the rollback
+   command was written into `.oplan/word-trophies/phase-state.md` **and committed** before step 4.3.
+6. **The D25 capture exists and is proven, taken AFTER step 4.1 and BEFORE the deploy**, with the
+   frozen subshell verbatim: HTTP 200, ≥200 bytes, parseable, non-empty `words` map,
+   `validateProfile(prof).ok`, prints `BACKUP OK bytes=… words=… known=… candidate=…`; receipt
+   (path + bytes + sha256 + top-level key list + counts) appended to
+   `.oplan/word-trophies/backup-receipt.txt`; **contents never recorded**; the `APP_CODE`
+   post-assertion passed.
+7. **The deploy ran exactly ONCE**, with `--prod --yes`, output redirected to a FILE, and the new
+   deployment id + url + status `Ready` + upload size recorded. Evidence that it ran once, now
+   MECHANICAL (P4-AMENDMENT #4): `grep -o 'dpl_[A-Za-z0-9]*' deploy.log | sort -u | wc -l` = **1**,
+   and `vercel inspect` on the alias afterwards reports that same id. `Ready` and the upload size
+   are asserted positively, not inferred from the absence of the word "error" (P4-AMENDMENT #9).
+8. **THE MD5 PROOF.** For every one of the 16 enumerated payload paths under `public/`, live bytes
+   md5 == **worktree** bytes md5 (never a git blob). Enumerated by
+   `git diff --name-only --diff-filter=ACMR <OUTGOING_COMMIT>..HEAD -- public/ | LC_ALL=C sort`
+   — `--diff-filter=ACMR` is load-bearing: ten of the sixteen are ADDED, and a modified-only
+   enumeration would silently skip the actual payload of this deploy (word-quiz plan finding 3).
+   The shell is fetched as `/`, not `/index.html` (`cleanUrls` 308s).
+9. **THE CACHE BUMP IS PROVEN.** Live `/sw.js` md5 == worktree `d76f781dc49c5f629aba0f2dfe3304b6`,
+   contains `magic-vet-v18`, and does **not** contain `magic-vet-v17`.
+10. **THE PRECACHE IS INSTALLABLE.** All **15** `PRECACHE` URLs return 200 in production. This is a
+    gate, not a nicety: `sw.js:24` is `cache.addAll(PRECACHE)`, which rejects as a whole if any one
+    URL fails, leaving every returning device on the v17 shell forever (SK4-3). Today
+    `/views/trophies.js` 404s, so this check is **measured failing before the deploy**.
+11. **THE ART IS REACHABLE AND CASE-EXACT.** All nine `/assets/trophies/<id>.webp` return 200 with
+    `content-type: image/webp` and md5 == worktree, fetched with the exact camelCase filenames
+    (`quizRight.webp`). None of them appears in `PRECACHE` — that is by design (T6) and must not be
+    "fixed".
+12. **The function bundle loaded**: `/api/health` returns exactly
+    `{"ok":true,"data":{"status":"up","version":1}}` and unauthenticated `/api/chapter` returns
+    **401**. **`/api/profile` is never requested unauthenticated** (SK4-5).
+13. **READ-BACK R1 (immediately post-deploy)**, via the frozen subshell against the new deployment,
+    **with the two compared files bound to distinct explicit paths and the comparator refusing a
+    self-comparison** (P4-AMENDMENT #1), and only after its 8-case self-test has written
+    `SELFTEST 8/8 AS REQUIRED` (P4-AMENDMENT #2/#8):
+    200; `validateProfile(live).ok`; live word-key count ≥ the capture's; the set difference
+    `capture \ live` is **EMPTY**; every status change carries activity evidence (SK4-2);
+    **every trophy tier present in the capture is still present live, with a byte-identical
+    timestamp** (SK4-1). `trophies` being ABSENT at R1 is the EXPECTED result, not a failure
+    (SK4-6).
+14. **READ-BACK R2 (after her first real session)**: the same assertions, plus every tier that
+    APPEARED is accompanied by activity evidence and is one that the shipped engine, run over R1's
+    snapshot, agrees should have been awarded. A DISAPPEARING tier, a changed timestamp, or a lost
+    word key at either read-back → **STOP, roll back, owner** (SK4-8).
+15. **HUMAN GATE (step 4.6)**: the owner opened the app on a real device against the written
+    checklist and said yes. No machine in this run may open a browser on production (lesson 11).
+16. The rollback command is in `phase-state.md` verbatim before the deploy and re-confirmed after,
+    with the new deployment recorded as the top of the rollback ladder at the close.
+17. **D27 rider re-asked, not assumed** (`.oplan/word-g1/journal.md:480` — *"as last run" is not
+    assumed to be a standing order*): the owner is asked whether the capture files are deleted at
+    the close. Deletion, if ruled, happens strictly AFTER R2 and the criteria re-run.
+
+---
+
+## DEPENDS ON (every row read or measured today)
+
+| thing | where | verified |
+|---|---|---|
+| design §5 phase-4 sketch, T8 (the safety ritual), T2 (awarding), T6 (art never precached) | `design.md:173`, `:145-151`, `:75-83`, `:125-135` | read in full |
+| **design §9 amendments A1-A4** — the celebration was rebuilt and **now makes sound**, reversing signed T5/T9 | `design.md:207-256` | read in full |
+| the SEVEN carried obligations + the pins phase 4 must quote | `.oplan/word-trophies/phase-state.md:21-83` | read in full; **every pin re-measured today and confirmed** |
+| the D25 capture taken early, and what the first award pass will do | `.oplan/word-trophies/journal.md:735-792` | read in full |
+| PHASE 3 CLOSED, incl. "for phase 4 to consume" | `.oplan/word-trophies/journal.md:1123-1192` | read in full |
+| POST-CLOSE owner review: A1/A2 rulings, steps 3.8/3.9, the desktop ray cap | `.oplan/word-trophies/journal.md:1194-1357` | read in full |
+| the field guide, all 14 lessons | `.oplan/word-trophies/field-guide/index.md` (`wc -l` = **89**, matching `phase-state.md:9`) | read in full |
+| **lesson 10 (DEPLOY)** | `field-guide/index.md:52-55` | quoted verbatim below |
+| **lesson 3 (the profile is live; a GET CREATES one)** | `field-guide/index.md:11-16` | quoted verbatim below |
+| lesson 11 (visual gates are sandbox-only, NEVER production) | `field-guide/index.md:56-59` | quoted verbatim below |
+| **the frozen DEPLOY RECIPE** | `.oplan/word-audio/phase-state.md:55-66` | read in full; quoted below with the version corrected (SK4-7) |
+| **the frozen CAPTURE COMMAND** | `.oplan/word-quiz/plan.md:1573-1586` | read in full; quoted verbatim below, unchanged |
+| the frozen capture PROOF block | `.oplan/word-g1/plan.md:828-856` | read; quoted below |
+| the frozen READ-BACK block and its ACT-fields rule | `.oplan/word-g1/plan.md:952-999`, amending `.oplan/word-quiz/plan.md:1510-1517` | read; extended in SK4-1/SK4-2 |
+| the rollback ladder and the exact rollback command form | `.oplan/word-g1/phase-state.md:19-25` | read; SK4-8 rules on the target |
+| the two previous deploys, as executed | `.oplan/word-g1/journal.md:210-221`, `:484-495` | read — including the double-deploy incident and the wrong-url incident |
+| the house plan SHAPE and §VAL-P3 as the template for §VAL-P4 | `.oplan/word-trophies/plan.md:1324-3492`, `§VAL-P3` at `:1929-2041` | read in full |
+| `STATUS.md` and `briefing.md` (phase-3 RECORD GAP 9 said to read both) | `.oplan/word-trophies/STATUS.md`, `briefing.md:27-28`, `:73`, `:107` | **read — they hold no phase-4 instruction beyond the record**; that gap is closed |
+| the learner's two open requests, NOT part of this run | `.oplan/REQUESTS-FROM-THE-LEARNER.md` | noted, out of scope |
+
+**Nothing in phase 4 is already done:** production is at v17, `/views/trophies.js` and all nine
+webps 404, no fresh capture exists, `phase-state.md` carries no phase-4 rollback line.
+
+---
+
+## SKELETON CHANGES — where the record is silent, decided here, with citations
+
+### SK4-1 — WHAT THE T8 READ-BACK MEANS FOR A TROPHY (the rule the record does not have)
+
+**The conflict.** `design.md:145-151` (T8) says: *"a trophy tier may APPEAR between capture and
+read-back only with accompanying activity evidence (the same ACT-fields rule — award moments
+coincide with activity writes by construction, T2); a trophy that DISAPPEARS or loses a tier is an
+immediate read-back failure → code rollback."* But the only mechanical read-back that exists
+(`.oplan/word-g1/plan.md:966-985`) knows nothing about trophies: it iterates `words` and checks
+`status` against five activity fields. Nobody has written the trophy half.
+
+**RULED.** The read-back gains a third block, alongside the key-loss block and the status block:
+
+```
+for every trophyId in capture.trophies (if the key exists at all):
+    the id must exist live                              -> else FAIL "trophy LOST"
+    for every tier in that id:
+        the tier must exist live                        -> else FAIL "tier LOST"
+        live[id][tier] must equal capture[id][tier]     -> else FAIL "tier RESTAMPED"
+for every trophyId/tier present live but NOT in the capture:   (an APPEARANCE)
+    at least one word entry, or the chapter list, must show activity newer than the capture
+    -> else FAIL "tier appeared with no activity evidence"
+    otherwise: ALLOWED, and REPORTED to the owner by name
+```
+
+Three things this deliberately encodes:
+* **Timestamps are compared, not just presence.** `awardTrophies` writes a tier key ONCE
+  (`lib/profile.js:713-714`: `if (tier in earned) continue;`). A *changed* timestamp means
+  something rewrote history, which is exactly as bad as a deletion and would otherwise pass a
+  presence-only check. This is the "assertion that names a property it does not observe" defect
+  class the run has now hit three times (`journal.md:1239-1249`, `:1324-1330`); it is not repeated
+  here.
+* **Appearances are expected.** `phase-state.md:59-61` and `journal.md:789-792`: four trophies sit
+  1-3 actions from their next tier (`chapters` 2, `proven` 1, `streak` 2, `known` 3). A read-back
+  rule that treats an appearance as a fault would fire on correct behaviour and burn the one
+  rollback decision on a false alarm.
+* **A locked trophy staying locked is never a failure.** Nothing in T8 requires anything to appear.
+
+**Consequence:** the read-back script grows ~20 lines and one new failure mode. **Fallback if the
+capture has no `trophies` key at all** (the expected state at R1 — SK4-6): the loop body simply
+does not execute, and the block degenerates to the appearance check. That is correct, not a hole.
+
+### SK4-2 — WHAT "ACTIVITY EVIDENCE" CONCRETELY MEANS HERE
+
+**The record's rule** (`.oplan/word-quiz/plan.md:1512-1516`, as amended by
+`.oplan/word-g1/plan.md:988-998`): for every key in the capture, `live.status === capture.status`
+**or** at least one of `taps`, `lastSeen`, `lastQuizAt`, `quizRight`, `quizWrong`, `nominations`
+differs. That rule is per-word. A trophy is not per-word: `days` is derived from chapters ∪ words,
+`chapters` from `story.chapters.length` only.
+
+**RULED — "activity evidence" for phase 4 is a two-level test, both levels mechanical:**
+
+1. **Per-word (unchanged, inherited verbatim):** `ACT = ["taps","lastSeen","lastQuizAt",
+   "quizRight","quizWrong","nominations"]`. A status change with no ACT movement fails outright.
+2. **Profile-level, new, for a trophy tier that APPEARED** — at least one of:
+   * `live.story.chapters.length > capture.story.chapters.length`, or
+   * any `live.words[k]` differs from `capture.words[k]` in any ACT field (including keys the
+     capture did not have — a brand-new word is activity), or
+   * `live.meta.updatedAt !== capture.meta.updatedAt`.
+
+The third clause is the weakest, and **P4-AMENDMENT #7 measured just how weak.** `lib/store.js`'s
+`saveProfile` stamps `profile.meta.updatedAt = new Date().toISOString()` on every save, and
+`api/profile.js:31` calls `saveProfile` **on the GET path** whenever `migrateWordKeys` changes
+anything. So the writer clause 3 detects **may be our own sanctioned capture GET, not her**. It
+proves less than "the server wrote something because she did something" — it proves only "somebody
+wrote, possibly us". It is kept because **a tier can legitimately be awarded by `api/chapter.js:63`
+on a path that touches no word**, and excluding it would make a correct `chapters`-trophy award look
+like a violation.
+
+**Consequence, now mechanical:** the comparator computes `herActivity = chaptersGrew || wordMoved`,
+and when a tier appears with `herActivity` false the report line carries
+`WARNING: explained ONLY by meta.updatedAt, which our own capture GET can move -- NOT evidence of
+her activity`. A tier in that state is reported to the owner as **unexplained by any evidence of her
+activity**, not as "the weakest clause fired". The first two clauses remain the strong ones.
+
+**Consequence:** an appearance is *explained*, never merely *tolerated*. **Fallback:** if a tier
+appears and NO clause fires, that is a hard FAIL and a rollback trigger under SK4-8 — a trophy
+materialising over a profile that did not change is exactly the "shows the child a lie" risk of
+`design.md:176-179`.
+
+### SK4-3 — HOW TO VERIFY THE SCREEN WORKS IN PRODUCTION WITHOUT OPENING A BROWSER ON IT
+
+**The constraint.** Field guide lesson 11: *"VISUAL GATES ARE SELF-SERVED (owner directive):
+sandbox browser only, NEVER production."* So the obvious check — drive `/#/trophies` in production
+and look — is forbidden to every agent in this run.
+
+**RULED — the substitute is a three-part bridge, and its limits are stated, not implied.**
+
+1. **Byte-identity.** Every file the screen needs — `/`, `/styles.css`, `/app.js`,
+   `/views/trophies.js`, `/views/words.js`, `/views/reader.js`, and all nine webps — is proven
+   md5-identical to the worktree. Those exact bytes were exercised by 349 tests **and** by a human
+   in a real browser at steps 3.6/3.8/3.9 (`journal.md:1288-1296`, `:1342-1349`). Identical bytes
+   fetched over the same protocol into the same browser engine produce the same screen. This is a
+   real argument, and it is the strongest one available without a browser.
+2. **Reachability.** A screen made of correct bytes still fails if one of them 404s. So: all 15
+   `PRECACHE` URLs 200 (`sw.js:24` is `cache.addAll`, all-or-nothing — one 404 and the new SW never
+   installs and every returning device stays on the v17 shell **forever**, which is precisely the
+   QZ-22 hazard this deploy exists to discharge); all nine webps 200 with `content-type: image/webp`
+   and case-exact names; `/api/chapter` 401 and `/api/health` byte-exact.
+3. **A human on a real device — the OWNER, not an agent (step 4.6).** Lesson 11 constrains *this
+   run's agents*; it does not and cannot constrain the app's owner opening his own app. He is given
+   a written checklist (step 4.6) and his "yes" is criterion 15.
+
+**WHAT THIS BRIDGE CANNOT DO, said plainly:** it cannot prove the *server* function behaves — see
+SK4-6 — and it cannot see a rendering defect that depends on her device, her OS font stack or her
+cache state. Byte-identity plus reachability is evidence about *delivery*; only 4.6 and 4.7 are
+evidence about *experience*. The plan never claims otherwise.
+
+### SK4-4 — THE ART IS RUNTIME-FETCHED, SO ITS ONLY PRODUCTION GATE IS AN HTTP PROBE
+
+`phase-state.md:63-64` and design T6: the nine webps are served but deliberately **never** in
+`PRECACHE`, and a committed test asserts both the absence from `PRECACHE` and the nine filenames
+**case-exactly** ("Vercel is case-sensitive; `existsSync` here is not"). Consequence for phase 4:
+the local test cannot see a case failure in production, because the local filesystem is
+case-insensitive. **RULED:** step 4.4 fetches all nine over HTTP with the exact camelCase names and
+requires 200 + `image/webp` + worktree md5. `quizRight.webp` is the one that would actually break
+(`journal.md` phase-2 record; the other eight are all-lowercase). **Do not "fix" their absence from
+`PRECACHE`** — that absence is the design. **Fallback if one 404s:** it is a rollback trigger under
+SK4-8, because a locked trophy card would render as a broken image on her shelf.
+
+### SK4-5 — `/api/profile` IS NEVER PROBED, NOT EVEN FOR THE 401 CONTROL
+
+**The conflict.** The word-quiz deploy criterion 9 (`plan.md:1500-1502`) used *"unauthenticated
+`GET /api/profile` → 401 (proves the function bundled; 401 short-circuits before store access)"* as
+a post-deploy control. The standing contract (`.oplan/word-g1/phase-state.md:37-39`, field-guide
+lesson 3) says: *"`GET /api/profile` CREATES one — never probe."*
+
+**RULED: `/api/chapter` replaces it.** It returns 401 today (measured), it is on the same function
+bundle path, and it proves exactly the same thing — that the serverless functions built and loaded.
+The word-audio recipe already prefers this form (`.oplan/word-audio/phase-state.md:61-62`:
+*"`/api/chapter` → 401 (proves the function and its bundled JSON loaded, free)"*). The
+"401 short-circuits" argument is a **code reading**, and a code reading is worth least at the exact
+moment the deploy might be broken. **Consequence:** one line of the inherited recipe is not copied.
+**Fallback:** none needed — `/api/chapter` 401 is strictly better evidence at zero risk.
+
+### SK4-6 — `trophies` WILL BE ABSENT AT READ-BACK R1, AND THAT IS CORRECT
+
+**The trap, measured today.** `api/profile.js:20-35` — the GET path is `loadProfile` →
+`migrateWordKeys` → `sendJson`. `awardTrophies` is called only at `:143`, on the POST path, and at
+`api/chapter.js:63`. Design T2 states this deliberately: *"Never in GET (a read stays a read as far
+as trophies are concerned)."* The sanctioned capture **is a GET**. Therefore:
+
+> **The read-back immediately after the deploy will show NO `trophies` key at all, exactly as the
+> capture did. This is the correct, expected result. It is NOT evidence that the deploy failed and
+> it is NOT a rollback trigger.**
+
+This is written in capitals because the failure mode is obvious and expensive: an executor sees an
+empty shelf in the read-back, concludes the engine is broken, and rolls back a good deploy.
+
+**Consequence — the phase needs TWO read-backs, not one** (SK4-7 details the timing):
+* **R1, immediately post-deploy:** proves *nothing was lost*. It cannot prove awarding works.
+* **R2, after her first real session:** proves *awarding works in production*. It is the only
+  evidence that exists, because proving it any other way would require this run to POST to her live
+  profile — an irreversible write, forbidden.
+
+**Fallback if R2 cannot be had** (she does not use the app inside the phase window): the phase
+closes with R2 explicitly OPEN and the record saying so, rather than closing on a claim it has not
+measured. The projection in step 4.2 (the shipped engine run over the capture, outside the repo)
+is a *prediction*, and the close must call it a prediction.
+
+### SK4-7 — DOES THE READ-BACK NEED A SECOND CAPTURE? YES — AND HOW IT IS COMPARED
+
+**The record is split.** word-quiz took capture #1 (seed) and capture #2 (binding, seconds before
+the deploy) and then a read-back file (`plan.md:1573-1594`, `:1670-1679`). word-g1 took one capture
+per phase plus a read-back (`plan.md:942-999`). `phase-state.md:46-50` says only "phase 4
+re-captures".
+
+**RULED — three authenticated reads, all with the identical frozen subshell form, all writing to
+files OUTSIDE the repo:**
+
+| # | when | file | role |
+|---|---|---|---|
+| C2 | step 4.2, immediately before the deploy | `/c/Users/dkreinov/english-app-backups/profile-<ts>.json` | **the binding D25 artifact**. The 2026-07-30 capture (C1) is kept for comparison, not for safety. |
+| R1 | step 4.5, immediately after the deploy | `$HOME/trophies-deploy/readback-1.json` | nothing lost |
+| R2 | step 4.7, after her first session | `$HOME/trophies-deploy/readback-2.json` | awarding works |
+
+Comparisons: **C2 vs R1** (must be near-identical: same keys, no status change without evidence, no
+tier lost); **R1 vs R2** (tiers may appear, with evidence; nothing may vanish); **C1 vs C2** is
+computed and REPORTED only — it measures what she did in the days before the deploy and is never a
+gate (the word-quiz precedent at `plan.md:1482-1487`: a change she makes between captures must never
+fail a gate no work of ours can satisfy).
+
+**Consequence:** three reads of a live profile instead of one. Each is a GET that, as the frozen
+recipe discloses, *"can rewrite her stored file into sorted-key order — byte-identical to what her
+own app does on every load."* That is the known, accepted cost, disclosed at every capture.
+**Fallback:** if any read returns 401, STOP at once (B2: the local `.env` code no longer matches
+production; the owner supplies it out of band; never `vercel env`).
+
+### SK4-8 — THE ROLLBACK: EXACT COMMAND, EXACT TARGET, AND WHO DECIDES
+
+**The record's ladder** (`.oplan/word-g1/phase-state.md:19-25`) gives the command form and two full
+urls, but for the CURRENTLY LIVE deployment it records only `dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw
+(english-qh5ne6g96)` — **a bare project-name fragment, not a url**. `journal.md:488` has the full
+host, `english-qh5ne6g96-dkreinovs-projects.vercel.app`. Lesson 10 exists precisely because *"a
+hand-constructed url once pointed at the WRONG deployment"* (`journal.md:212-214`).
+
+**RULED:**
+* The rollback target is **the outgoing deployment as `vercel inspect` reports it in step 4.1**,
+  and nothing else. The record's value is treated as a *hypothesis to confirm*: if inspect reports
+  an id other than `dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw`, **STOP** — something deployed outside this
+  run's knowledge and the whole baseline must be re-established before anything ships.
+* The command, frozen. The url is **pasted in from `outgoing.txt`, never hand-built**, and the
+  recorded line must contain the literal url — an angle-bracket placeholder left in place would be
+  read by bash as a redirect and would roll back nothing:
+  ```bash
+  "$(npm prefix -g)/vercel" rollback https://<the exact host inspect printed> --yes
+  ```
+  For example, the two runnable rungs already in the record
+  (`.oplan/word-g1/phase-state.md:23`, `:25`) look like
+  `"$(npm prefix -g)/vercel" rollback https://english-g80h5gnd9-dkreinovs-projects.vercel.app --yes`.
+  Written into `.oplan/word-trophies/phase-state.md` **and committed** in step 4.1, BEFORE the
+  deploy — the word-g1 step-2.10 practice (`journal.md:484-487`), which is why that deploy had a
+  usable rollback and the one before it did not.
+* **WHO DECIDES: the owner.** The orchestrator STOPS and reports; it does not roll back on its own
+  initiative. The single exception, pre-authorised here so that nobody waits while the app is
+  broken for a child: **if a PRECACHE URL 404s or the shell (`/`) does not serve, roll back
+  immediately and report** — that state means returning devices are being handed a broken or
+  permanently-stale app, and delay makes it worse.
+  **Guarded by a three-attempt confirmation (P4-AMENDMENT #3):** the failing URL is re-probed twice
+  more, ≥10 s apart, and **all three attempts must fail** before the automatic rollback fires. These
+  are the only two actions in the phase a machine takes against production without a human, and the
+  reviewer was right that resting them on one unretried `curl` — over a corporate TLS proxy, against
+  a CDN seconds after a deploy — invited rolling back a good deploy. Anything that recovers, and
+  anything ambiguous, escalates to the owner like everything else.
+* **What rollback does and does not do, stated plainly (D27, owner-accepted,
+  `.oplan/word-quiz/plan.md:1444-1447`): `vercel rollback` restores CODE ONLY. There is no restore
+  path for her profile. The capture is a capture, not a backup you can put back.** If her data is
+  damaged, rollback does not undo it; that is why the awarding function is pure and additive
+  (`lib/profile.js:698-719` never deletes and never lowers) and why T8's rule is written around
+  *disappearance* as the alarm.
+
+### SK4-9 — FAIL-FIRST WHERE IT IS POSSIBLE; GUARDS NAMED AS GUARDS WHERE IT IS NOT
+
+Field-guide lesson 2: *"A test never seen to FAIL is not evidence — mutate first."* A deploy phase
+cannot mutate production to watch a check fail. **RULED — each check is labelled honestly:**
+
+**GATES seen to fail (real fail-first evidence, obtained today, without touching anything):**
+* the md5 proof — all seven changed paths **currently differ** from the worktree (§D above);
+  `/views/trophies.js` currently 404s. After the deploy they must all match. The assertion is
+  demonstrably false right now.
+* the PRECACHE sweep — 14/15 200, **`/views/trophies.js` 404 today**. The check fires today.
+* the nine-webp probe — **all nine 404 today**.
+* the v18 assertion — live `/sw.js` says `magic-vet-v17` today.
+* §VAL-P4's `APP_CODE` guard — demonstrated firing under `APP_CODE=notarealcode` in a throwaway
+  shell (RC=1) and passing with it unset (RC=0).
+* §VAL-P4's stray-capture guard — demonstrated firing against a scratch directory containing a
+  `profile-*.json` (RC=1).
+
+* **the read-back comparator itself — now the strongest fail-first evidence in the phase**
+  (P4-AMENDMENT #2/#8). Its 8-case self-test was **built and run by the planner today** against the
+  real `lib/profile.js`, and five of its cases are watched failures: key loss, status-without-
+  evidence, trophy loss, tier restamp, and an appearance with no evidence. Case 7 is the
+  self-comparison refusal — the case that catches the blocking defect this plan shipped in its first
+  draft — and case 8 is the negative control proving an *unchanged* profile still passes. Observed:
+  `selftest passes: 8/8`. The runner is quoted in full at 4.5-B.
+
+**GUARDS, not gates — checks whose failure has never been observed and cannot be staged:**
+* the comparator running against **her real data**. The script is proven; the *data path* is not,
+  and cannot be without damaging a profile to watch the alarm work.
+* the deploy's own success/failure. Production cannot be mutated to watch a check fail.
+* everything about her actual experience. Only the owner at 4.6 can see it.
+
+### SK4-10 — THE DEPLOY CARRIES THE SERVER, NOT JUST THE SCREEN
+
+Worth stating because three phases of records emphasise `public/`: `git diff --name-status
+e786273 HEAD -- lib api data` = `M api/chapter.js`, `M api/profile.js`, `M lib/profile.js`. **This
+deploy is what turns awarding on.** Nothing under `lib/` or `api/` has been live for one second of
+this run. Consequences folded into the plan: the md5 proof cannot cover them (functions are not
+fetchable), `/api/chapter` 401 and `/api/health` are the only free signals, and R2 is the only
+behavioural proof. Also: `api/chapter.js` now calls `awardTrophies` at chapter generation, so a
+chapter she generates is an award moment with no word activity — which is why SK4-2 clause 3 exists.
+
+### SK4-11 — THE OWNER'S DEVICE CHECK IS LOOK-ONLY, BECAUSE HIS TAPS ARE WRITES TO HER PROFILE
+
+**The trap.** There is ONE profile behind `APP_CODE` (`lib/store.js` via `api/profile.js`). The
+owner's phone and the child's phone are the same account. So at step 4.6:
+* **opening the app** performs a `GET /api/profile` — the same read her own app does on every load,
+  already disclosed by the frozen recipe, harmless;
+* **tapping a word, answering a quiz question, or generating a chapter** performs a **POST**, which
+  writes her profile *and* runs `awardTrophies` — consuming a real earn moment that belongs to her,
+  and stamping her trophy timestamps with his session instead of hers.
+
+**RULED — step 4.6 is LOOK-ONLY and the checklist says so in its first line.** The owner may open
+the app, hard-reload past the old service worker, and navigate to the trophies tab. He may not tap a
+word, run a quiz, or generate a chapter. **Consequence:** he will see the shelf but NOT the
+celebration, because the celebration only fires at an earn moment and an earn moment is a write.
+**Fallback, if the owner decides he wants to see the celebration himself:** that is his call to
+make about his own child's data, but it must be an explicit, recorded decision — not a side effect
+of a checklist — and the journal must record that one of her four day-one celebrations was
+triggered by him. The plan's default is: do not.
+
+---
+
+## §VAL-P4 — the frozen validation preamble
+
+**Deliver this to any executor as a FILE, never inline in a JSON packet** — backslashes collapsed
+in transit twice in phase 1. **Every step's validation is ONE script = §VAL-P4 verbatim + that
+step's tail, in the SAME file** (P2-AMENDMENT #1a: a child `bash` cannot supply `fail` / `$PORC` /
+`$RC` to a tail). The `.oplan` filter is `awk '$NF !~ /^\.oplan\//'` — **four characters of
+backslash**; `plan.md:989` carries a collapsed-backslash copy that is a bash SYNTAX ERROR (P2-NOTE
+#1): never copy that line.
+
+Unlike §VAL-P3, this preamble **hard-codes every number**, because phase 4 moves none of them: the
+suite, the ledger, the anchor, the `public/` digest and every file's endings are frozen for the
+whole phase. It also adds two things no earlier preamble had: an `APP_CODE`-in-the-shell guard, and
+a sweep for any capture file that leaked into the repository.
+
+```bash
+#!/usr/bin/env bash
+set -o pipefail
+cd C:/Users/dkreinov/claude/english-app || { echo "FAIL: cannot cd to the repo"; exit 1; }
+RC=0
+fail() { echo "FAIL: $*"; RC=1; }
+
+# --- APP_CODE must NOT exist in this shell (lesson 3: a leak silently 401s the whole suite) ---
+if [ -n "${APP_CODE:-}" ]; then fail "APP_CODE is set in this shell -- it may only ever live inside the frozen capture subshell"; fi
+
+# --- suite (plain) ---
+OUT="$(npm test 2>&1)"; STAT=$?
+case "$STAT" in 0) ;; *) fail "npm test exited $STAT";; esac
+TOTAL="$(printf '%s\n' "$OUT" | sed -n 's/^# tests \([0-9][0-9]*\).*$/\1/p')"
+FAILED="$(printf '%s\n' "$OUT" | sed -n 's/^# fail \([0-9][0-9]*\).*$/\1/p')"
+PLAN="$(printf '%s\n' "$OUT" | sed -n 's/^1\.\.\([0-9][0-9]*\).*$/\1/p')"
+case "$TOTAL" in 349) ;; *) fail "suite reported $TOTAL, expected 349";; esac
+case "$FAILED" in 0) ;; *) fail "suite had $FAILED failures";; esac
+case "$PLAN" in 344) ;; *) fail "top-level plan is 1..$PLAN, expected 1..344";; esac
+
+# --- suite (gated) ---
+GOUT="$(APP_CODE=dummy npm test 2>&1)"; GSTAT=$?
+case "$GSTAT" in 0) ;; *) fail "APP_CODE=dummy npm test exited $GSTAT";; esac
+GTOTAL="$(printf '%s\n' "$GOUT" | sed -n 's/^# tests \([0-9][0-9]*\).*$/\1/p')"
+GFAILED="$(printf '%s\n' "$GOUT" | sed -n 's/^# fail \([0-9][0-9]*\).*$/\1/p')"
+case "$GTOTAL" in 349) ;; *) fail "gated suite reported $GTOTAL, expected 349";; esac
+case "$GFAILED" in 0) ;; *) fail "gated suite had $GFAILED failures";; esac
+
+# --- flat ledger ---
+FLAT="$(grep -h -c '^test(' tests/*.js | awk '{s+=$1} END{print s+0}')"
+case "$FLAT" in 344) ;; *) fail "flat ledger is $FLAT, expected 344";; esac
+
+# --- contrast anchor ---
+CON="$(node scripts/check-contrast.mjs 2>&1)"; CSTAT=$?
+case "$CSTAT" in 0) ;; *) fail "check-contrast exited $CSTAT";; esac
+PASSES="$(printf '%s\n' "$CON" | grep -c '^PASS')"
+case "$PASSES" in 58) ;; *) fail "contrast anchor is $PASSES, expected 58";; esac
+case "$CON" in *"ALL PASS"*) ;; *) fail "check-contrast did not print ALL PASS";; esac
+
+# --- public/ is byte-frozen for the whole phase: phase 4 SHIPS the tree, it does not edit it ---
+PUBFULL="$(node -e 'const fs=require("fs"),path=require("path"),crypto=require("crypto");const out=[];(function walk(d){for(const e of fs.readdirSync(d).sort()){const f=path.join(d,e);const s=fs.statSync(f);if(s.isDirectory())walk(f);else out.push(f.split(path.sep).join("/")+" "+crypto.createHash("md5").update(fs.readFileSync(f)).digest("hex"));}})("public");console.log(out.length+" "+crypto.createHash("md5").update(out.join(String.fromCharCode(10))).digest("hex"));')"
+case "$PUBFULL" in "2372 25db383385172d14d512e8f3695bdd33") ;; *) fail "public/ moved: expected '2372 25db383385172d14d512e8f3695bdd33', got '$PUBFULL'";; esac
+
+# --- the deploy-payload md5 pins, individually, so a failure names the file ---
+SWMD5="$(md5sum public/sw.js | cut -d' ' -f1)"
+case "$SWMD5" in d76f781dc49c5f629aba0f2dfe3304b6) ;; *) fail "public/sw.js moved: $SWMD5";; esac
+CSSMD5="$(md5sum public/styles.css | cut -d' ' -f1)"
+case "$CSSMD5" in 21386f241459f7cc8ca353e9571c0490) ;; *) fail "public/styles.css moved: $CSSMD5";; esac
+HTMLMD5="$(md5sum public/index.html | cut -d' ' -f1)"
+case "$HTMLMD5" in 9976fb94ccda6eb5aa86d90335103337) ;; *) fail "public/index.html moved: $HTMLMD5";; esac
+APPMD5="$(md5sum public/app.js | cut -d' ' -f1)"
+case "$APPMD5" in bfa3a8837a2fcdcd1c85502e5f1a86fb) ;; *) fail "public/app.js moved: $APPMD5";; esac
+TRMD5="$(md5sum public/views/trophies.js | cut -d' ' -f1)"
+case "$TRMD5" in 3e45fe68b6a1e03b3072a63121c98a24) ;; *) fail "public/views/trophies.js moved: $TRMD5";; esac
+QMD5="$(md5sum public/quiz.js | cut -d' ' -f1)"
+case "$QMD5" in 69b6d71117cf776715374abc6f0abb02) ;; *) fail "public/quiz.js moved: $QMD5 (QZ-18 frozen)";; esac
+QCMD5="$(md5sum public/quiz-core.js | cut -d' ' -f1)"
+case "$QCMD5" in 9a2131be8b9d1b77c219f1e8c3482a71) ;; *) fail "public/quiz-core.js moved: $QCMD5 (frozen)";; esac
+
+# --- the server the deploy carries must not move during the phase ---
+SRV="$(git diff --name-only HEAD -- lib api data)"
+case "$SRV" in "") ;; *) fail "lib/ api/ or data/ changed, which phase 4 must never do: $SRV";; esac
+
+# --- awardTrophies stays server-side only (T2) ---
+CLIENTAWARD="$(grep -rl 'awardTrophies' public/ | wc -l | tr -d ' ')"
+case "$CLIENTAWARD" in 0) ;; *) fail "awardTrophies appears under public/ -- T2 forbids client-side awarding";; esac
+
+# --- both transcripts must diff EMPTY ---
+VD="$HOME/trophies-val"; mkdir -p "$VD"
+node .oplan/word-quiz/quiz-transcript.mjs > "$VD/qz.out" 2>&1 || fail "quiz-transcript.mjs exited non-zero"
+QZ="$(diff "$VD/qz.out" .oplan/word-quiz/quiz-transcript-expected.txt)"
+case "$QZ" in "") ;; *) fail "QZ-21 transcript moved";; esac
+node .oplan/word-g1/g1-transcript.mjs > "$VD/g1.out" 2>&1 || fail "g1-transcript.mjs exited non-zero"
+G1="$(diff "$VD/g1.out" .oplan/word-g1/g1-transcript-expected.txt)"
+case "$G1" in "") ;; *) fail "G1 transcript moved";; esac
+rm -f "$VD/qz.out" "$VD/g1.out"
+
+# --- NOT ONE BYTE OF HER PROFILE MAY EXIST INSIDE THE REPOSITORY ---
+if [ -e .data/profile.json ]; then fail ".data/profile.json exists -- a local write leaked"; fi
+STRAY="$(find . -path ./node_modules -prune -o -name 'profile-*.json' -print | head -5)"
+case "$STRAY" in "") ;; *) fail "a capture file is inside the repo: $STRAY";; esac
+
+# --- line endings are LAW (field guide lesson 4 as corrected by SK3-1) ---
+ENDS="$(node -e 'const fs=require("fs");const out=[];for(const f of process.argv.slice(1)){if(!fs.existsSync(f)){out.push(f+" MISSING");continue;}const b=fs.readFileSync(f);let c=0,l=0;for(let i=0;i<b.length;i++){if(b[i]===10){if(i>0&&b[i-1]===13)c++;else l++;}}out.push(f+" CRLF="+c+" LF="+l);}console.log(out.join("; "));' public/sw.js public/styles.css public/index.html public/app.js public/views/words.js public/views/reader.js public/views/trophies.js public/quiz.js public/quiz-core.js)"
+echo "ENDINGS: $ENDS"
+case "$ENDS" in *"public/sw.js CRLF=51 LF=0"*)              ;; *) fail "public/sw.js endings moved: $ENDS";; esac
+case "$ENDS" in *"public/styles.css CRLF=707 LF=0"*)        ;; *) fail "public/styles.css endings moved: $ENDS";; esac
+case "$ENDS" in *"public/index.html CRLF=90 LF=0"*)         ;; *) fail "public/index.html endings moved: $ENDS";; esac
+case "$ENDS" in *"public/app.js CRLF=0 LF=67"*)             ;; *) fail "public/app.js endings moved: $ENDS";; esac
+case "$ENDS" in *"public/views/words.js CRLF=289 LF=0"*)    ;; *) fail "public/views/words.js endings moved: $ENDS";; esac
+case "$ENDS" in *"public/views/reader.js CRLF=767 LF=0"*)   ;; *) fail "public/views/reader.js endings moved: $ENDS";; esac
+case "$ENDS" in *"public/views/trophies.js CRLF=0 LF=368"*) ;; *) fail "public/views/trophies.js endings moved: $ENDS";; esac
+case "$ENDS" in *"public/quiz.js CRLF=346 LF=0"*)           ;; *) fail "public/quiz.js endings moved: $ENDS";; esac
+case "$ENDS" in *"public/quiz-core.js CRLF=99 LF=0"*)       ;; *) fail "public/quiz-core.js endings moved: $ENDS";; esac
+
+# --- nothing deleted, ever ---
+GONE="$(git diff --diff-filter=D --name-only HEAD)"
+case "$GONE" in "") ;; *) fail "files were deleted: $GONE";; esac
+
+# --- P4-AMENDMENT #14: the phase write set vs BASE, at EVERY step (criterion 2 claimed this) ---
+WROTE="$(git diff --name-only 678dbc8fade5eda2b005b4f6c3948e9f875f7c10 HEAD | awk '$NF !~ /^\.oplan\//' | wc -l | tr -d ' ')"
+case "$WROTE" in 0) ;; *) fail "phase 4 has changed $WROTE files outside .oplan/ -- it must change NONE";; esac
+
+PORC="$(git status --porcelain -uall | awk '$NF !~ /^\.oplan\//' | LC_ALL=C sort)"   # .oplan is the orchestrator record, never the executor write set
+case "$PORC" in "") ;; *) fail "the tree is dirty outside .oplan/:
+$PORC";; esac
+
+# --- P4-AMENDMENT #5: PRINT the summary. The plan used to claim this line existed; it did not. ---
+echo "VAL-P4: TOTAL=$TOTAL PLAN=$PLAN FLAT=$FLAT PASSES=$PASSES GTOTAL=$GTOTAL PUBFULL='$PUBFULL' WROTE=$WROTE"
+```
+
+Per-step blocks continue from here with their own assertions and end with `exit $RC`.
+
+**THIS PREAMBLE WAS EXTRACTED BACK OUT OF THIS FILE BY `awk` AND RUN** against the clean tree at
+`678dbc8` — **108 lines, exit 0** — so what is written here, not merely what was tested, is what
+runs. That closes the phase-2 failure mode where the plan's copy of a frozen script differed from
+the copy that worked (P2-NOTE #1's collapsed backslash).
+
+**Its COMPLETE stdout, copied from the run rather than described (P4-AMENDMENT #5):**
+```
+ENDINGS: public/sw.js CRLF=51 LF=0; public/styles.css CRLF=707 LF=0; public/index.html CRLF=90 LF=0; public/app.js CRLF=0 LF=67; public/views/words.js CRLF=289 LF=0; public/views/reader.js CRLF=767 LF=0; public/views/trophies.js CRLF=0 LF=368; public/quiz.js CRLF=346 LF=0; public/quiz-core.js CRLF=99 LF=0
+VAL-P4: TOTAL=349 PLAN=344 FLAT=344 PASSES=58 GTOTAL=349 PUBFULL='2372 25db383385172d14d512e8f3695bdd33' WROTE=0
+```
+Two lines and nothing else on a clean pass; a failure adds `FAIL:` lines. **The first draft claimed
+the `VAL-P4:` line existed when it did not** — the planner described its own hand-run instead of the
+written script, which is the very failure this paragraph exists to close. The `echo` is now in the
+script and the output above is what the written form actually printed.
+
+**A frozen validation can itself be the bug (lesson 9); this one has been seen to run from its
+written form, and two of its clauses have been seen to FAIL** (SK4-9).
+
+---
+
+## FROZEN CONTRACTS — quoted, in force for every step
+
+**Field guide lesson 10 (DEPLOY)** — `field-guide/index.md:52-55`:
+> "DEPLOY: `vercel inspect` FIRST and record the id AND the url exactly as inspect reports it (a
+> hand-constructed url once pointed at the WRONG deployment); deploy ONCE with output to a FILE
+> (truncated output once caused a double deploy); md5 the WORKTREE vs live, never a git blob;
+> recipe: `.oplan/word-audio/phase-state.md:55-66`."
+
+**Field guide lesson 3 (the profile is live)** — `field-guide/index.md:11-16`:
+> "THE PROFILE IS LIVE (Vercel Blob behind `APP_CODE`). NEVER probe it. `GET /api/profile` CREATES
+> one — a read that writes … `isAuthorized` is open only when `APP_CODE` is UNSET; the frozen
+> subshell capture (`.oplan/word-quiz/plan.md:1573-1586`) is the ONLY sanctioned live read — its
+> post-assert proves no leak, and a leak silently 401s the whole suite."
+
+**Field guide lesson 11** — `field-guide/index.md:56-59`:
+> "VISUAL GATES ARE SELF-SERVED (owner directive): sandbox browser only, NEVER production."
+
+**THE FROZEN DEPLOY RECIPE** — `.oplan/word-audio/phase-state.md:55-66`, binding, quoted in full:
+> "· `vercel inspect <canonical-url>` FIRST and record id+url+commit — the only rollback target.
+> · `"$(npm prefix -g)/vercel" deploy --prod --yes` (npm global bin is off PATH).
+> · Verify live files by md5 against the WORKTREE, never a git blob (index.html is CRLF on disk,
+> LF in git). `cleanUrls` 308s every *.html, so fetch the shell as `/`.
+> · live /sw.js must contain magic-vet-v11 · spot-check several /audio/words/<lemma>.aac …
+> · /api/health exact payload · /api/chapter -> 401 (proves the function and its bundled JSON
+> loaded, free). · curl needs --ssl-no-revoke on this machine. · WATCH THE DEPLOY SIZE …
+> · NEVER request /api/profile (a GET CREATES one), never open a browser on production, never run
+> `vercel env`."
+
+**THE ONE VALUE THAT MUST BE RE-STATED FOR THIS RUN:** that recipe says *"live /sw.js must contain
+magic-vet-v11"* because it was written for the word-audio run. **For THIS run the value is
+`magic-vet-v18`, and `magic-vet-v17` must be ABSENT** — measured today: production serves v17, the
+worktree carries v18 (`public/sw.js:1`), and QZ-22's next bump after this one is v19, which phase 4
+does **not** spend (`plan.md:3365-3367`: *"phase 4 deploys v18 and nothing else"*).
+
+**THE FROZEN CAPTURE COMMAND** — `.oplan/word-quiz/plan.md:1573-1586`, verbatim, **no improvisation
+at run time**; it has now run clean twice (word-g1 ×2 and the 2026-07-30 early capture):
+```bash
+set -o pipefail
+mkdir -p /c/Users/dkreinov/english-app-backups   # Git-Bash path form — a Windows-style path here creates a stray repo file (field guide 4)
+BK="/c/Users/dkreinov/english-app-backups/profile-$(date +%Y%m%d-%H%M%S).json"
+code=$( ( set -a; . ./.env; set +a
+          curl -s --ssl-no-revoke -H "x-app-code: $APP_CODE" \
+               -o "$BK" -w '%{http_code}' \
+               https://english-app-three-tan.vercel.app/api/profile ) )
+case "$code" in 200) ;; 401) echo "FAIL: 401 - local .env APP_CODE != production (B2: stop, owner supplies it out of band)"; exit 1;;
+                *) echo "FAIL: GET -> $code"; exit 1;; esac
+[ -z "${APP_CODE:-}" ] || { echo "FAIL: APP_CODE leaked into this shell"; exit 1; }
+```
+> "The subshell `( set -a; . ./.env; set +a; curl ... )` is the load-bearing part: `.env` is sourced
+> INSIDE the parentheses so `APP_CODE` dies with the subshell … `$APP_CODE` is never echoed, never
+> logged. … Stated openly: this GET can rewrite her file into sorted-key order — byte-identical to
+> what her own app does on every load."
+
+**`APP_CODE` RULES, absolute:** never echoed, never logged, never written to any file, never
+exported into a shell, never passed on a command line, never `vercel env`. §VAL-P4's first clause
+asserts it is unset before every step.
+
+**Executor stop-rule (lesson 9):** never silently "fix" a frozen command, a pinned number, a url or
+a string. If a gate contradicts reality, STOP, report, wait for a ruling. In this phase the
+stop-rule is worth more than in any previous one: the two things it protects are irreversible.
+
+**Design §9 A2, so nobody looks for a missing asset:** the celebration sound is **synthesised with
+Web Audio — there is no audio asset, and none may be added**. Measured firing: four oscillators at
+523/659/784/1047 Hz, 85 ms apart (`journal.md:1343-1345`). Any post-deploy check that expects an
+audio file in the payload is wrong.
+
+**Commits are the ORCHESTRATOR's.** No step's commands contain `git add`/`git commit` except the
+two `.oplan`-only record commits explicitly named in steps 4.1 and 4.8. **Nothing outside `.oplan/`
+is committed in this phase at all** — the tree is clean at `678dbc8` and must be clean at the close.
+
+---
+
+# STEP 4.1 — pre-flight: freeze the outgoing deployment and write the rollback down
+
+**GOAL:** know exactly what is live, exactly what we would roll back to, and have that command
+committed to the record BEFORE anything can go wrong. Nothing is deployed and nothing authenticated
+against the APP is done in this step.
+
+**TIER:** ORCHESTRATOR. **DEPENDS ON:** the owner's phase-4 go-ahead (`phase-state.md:84`).
+
+**FILES:** `.oplan/word-trophies/phase-state.md` (APPEND the rollback block) — the only repository
+write in this step, and it is an `.oplan` record. All other output goes to
+`$HOME/trophies-deploy/` (outside the repo, field-guide lesson 4).
+
+**COMMANDS, frozen:**
+```bash
+mkdir -p "$HOME/trophies-deploy"
+# 1. the outgoing deployment, from inspect's own mouth (lesson 10) -- output to a FILE
+"$(npm prefix -g)/vercel" inspect https://english-app-three-tan.vercel.app \
+  > "$HOME/trophies-deploy/outgoing.txt" 2>&1
+# 2. live baselines, unauthenticated, read-only
+B=https://english-app-three-tan.vercel.app
+{
+  curl -s --ssl-no-revoke "$B/sw.js" | head -1
+  curl -s --ssl-no-revoke "$B/api/health"; echo
+  curl -s --ssl-no-revoke -o /dev/null -w 'chapter=%{http_code}\n' "$B/api/chapter"
+  for p in / /styles.css /app.js /api.js /lemma.js /words-index.js /quiz-core.js /quiz.js \
+           /views/home.js /views/placement.js /views/reader.js /views/words.js \
+           /views/trophies.js /manifest.webmanifest /icons/icon.svg; do
+    printf '%s ' "$p"; curl -s --ssl-no-revoke -o /dev/null -w '%{http_code}\n' "$B$p"
+  done
+  for f in chapters curious days known proven quizRight quizzer shelf-header streak; do
+    printf '/assets/trophies/%s.webp ' "$f"
+    curl -s --ssl-no-revoke -o /dev/null -w '%{http_code}\n' "$B/assets/trophies/$f.webp"
+  done
+} > "$HOME/trophies-deploy/live-baseline.txt" 2>&1
+```
+Then, by hand, into `.oplan/word-trophies/phase-state.md`, from `outgoing.txt` **verbatim** — never
+retyped from memory, never hand-constructed (lesson 10):
+```
+ROLLBACK (code only) — the deployment live before phase 4, exactly as `vercel inspect` reported it:
+  id  = <OUTGOING_ID>
+  url = <OUTGOING_URL>
+  commit = <OUTGOING_COMMIT>
+  `"$(npm prefix -g)/vercel" rollback <OUTGOING_URL> --yes`
+  vercel rollback restores CODE ONLY. There is no restore path for her profile (D27).
+```
+and commit it: `oplan: word-trophies 4.1 pre-flight — outgoing deployment frozen, rollback command
+recorded before any deploy`.
+
+**FROZEN VALIDATION:** §VAL-P4 verbatim, then, in the SAME file:
+```bash
+OUT4="$HOME/trophies-deploy/outgoing.txt"
+[ -s "$OUT4" ] || fail "vercel inspect produced no output"
+OID="$(grep -o 'dpl_[A-Za-z0-9]*' "$OUT4" | head -1)"
+case "$OID" in dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw) ;; "") fail "no deployment id in inspect output";;
+  *) fail "LIVE DEPLOYMENT IS NOT THE ONE THE RECORD KNOWS ABOUT: got '$OID', record says dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw (.oplan/word-g1/phase-state.md:21) -- STOP";; esac
+BL="$HOME/trophies-deploy/live-baseline.txt"
+grep -q 'magic-vet-v17' "$BL" || fail "live /sw.js is not v17 -- the baseline moved, STOP"
+grep -q '{"ok":true,"data":{"status":"up","version":1}}' "$BL" || fail "/api/health payload is not byte-exact"
+grep -q 'chapter=401' "$BL" || fail "/api/chapter is not 401"
+grep -q '/views/trophies.js 404' "$BL" || fail "/views/trophies.js is not 404 -- something already shipped, STOP"
+grep -q 'vercel" rollback' .oplan/word-trophies/phase-state.md || fail "the rollback command is not in phase-state.md"
+grep -q "$OID" .oplan/word-trophies/phase-state.md || fail "the outgoing id is not recorded in phase-state.md"
+git log -1 --format=%s | grep -q '4.1 pre-flight' || fail "the rollback record is not committed"
+echo STEP-4.1-OK
+exit $RC
+```
+
+**STOP IF:**
+* `vercel inspect` reports **any id other than `dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw`** → STOP.
+  Something deployed outside this run's knowledge. *Next:* report to the owner with both ids; the
+  entire live baseline (§B) is re-established against the new deployment before anything ships.
+* `vercel inspect` prints **no url**, or a url that does not resolve → STOP. *Next:* do not
+  hand-build one (lesson 10's exact incident). Re-run inspect; if it still gives nothing, the phase
+  cannot proceed, because there would be no rollback target.
+* live `/sw.js` already contains `magic-vet-v18`, or `/views/trophies.js` already returns 200 → STOP.
+  *Next:* someone deployed this run's tree already; report and re-plan. Do not deploy on top.
+* `/api/health` is not byte-exact or `/api/chapter` is not 401 → STOP. *Next:* production is already
+  unhealthy; fix that before adding a deploy to it.
+* §VAL-P4 fails for any reason → STOP. The tree that would ship is not the tree that was gated.
+
+**NON-GOALS:** no deploy · no authenticated request to the app · no `/api/profile` in any form ·
+no `vercel env` · no browser · no repository change outside `.oplan/`.
+
+---
+
+# STEP 4.2 — the fresh D25 capture, and the projection of what the first award pass will do
+
+**GOAL:** her profile is safely captured, proven, and receipted, minutes before the deploy — and we
+compute, from THAT capture and the SHIPPED engine, exactly which tiers the first real POST will
+stamp, so that R2 has an expectation to be checked against instead of a guess.
+
+**TIER:** ORCHESTRATOR. **DEPENDS ON:** 4.1 OK. **This step must be immediately followed by 4.3.**
+If more than an hour passes between this step and the deploy, **re-capture** with the same command
+and use the later file (the word-g1 non-goal at `plan.md:868-870`).
+
+**FILES:** `.oplan/word-trophies/backup-receipt.txt` (CREATE/APPEND — counts and digests only,
+**never contents**). The capture itself lives at
+`/c/Users/dkreinov/english-app-backups/profile-<ts>.json`, outside the repo.
+
+**COMMANDS:** the FROZEN CAPTURE COMMAND above, verbatim, no improvisation. Then, in the SAME shell
+with `$BK` still bound, the frozen proof block (`.oplan/word-g1/plan.md:828-856`):
+```bash
+node -e '
+const fs = require("fs");
+const p = process.argv[1];
+const raw = fs.readFileSync(p, "utf8");
+if (raw.length < 200) { console.log("FAIL: capture is " + raw.length + " bytes"); process.exit(1); }
+let env; try { env = JSON.parse(raw); } catch (e) { console.log("FAIL: unparseable"); process.exit(1); }
+const prof = env && env.data ? env.data : env;
+if (!prof || typeof prof.words !== "object" || Object.keys(prof.words).length === 0) { console.log("FAIL: empty words map"); process.exit(1); }
+import("./lib/profile.js").then((m) => {
+  const v = m.validateProfile(prof);
+  if (!v.ok) { console.log("FAIL: " + JSON.stringify(v.errors)); process.exit(1); }
+  const keys = Object.keys(prof.words);
+  const known = keys.filter((k) => prof.words[k].status === "known").length;
+  const cand  = keys.filter((k) => prof.words[k].status === "candidate").length;
+  console.log("BACKUP OK bytes=" + raw.length + " words=" + keys.length + " known=" + known + " candidate=" + cand);
+});
+' "$BK" || exit 1
+sha=$(sha256sum "$BK" | awk '{print $1}')
+printf "capture C2 %s bytes=%s sha256=%s\n" "$BK" "$(wc -c < "$BK")" "$sha" >> .oplan/word-trophies/backup-receipt.txt
+```
+Then **the projection**, run on a COPY in `$HOME/trophies-deploy/` so the capture file is never
+mutated, with the engine IMPORTED from `lib/profile.js` and never re-implemented (lesson 2 — this
+is exactly how the 2026-07-30 four-tier number was obtained, `journal.md:760-777`):
+```bash
+node -e '
+const fs = require("fs");
+const un = (p) => { const e = JSON.parse(fs.readFileSync(p, "utf8")); return e && e.data ? e.data : e; };
+const prof = un(process.argv[1]);
+import("./lib/profile.js").then((m) => {
+  const before = JSON.stringify(prof.trophies || {});
+  m.awardTrophies(prof, "PROJECTION");
+  const rows = [];
+  for (const t of m.TROPHY_CATALOG) {
+    const earned = (prof.trophies && prof.trophies[t.id]) || {};
+    const tiers = m.TROPHY_TIERS.filter((x) => x in earned);
+    rows.push(t.id + "=" + (tiers.length ? tiers.join("+") : "LOCKED") + " metric=" + t.metric(prof));
+  }
+  console.log("TROPHIES BEFORE (from her live profile): " + before);
+  console.log("PROJECTION (what the first real POST will stamp): " + rows.join(" | "));
+});
+' "$HOME/trophies-deploy/capture-copy.json"
+```
+**Redirection, frozen (P4-AMENDMENT #6 — the first draft piped this and broke it).** The capture
+command must run **directly, never on the left of a pipe**: anything left of `|` runs in a subshell,
+so the frozen command's `401) … exit 1` would have exited only the subshell and the step would have
+carried on past a 401, and `$BK` would have died before `cp` could use it. So:
+
+```bash
+D="$HOME/trophies-deploy"; mkdir -p "$D"
+# ... the FROZEN CAPTURE COMMAND runs here, directly, unpiped, exactly as quoted above ...
+printf '%s\n' "$BK" > "$D/capture-path.txt"      # the path leaves this shell as a FILE, never a variable (P4-AMENDMENT #1)
+cp "$BK" "$D/capture-copy.json"                  # the capture itself is never opened for writing
+# only the PROOF BLOCK's output is teed:
+node -e '...the frozen proof block...' "$BK" 2>&1 | tee "$D/capture.log"
+case "${PIPESTATUS[0]}" in 0) ;; *) echo "FAIL: the capture proof block exited non-zero"; exit 1;; esac
+node -e '...the projection...' "$D/capture-copy.json" > "$D/projection.txt" 2>&1
+```
+`capture-path.txt` is the fix for the blocking defect: **the capture path is never carried in a shell
+variable across a step boundary**, so steps 4.5 and 4.7 cannot inherit a rebound `$BK` and compare a
+file with itself. The projection's output goes into the journal as a **prediction** and into
+`projection.txt` for step 4.7 to check R2 against.
+
+**FROZEN VALIDATION:** §VAL-P4 verbatim, then:
+```bash
+D="$HOME/trophies-deploy"
+grep -q 'BACKUP OK' "$D/capture.log" || fail "the capture proof block did not print BACKUP OK"
+grep -q '^capture C2 ' .oplan/word-trophies/backup-receipt.txt || fail "no C2 receipt line"
+[ -s "$D/projection.txt" ] || fail "no projection recorded"
+[ -s "$D/capture-path.txt" ] || fail "capture-path.txt was not written -- steps 4.5/4.7 have no C2 to bind"
+CP="$(cat "$D/capture-path.txt")"
+[ -s "$CP" ] || fail "capture-path.txt points at '$CP', which is missing or empty"
+case "$CP" in /c/Users/dkreinov/english-app-backups/profile-*.json) ;; *) fail "capture-path.txt does not point into the backups folder: $CP";; esac
+cmp -s "$CP" "$D/capture-copy.json" || fail "capture-copy.json is not a byte-copy of the capture"
+NEWEST="$(ls -1t /c/Users/dkreinov/english-app-backups/profile-*.json | head -1)"
+AGE=$(( $(date +%s) - $(stat -c %Y "$NEWEST") ))
+[ "$AGE" -lt 3600 ] || fail "the newest capture is $AGE seconds old -- re-capture before deploying"
+grep -q 'sha256=' .oplan/word-trophies/backup-receipt.txt || fail "receipt has no sha256"
+grep -riq 'x-app-code\|APP_CODE=' .oplan/word-trophies/backup-receipt.txt "$HOME/trophies-deploy/" && fail "a secret may have been written to a file" || true
+echo STEP-4.2-OK
+exit $RC
+```
+
+**STOP IF:**
+* **HTTP 401** → STOP immediately (B2). *Next:* the local `.env` code no longer matches production.
+  The owner supplies the production code out of band. **Never `vercel env`.** No deploy until a
+  capture exists — T8 is not optional.
+* **Any code other than 200** → STOP. *Next:* production is not answering; deploying into that is
+  strictly worse.
+* **The `APP_CODE` post-assertion fails** (it leaked into the shell) → STOP, close the shell,
+  start a fresh one, re-run. A leaked code silently 401s everything afterwards and the failure will
+  look like something else entirely.
+* **`BACKUP OK` does not print**, or `validateProfile` fails on her live data → STOP and report to
+  the owner. A profile that does not validate BEFORE we deploy is a pre-existing condition, and it
+  must be understood before new code touches it.
+* **The projection shows a tier already present in her live `trophies` key** → this would contradict
+  every measurement (production has never run the engine). STOP and report; something is not what
+  the record says it is.
+
+**NON-GOALS:** no deploy · no second GET "just to check" · never open, print, paste or summarise
+the capture's CONTENTS anywhere — receipts are bytes, sha256, key names and counts only · never
+copy the capture into the repository · no restore attempt (there is no restore path).
+
+---
+
+# STEP 4.3 — THE DEPLOY (once)
+
+**GOAL:** ship the committed tree to production, exactly once, with the evidence of what shipped
+written to a file rather than read off a scrolling terminal.
+
+**TIER:** ORCHESTRATOR, **with the owner's explicit GO in the same session**. **DEPENDS ON:** 4.1
+and 4.2 OK, 4.2 less than an hour old, tree clean at `678dbc8`.
+
+**FILES:** none in the repository. Output to `$HOME/trophies-deploy/deploy.log`.
+
+**COMMANDS, frozen — this is the whole step, and it runs ONCE:**
+```bash
+cd C:/Users/dkreinov/claude/english-app
+"$(npm prefix -g)/vercel" deploy --prod --yes > "$HOME/trophies-deploy/deploy.log" 2>&1
+echo "deploy exit=$?"
+```
+`"$(npm prefix -g)/vercel"` because the npm global bin is off PATH on this machine (lesson 4,
+re-verified today: `npm prefix -g` = `C:\Users\dkreinov\AppData\Roaming\npm`, and the binary is
+there). **Output to a FILE because truncated output once caused a double deploy** (lesson 10;
+`journal.md:214-217` — two invocations, both completed).
+
+**IF THE COMMAND APPEARS TO HANG OR ITS OUTPUT IS LOST: DO NOT RE-RUN IT.** Read
+`$HOME/trophies-deploy/deploy.log`, then run
+`"$(npm prefix -g)/vercel" inspect https://english-app-three-tan.vercel.app` and compare ids. That
+is the exact mistake the field guide records, and re-running is how it happened.
+
+**FROZEN VALIDATION:** §VAL-P4 verbatim, then:
+```bash
+D="$HOME/trophies-deploy"; DL="$D/deploy.log"
+[ -s "$DL" ] || fail "deploy.log is empty -- do NOT re-run the deploy; inspect the alias instead"
+
+# --- P4-AMENDMENT #4: COUNT the ids. `head -1` hid a double deploy behind a coin flip. ---
+NIDS="$(grep -o 'dpl_[A-Za-z0-9]*' "$DL" | LC_ALL=C sort -u | wc -l | tr -d ' ')"
+case "$NIDS" in
+  1) NID="$(grep -o 'dpl_[A-Za-z0-9]*' "$DL" | head -1)" ;;
+  0) NID="" ;;
+  *) fail "deploy.log names $NIDS distinct deployment ids -- a DOUBLE DEPLOY happened; do NOT deploy again, record both and report";;
+esac
+
+"$(npm prefix -g)/vercel" inspect https://english-app-three-tan.vercel.app > "$D/incoming.txt" 2>&1
+AID="$(grep -o 'dpl_[A-Za-z0-9]*' "$D/incoming.txt" | head -1)"
+
+# --- written fallback: if the CLI's log carries no id at all, take it from inspect (never re-deploy) ---
+if [ -z "$NID" ]; then
+  echo "NOTE: deploy.log carried no dpl_ id; falling back to the alias inspect (do NOT re-run the deploy)"
+  NID="$AID"
+  [ -n "$NID" ] || fail "neither deploy.log nor inspect yields a deployment id -- STOP, do not deploy again"
+fi
+case "$NID" in dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw) fail "the live id is still the OUTGOING one -- nothing new shipped";; esac
+case "$AID" in "$NID") ;; *) fail "the alias points at '$AID' but the deploy created '$NID' -- ONE of these is the wrong deployment, STOP";; esac
+
+# --- P4-AMENDMENT #9: assert SUCCESS positively; the error sweep is only REPORTED ---
+grep -q 'https://' "$DL" || fail "deploy.log carries no production URL -- the deploy did not report success"
+grep -qi 'ready' "$D/incoming.txt" || fail "inspect does not report the new deployment Ready"
+SIZE="$(grep -Eio '[0-9.]+ *[KMG]?B' "$DL" | tail -1)"
+echo "UPLOAD SIZE (recorded, record gap 8): ${SIZE:-not reported}"
+ERRS="$(grep -in 'error\|failed' "$DL" | head -5)"
+echo "ERROR-SUBSTRING OBSERVATIONS (reported, NOT a gate -- build logs legitimately print '0 errors' and dependency names): ${ERRS:-none}"
+
+echo "NEW DEPLOYMENT: $NID"
+echo STEP-4.3-OK
+exit $RC
+```
+The alias-vs-log comparison is the mechanical form of lesson 10's warning: it is the only thing that
+distinguishes "we deployed and it is live" from "we deployed and something else is live".
+
+**STOP IF:**
+* the deploy command exits non-zero, or the log contains a build error → **STOP. Nothing shipped;
+  production is untouched and still healthy at v17.** *Next:* read the log, report, do not retry
+  blindly. A failed Vercel build does not change the alias, so no rollback is needed.
+* the alias id ≠ the new deploy id → **STOP.** *Next:* do not deploy again. Report both ids to the
+  owner; this is the wrong-deployment failure lesson 10 was written for.
+* two `dpl_` ids appear in `deploy.log` → the double-deploy happened. *Next:* record both, verify
+  which one the alias carries, and proceed only after the owner is told.
+
+**NON-GOALS:** no second invocation for any reason · no `--force` · no `vercel env` · no commit ·
+no browser · no `/api/profile`.
+
+---
+
+# STEP 4.4 — the md5 proof, the cache-bump proof, and the reachability sweep
+
+**GOAL:** prove that what production now serves is byte-for-byte the tree that 349 tests and a human
+browser session gated; that the `v18` bump took effect; and that every URL the new app will ask for
+actually answers. **No authenticated request in this step.**
+
+**TIER:** ORCHESTRATOR. **DEPENDS ON:** 4.3 OK.
+
+**FILES:** none in the repository. Evidence to `$HOME/trophies-deploy/deploy-verify.txt`.
+
+**COMMANDS, frozen.** The enumeration baseline `OC` comes from `outgoing.txt`. **Fallback, measured
+today:** if inspect reports no commit, use `e786273` — the last commit that touched `public/` before
+this run began. Enumerating from it today yields exactly the 16 paths this deploy carries, so the
+fallback is not a guess; and it is safe in the other direction too, because any commit between
+`e786273` and the deployed one changed nothing under `public/` (`git log e786273..HEAD -- public`
+lists only this run's own commits).
+**`OC` IS A SHELL VARIABLE, NOT A `<PLACEHOLDER>`, ON PURPOSE:** written as `<OUTGOING_COMMIT>` in a
+command line, bash would silently read it as an input redirect and `..HEAD` as an output redirect,
+creating a junk file and enumerating nothing. Assign it once, visibly, and the mistake cannot happen.
+
+```bash
+B=https://english-app-three-tan.vercel.app
+OC=""   # <-- EDIT: the commit vercel inspect reported in outgoing.txt (fallback: e786273)
+[ -n "$OC" ] || { echo "FAIL: set OC to the outgoing commit before running this step"; exit 1; }
+git cat-file -e "$OC^{commit}" 2>/dev/null || { echo "FAIL: OC='$OC' is not a commit in this repo"; exit 1; }
+D="$HOME/trophies-deploy"; mkdir -p "$D/live"
+{
+  echo "=== payload enumeration (ACMR is load-bearing: 10 of 16 are ADDED) ==="
+  git diff --name-only --diff-filter=ACMR "$OC"..HEAD -- public/ | LC_ALL=C sort
+
+  echo "=== md5 live vs WORKTREE (never a git blob) ==="
+  for f in $(git diff --name-only --diff-filter=ACMR "$OC"..HEAD -- public/ | LC_ALL=C sort); do
+    url="${f#public}"
+    case "$url" in /index.html) url=/ ;; esac      # cleanUrls 308s every *.html
+    curl -s --ssl-no-revoke -o "$D/live/probe" "$B$url"
+    a="$(md5sum "$D/live/probe" | cut -d' ' -f1)"
+    b="$(md5sum "$f" | cut -d' ' -f1)"
+    if [ "$a" = "$b" ]; then echo "MD5 OK   $url"; else echo "MD5 BAD  $url live=$a work=$b"; fi
+  done
+
+  echo "=== the cache bump ==="
+  curl -s --ssl-no-revoke -o "$D/live/sw.js" "$B/sw.js"
+  echo "sw.js live md5 $(md5sum "$D/live/sw.js" | cut -d' ' -f1)  worktree $(md5sum public/sw.js | cut -d' ' -f1)"
+  grep -c 'magic-vet-v18' "$D/live/sw.js" | sed 's/^/v18 count /'
+  grep -c 'magic-vet-v17' "$D/live/sw.js" | sed 's/^/v17 count /'
+
+  echo "=== PRECACHE reachability (sw.js:24 is cache.addAll -- all or nothing) ==="
+  # P4-AMENDMENT #13: the list is DERIVED from the sw.js production actually serves, not hard-coded.
+  node -e 'const s=require("fs").readFileSync(process.argv[1],"utf8");const m=s.match(/const PRECACHE = \[([^\]]*)\]/);if(!m){console.error("NOPRECACHE");process.exit(1);}for(const q of m[1].match(/"[^"]*"/g)||[])console.log(q.slice(1,-1));' "$D/live/sw.js" > "$D/precache-urls.txt"
+  echo "PRECACHE ENTRIES DERIVED $(wc -l < "$D/precache-urls.txt" | tr -d ' ')"
+  while read -r p; do
+    printf 'PRECACHE %s ' "$p"; curl -s --ssl-no-revoke -o /dev/null -w '%{http_code}\n' "$B$p"
+  done < "$D/precache-urls.txt"
+
+  echo "=== the nine trophy webps, case-exact (Vercel is case-sensitive; this filesystem is not) ==="
+  for f in chapters curious days known proven quizRight quizzer shelf-header streak; do
+    curl -s --ssl-no-revoke -o "$D/live/art" -w "ART $f.webp %{http_code} %{content_type} " "$B/assets/trophies/$f.webp"
+    a="$(md5sum "$D/live/art" | cut -d' ' -f1)"; b="$(md5sum "public/assets/trophies/$f.webp" | cut -d' ' -f1)"
+    if [ "$a" = "$b" ]; then echo "md5 OK"; else echo "md5 BAD live=$a work=$b"; fi
+  done
+
+  echo "=== the function bundle (never /api/profile -- SK4-5) ==="
+  curl -s --ssl-no-revoke "$B/api/health"; echo
+  curl -s --ssl-no-revoke -o /dev/null -w 'chapter=%{http_code}\n' "$B/api/chapter"
+  curl -s --ssl-no-revoke -o /dev/null -w 'notafile=%{http_code}\n' "$B/assets/trophies/zzznotatrophy.webp"
+} > "$D/deploy-verify.txt" 2>&1
+```
+The last line is the **negative control**: a path that must still 404, so a "200 for everything"
+misconfiguration cannot masquerade as success (the D4 404-probe correction,
+`.oplan/word-audio/phase-state.md:44-45`).
+
+**FROZEN VALIDATION:** §VAL-P4 verbatim, then:
+```bash
+D="$HOME/trophies-deploy"; V="$D/deploy-verify.txt"; B=https://english-app-three-tan.vercel.app
+
+# --- P4-AMENDMENT #3: NOTHING auto-rolls-back on ONE curl. A failing URL is re-probed twice ---
+# --- more, >=10s apart, and all three attempts must fail before the pre-authorised rollback   ---
+# --- fires. Anything that recovers is RECORDED and REPORTED, never rolled back on.            ---
+confirm_dead() {   # $1 = path. Returns 0 only if it fails three times in a row.
+  local p="$1" c1 c2 c3
+  c1="$(curl -s -m 20 --ssl-no-revoke -o /dev/null -w '%{http_code}' "$B$p")"
+  case "$c1" in 200) return 1;; esac
+  sleep 10
+  c2="$(curl -s -m 20 --ssl-no-revoke -o /dev/null -w '%{http_code}' "$B$p")"
+  case "$c2" in 200) echo "RECOVERED ON RETRY 2: $p ($c1 -> 200) -- recorded, NOT a rollback"; return 1;; esac
+  sleep 10
+  c3="$(curl -s -m 20 --ssl-no-revoke -o /dev/null -w '%{http_code}' "$B$p")"
+  case "$c3" in 200) echo "RECOVERED ON RETRY 3: $p ($c1/$c2 -> 200) -- recorded, NOT a rollback"; return 1;; esac
+  echo "CONFIRMED DEAD after 3 attempts >=10s apart: $p ($c1/$c2/$c3)"
+  return 0
+}
+
+N="$(grep -c '^MD5 OK ' "$V")"
+case "$N" in 16) ;; *) fail "expected 16 MD5 OK lines, got $N";; esac
+grep -q '^MD5 BAD' "$V" && fail "at least one live file does not match the worktree: $(grep '^MD5 BAD' "$V")"
+grep -q '^v18 count 1' "$V" || fail "live sw.js does not contain magic-vet-v18 exactly once"
+grep -q '^v17 count 0' "$V" || fail "live sw.js still contains magic-vet-v17"
+grep -q '^PRECACHE ENTRIES DERIVED 15$' "$V" || fail "the PRECACHE list derived from the LIVE sw.js is not 15 entries"
+P="$(grep -c '^PRECACHE .* 200$' "$V")"
+if [ "$P" != "15" ]; then
+  DEAD=""
+  for p in $(grep '^PRECACHE ' "$V" | grep -v ' 200$' | awk '{print $2}'); do
+    if confirm_dead "$p"; then DEAD="$DEAD $p"; fi
+  done
+  if [ -n "$DEAD" ]; then
+    fail "PRECACHE urls CONFIRMED DEAD three times:$DEAD -- cache.addAll will REJECT and every returning device stays on the old shell. THIS IS THE PRE-AUTHORISED ROLLBACK (SK4-8)."
+  else
+    echo "NOTE: $((15-P)) PRECACHE url(s) failed once and recovered on retry -- recorded and REPORTED to the owner, no rollback (P4-AMENDMENT #3)"
+  fi
+fi
+A="$(grep -c '^ART .* 200 image/webp md5 OK$' "$V")"
+case "$A" in 9) ;; *) fail "only $A of 9 trophy webps are 200 + image/webp + md5-matched";; esac
+grep -q '{"ok":true,"data":{"status":"up","version":1}}' "$V" || fail "/api/health payload is not byte-exact"
+grep -q 'chapter=401' "$V" || fail "/api/chapter is not 401 -- the function bundle may not have loaded"
+grep -q 'notafile=404' "$V" || fail "the negative control did not 404 -- a 200-for-everything rule would fake this whole step"
+grep -q 'awardTrophies' "$V" && fail "server internals leaked into the evidence file" || true
+echo STEP-4.4-OK
+exit $RC
+```
+
+**STOP IF (this step owns the most dangerous outcomes):**
+* **any `PRECACHE` URL ≠ 200, CONFIRMED DEAD on three attempts ≥10 s apart** → **ROLL BACK
+  IMMEDIATELY** under SK4-8's pre-authorised exception, then report. `cache.addAll` rejects as a
+  whole; the new service worker would never install and every device that already has the app would
+  serve the v17 shell **forever** — the exact QZ-22 hazard this deploy exists to end.
+  **A URL that fails once and answers on retry is RECORDED and REPORTED, never rolled back on**
+  (P4-AMENDMENT #3): a CDN propagation lag or one TLS hiccup on this corporate-proxied machine must
+  not burn the phase's one rollback on a healthy deploy.
+* **`/` does not serve, CONFIRMED on three attempts** → **ROLL BACK IMMEDIATELY**, same reason: that
+  is the app itself. **An md5 mismatch on `/` is NOT auto-rollback** — a mismatch is a stable fact,
+  not a transient one, so it goes to the owner like every other `MD5 BAD` (below).
+* **any `MD5 BAD`** → STOP and report before anything else. *Next:* determine whether the mismatch
+  is one file or many. One file = a partial upload; many = the wrong tree shipped. Either way the
+  owner decides, and the default recommendation is rollback, because the byte-identity bridge
+  (SK4-3) is the ONLY evidence that the screen works — without it, this phase has no argument at all.
+* **live `sw.js` still contains `magic-vet-v17`** → STOP. The bump did not ship; returning devices
+  will keep the old shell. Rollback is not urgent here (they are no worse off than yesterday), but
+  nothing further in this plan may proceed.
+* **a trophy webp 404s or has the wrong case** → STOP and report; a locked card renders as a broken
+  image on her shelf. Recommend rollback; the owner decides. **Do not "fix" it by adding the art to
+  `PRECACHE`** (T6, `phase-state.md:63-64`).
+* **the negative control returns 200** → STOP; every other 200 in this file is now meaningless.
+
+**NON-GOALS:** no authenticated request · no `/api/profile` · no browser · no repository change ·
+no "helpful" re-deploy.
+
+---
+
+# STEP 4.5 — READ-BACK R1: nothing she had was lost
+
+**GOAL:** the first of the two checks ever run against her real data. Prove that the deploy cost her
+nothing. It cannot and does not try to prove that awarding works (SK4-6).
+
+**TIER:** ORCHESTRATOR. **DEPENDS ON:** 4.4 OK.
+
+**FILES:** `.oplan/word-trophies/backup-receipt.txt` (APPEND, counts only). The read-back file is
+`$HOME/trophies-deploy/readback-1.json`, outside the repo.
+
+> **P4-AMENDMENT #1 + #2 + #8 REWROTE THIS STEP.** As first drafted it (a) compared her capture with
+> itself — `$BK` was the only path variable in the plan and 4.5's own instruction rebound it, so
+> `READBACK OK` printed for any input whatsoever — and (b) gated on four artifacts that no command
+> produced, including the self-test that was its sole fail-first evidence. Everything below is now
+> **quoted, not named**, and **was built and run by the planner today**: the comparator, the six
+> fixtures, the runner, and the observed output are all real, not projected.
+
+## 4.5-A — the comparator, written to a file ONCE and reused by 4.7
+
+Never inlined twice, never retyped (lesson 8). Write it to `$HOME/trophies-deploy/readback.js`:
+
+```javascript
+// T8 read-back comparator. Two arguments: the EARLIER snapshot, then the LATER one.
+const fs = require("fs");
+const { pathToFileURL } = require("url");
+const REPO = "C:/Users/dkreinov/claude/english-app";
+const fail = (w) => { console.log("FAIL: " + w); process.exit(1); };
+
+const A = process.argv[2], B = process.argv[3];
+if (!A || !B) fail("readback.js needs exactly two file arguments (earlier, later)");
+for (const p of [A, B]) if (!fs.existsSync(p)) fail("missing file: " + p);
+if (fs.realpathSync(A) === fs.realpathSync(B)) {
+  fail("SAME FILE TWICE: '" + A + "' and '" + B + "' resolve to one path -- a file compared with itself can never fail (P4-AMENDMENT #1)");
+}
+
+const un = (p) => { const e = JSON.parse(fs.readFileSync(p, "utf8")); return e && e.data ? e.data : e; };
+const back = un(A), live = un(B);
+
+import(pathToFileURL(REPO + "/lib/profile.js").href).then((m) => {
+  const v = m.validateProfile(live); if (!v.ok) fail(JSON.stringify(v.errors));
+  const bk = Object.keys(back.words), lk = new Set(Object.keys(live.words));
+  if (Object.keys(live.words).length < bk.length) fail("live has fewer words");
+  const lost = bk.filter((k) => !lk.has(k));
+  if (lost.length) fail("keys LOST: " + lost.join(","));
+  const ACT = ["taps", "lastSeen", "lastQuizAt", "quizRight", "quizWrong", "nominations"];
+  const report = [];
+  for (const k of bk) {
+    const b = back.words[k], l = live.words[k];
+    if (l.status === b.status) continue;
+    const moved = ACT.some((f) => JSON.stringify(b[f]) !== JSON.stringify(l[f]));
+    if (!moved) fail("status change with NO activity evidence: " + k + " " + b.status + " -> " + l.status);
+    report.push(k + " " + b.status + " -> " + l.status);
+  }
+  /* --- SK4-1: the trophy half of T8 --- */
+  const bt = back.trophies || {}, lt = live.trophies || {};
+  for (const id of Object.keys(bt)) {
+    if (!lt[id]) fail("trophy LOST: " + id);
+    for (const tier of Object.keys(bt[id])) {
+      if (!(tier in lt[id])) fail("tier LOST: " + id + "." + tier);
+      if (lt[id][tier] !== bt[id][tier]) fail("tier RESTAMPED: " + id + "." + tier + " " + bt[id][tier] + " -> " + lt[id][tier]);
+    }
+  }
+  const appeared = [];
+  for (const id of Object.keys(lt)) {
+    for (const tier of Object.keys(lt[id])) {
+      if (bt[id] && tier in bt[id]) continue;
+      appeared.push(id + "." + tier);
+    }
+  }
+  if (appeared.length) {
+    const chaptersGrew = (live.story.chapters.length > back.story.chapters.length);
+    const wordMoved = Object.keys(live.words).some((k) => {
+      const b = back.words[k];
+      if (!b) return true;
+      return ACT.some((f) => JSON.stringify(b[f]) !== JSON.stringify(live.words[k][f]));
+    });
+    const metaMoved = (live.meta.updatedAt !== back.meta.updatedAt);
+    if (!chaptersGrew && !wordMoved && !metaMoved) fail("tiers appeared with NO activity evidence: " + appeared.join(","));
+    const herActivity = (chaptersGrew || wordMoved);
+    console.log("TIERS APPEARED (allowed, report to the owner): " + appeared.join(",") +
+      " | evidence: chapters=" + chaptersGrew + " words=" + wordMoved + " meta=" + metaMoved +
+      (herActivity ? "" : " | WARNING: explained ONLY by meta.updatedAt, which our own capture GET can move (SK4-2 clause 3) -- NOT evidence of her activity"));
+  } else {
+    console.log("TIERS APPEARED: none");
+  }
+  const cand = Object.keys(live.words).filter((k) => live.words[k].status === "candidate");
+  console.log("READBACK OK words=" + Object.keys(live.words).length + " candidates=" + cand.length +
+    " trophyIds=" + Object.keys(lt).length);
+  console.log("STATUS CHANGES (report to the owner): " + (report.length ? report.join(" | ") : "none"));
+});
+```
+
+**`pathToFileURL(REPO + "/lib/profile.js")` is load-bearing, not decoration.** This file lives
+OUTSIDE the repo, and in a CommonJS script a bare `import("./lib/profile.js")` resolves relative to
+the SCRIPT, not the working directory — it would look for `$HOME/trophies-deploy/lib/profile.js` and
+throw. The word-g1 precedent got away with `"./lib/profile.js"` only because it ran as `node -e`
+from inside the repo.
+
+## 4.5-B — the six fixtures and the self-test that proves the comparator can FAIL (SK4-9)
+
+The fixtures are **generated from the shipped `defaultProfile()`**, not hand-written as literal JSON.
+That is a deliberate improvement on the reviewer's suggested correction: a hand-copied literal can
+drift out of the schema and start failing `validateProfile` for the wrong reason, and the whole
+point of a self-test is that its failures mean what they say. Write to
+`$HOME/trophies-deploy/make-fixtures.js`:
+
+```javascript
+// Builds the self-test fixtures from the SHIPPED defaultProfile(), never from a hand-copied
+// literal -- so a schema change can never leave the fixtures silently invalid (lesson 2).
+const fs = require("fs");
+const { pathToFileURL } = require("url");
+const REPO = "C:/Users/dkreinov/claude/english-app";
+const DIR = process.argv[2];
+
+import(pathToFileURL(REPO + "/lib/profile.js").href).then((m) => {
+  const T0 = "2026-07-01T00:00:00.000Z", T1 = "2026-07-02T00:00:00.000Z";
+  const word = (over) => Object.assign({
+    status: "learning", source: "tap", he: null, taps: 3,
+    firstSeen: T0, lastSeen: T0, quizRight: 0, quizWrong: 0, nominations: 0,
+  }, over || {});
+  const base = () => {
+    const p = m.defaultProfile(T0);
+    p.words = { cat: word(), dog: word() };
+    p.story.chapters = [{ generatedAt: T0 }];
+    p.meta.updatedAt = T0;
+    p.trophies = { days: { bronze: T0 } };
+    return p;
+  };
+  const w = (name, mutate) => {
+    const p = base(); mutate(p);
+    fs.writeFileSync(DIR + "/" + name, JSON.stringify(p, null, 1));
+  };
+
+  w("base.json", () => {});
+  // key LOST while the COUNT stays 2 -- otherwise the "fewer words" check fires first and the
+  // key-loss assertion is never reached (measured while building this self-test)
+  w("f1-live.json", (p) => { delete p.words.cat; p.words.bird = word(); });
+  w("f2-live.json", (p) => { p.words.cat.status = "known"; });                      // status, no ACT movement
+  w("f3-live.json", (p) => { delete p.trophies.days; });                            // trophy LOST
+  w("f4-live.json", (p) => { p.trophies.days.bronze = T1; });                       // tier RESTAMPED
+  w("f5-live.json", (p) => { p.trophies.known = { bronze: T1 }; });                 // tier APPEARED, no evidence
+  w("f6-live.json", (p) => { p.trophies.known = { bronze: T1 }; p.words.cat.taps = 9; }); // APPEARED + ACT moved
+  console.log("FIXTURES WRITTEN");
+});
+```
+
+And the runner, `$HOME/trophies-deploy/selftest.sh`:
+
+```bash
+#!/usr/bin/env bash
+# Proves the read-back comparator can FAIL before it is ever pointed at her data (SK4-9).
+set -o pipefail
+D="$1"                       # the selftest directory
+RB="$2"                      # path to readback.js
+mkdir -p "$D"
+node "$D/../make-fixtures.js" "$D" || { echo "SELFTEST ABORTED: fixtures not built"; exit 1; }
+
+pass=0
+expect_fail() {  # $1 = later fixture, $2 = expected FAIL substring, $3 = label
+  out="$(node "$RB" "$D/base.json" "$D/$1" 2>&1)"; rc=$?
+  case "$rc:$out" in
+    0:*) echo "SELFTEST $3: PASSED WHEN IT MUST FAIL -- $out"; return 1;;
+  esac
+  case "$out" in
+    *"$2"*) echo "SELFTEST $3: correctly failed -- $2"; pass=$((pass+1)); return 0;;
+    *) echo "SELFTEST $3: failed for the WRONG reason -- $out"; return 1;;
+  esac
+}
+expect_pass() {  # $1 = later fixture, $2 = expected substring, $3 = label
+  out="$(node "$RB" "$D/base.json" "$D/$1" 2>&1)"; rc=$?
+  case "$rc" in 0) ;; *) echo "SELFTEST $3: FAILED WHEN IT MUST PASS -- $out"; return 1;; esac
+  case "$out" in
+    *"$2"*) echo "SELFTEST $3: correctly passed"; pass=$((pass+1)); return 0;;
+    *) echo "SELFTEST $3: passed without the expected line -- $out"; return 1;;
+  esac
+}
+
+expect_fail f1-live.json "keys LOST: cat"                          1
+expect_fail f2-live.json "status change with NO activity evidence" 2
+expect_fail f3-live.json "trophy LOST: days"                       3
+expect_fail f4-live.json "tier RESTAMPED: days.bronze"             4
+expect_fail f5-live.json "tiers appeared with NO activity evidence" 5
+expect_pass f6-live.json "words=true"                              6
+
+# case 7, the one that would have caught P4-AMENDMENT #1's defect: the SAME file twice
+out="$(node "$RB" "$D/base.json" "$D/base.json" 2>&1)"; rc=$?
+case "$rc:$out" in
+  0:*) echo "SELFTEST 7: the comparator ACCEPTED a file compared with itself -- STOP"; ;;
+  *"SAME FILE TWICE"*) echo "SELFTEST 7: correctly refused a self-comparison"; pass=$((pass+1));;
+  *) echo "SELFTEST 7: refused for the wrong reason -- $out";;
+esac
+
+# control: identical CONTENT in two DIFFERENT files must pass cleanly
+cp "$D/base.json" "$D/base-copy.json"
+out="$(node "$RB" "$D/base.json" "$D/base-copy.json" 2>&1)"; rc=$?
+case "$rc:$out" in
+  0:*"READBACK OK"*) echo "SELFTEST 8: unchanged profile passes"; pass=$((pass+1));;
+  *) echo "SELFTEST 8: an unchanged profile did NOT pass -- $out";;
+esac
+
+echo "selftest passes: $pass/8"
+if [ "$pass" = "8" ]; then
+  echo "SELFTEST 8/8 AS REQUIRED" > "$D/result.txt"
+  echo "SELFTEST 8/8 AS REQUIRED"
+else
+  rm -f "$D/result.txt"
+  echo "SELFTEST INCOMPLETE ($pass/8) -- the read-back is NOT proven able to fail; STOP"
+  exit 1
+fi
+```
+
+**THIS WAS RUN TODAY, IN THE SCRATCHPAD, AGAINST THE REAL `lib/profile.js`. Observed output,
+verbatim:**
+```
+FIXTURES WRITTEN
+SELFTEST 1: correctly failed -- keys LOST: cat
+SELFTEST 2: correctly failed -- status change with NO activity evidence
+SELFTEST 3: correctly failed -- trophy LOST: days
+SELFTEST 4: correctly failed -- tier RESTAMPED: days.bronze
+SELFTEST 5: correctly failed -- tiers appeared with NO activity evidence
+SELFTEST 6: correctly passed
+SELFTEST 7: correctly refused a self-comparison
+SELFTEST 8: unchanged profile passes
+selftest passes: 8/8
+SELFTEST 8/8 AS REQUIRED
+```
+**Eight cases, not the six the reviewer asked for**: case 7 is the self-comparison refusal (the one
+fixture that would have caught the blocking defect) and case 8 is the negative control that an
+*unchanged* profile still passes — without it, a comparator that failed on everything would score a
+perfect self-test. **The self-test also earned its keep while being written:** fixture 1 originally
+deleted a word without replacing it, so the `live has fewer words` check fired before the key-loss
+check and case 1 "failed for the WRONG reason". The runner caught it. That is the fourth instance in
+this run of a mutation catching an assertion that did not observe what it claimed.
+
+## 4.5-C — the read of her data, with both sides bound explicitly
+
+```bash
+D="$HOME/trophies-deploy"
+C2="$(cat "$D/capture-path.txt")"            # written by step 4.2 -- NEVER carried in a variable across steps
+RB1="$D/readback-1.json"
+[ -s "$C2" ] || { echo "FAIL: no C2 capture at '$C2'"; exit 1; }
+[ "$C2" != "$RB1" ] || { echo "FAIL: the read-back would compare a file with itself"; exit 1; }
+
+# the frozen capture subshell, with -o pointed at RB1 and the backups folder untouched
+code=$( ( set -a; . ./.env; set +a
+          curl -s --ssl-no-revoke -H "x-app-code: $APP_CODE" \
+               -o "$RB1" -w '%{http_code}' \
+               https://english-app-three-tan.vercel.app/api/profile ) )
+case "$code" in 200) ;; 401) echo "FAIL: 401 - local .env APP_CODE != production (B2)"; exit 1;;
+                *) echo "FAIL: GET -> $code"; exit 1;; esac
+[ -z "${APP_CODE:-}" ] || { echo "FAIL: APP_CODE leaked into this shell"; exit 1; }
+
+node "$D/readback.js" "$C2" "$RB1" 2>&1 | tee "$D/readback-1.log"
+case "${PIPESTATUS[0]}" in 0) ;; *) echo "FAIL: the read-back comparator exited non-zero"; exit 1;; esac
+printf "readback R1 %s bytes=%s sha256=%s\n" "$RB1" "$(wc -c < "$RB1")" "$(sha256sum "$RB1" | awk '{print $1}')" \
+  >> .oplan/word-trophies/backup-receipt.txt
+```
+`${PIPESTATUS[0]}` rather than `$?` because the `tee` is on the right of the pipe — the same subshell
+trap that P4-AMENDMENT #6 removed from step 4.2. Here the pipe is safe (nothing after it needs a
+variable the left side set) but the exit status still has to be read from the correct end.
+
+**FROZEN VALIDATION:** §VAL-P4 verbatim, then:
+```bash
+D="$HOME/trophies-deploy"
+grep -q 'SELFTEST 8/8 AS REQUIRED' "$D/selftest/result.txt" || fail "the read-back script was not proven able to fail"
+L="$D/readback-1.log"
+grep -q '^READBACK OK ' "$L" || fail "the read-back did not print READBACK OK"
+grep -q '^FAIL: ' "$L" && fail "the read-back reported a failure: $(grep '^FAIL: ' "$L")"
+C2="$(cat "$D/capture-path.txt")"
+[ "$C2" != "$D/readback-1.json" ] || fail "C2 and R1 are the same path -- the comparison was vacuous"
+[ -z "${APP_CODE:-}" ] || fail "APP_CODE leaked into this shell"
+grep -q '^readback R1 ' .oplan/word-trophies/backup-receipt.txt || fail "no R1 receipt line"
+echo STEP-4.5-OK
+exit $RC
+```
+
+**EXPECTED RESULT, stated so nobody misreads it (SK4-6):** `trophyIds=0` and
+`TIERS APPEARED: none`. **`awardTrophies` is not on the GET path** (`api/profile.js:20-35`,
+re-measured today — the GET branch opens at `:20` and returns at `:34`), so a read cannot create a
+trophy. An empty shelf at R1 means the deploy behaved exactly as designed.
+
+**STOP IF:**
+* **any key LOST, any trophy LOST, any tier LOST or RESTAMPED** → **STOP. This is the T8 rollback
+  trigger.** *Next:* roll back the code with the step-4.1 command, tell the owner immediately and
+  plainly, and state — because it is true and must not be softened — that **rollback restores code
+  only; if her data was damaged, this does not undo it** (D27). Then stop the phase.
+* **a status change with no activity evidence** → same: STOP, report, owner decides.
+* **HTTP 401 or non-200** → STOP; do not retry in a loop against her profile.
+* **`trophyIds` > 0 at R1** → do NOT treat this as failure by itself. It means she used the app
+  between the capture and now. Verify the appearance under SK4-2 and report it; only an
+  *unexplained* appearance is a fault.
+
+**NON-GOALS:** no POST of any kind, ever, to her profile · no third read "to be sure" · no contents
+in any record · no rollback on the orchestrator's own initiative except SK4-8's two pre-authorised
+cases (which belong to step 4.4, not here).
+
+---
+
+# STEP 4.6 — HUMAN GATE: the owner looks at it on a real device (LOOK-ONLY)
+
+**GOAL:** the one thing no agent in this run may do. Field-guide lesson 11 forbids every agent here
+from opening a browser on production; it does not constrain the app's owner opening his own app.
+
+**TIER:** OWNER. **DEPENDS ON:** 4.5 OK. Prints nothing; its output is a yes or a named defect.
+
+**THE CHECKLIST, frozen — the orchestrator hands it over exactly like this:**
+
+> **BEFORE ANYTHING: this is LOOK-ONLY (SK4-11).** You and Mika share one profile. Opening the app
+> is a read and is harmless. **Tapping a word, answering a quiz question or generating a chapter is
+> a WRITE to her profile** — it would award her trophies under your session and use up one of her
+> four first-day celebrations. Please only look.
+>
+> 1. **Defeat the old app first.** The phone is holding the previous version in a service-worker
+>    cache. Close every tab and the installed app, then open it fresh. The new version reloads
+>    itself once when it takes over (that is `public/app.js:62-66` doing its job, not a glitch).
+> 2. **Four tabs at the bottom**, the new one LAST, after "המילים שלי". Its cup icon should look
+>    like it belongs with the other three, at rest and when selected.
+> 3. **Open it.** A shelf picture at the top, then eight cards.
+> 4. **The eight cards.** Each has a picture, a Hebrew name and a plain progress line. Right now
+>    every one of them should look **locked** — greyed out — because nothing has been awarded yet.
+>    That is correct: trophies are stamped when she next uses the app, not when it is installed.
+> 5. **Look for a broken image.** Nine pictures are fetched from the network as she scrolls; if any
+>    of them shows as a broken-image icon rather than a dimmed picture, say so — that is a defect,
+>    not a style choice.
+> 6. **Turn the phone / try a narrow window** if it is easy. The layout is built for a phone column.
+> 7. **What you will NOT see today:** the celebration. It only appears at the moment a trophy is
+>    earned, and earning requires her to actually use the app. When she does, she gets **four bronze
+>    celebrations — days, streak, known, curious — one per earning moment, in that order, never
+>    repeated**, each with a short rising four-note sound. **There is no mute setting** (your ruling,
+>    2026-07-30); the device's own volume is the only control, and on some phones a silenced device
+>    still plays it.
+>
+> **Say "yes" or name what is wrong.** A defect found here does not get fixed in place — it becomes
+> its own planned, gated step.
+
+**STOP IF:** the owner names any defect → STOP the phase at this point. *Next:* the orchestrator
+brings him two options with costs — (a) roll back now with the step-4.1 command and fix in a new
+gated step, or (b) leave it live and fix forward — and **he chooses**. The recommendation is
+rollback for anything a child would notice (broken image, unreadable text, a tab that does nothing)
+and fix-forward for anything cosmetic, but the decision is his, not the orchestrator's.
+
+**NON-GOALS:** no agent-driven browser on production · no tapping/quizzing/generating · no
+screenshot of her data · no in-gate edit.
+
+---
+
+# STEP 4.7 — READ-BACK R2: the awarding engine really runs in production
+
+**GOAL:** the only evidence that can exist that the server half of this run works. It requires her
+to have used the app at least once after the deploy.
+
+**TIER:** ORCHESTRATOR. **DEPENDS ON:** 4.5 OK and 4.6 yes, **and at least one real session by
+her**. The orchestrator does not manufacture that session (SK4-11).
+
+**FILES:** `.oplan/word-trophies/backup-receipt.txt` (APPEND, counts only). Read-back file
+`$HOME/trophies-deploy/readback-2.json`.
+
+**COMMANDS (P4-AMENDMENT #1 + #2 — previously this step named three files and bound none of them):**
+```bash
+D="$HOME/trophies-deploy"
+C2="$(cat "$D/capture-path.txt")"
+RB1="$D/readback-1.json"
+RB2="$D/readback-2.json"
+[ "$C2" != "$RB1" ] || { echo "FAIL: C2 and R1 are the same path"; exit 1; }
+[ "$C2" != "$RB2" ] || { echo "FAIL: C2 and R2 are the same path"; exit 1; }
+[ "$RB1" != "$RB2" ] || { echo "FAIL: R1 and R2 are the same path"; exit 1; }
+[ -s "$C2" ] && [ -s "$RB1" ] || { echo "FAIL: C2 or R1 is missing -- R2 has nothing to compare against"; exit 1; }
+
+code=$( ( set -a; . ./.env; set +a
+          curl -s --ssl-no-revoke -H "x-app-code: $APP_CODE" \
+               -o "$RB2" -w '%{http_code}' \
+               https://english-app-three-tan.vercel.app/api/profile ) )
+case "$code" in 200) ;; 401) echo "FAIL: 401 - local .env APP_CODE != production (B2)"; exit 1;;
+                *) echo "FAIL: GET -> $code"; exit 1;; esac
+[ -z "${APP_CODE:-}" ] || { echo "FAIL: APP_CODE leaked into this shell"; exit 1; }
+
+{
+  echo "=== C2 -> R2 (the full T8 comparison, across the whole deploy window) ==="
+  node "$D/readback.js" "$C2" "$RB2"; echo "rc=$?"
+  echo "=== R1 -> R2 (what changed since the deploy) ==="
+  node "$D/readback.js" "$RB1" "$RB2"; echo "rc=$?"
+} 2>&1 | tee "$D/readback-2.log"
+printf "readback R2 %s bytes=%s sha256=%s\n" "$RB2" "$(wc -c < "$RB2")" "$(sha256sum "$RB2" | awk '{print $1}')" \
+  >> .oplan/word-trophies/backup-receipt.txt
+```
+Then the correctness check against step 4.2's projection, appended to the same log:
+```bash
+node -e '
+const fs = require("fs");
+const un = (p) => { const e = JSON.parse(fs.readFileSync(p, "utf8")); return e && e.data ? e.data : e; };
+const live = un(process.argv[1]);
+import("./lib/profile.js").then((m) => {
+  const shipped = JSON.parse(JSON.stringify(live));
+  m.awardTrophies(shipped, "RECOMPUTE");
+  const flat = (t) => Object.keys(t || {}).flatMap((id) => Object.keys(t[id]).map((x) => id + "." + x)).sort();
+  const a = flat(live.trophies), b = flat(shipped.trophies);
+  const extra = a.filter((x) => !b.includes(x));
+  if (extra.length) { console.log("FAIL: live carries tiers the shipped engine would NOT award: " + extra.join(",")); process.exit(1); }
+  const owed = b.filter((x) => !a.includes(x));
+  console.log("AWARD CHECK OK live=" + a.join(",") + " | not-yet-stamped (will land on her next POST)=" + (owed.join(",") || "none"));
+});
+' "$RB2" 2>&1 | tee -a "$D/readback-2.log"
+```
+`extra` is the sharp half: a tier that exists in her data but that the shipped catalogue would not
+award is a trophy awarded on a metric nobody can reproduce — design §6's first risk, *"a trophy
+awarded on a buggy metric shows the child a lie"*. `owed` is expected and harmless: tiers she has
+qualified for but which have not been stamped yet, because the last write happened before she
+crossed the line.
+
+**FROZEN VALIDATION:** §VAL-P4 verbatim, then:
+```bash
+D="$HOME/trophies-deploy"
+L2="$D/readback-2.log"
+OKN="$(grep -c '^READBACK OK ' "$L2")"
+case "$OKN" in 2) ;; *) fail "expected TWO READBACK OK lines (C2->R2 and R1->R2), got $OKN";; esac
+RCN="$(grep -c '^rc=0$' "$L2")"
+case "$RCN" in 2) ;; *) fail "expected both comparisons to exit 0, got $RCN";; esac
+grep -q '^FAIL: ' "$L2" && fail "R2 reported a failure: $(grep '^FAIL: ' "$L2")"
+grep -q '^AWARD CHECK OK ' "$L2" || fail "the award recomputation did not pass"
+grep -q 'SELFTEST 8/8 AS REQUIRED' "$D/selftest/result.txt" || fail "the comparator's self-test result is missing"
+grep -q '^readback R2 ' .oplan/word-trophies/backup-receipt.txt || fail "no R2 receipt line"
+[ -z "${APP_CODE:-}" ] || fail "APP_CODE leaked into this shell"
+echo STEP-4.7-OK
+exit $RC
+```
+
+**EXPECTED, from the 2026-07-30 measurement** (`journal.md:760-777`; step 4.2's projection replaces
+it with a fresh number): after her first real POST, **four bronze tiers — `days`, `streak`, `known`,
+`curious`** — and four still locked (`chapters` 3/5, `quizRight` 3/10, `quizzer` 5/20, `proven` 0/1).
+Because four trophies sit 1-3 actions from their next tier, more may legitimately have landed by the
+time R2 runs.
+
+**STOP IF:**
+* **anything LOST or RESTAMPED** → the T8 rollback trigger, exactly as in 4.5. *Next:* SK4-8.
+* **`extra` is non-empty** (a tier the shipped engine would not award) → STOP. *Next:* this is
+  design §6's ruled case: a wrong award **cannot be silently retracted** (never-regress), so it is
+  an **OWNER decision** — keep it, or authorise a one-time correction as its own gated work. The
+  orchestrator does not touch her trophies.
+* **she has not used the app within the phase window** → **do not force it and do not fake it.**
+  *Next:* close the phase with R2 explicitly OPEN, the record saying that production awarding is
+  still unproven, and step 4.2's projection labelled a prediction. A phase that closes honestly with
+  one open item is worth more than one that closes on an unmeasured claim.
+
+**NON-GOALS:** never POST to trigger an award · never edit her trophies · no third-party retry loop.
+
+---
+
+# STEP 4.8 — phase close
+
+**GOAL:** re-run every criterion, write the record the next run starts from, and put the D27
+question to the owner.
+
+**TIER:** ORCHESTRATOR-authoring. **DEPENDS ON:** 4.1-4.7 (4.7 may be OPEN — see above).
+
+**FILES (exhaustive):** `.oplan/word-trophies/journal.md` (APPEND), `.oplan/word-trophies/phase-state.md`
+(REWRITE), `.oplan/word-trophies/field-guide/index.md` (amend, if the phase produced a lesson),
+`.oplan/word-trophies/STATUS.md` (rewrite for the owner).
+
+**COMMANDS:** §VAL-P4 verbatim plus the close tail; then the records commit
+`oplan: word-trophies PHASE 4 CLOSED — magic-vet-v18 live at <NEW_ID>, 16/16 md5 proofs, 15/15 precache, read-back intact`.
+
+```bash
+# TAIL of the close script, which BEGINS with §VAL-P4 verbatim in the SAME file
+BASE=678dbc8fade5eda2b005b4f6c3948e9f875f7c10
+WROTE="$(git diff --name-only "$BASE" HEAD | awk '$NF !~ /^\.oplan\//' | wc -l | tr -d ' ')"
+case "$WROTE" in 0) ;; *) fail "phase 4 changed $WROTE files outside .oplan/ -- it must change NONE";; esac
+GONE="$(git diff --diff-filter=D --name-only "$BASE" HEAD)"
+case "$GONE" in "") ;; *) fail "files were deleted: $GONE";; esac
+case "$PORC" in "") ;; *) fail "tree not clean at the close:
+$PORC";; esac
+B=https://english-app-three-tan.vercel.app
+# P4-AMENDMENT #12: never `cmd | grep -q` under set -o pipefail (field-guide lesson 6, SIGPIPE)
+SW="$(curl -s -m 20 --ssl-no-revoke "$B/sw.js")"
+case "$SW" in *magic-vet-v18*) ;; *) fail "live sw.js is not v18 at the close";; esac
+case "$SW" in *magic-vet-v17*) fail "live sw.js still carries v17";; esac
+grep -q 'vercel" rollback' .oplan/word-trophies/phase-state.md || fail "the rollback ladder is missing from the record"
+echo STEP-4.8-OK
+exit $RC
+```
+
+**THE RECORD MUST STATE, for whatever comes next:**
+* the NEW deployment id and url **exactly as inspect reported them**, at the top of the rollback
+  ladder, with the outgoing one beneath it — the `.oplan/word-g1/phase-state.md:19-25` format, and
+  **with the full url, not a bare project-name fragment** (the gap SK4-8 had to work around);
+* `magic-vet-v18` is LIVE; **QZ-22's next bump is v19** and the next phase that moves a precached
+  file owes it — phase 4 spent v18 and nothing else;
+* the 16 md5-proved payload paths, the 15/15 precache result, the nine webp results;
+* the capture receipts (C2, R1, R2 — bytes, sha256, counts, **never contents**);
+* what R1 and R2 actually showed, including the tiers that appeared and which SK4-2 clause
+  explained each one;
+* **whether R2 ran at all**, plainly, and if not, that production awarding is UNPROVEN;
+* the owner's 4.6 verdict, verbatim;
+* the D27 answer, verbatim, and — if "delete" — that the deletion happened strictly AFTER R2 and the
+  criteria re-run, with the pre-delete sha256 verified against the receipt first, and that **from
+  that moment no captured copy of her profile exists** (the `.oplan/word-g1/journal.md:527-535`
+  wording);
+* anything worth promoting into the field guide. **Three candidate lessons from this plan:**
+  (a) *"`cache.addAll` is all-or-nothing: one 404 among the precached URLs and every returning
+  device keeps the old shell forever. Probe all of them after a deploy that adds a precached file."*
+  (b) *"A GET never awards; an empty trophy shelf at read-back is the correct result, not a broken
+  deploy."*
+  (c) *"A COMPARISON GATE CAN BE AIMED AT NOTHING. Every assertion in the phase-4 read-back was
+  correct and it still could not fail, because both arguments resolved to the same file. Never carry
+  a path across a step boundary in a shell variable — write it to a file — bind both sides
+  explicitly, and make the comparator refuse `realpath(A) == realpath(B)`."* — plus lesson 5's stale
+  ledger/anchor numbers (record gap 9).
+
+**THE D27 QUESTION, asked verbatim at this step** (`.oplan/word-g1/journal.md:480` — *"as last run"
+is not assumed to be a standing order*): *"Do the capture files in
+`C:/Users/dkreinov/english-app-backups/` get deleted now, as at the end of the previous three
+phases, or kept? They are the only copies of her profile that exist. Deleting ends the safety net;
+keeping leaves her data sitting on this machine."*
+
+**NON-GOALS:** no code change · no deploy · no further read of her profile · no `public/` change ·
+no "small fix while we are here".
+
+---
+
+## STOPPING CONDITIONS — the whole phase on one page
+
+| # | observation | verdict | who decides | next action |
+|---|---|---|---|---|
+| 1 | `vercel inspect` reports an unexpected deployment id | STOP before anything | orchestrator stops, owner rules | re-establish the entire live baseline |
+| 2 | inspect gives no url | STOP | orchestrator | never hand-build one; no rollback target = no deploy |
+| 3 | v18 or `/views/trophies.js` already live at 4.1 | STOP | owner | something shipped outside the run; re-plan |
+| 4 | capture returns **401** | STOP | owner supplies the code out of band | never `vercel env`; no deploy without a capture |
+| 5 | capture fails `validateProfile` | STOP | owner | understand a pre-existing data problem before adding code to it |
+| 6 | `APP_CODE` leaked into the shell | STOP | orchestrator | new shell, re-run; a leak silently 401s everything after it |
+| 7 | deploy build fails | STOP; **nothing shipped**, production still v17 | orchestrator reports | read the log; no blind retry; no rollback needed |
+| 8 | deploy log lost / command seems to hang | **DO NOT RE-RUN** | orchestrator | read the log, then `vercel inspect` the alias |
+| 9 | alias id ≠ new deploy id | STOP | owner | the wrong-deployment failure lesson 10 exists for |
+| 10 | **any PRECACHE URL ≠ 200, confirmed dead 3× ≥10 s apart** | **ROLL BACK IMMEDIATELY**, then report | pre-authorised (SK4-8) | every returning device would keep the v17 shell forever |
+| 10b | a PRECACHE URL fails once and recovers on retry | **no rollback** — record and report | orchestrator records, owner informed | a blip must not burn the one rollback (P4-AMENDMENT #3) |
+| 11 | **`/` does not serve, confirmed 3×** | **ROLL BACK IMMEDIATELY**, then report | pre-authorised (SK4-8) | that is the app itself |
+| 11b | `/` serves but md5-mismatches | STOP, no auto-rollback | owner | a mismatch is stable, not transient — it is row 12 |
+| 12 | any other `MD5 BAD` | STOP | owner (default recommendation: roll back) | without byte-identity this phase has no evidence at all |
+| 13 | live `sw.js` still contains v17 | STOP | owner | the bump did not ship; nothing further proceeds |
+| 14 | a trophy webp 404s or is case-wrong | STOP | owner (recommend rollback) | broken image on her shelf; never "fix" via PRECACHE |
+| 15 | negative control returns 200 | STOP | orchestrator | every other 200 is now meaningless |
+| 16 | read-back: key/trophy/tier **LOST or RESTAMPED** | **STOP — the T8 trigger** | owner, immediately | roll back code; say plainly that code rollback does not restore data |
+| 17 | status change with no activity evidence | STOP | owner | same path as 16 |
+| 18 | a tier appeared with no SK4-2 clause firing | STOP | owner | a trophy over an unchanged profile is the "shows her a lie" risk |
+| 19 | R2's `extra` non-empty (engine would not award it) | STOP | **owner only** — never-regress forbids silent retraction | keep, or a one-time correction as new gated work |
+| 20 | she has not used the app in the window | **not a failure** | orchestrator records | close with R2 OPEN and awarding UNPROVEN; do not fake a session |
+| 21 | owner names a defect at 4.6 | STOP | owner picks rollback vs fix-forward | fix is a new gated step, never in place |
+| 22 | §VAL-P4 fails at any step | STOP | orchestrator | the tree that would ship is not the tree that was gated |
+
+**The pre-authorised rollbacks are exactly two (rows 10 and 11)** — the cases where waiting for a
+human makes a child's app broken for longer. Everything else stops and asks.
+
+---
+
+## RISKS
+
+1. **The service worker hands her a broken mix.** Her phone holds the v17 shell. The new SW must
+   install (all 15 URLs), activate, claim, and trigger the one-shot reload at `app.js:62-66`. If
+   `addAll` fails she stays on v17 **silently and indefinitely**. *Noticed by:* criterion 10, the
+   15/15 sweep — the highest-value check in the phase, and one that is **measured failing today**.
+   *Residual:* a phone that never revisits never updates. Nothing can fix that from here.
+2. **Rollback restores code, not data.** Accepted at D27 by the owner. *Mitigation:* the engine is
+   pure and additive (`lib/profile.js:698-719` never deletes, never lowers), T8 watches for
+   disappearance, and the capture exists for the deploy window — which is when the risk lives.
+   *Residual, stated:* if her profile is damaged, the capture is a photograph, not a spare.
+3. **A wrong award cannot be un-shown.** Never-regress means a bad tier stays. *Mitigation:* R2's
+   recomputation catches a tier the shipped catalogue would not award. *Residual:* it cannot catch a
+   tier that is wrong because the *catalogue* is wrong — that is design §6's owner-ruled case.
+4. **The read-back script silently passes.** The run's recurring defect class: an assertion that
+   names a property it does not observe (`journal.md:1151-1156`, `:1239-1249`, `:1324-1330`).
+   **THIS PLAN'S FIRST DRAFT WAS THE FOURTH INSTANCE** — it passed the same file as both arguments,
+   so `READBACK OK` printed unconditionally, and its own validation passed. Found by the reviewer,
+   not by any gate here. *Mitigation now:* the path never crosses a step boundary in a variable
+   (`capture-path.txt`), both sides are bound explicitly, the comparator refuses a self-comparison
+   outright, and the 8-case self-test — including that exact case — must write
+   `SELFTEST 8/8 AS REQUIRED` before the comparator is pointed at her data. *Residual:* the
+   comparator is proven against fixtures, never against a real damaged profile.
+   **The lesson worth promoting:** the defect was not in any assertion — every assertion was
+   correct — it was in the *arguments*. A gate can be perfect and still be aimed at nothing.
+5. **A stale capture.** T8's protection is only as good as its freshness. *Mitigation:* the one-hour
+   age assertion in 4.2's tail and the ordering rule that 4.2 is immediately followed by 4.3.
+6. **The owner's own taps become her data** (SK4-11). *Mitigation:* the checklist's first line.
+   *Residual:* he may still decide to; it must be recorded if he does.
+7. **The projection is a prediction.** The four-bronze number comes from a capture taken earlier
+   today and from an engine that has never run in production. *Mitigation:* 4.2 recomputes it from
+   the fresh capture; 4.7 recomputes it again from live data. The close must not present a
+   prediction as a measurement — the run has already made that mistake once and corrected it
+   (`journal.md:774-777`).
+8. **`meta.updatedAt` is weak evidence** (SK4-2 clause 3). *Mitigation:* the report names which
+   clause fired, so a tier explained only by clause 3 is visible rather than silently blessed.
+9. **The desktop ray fan.** Fixed at step 3.9 and measured at three widths; her device is a phone.
+   *Residual:* none expected — recorded only so nobody re-opens it.
+10. **Sound with no mute** (design A2, owner-ruled). On some phones a silenced device still plays
+    Web Audio. *Mitigation:* none in code, by decision. *Action:* the 4.6 checklist tells him
+    before she meets it, not after.
+
+## BLOCKERS
+
+**None for planning.** Every command an executor runs is quoted, not named: the capture, the proof
+block, the deploy, the inspect, the rollback, the md5 sweep, the precache sweep, the read-back, and
+§VAL-P4 (dry-run today, exit 0, two clauses seen to fail).
+
+**Two things need the owner before step 4.3 is run, and neither blocks planning:**
+1. **the phase-4 go-ahead itself** (`phase-state.md:84`, "OPEN QUESTIONS: phase-4 go-ahead — owner");
+2. **the deploy GO in the same session as the deploy**, because this is the first time anything from
+   this run reaches the child.
+
+**One thing needs the owner at the close:** the D27 rider (delete or keep the captures).
+
+## RECORD GAPS
+
+1. **The rollback ladder records the live deployment's url as a bare fragment**
+   (`.oplan/word-g1/phase-state.md:21`: `dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw (english-qh5ne6g96)`),
+   while the full host only appears in `journal.md:488`. As written, the ladder's top rung is not a
+   runnable command. **Worked around by SK4-8** (inspect is the source of truth) and **the close must
+   fix the format** so the next run inherits a runnable line.
+2. **The frozen deploy recipe names `magic-vet-v11`** because it was written for the word-audio run
+   (`.oplan/word-audio/phase-state.md:59`). Restated for this run as **v18**, with v17 required
+   absent. The recipe should carry a "substitute the run's own version here" note.
+3. **The word-quiz deploy criterion still tells a future run to probe `GET /api/profile` for a 401**
+   (`plan.md:1500-1502`), which contradicts the standing never-probe contract. Ruled in SK4-5;
+   **recommend the close annotate that criterion** so it is not copied again.
+4. **No read-back rule for trophies existed anywhere** — T8 states the policy in prose, no script
+   implements it. Written here as SK4-1; it should be promoted into the shared record, because the
+   next profile-writing run will need it.
+5. **`STANDING-RULES.md`'s line-ending table is stale** (P3-NOTE #10, `journal.md:1354-1356`).
+   Phase 4 touches no code, so it costs nothing here, but it will mislead a future worker.
+6. **`docs/visual-design.md:189` still reads "over 52 pairs" on purpose** (SK3-9). Do not "fix" it.
+7. **What this planner could not measure** is listed in §E above: her live profile, `vercel inspect`,
+   the deploy result, her device's rendering, and whether the engine behaves inside a Vercel
+   function. Items 1, 2 and 5 of that list are precisely what steps 4.2, 4.1 and 4.7 exist to close;
+   items 3 and 4 close at 4.3 and 4.6.
+8. **The upload size is unknown.** The recipe says "WATCH THE DEPLOY SIZE"; this deploy adds nine
+   webps totalling **256 146 bytes** (measured, `ls -l | awk`) plus one 368-line JS file — small.
+   Recorded so that a surprisingly large upload is itself a signal. **P4-AMENDMENT #9 now extracts
+   and records it**, rather than only saying it should be watched.
+9. **The field guide's own lesson 5 is stale** (P4-AMENDMENT #15, nit N6).
+   `field-guide/index.md:32-35` still reads *"pin the exact cumulative ledger per step (298 at the
+   phase-2 close …)"* and *"Contrast anchor = `grep -c '^PASS'` = 52"*. Measured today: **344 flat /
+   349 reported** and **58**. It is the document a future worker reads first and it is wrong about
+   both anchors. **Recommend the close amends lesson 5**, the way the phase-3 close amended lesson 4.
+
+---
+
+## PLAIN PLAN
+
+*(One line per step, for the owner, no jargon — each says WHY.)*
+
+- **Step 4.1 — Write down the escape route before touching anything.** Ask the hosting service which
+  version is live right now, copy its exact name and address into our notes, and save the one
+  command that would put it back — then commit that note. *Why: the moment something goes wrong is
+  the worst moment to be looking up how to undo it, and the last time somebody typed that address
+  by hand instead of copying it, it pointed at the wrong version.*
+- **Step 4.2 — Take a fresh photograph of Mika's data, minutes before shipping.** One authorised
+  read, using the exact same command that has worked three times before, saving the file outside the
+  project; then work out, from that photograph and the real code, exactly which trophies she will be
+  given the first time she uses the new app. *Why: this run writes to the one file that holds
+  everything she has collected. If anything goes wrong we need to be able to prove what was there
+  before — and knowing in advance what should appear is what makes "did it work?" answerable.*
+- **Step 4.3 — Ship it. Once.** One command, with everything it prints saved to a file rather than
+  scrolling past. *Why: the last time the output scrolled past, it was misread and the deploy was
+  run twice.*
+- **Step 4.4 — Prove that what the internet is now serving is exactly what we tested.** Compare every
+  single changed file, byte for byte, against the copy on this machine; check that all fifteen files
+  the app pre-downloads actually answer; check all nine trophy pictures answer with the right names;
+  and check that a made-up address still says "not found". *Why: we are not allowed to open her app
+  in a browser to look, so byte-for-byte sameness is our evidence that the screen we watched working
+  is the screen she will get. And the pre-download list is all-or-nothing: if even one of those
+  fifteen is missing, every phone that already has the app keeps the OLD version forever.*
+- **Step 4.5 — Read her data back and prove nothing was lost.** Every word she had is still there,
+  no status changed without something to explain it, and no trophy or trophy level vanished or had
+  its date rewritten. *Why: this is the promise the whole safety ritual is built on. Note the thing
+  that looks alarming and is not: the trophy shelf will still be empty at this point, because
+  trophies are awarded when she next USES the app, not when it is installed.*
+- **Step 4.6 — You open it on a real phone and look.** Four tabs, the shelf, the eight cards, no
+  broken pictures. **Look only — do not tap words or run a quiz**, because your taps write to her
+  file and would use up one of her first celebrations. *Why: no automatic check can tell whether it
+  looks right to a person, and I am not permitted to open a browser on the live app.*
+- **Step 4.7 — After Mika has actually used it, read her data once more.** Check that the trophies
+  she now has are exactly the ones the code says she has earned, that nothing disappeared, and that
+  anything new is explained by something she actually did. *Why: this is the only way to know the
+  awarding really works on the real server. Until she uses it, that remains unproven — and if she
+  does not use it in time, we say so instead of pretending.*
+- **Step 4.8 — Re-run every check, write down what happened, and ask you one question:** keep the
+  photograph of her data, or delete it as you have the last three times? *Why: deleting it ends the
+  safety net; keeping it leaves her data on this machine. That has always been your call, and it is
+  not assumed from last time.*
+
+**DONE WHEN:** the app Mika opens is `magic-vet-v18`; every one of the sixteen changed files is
+proven byte-identical to the version that was tested and looked at; all fifteen pre-downloaded files
+and all nine trophy pictures answer; her profile has been photographed before the deploy and read
+back after it with **no word, no trophy and no trophy level lost, and no date rewritten**; you have
+opened it on a real phone and said yes; the project itself has **not changed by a single byte**
+(nothing committed but the notes); the escape-route command is written down and still valid; and —
+once she has used it — her four bronze trophies are stamped, celebrated one at a time, and match
+exactly what the code says she earned.

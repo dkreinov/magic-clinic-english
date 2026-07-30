@@ -1355,3 +1355,88 @@ P3-NOTE #10 (housekeeping): STANDING-RULES.md's ending table is now stale -- sty
 sw.js 50 -> 51, index.html 81 -> 90, words.js 281 -> 289, reader.js 749 -> 767. The gates assert
 CRLF/LF KIND rather than counts, so nothing broke, but the table should be refreshed before it
 misleads a future worker.
+
+## PHASE 4 PLANNING (2026-07-30)
+
+Owner asked for a planner. Phase 4 is unlike the three before it: phases 1-3 could only damage a
+working tree, and every mistake was recoverable with git. THIS phase deploys to a real child's
+phone and reads her real profile. Two things are irreversible -- a bad deploy she opens, and any
+write to her live data -- so the briefing told the planner the value of the plan is in its
+STOPPING CONDITIONS, not its speed.
+
+PLAN: 8 steps (pre-flight+rollback recorded / fresh D25 capture / deploy once / md5 + cache-bump
+proof / read-back R1 / owner's LOOK-ONLY device check / read-back R2 / close), 11 skeleton
+changes, 1902 lines. Spliced into plan.md at the "# WORD-TROPHIES -- PHASE 4 \"SHIP\" IN FULL"
+header.
+
+THE THREE SKELETON CHANGES THAT EARN THEIR KEEP:
+  SK4-6 awardTrophies IS NOT ON THE GET PATH. Verified by the orchestrator: api/profile.js:143
+        sits inside the POST branch; GET returns at :20. So read-back R1, taken immediately after
+        the deploy, will show an EMPTY trophies map -- and that is CORRECT, not a rollback
+        trigger. Without this written down the first read-back would have looked like total
+        failure and could have rolled back a perfectly good deploy.
+  SK4-11 THE OWNER'S DEVICE CHECK IS LOOK-ONLY, because his taps would be writes to her profile.
+  SK4-4 the nine webps get a CASE-EXACT HTTP probe (quizRight.webp) -- the same trap phase 2
+        found locally, now checked against a case-sensitive server.
+
+REVIEW (fresh, Opus, read-only): VERDICT ship with fixes -- 2 BLOCKING, 7 should-fix, 6 nits.
+It re-measured everything rather than agreeing: hand-computed the three contrast ratios, extracted
+§VAL-P4 out of the plan with sed and RAN it, and mutation-tested two guards to confirm they fire.
+
+*** BLOCKING 1, and the most dangerous defect this run has produced ***
+The read-back gate COULD NOT FAIL. $BK is assigned in exactly ONE place in the plan (inside the
+frozen capture command). Step 4.5 told the executor to reuse that same capture form "writing to
+readback-1.json", which REBINDS $BK to that very file -- and the comparison line then passed
+"$BK" and readback-1.json as the two files to compare. The same path twice. READBACK OK would
+have printed for ANY input, including a wrecked profile. The single mechanical thing standing
+between a corrupted profile and an 11-year-old, incapable of failing. Orchestrator confirmed by
+grepping every BK= assignment before sending it back.
+
+*** BLOCKING 2 *** Four artifacts the frozen validations GATE ON were produced by no command
+anywhere: readback-1.log, readback-2.log, the R1/R2 receipt lines, and selftest/result.txt with
+its "SELFTEST 4/4" string -- each appearing exactly ONCE in 1525 lines, in the validation that
+CONSUMES it. The self-test was the plan's own mitigation for its own risk 4, and its fixtures
+existed only as a prose table. A contract named but not quoted (lesson 9).
+
+ALL 15 FINDINGS FIXED by the planner, and one deliberate improvement on what was asked: the
+reviewer wanted the self-test fixtures as literal JSON; the planner GENERATES them from the
+shipped defaultProfile() instead, because a hand-copied literal drifts out of schema and starts
+failing validateProfile for the wrong reason. That choice paid immediately -- its first fixture
+deleted a word without replacing it, so a "live has fewer words" check fired before the intended
+key-loss check and the case "failed for the WRONG reason". It also added an 8th fixture as a
+NEGATIVE CONTROL, without which a comparator that failed on everything would score a perfect
+self-test. 8/8, built and run today against the real lib/profile.js.
+
+ORCHESTRATOR VERIFICATION OF THE REPAIRED GATE (not taken on trust -- extracted from the plan
+text and driven directly):
+  same file twice        -> FAIL: SAME FILE TWICE ... "a file compared with itself can never
+                            fail (P4-AMENDMENT #1)"   exit 1
+  a trophy disappeared   -> FAIL: trophy LOST: known                             exit 1
+  nothing changed        -> READBACK OK words=32 candidates=0 trophyIds=4        exit 0
+So the gate now refuses the degenerate case, catches the real failure, and does not cry wolf.
+
+*** A MATERIAL SAFETY FINDING THE REVIEW SURFACED (F7), verified and extended by the orchestrator ***
+saveProfile stamps meta.updatedAt on EVERY call (lib/store.js:64), and api/profile.js's GET path
+calls saveProfile when migrateWordKeys changes anything. Her captured profile shows
+meta.updatedAt = 2026-07-30T08:40:12.072Z = 11:40:12 local -- four seconds before the 11:40:16
+capture completed. SO THE "READ-ONLY" CAPTURE OF 2026-07-30 WROTE TO HER PROFILE. The frozen
+recipe did disclose that the GET "can rewrite her file", so this was anticipated, but the
+consequence is sharper than the record said: meta.updatedAt can NEVER be evidence of HER activity,
+because our own read stamps it. The plan's comparator now emits an explicit warning to that effect.
+GOOD NEWS, measured locally against the capture with the SHIPPED migrateWordKeys and the REAL
+2254-lemma allow-list (public/audio/words/index.json): migration is now settled, before === after,
+so A FUTURE CAPTURE WILL NOT WRITE. The 2026-07-30 capture paid that one-time cost.
+
+P4-NOTE #1 (nit, recorded): the phase-4 plan contains 9 raw Hebrew characters on one line --
+the owner-facing device check quoting the words-tab label as a landmark. Phases 1-3 kept their
+plans Hebrew-free using decimal codepoints. This is display prose for a human rather than a string
+entering code, and the orchestrator relays it, so the lesson-8 risk is low. Left as written.
+
+STATE AT PLANNING TIME, measured: HEAD 678dbc8 clean · suite 349 reported / 344 flat / 0 fail ·
+contrast 58 · public/ 2372 25db383385172d14d512e8f3695bdd33 · LIVE production still
+magic-vet-v17, /views/trophies.js 404, all nine trophy webps 404, 14 of 15 PRECACHE entries 200
+(the one 404 IS /views/trophies.js, exactly as expected), /api/chapter 401, health byte-exact.
+NOTHING FROM THIS ENTIRE RUN HAS EVER SHIPPED.
+
+AWAITING: the owner's phase-4 go-ahead. The GO is not a formality -- it is the step that reaches
+her phone.
