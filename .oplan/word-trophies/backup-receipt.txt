@@ -1,0 +1,2 @@
+capture C2 /c/Users/dkreinov/english-app-backups/profile-20260730-201842.json bytes=15133 sha256=f7befc3833cdbfdfb24ce4a785c81fedadf9c72dc493acf94f60c6385557d049
+readback R1 /c/Users/dkreinov/trophies-deploy/readback-1.json bytes=15133 sha256=f7befc3833cdbfdfb24ce4a785c81fedadf9c72dc493acf94f60c6385557d049

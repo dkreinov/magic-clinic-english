@@ -1440,3 +1440,68 @@ NOTHING FROM THIS ENTIRE RUN HAS EVER SHIPPED.
 
 AWAITING: the owner's phase-4 go-ahead. The GO is not a formality -- it is the step that reaches
 her phone.
+
+## PHASE 4 STEPS 4.1-4.5 EXECUTED (2026-07-30) — IT IS LIVE
+
+Owner ruling at the GO: "straight through to 4.5"; her next session time unknown, so 4.7 stays OPEN.
+
+4.1 PRE-FLIGHT — STEP-4.1-OK. vercel inspect (to a FILE, lesson 10) reported the outgoing
+deployment dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw -- EXACTLY the id the record already knew, so nothing
+had shipped outside this run's knowledge. url https://english-qh5ne6g96-dkreinovs-projects.vercel.app.
+inspect printed NO commit line; recorded as ABSENT rather than invented. Rollback command written
+into phase-state.md verbatim and committed (a40cdb2) BEFORE anything could go wrong.
+Live baseline: v17, health byte-exact, chapter 401, 14/15 PRECACHE 200, /views/trophies.js 404,
+all nine webps 404.
+EXTRA CHECK, not in the plan: confirmed the .oplan record is NOT publicly served -- /.oplan/...,
+/package.json, /lib/profile.js, /.env and /data/band1.json all 404. Vercel serves only public/.
+
+4.2 FRESH CAPTURE — STEP-4.2-OK. The frozen subshell, run UNPIPED (P4-AMENDMENT #6).
+  capture C2 = profile-20260730-201842.json, 15133 bytes,
+  sha256 f7befc3833cdbfdfb24ce4a785c81fedadf9c72dc493acf94f60c6385557d049
+  BACKUP OK words=32 known=12 candidate=2
+SHE USED THE APP TODAY, between the 11:40 capture and this one: chapters 3 -> 4, quizRight 3 -> 4,
+quizzer 5 -> 6, and candidates 0 -> 2 (G1 has now nominated two words). The projection is
+UNCHANGED at four bronze: days, streak, known, curious; chapters/quizRight/quizzer/proven LOCKED.
+NOTE the harmless discrepancy in the two byte counts: the proof block reports raw.length (14068,
+UTF-16 code units) and the receipt reports wc -c (15133, bytes). Hebrew is multi-byte. Not drift.
+
+4.3 THE DEPLOY — STEP-4.3-OK. ONE invocation, output to a FILE.
+  NEW DEPLOYMENT dpl_AVmWnh3XxBZPhLJKnjTUZT9r5EXB
+  url https://english-1jnh1sn5e-dkreinovs-projects.vercel.app, READY, target production,
+  aliased to https://english-app-three-tan.vercel.app. 17.6 MB uploaded, build 4s.
+  Exactly ONE dpl_ id in the log (P4-AMENDMENT #4's count check), and the alias id equals the
+  deployed id -- the mechanical form of lesson 10's wrong-deployment warning.
+  GATE COSMETIC BUG, recorded: the gate reported "UPLOAD SIZE: 8 GB" because its regex takes the
+  LAST size-shaped string in the log, which is "2 cores, 8 GB" from the build machine spec. The
+  real upload was 17.6 MB. It is a reported observation, not a gate, so nothing was affected.
+
+4.4 THE PROOF — STEP-4.4-OK. Enumerated from e786273 (the plan's MEASURED fallback, since inspect
+gave no commit): exactly the 16 paths this deploy carries, and every commit touching public/
+between it and HEAD is one of this run's own.
+  ALL 16 FILES md5 LIVE == WORKTREE (never a git blob -- index.html and styles.css are CRLF on
+  disk and LF in git, so a blob comparison would have been meaningless).
+  CACHE BUMP PROVEN: live sw.js md5 == worktree, v18 count 1, v17 count 0.
+  PRECACHE: the list was DERIVED from the sw.js production actually serves (P4-AMENDMENT #13) --
+  15 entries, ALL 200, including /views/trophies.js which was 404 an hour earlier.
+  ALL NINE WEBPS 200 image/webp md5 OK, INCLUDING quizRight.webp CASE-EXACT -- the bug phase 2's
+  amendment was written for, now proven absent against a case-sensitive server.
+  NEGATIVE CONTROL held: /assets/trophies/zzznotatrophy.webp 404, so "200 for everything" cannot
+  masquerade as success. health byte-exact, chapter 401.
+
+4.5 READ-BACK R1 — STEP-4.5-OK. THE COMPARATOR WAS PROVEN ABLE TO FAIL FIRST, 8/8:
+  1 keys LOST  2 status change with no evidence  3 trophy LOST  4 tier RESTAMPED
+  5 tiers appeared with no evidence  6 appearance WITH evidence correctly passes
+  7 SAME FILE TWICE correctly refused (the blocking defect, now a live guard)
+  8 unchanged profile passes (the negative control, without which a comparator that failed on
+    everything would score perfect)
+  THE RESULT ON HER REAL DATA:
+    READBACK OK words=32 candidates=2 trophyIds=0 · TIERS APPEARED: none · STATUS CHANGES: none
+    RB1 sha256 f7befc3833cdbfdfb24ce4a785c81fedadf9c72dc493acf94f60c6385557d049
+    == C2's sha256 EXACTLY. Her profile is BYTE-IDENTICAL before and after the deploy.
+  trophyIds=0 is CORRECT and is not a failure: awardTrophies is on the POST path only
+  (api/profile.js:143), so nothing is stamped until she next uses the app. SK4-6 called this in
+  advance; without it this result would have looked like total failure.
+
+STILL OPEN: 4.6 (the owner looks at it on a real device, LOOK-ONLY -- his taps would write to her
+profile and burn one of her first celebrations) and 4.7 (read-back R2, only possible after she has
+used it). Awarding in production remains UNPROVEN until R2. Said plainly rather than assumed.
