@@ -1,9 +1,11 @@
 CURRENT: phase 2 "the assets" CLOSED (2026-07-30). Nine owner-approved trophy images are
   committed as PNG masters and 640x640 webp derivatives; no app code, no test, no CSS, no CACHE
-  bump, no deploy. NEXT: phase 3 "the screen" — NOT PLANNED YET (design §5 sketch only; a fresh
-  planner details it on the owner's go-ahead).
-PLAN: .oplan/word-trophies/plan.md (phases 1 and 2 closed in full; phases 3-4 still the design
-  §5 sketch)
+  bump, no deploy. NEXT: phase 3 "the screen" is PLANNED and REVIEWED (fresh planner + fresh
+  reviewer, verdict "ship with fixes", P3-AMENDMENT #1 applied; committed at 0e5155d) — awaiting
+  the owner's GO. One open owner decision at the GO: the day-one celebration rule (SK3-10), now
+  informed by the real numbers from the 2026-07-30 capture (4 bronze tiers, not 6-8).
+PLAN: .oplan/word-trophies/plan.md (phases 1, 2 and 3 in full; phase 4 still the design §5
+  sketch. Phase 3 begins at the "# WORD-TROPHIES — PHASE 3 IN FULL" header, 7 steps.)
 DESIGN: design.md (SIGNED 2026-07-29) · JOURNAL: journal.md (PHASE 2 CLOSED block has the
   rulings, the traps and every measurement) · BRIEFING: briefing.md · STATUS: STATUS.md ·
   FIELD GUIDE: field-guide/index.md (73 lines; phase-2 close added lesson 13, the art-chat
