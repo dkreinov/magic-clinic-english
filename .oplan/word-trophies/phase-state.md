@@ -6,8 +6,11 @@ PLAN: .oplan/word-trophies/plan.md (phases 1 and 2 closed in full; phases 3-4 st
   §5 sketch)
 DESIGN: design.md (SIGNED 2026-07-29) · JOURNAL: journal.md (PHASE 2 CLOSED block has the
   rulings, the traps and every measurement) · BRIEFING: briefing.md · STATUS: STATUS.md ·
-  FIELD GUIDE: field-guide/index.md (66 lines; phase-2 close added lesson 13, the art-chat
-  driving recipe and its four silent no-op traps)
+  FIELD GUIDE: field-guide/index.md (73 lines; phase-2 close added lesson 13, the art-chat
+  driving recipe and its four silent no-op traps. NOTE: lesson 4's claim that public/sw.js is
+  LF is FALSE on disk — measured 2026-07-30, sw.js is CRLF=50 LF=0, and styles.css and
+  index.html are CRLF too; app.js and lib/*.js are LF. The phase-3 planner found this
+  independently. Amend lesson 4 at the phase-3 close.)
 BASE (phase 1): 1a30012991130cf0032c1743d0448a4c509509ac
 BASE (phase 2): fe1f78ab1d9e0b92d4d53208f117fa65f4c71c37
 ACCEPTED (phase 1): 1.1 f5212c5 · 1.2 344f0de · 1.3 d848aa7 · 1.4 3d19efb · closed 4966d89
