@@ -903,3 +903,48 @@ P3-NOTE #3 (FIELD GUIDE candidate, found the hard way): a text-scanning assertio
 block ALSO SEES COMMENTS. The worker's first build failed "VIEW_STYLE must not use color-mix()"
 on an explanatory COMMENT that used no colour at all. No VIEW_STYLE comment may name a forbidden
 construct. Same family as lesson 5's "color-mix fabricates a pass" -- the gate reads text, not CSS.
+
+STEP 3.3 wiring: route, fourth tab, PRECACHE, CACHE v17 -> v18 (T4 + obligation 1) — WORKER
+Every inserted line EXTRACTED from plan.md by line number and asserted before use; the Hebrew tab
+label extracted from design.md:189. app.js LF 65 -> 67 (insert-only); index.html CRLF 81 -> 90
+(insert-only, 9-line tab block); sw.js CRLF 50 -> 51 (CACHE line replaced + one PRECACHE entry);
+shell.test.js LF 94 -> 96; trophies-ui.test.js LF 336 -> 448, +3 flat (12 total).
+Deletions exactly 2 (the CACHE line in each of sw.js and shell.test.js), app.js/index.html/
+trophies-ui insert-only. Ledger 332/337 -> 335 flat / 340 reported. gate-3.3.sh exit 0.
+SK3-1 CONFIRMED AGAIN on disk: sw.js and index.html were CRLF before AND after.
+
+P3-AMENDMENT #1 IMPLEMENTED AND PROVEN LOAD-BEARING — the single most valuable result of this
+step. The worker mis-cased quizRight.webp -> quizright.webp (renameSync DOES change case on this
+filesystem; the move-aside fallback was unnecessary) and measured:
+  existsSync("quizRight.webp") = true   <- the case-blind per-id loop STILL PASSES
+  and, run standalone against the mis-cased tree, ALL of the pre-amendment assertions
+  (per-id existsSync loop + shelf-header + count-of-9) PASS COMPLETELY.
+Only the amendment's assertion failed, at trophies-ui.test.js:421:
+  not ok 12 - every trophy id has its own webp on disk ...
+    + 'quizright.webp'  - 'quizRight.webp'
+So the test AS ORIGINALLY DRAFTED could not see the bug it exists to catch, and would have shipped
+a 404 on her phone from Vercel's case-sensitive Linux while every local test stayed green. The
+reviewer called this "should-fix"; it was in truth the difference between a working screen and a
+broken one.
+
+FAIL-FIRST, all observed failing with text recorded: M3.3a v17 revert (plus a second part where
+v17 is JOINED rather than removed, giving "the old cache name must be gone, not merely joined" --
+the QZ-22 failure mode made mechanical); M3.3b reordering PRECACHE failed the deepStrictEqual on
+ORDER not membership; M3.3c moving the tab before words failed "T4 pins DOM order"; the artwork-
+in-PRECACHE mutation failed BOTH shell.test.js and test 12. All restored, md5-verified.
+
+ORCHESTRATOR AUDIT (independent): PRECACHE has 15 entries with /views/trophies.js at index 12
+IMMEDIATELY after /views/words.js at 11, every entry resolves to a real file on disk, and no
+/assets/ entry exists; sw.js is at v18 with no surviving mention of v17; nav DOM order is
+/reader /home /words /trophies with exactly four tabs, placement still tab-less and /parent still
+absent; the tab label's codepoints were pulled from design.md and from index.html separately and
+are IDENTICAL (1492,1490,1489,1497,1506,1497,1501,32,1513,1500,1497); app.js carries both the
+import and the route; the amendment's readdirSync/deepStrictEqual and the exact camelCase filename
+are present in the test; endings 51/90/67/96 all match their pins; 0 raw non-ASCII in the test
+file. ACCEPTED.
+
+P3-NOTE #4 (plan defect, no action needed, recorded): the plan defines M3.3e TWICE -- the
+MANDATED FAIL-FIRST list at :2737 calls it "add trophy artwork to PRECACHE", while
+P3-AMENDMENT #1 at :2709 adds a different M3.3e, "rename one derivative to lowercase". The worker
+did not guess which to skip; it ran BOTH and reported both. Rename the amendment's to M3.3f if the
+plan is ever amended again. My error when writing the amendment.

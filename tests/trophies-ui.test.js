@@ -334,3 +334,115 @@ test('the trophies VIEW_STYLE is token-only and the screen has no progress bar o
   }
   assert.ok(!/width:\s*[^;]*%/.test(html), 'T9 forbids a percentage width -- that is a progress bar in disguise');
 });
+
+// ===== step 3.3 (T4 + carried obligation 1): the wiring -- /trophies in
+// ROUTES, the fourth nav tab, PRECACHE += "/views/trophies.js", CACHE
+// magic-vet-v18 -- plus the SK2-7 asset test the run has been deferring.
+// Hebrew appears here ONLY as backslash-u escapes written by
+// $HOME/trophies-art/apply-3.3.js; it is never typed.
+import { existsSync, readdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+
+const t33AppPath = path.join(root, 'public', 'app.js');
+const t33IndexPath = path.join(root, 'public', 'index.html');
+const t33SwPath = path.join(root, 'public', 'sw.js');
+const t33ArtDir = path.join(root, 'public', 'assets', 'trophies');
+const t33AssetsDir = path.join(root, 'public', 'assets');
+
+test('app.js routes /trophies to the trophies view, keeps /placement tab-less and keeps /parent out of ROUTES', () => {
+  const app = readFileSync(t33AppPath, 'utf8');
+  const html = readFileSync(t33IndexPath, 'utf8');
+
+  assert.ok(
+    app.includes('import { render as renderTrophies } from "./views/trophies.js";'),
+    'app.js must statically import the trophies view',
+  );
+  assert.ok(app.includes('"/trophies": renderTrophies,'), '/trophies must be a ROUTES entry');
+
+  // the parent door stays exactly as it was: lazy, hash-only, never in ROUTES.
+  assert.ok(app.includes('const OWNER_ROUTE = "/parent";'), 'OWNER_ROUTE must be untouched');
+  assert.ok(app.includes('import("./views/parent.js")'), 'the parent view must stay lazily imported');
+  assert.ok(!app.includes('"/parent":'), '/parent must never become a ROUTES entry');
+
+  // /placement is the tab-less route: in ROUTES, absent from the nav.
+  assert.ok(app.includes('"/placement":'), '/placement must stay a ROUTES entry');
+  assert.ok(!html.includes('data-route="/placement"'), '/placement must stay tab-less');
+});
+
+test('index.html carries exactly four nav tabs and the trophies tab is last, after the words tab', () => {
+  const html = readFileSync(t33IndexPath, 'utf8');
+  const TITLE = '\u05d4\u05d2\u05d1\u05d9\u05e2\u05d9\u05dd \u05e9\u05dc\u05d9';
+  assert.strictEqual(TITLE.length, 11, 'the extracted tab label is eleven characters');
+
+  assert.strictEqual(html.split('class="nav-tab"').length - 1, 4, 'expected exactly four nav tabs');
+
+  const trophiesAt = html.indexOf('data-route="/trophies"');
+  const wordsAt = html.indexOf('data-route="/words"');
+  assert.ok(trophiesAt >= 0, 'the trophies tab must exist');
+  assert.ok(wordsAt >= 0, 'the words tab must exist');
+  assert.ok(trophiesAt > wordsAt, 'T4 pins DOM order: the trophies tab comes AFTER the words tab');
+
+  const start = html.indexOf('<a class="nav-tab" href="#/trophies"');
+  assert.ok(start >= 0, 'the trophies tab must be an <a class="nav-tab"> with its own href');
+  const block = html.slice(start, html.indexOf('</a>', start) + 4);
+  assert.ok(block.includes('href="#/trophies"'), 'the tab must link to #/trophies');
+  assert.ok(block.includes('viewBox="0 0 24 24"'), 'the icon must match the three existing tabs');
+  assert.ok(block.includes('stroke-width="1.6"'), 'the icon must match the three existing tabs');
+  assert.ok(block.includes('fill-opacity="0.15"'), 'the icon must match the three existing tabs');
+  assert.ok(block.includes('<span>' + TITLE + '</span>'), 'the tab label is the extracted design.md label');
+
+  // negative controls, restated from tests/parent-access.test.js:37-38 so that
+  // a fourth tab can never smuggle the parent door into the shipped shell.
+  assert.ok(!html.includes('#/parent'), 'the parent door must stay invisible');
+  assert.ok(!html.includes('data-route="/parent"'), 'the parent door must stay invisible');
+});
+
+test('every trophy id has its own webp on disk, all nine are distinct, and none of them is precached', async () => {
+  const { TROPHY_CATALOG } = await import('../lib/profile.js');
+
+  // Documentation of intent only. existsSync is CASE-BLIND on this machine
+  // (P3-AMENDMENT #1: existsSync("public/assets/trophies/quizright.webp")
+  // returns true while the real file is quizRight.webp), so this loop CANNOT
+  // police the frozen camelCase. It runs first on purpose: under a mis-cased
+  // file it still passes and the deepStrictEqual below is what fails.
+  for (const trophy of TROPHY_CATALOG) {
+    assert.ok(existsSync(path.join(t33ArtDir, trophy.id + '.webp')), 'expected artwork for ' + trophy.id);
+  }
+  assert.ok(existsSync(path.join(t33ArtDir, 'shelf-header.webp')), 'expected the shelf-header banner');
+
+  // THE GATE. readdirSync returns the TRUE on-disk spelling and is case-exact
+  // on every platform. Vercel serves from a case-SENSITIVE Linux filesystem,
+  // so a mis-cased derivative would 404 on her phone while existsSync stayed
+  // green here. This also subsumes "the directory holds exactly nine files".
+  const got = readdirSync(t33ArtDir).sort();
+  const want = ['chapters', 'curious', 'days', 'known', 'proven', 'quizRight', 'quizzer', 'shelf-header', 'streak']
+    .map((n) => n + '.webp')
+    .sort();
+  assert.deepStrictEqual(got, want);
+  assert.strictEqual(got.length, 9, 'the trophies directory holds exactly nine files');
+
+  // all nine distinct from each other...
+  const seen = new Map();
+  for (const name of got) {
+    const digest = createHash('md5').update(readFileSync(path.join(t33ArtDir, name))).digest('hex');
+    assert.ok(!seen.has(digest), name + ' is byte-identical to ' + seen.get(digest));
+    seen.set(digest, name);
+  }
+
+  // ...and from the eight webps that already lived in public/assets.
+  const others = readdirSync(t33AssetsDir).filter((n) => n.endsWith('.webp')).sort();
+  assert.strictEqual(others.length, 8, 'expected the eight pre-existing public/assets webps');
+  for (const name of others) {
+    const digest = createHash('md5').update(readFileSync(path.join(t33AssetsDir, name))).digest('hex');
+    assert.ok(!seen.has(digest), 'assets/' + name + ' is byte-identical to trophies/' + seen.get(digest));
+  }
+
+  // carried obligation 3 / design T6: trophy artwork is runtime-fetched and
+  // must NEVER enter the precache list.
+  const sw = readFileSync(t33SwPath, 'utf8');
+  const precacheMatch = sw.match(/PRECACHE\s*=\s*(\[[\s\S]*?\])/);
+  assert.ok(precacheMatch, 'expected to find the PRECACHE array literal in sw.js');
+  for (const entry of JSON.parse(precacheMatch[1])) {
+    assert.ok(!entry.includes('/assets/trophies/'), 'trophy artwork must never be precached, found ' + entry);
+  }
+});

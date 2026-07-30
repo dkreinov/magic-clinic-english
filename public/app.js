@@ -1,12 +1,14 @@
 import { render as renderHome } from "./views/home.js";
 import { render as renderPlacement } from "./views/placement.js";
 import { render as renderReader } from "./views/reader.js";
+import { render as renderTrophies } from "./views/trophies.js";
 import { render as renderWords } from "./views/words.js";
 
 const ROUTES = {
   "/home": renderHome,
   "/placement": renderPlacement,
   "/reader": renderReader,
+  "/trophies": renderTrophies,
   "/words": renderWords,
 };
 
