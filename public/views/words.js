@@ -3,6 +3,7 @@ import { resolveLemma } from "../lemma.js";
 import { getAllowedSet } from "../words-index.js";
 import { startQuiz } from "../quiz.js";
 import { pickQuizWords, knownSetFromProfile, pickCandidateWords } from "../quiz-core.js";
+import { maybeCelebrateTrophy } from "./trophies.js";
 
 const VIEW_STYLE = `
   .words-count {
@@ -246,7 +247,14 @@ export async function render(container, ctx) {
           knownSet: knownSetFromProfile(profile),
           candidateSet,
           count: 4,
-          onDone: () => boot(),
+          // T5. boot() already re-reads /api/profile, so the post-award profile is
+          // in hand -- no extra request. total > 0 skips the no-questions path
+          // (quiz.js:247-250 fires onDone with NO done screen), and the
+          // celebration NEVER goes inside renderQuizDone (QZ-18 frozen).
+          onDone: async ({ total }) => {
+            await boot();
+            if (total > 0) maybeCelebrateTrophy(profile);
+          },
         });
       });
     }

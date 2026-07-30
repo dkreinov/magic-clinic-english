@@ -948,3 +948,55 @@ MANDATED FAIL-FIRST list at :2737 calls it "add trophy artwork to PRECACHE", whi
 P3-AMENDMENT #1 at :2709 adds a different M3.3e, "rename one derivative to lowercase". The worker
 did not guess which to skip; it ran BOTH and reported both. Rename the amendment's to M3.3f if the
 plan is ever amended again. My error when writing the amendment.
+
+STEP 3.4 the celebration (T5), hooked at exactly three moments — WORKER
+trophies.js LF 298 -> 439 (+141, 0 deletions): celebrationKey, readCelebrated, writeCelebrated,
+collectUncelebrated, celebrateHtml, showCelebration, celebrateFirst, plus the overlay CSS inside
+VIEW_STYLE (token-only, reduced-motion honoured). words.js CRLF 281 -> 289 (+9/-1), reader.js
+CRLF 749 -> 767 (+19/-1) with celebrateFromServer() and the two guarded hooks; test file LF
+448 -> 734, +5 flat (17 total). Ledger 335/340 -> 340 flat / 345 reported. gate-3.4.sh exit 0.
+quiz.js md5 still 69b6d71117cf776715374abc6f0abb02 and quiz-core.js 9a2131be... — QZ-18 intact.
+
+ORCHESTRATOR AUDIT — THE OWNER'S RULING MADE OBSERVABLE. Rather than trust the tests, the
+orchestrator imported the REAL shipped module and drove it against the REAL day-one set from the
+2026-07-30 capture (days, streak, known, curious, all bronze) with a fake localStorage:
+  pass 1 showed days/bronze,   1 key written
+  pass 2 showed streak/bronze, 1 key written
+  pass 3 showed known/bronze,  1 key written
+  pass 4 showed curious/bronze,1 key written
+  pass 5 showed null,          0 keys written
+  pass 6 showed null,          0 keys written
+FOUR earned tiers produced FOUR celebrations across four earning moments, one per pass, in
+catalogue order, then silence. That is exactly what the owner ruled and the opposite of what the
+plan originally specified. Also verified: quiz.js/quiz-core.js md5s frozen; the only "new Audio("
+occurrences are the PRE-EXISTING word-pronunciation feature in words.js:218 and reader.js:721,
+confirmed by diffing against 48ee853 — the celebration path has zero. ACCEPTED.
+
+FAIL-FIRST: M3.4a (dropping the total>0 guard) failed with "the words hook must skip the
+no-questions path"; M3.4c (removing the try/catch) failed with "Got unwanted exception ... private
+mode"; M3.4d (celebrating inside renderQuizDone) failed BOTH the QZ-18 md5 gate and "quiz.js must
+never celebrate"; M3.4e (assigning the module-scope profile) failed on the helper-containment
+assertion, with the plan's two named assertions confirmed failing by direct probe. All restored,
+all md5-verified.
+
+P3-NOTE #5 (ORCHESTRATOR ERROR in the amendment, caught by the worker). When applying
+P3-AMENDMENT #2 I updated SK3-10, the function contract at :2816 and test 14 at :2971 — but NOT
+the mutation list at :3018-3019. M3.4b still read "make maybeCelebrateTrophy mark only the tier it
+showed", which under the amendment IS the shipped behaviour: applying it produced a BYTE-IDENTICAL
+file and the suite stayed green. The worker reported this honestly as an observed NON-FAILURE
+instead of manufacturing one — the stop-rule working exactly as intended. It then ran the INVERTED
+mutation (mark ALL in one pass = SK3-10 as originally drafted) and observed
+  not ok 14 ... "pass 1 must write exactly one key"  4 !== 1
+which is STRONGER evidence than the stale mutation would have given: it proves the guard fires
+against precisely the behaviour the owner overruled. Lesson for future amendments: an amendment
+must sweep the step's MUTATION LIST too, not just its prose and its tests.
+
+P3-NOTE #6 (accepted shape, recorded). Step 3.2 shipped uncelebrated/maybeCelebrateTrophy as live
+stubs; step 3.4's gate requires trophies.js to be INSERT-ONLY (0 deletions). Giving the stubs new
+bodies would delete lines, so the worker preserved the stub lines byte-identical and had them
+delegate to the new implementations. The result is two slightly verbose passthroughs that are
+functionally identical to a direct return. RULED: accept. The behaviour is right (proven by the
+drain harness above), the gate was honoured rather than relaxed, an in-code note explains why, and
+the alternative is a gate amendment plus re-opening a passing mutation-tested step for a purely
+cosmetic gain. Root cause was a plan drafting artifact: "append-only" was written for 3.4 without
+accounting for the stubs 3.2 was told to ship.

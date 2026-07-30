@@ -446,3 +446,289 @@ test('every trophy id has its own webp on disk, all nine are distinct, and none 
     assert.ok(!entry.includes('/assets/trophies/'), 'trophy artwork must never be precached, found ' + entry);
   }
 });
+
+// ===== step 3.4 (T5): the celebration -- ONE overlay per pass, localStorage
+// memory, and exactly the three designed hook points. SK3-10 as AMENDED by
+// P3-AMENDMENT #2 (owner ruling, 2026-07-30): the FIRST uncelebrated tier is
+// shown and ONLY THAT ONE is marked, so the backlog DRAINS one per earning
+// moment instead of being discarded. Hebrew appears here ONLY as backslash-u
+// escapes written by $HOME/trophies-art/apply-3.4.js; it is never typed.
+import { statSync } from 'node:fs';
+
+const t34WordsPath = path.join(root, 'public', 'views', 'words.js');
+const t34ReaderPath = path.join(root, 'public', 'views', 'reader.js');
+const t34QuizPath = path.join(root, 'public', 'quiz.js');
+const t34QuizCorePath = path.join(root, 'public', 'quiz-core.js');
+const t34PublicDir = path.join(root, 'public');
+const t34Count = (haystack, needle) => haystack.split(needle).length - 1;
+
+// tests/shell.test.js:33-45's listJsFiles, reused.
+function t34ListJsFiles(dir) {
+  const entries = readdirSync(dir);
+  let files = [];
+  for (const entry of entries) {
+    const full = path.join(dir, entry);
+    if (statSync(full).isDirectory()) {
+      files = files.concat(t34ListJsFiles(full));
+    } else if (entry.endsWith('.js')) {
+      files.push(full);
+    }
+  }
+  return files;
+}
+
+// The injected reader/writer of design T5. `read` is the parameter
+// uncelebrated() takes; `store` is what the module sees as localStorage.
+function t34Store(initial) {
+  const map = new Map(Object.entries(initial || {}));
+  const writes = [];
+  return {
+    writes,
+    read: (key) => (map.has(key) ? map.get(key) : null),
+    store: {
+      getItem: (key) => (map.has(key) ? map.get(key) : null),
+      setItem: (key, value) => { writes.push([key, value]); map.set(key, value); },
+    },
+  };
+}
+
+function t34WithStorage(stub, fn) {
+  const had = Object.prototype.hasOwnProperty.call(globalThis, 'localStorage');
+  const previous = globalThis.localStorage;
+  globalThis.localStorage = stub;
+  try {
+    return fn();
+  } finally {
+    if (had) globalThis.localStorage = previous;
+    else delete globalThis.localStorage;
+  }
+}
+
+test('uncelebrated lists every unrecorded earned tier in catalogue then bronze-silver-gold order', async () => {
+  const { uncelebrated } = await import('../public/views/trophies.js');
+  const profile = {
+    trophies: {
+      known: { bronze: '2026-07-01T00:00:00.000Z', silver: '2026-07-02T00:00:00.000Z' },
+      chapters: { bronze: '2026-07-03T00:00:00.000Z' },
+      // an id this build does not know (T1 forward compatibility) is IGNORED
+      dragons: { bronze: '2026-07-04T00:00:00.000Z' },
+    },
+  };
+
+  // chapters precedes known in TROPHY_VIEW, and bronze precedes silver.
+  const empty = t34Store({});
+  const got = uncelebrated(profile, empty.read);
+  assert.deepStrictEqual(got, [
+    { id: 'chapters', tier: 'bronze' },
+    { id: 'known', tier: 'bronze' },
+    { id: 'known', tier: 'silver' },
+  ]);
+  assert.ok(!JSON.stringify(got).includes('dragons'), 'an unknown trophy id must never appear');
+
+  // a tier this phone has already recorded drops out of the list
+  const seen = t34Store({ 'trophyCelebrated:known:bronze': '2026-07-05T00:00:00.000Z' });
+  assert.deepStrictEqual(uncelebrated(profile, seen.read), [
+    { id: 'chapters', tier: 'bronze' },
+    { id: 'known', tier: 'silver' },
+  ]);
+
+  // nothing earned at all
+  assert.deepStrictEqual(uncelebrated({ trophies: {} }, empty.read), []);
+  assert.deepStrictEqual(uncelebrated({}, empty.read), []);
+});
+
+test('maybeCelebrateTrophy shows exactly one overlay per pass and drains the backlog one at a time', async () => {
+  const { maybeCelebrateTrophy } = await import('../public/views/trophies.js');
+
+  // the REAL day-one set measured 2026-07-30: four bronze tiers at once.
+  const iso = '2026-07-30T00:00:00.000Z';
+  const profile = {
+    trophies: {
+      days: { bronze: iso },
+      streak: { bronze: iso },
+      known: { bronze: iso },
+      curious: { bronze: iso },
+    },
+  };
+
+  const s = t34Store({});
+  const shown = [];
+  t34WithStorage(s.store, () => {
+    for (let i = 0; i < 4; i += 1) {
+      const before = s.writes.length;
+      const got = maybeCelebrateTrophy(profile);
+      assert.ok(got, 'pass ' + (i + 1) + ' must still have a trophy to show');
+      assert.strictEqual(got.tier, 'bronze');
+      shown.push(got.id);
+      // P3-AMENDMENT #2: exactly ONE key per pass...
+      assert.strictEqual(s.writes.length - before, 1, 'pass ' + (i + 1) + ' must write exactly one key');
+      // ...and it is the key of the tier that was SHOWN, never another one.
+      const last = s.writes[s.writes.length - 1];
+      assert.strictEqual(last[0], 'trophyCelebrated:' + got.id + ':' + got.tier);
+      assert.ok(!Number.isNaN(Date.parse(last[1])), 'the stored value must parse as ISO, got ' + last[1]);
+    }
+    // the fifth pass: caught up, so nothing shown and nothing written
+    const before = s.writes.length;
+    assert.strictEqual(maybeCelebrateTrophy(profile), null);
+    assert.strictEqual(s.writes.length, before, 'a caught-up phone must write nothing');
+  });
+
+  assert.deepStrictEqual(shown, ['days', 'streak', 'known', 'curious'],
+    'the backlog drains in TROPHY_VIEW order, one per earning moment');
+  assert.strictEqual(s.writes.length, 4, 'four earning moments, four keys -- never a parade');
+
+  // negative control: an unearned profile shows nothing and writes nothing
+  const none = t34Store({});
+  t34WithStorage(none.store, () => {
+    assert.strictEqual(maybeCelebrateTrophy({ trophies: {} }), null);
+    assert.strictEqual(maybeCelebrateTrophy({}), null);
+  });
+  assert.strictEqual(none.writes.length, 0, 'an unearned profile must write nothing');
+});
+
+test('a localStorage failure never breaks the celebration path', async () => {
+  const { uncelebrated, maybeCelebrateTrophy } = await import('../public/views/trophies.js');
+  const profile = { trophies: { days: { bronze: '2026-07-30T00:00:00.000Z' } } };
+
+  // private mode: the very first access throws (public/api.js:3-9).
+  const boom = {
+    getItem() { throw new Error('private mode'); },
+    setItem() { throw new Error('private mode'); },
+  };
+  t34WithStorage(boom, () => {
+    let got = 'not-run';
+    assert.doesNotThrow(() => { got = maybeCelebrateTrophy(profile); },
+      'a storage throw must never break the screen or the quiz');
+    // fail towards SHOWING: a reader that throws means 'not celebrated'
+    assert.deepStrictEqual(got, { id: 'days', tier: 'bronze' });
+    assert.doesNotThrow(() => { uncelebrated(profile); }, 'the list must not throw either');
+    assert.deepStrictEqual(uncelebrated(profile), [{ id: 'days', tier: 'bronze' }]);
+    // the write could not be recorded, so the next pass shows it again
+    assert.deepStrictEqual(maybeCelebrateTrophy(profile), { id: 'days', tier: 'bronze' });
+  });
+
+  // no storage object at all (node, and any phone with the API absent)
+  t34WithStorage(undefined, () => {
+    assert.deepStrictEqual(maybeCelebrateTrophy(profile), { id: 'days', tier: 'bronze' });
+  });
+});
+
+test('the celebration is hooked at exactly the three designed moments, guarded on total > 0, and never inside renderQuizDone', () => {
+  const words = readFileSync(t34WordsPath, 'utf8');
+  const reader = readFileSync(t34ReaderPath, 'utf8');
+  const quiz = readFileSync(t34QuizPath, 'utf8');
+  const quizCore = readFileSync(t34QuizCorePath, 'utf8');
+
+  // T5 names three hook points and SK3-11 refuses the free fourth one.
+  assert.strictEqual(t34Count(words, 'maybeCelebrateTrophy('), 1, 'words.js celebrates exactly once');
+  assert.strictEqual(t34Count(reader, 'maybeCelebrateTrophy('), 1, 'reader.js celebrates exactly once');
+  assert.strictEqual(t34Count(quiz, 'maybeCelebrateTrophy('), 0, 'QZ-18: quiz.js must never celebrate');
+  assert.strictEqual(t34Count(quizCore, 'maybeCelebrateTrophy('), 0, 'quiz-core.js must never celebrate');
+
+  // every OTHER .js under public/ is silent about the celebration
+  const owners = ['views/trophies.js', 'views/words.js', 'views/reader.js'];
+  const files = t34ListJsFiles(t34PublicDir);
+  assert.ok(files.length > 0, 'expected to find .js files under public/');
+  const checked = [];
+  for (const file of files) {
+    const rel = path.relative(t34PublicDir, file).split(path.sep).join('/');
+    if (owners.includes(rel)) continue;
+    checked.push(rel);
+    assert.strictEqual(t34Count(readFileSync(file, 'utf8'), 'maybeCelebrateTrophy'), 0,
+      rel + ' must not mention the celebration -- exactly three hooks exist');
+  }
+  for (const rel of ['quiz.js', 'quiz-core.js', 'api.js', 'views/home.js', 'views/placement.js', 'views/parent.js']) {
+    assert.ok(checked.includes(rel), 'expected ' + rel + ' to be among the files swept');
+  }
+
+  // SK3-2: the reader asks the server ONCE, into a LOCAL, and only boot() may
+  // ever reassign the module-scope profile.
+  assert.strictEqual(t34Count(reader, 'async function celebrateFromServer() {'), 1);
+  assert.strictEqual(t34Count(reader, 'await celebrateFromServer();'), 2, 'exactly two designed calls');
+  assert.strictEqual(t34Count(reader, 'celebrateFromServer'), 3, 'one declaration plus exactly two calls');
+  const helperAt = reader.indexOf('async function celebrateFromServer() {');
+  const celebrateAt = reader.indexOf('maybeCelebrateTrophy(fresh);', helperAt);
+  assert.ok(celebrateAt > helperAt, 'the single celebration call must live inside celebrateFromServer');
+  assert.ok(reader.slice(helperAt, celebrateAt).includes('let fresh;'),
+    'celebrateFromServer must read the fresh profile into a LOCAL (SK3-2)');
+  assert.strictEqual(t34Count(reader, 'profile = await getJson("/api/profile")'), 1,
+    'only boot() may reassign the module-scope profile');
+  const bootAt = reader.indexOf('async function boot() {');
+  const assignAt = reader.indexOf('profile = await getJson("/api/profile")');
+  assert.ok(bootAt >= 0 && assignAt > bootAt && assignAt < helperAt,
+    'the one profile reassignment must sit inside boot(), never in celebrateFromServer');
+
+  // the no-questions path (quiz.js:247-250) fires onDone with NO done screen,
+  // so both hooks are guarded on total > 0.
+  const wordsHook = words.indexOf('onDone: async ({ total }) => {');
+  assert.ok(wordsHook >= 0, 'the words hook must receive { total }');
+  const wordsBlock = words.slice(wordsHook, words.indexOf('},', wordsHook) + 2);
+  assert.ok(wordsBlock.includes('total > 0'), 'the words hook must skip the no-questions path');
+  assert.ok(wordsBlock.includes('maybeCelebrateTrophy(profile)'), 'the words hook celebrates the re-read profile');
+  const readerHook = reader.indexOf('onDone: async ({ total }) => {');
+  assert.ok(readerHook >= 0, 'the reader hook must receive { total }');
+  const readerBlock = reader.slice(readerHook, reader.indexOf('},', readerHook) + 2);
+  assert.ok(readerBlock.includes('total > 0'), 'the reader hook must skip the no-questions path');
+  assert.ok(readerBlock.includes('await celebrateFromServer();'), 'the reader hook celebrates from a fresh GET');
+
+  // tests/reader-ui.test.js:192-196 deepStrictEquals this shape: no third key.
+  assert.ok(reader.includes('{ started: false, done: false }'), 'the quizState shape is frozen');
+  assert.strictEqual(t34Count(reader, 'celebrated:'), 0, 'no celebrated flag may join quizState');
+  assert.strictEqual(t34Count(reader, '.celebrated'), 0, 'no celebrated flag may join quizState');
+
+  // QZ-18: renderQuizDone keeps its two frozen text nodes and gains nothing.
+  const DONE_TITLE = '<p class="quiz-done-title">\u05e1\u05d9\u05d9\u05de\u05e0\u05d5 \u05d0\u05ea \u05d4\u05ea\u05e8\u05d2\u05d5\u05dc!</p>';
+  const DONE_SCORE = '<p class="quiz-done-score">${right} \u05de\u05ea\u05d5\u05da ${total}</p>';
+  assert.ok(quiz.includes(DONE_TITLE), 'renderQuizDone must keep its frozen title node');
+  assert.ok(quiz.includes(DONE_SCORE), 'renderQuizDone must keep its frozen score node');
+  for (const needle of ['maybeCelebrateTrophy', 'trophyCelebrated', 'celebrate', 'Celebrate', 'trophies.js']) {
+    assert.ok(!quiz.includes(needle), 'quiz.js must carry no celebration identifier, found ' + needle);
+    assert.ok(!quizCore.includes(needle), 'quiz-core.js must carry no celebration identifier, found ' + needle);
+  }
+});
+
+test('the celebration honours reduced motion, adds no sound, and sits below the entry-code gate', () => {
+  const src = readFileSync(trophiesViewPath, 'utf8');
+  const styleMatch = src.match(VIEW_STYLE_RE);
+  assert.ok(styleMatch, 'could not find VIEW_STYLE');
+  const style = styleMatch[1];
+
+  // z-index 90: below the entry-code gate (public/styles.css:413), above the
+  // bottom nav (:331). A celebration must never cover the login gate.
+  const overlayAt = style.indexOf('.trophy-celebrate {');
+  assert.ok(overlayAt >= 0, 'VIEW_STYLE must carry the .trophy-celebrate overlay rule');
+  const overlayRule = style.slice(overlayAt, style.indexOf('}', overlayAt));
+  assert.ok(overlayRule.includes('z-index: 90'), 'the overlay must sit at z-index 90');
+  assert.ok(!overlayRule.includes('100'), 'the overlay must stay BELOW the entry-code gate');
+  assert.ok(overlayRule.includes('position: fixed'), 'the overlay must cover the screen');
+
+  // T5's reduced-motion clause (the public/views/reader.js:110 precedent).
+  const rmAt = style.indexOf('@media (prefers-reduced-motion: reduce)');
+  assert.ok(rmAt >= 0, 'T5 requires the reduced-motion block');
+  const rmBlock = style.slice(rmAt, style.indexOf('\n  }', rmAt));
+  assert.ok(rmBlock.includes('.trophy-celebrate-card'),
+    'the celebration card must be named inside the reduced-motion block');
+
+  // T9: no sound in v1, anywhere on the celebration path.
+  for (const needle of ['new Audio(', '<audio', '.play(']) {
+    assert.ok(!src.includes(needle), 'T9 forbids sound, found ' + needle);
+  }
+
+  // the overlay markup: artwork + name. The tier is the RING, never a word.
+  const markupAt = src.indexOf('function celebrateHtml(');
+  assert.ok(markupAt >= 0, 'the overlay markup must live in celebrateHtml');
+  const markup = src.slice(markupAt, src.indexOf('\n}', markupAt));
+  assert.ok(markup.includes('src="/assets/trophies/${trophy.id}.webp"'), 'the overlay shows the artwork');
+  assert.ok(markup.includes('${trophy.name}'), 'the overlay shows the trophy name');
+  assert.ok(markup.includes('trophy-card--${tier}'), 'SK3-8: the tier is the ring class, not a word');
+  assert.ok(markup.includes('trophy-celebrate-art'), 'the overlay art carries its own size class');
+
+  // SK3-8: the module's Hebrew inventory is EXACTLY ten strings -- the eight
+  // trophy names, the screen title and the progress word. The celebration
+  // authors none, so a tier WORD would show up here as an eleventh.
+  const runs = src.match(/[\u0590-\u05ff]+(?: [\u0590-\u05ff]+)*/g) || [];
+  const distinct = new Set(runs);
+  assert.strictEqual(distinct.size, 10,
+    'expected exactly ten distinct Hebrew strings in the module, got ' + distinct.size);
+  assert.strictEqual(runs.length, 10, 'each of the ten appears exactly once, got ' + runs.length);
+});

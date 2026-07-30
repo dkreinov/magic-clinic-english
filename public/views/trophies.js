@@ -97,6 +97,43 @@ const VIEW_STYLE = `
     color: var(--color-muted);
     text-align: center;
   }
+
+  /* T5: the celebration overlay, appended by step 3.4. The stacking order is
+     deliberate -- BELOW the entry-code gate (public/styles.css:413) and ABOVE
+     the bottom nav (:331), so a celebration can never cover the login gate. */
+  .trophy-celebrate {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
+  .trophy-celebrate-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    background: var(--color-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    padding: 24px 20px;
+  }
+
+  /* The SAME square webp the shelf card shows, just bigger. The tier ring
+     arrives through the .trophy-card--<tier> layer class, so no new colour
+     and no new gate pair. */
+  .trophy-celebrate-art {
+    width: 168px;
+    height: 168px;
+  }
+
+  /* T5's reduced-motion clause, the public/views/reader.js:110 precedent. */
+  @media (prefers-reduced-motion: reduce) {
+    .trophy-celebrate-card { animation: none; transition: none; }
+  }
 `;
 
 // ---------------------------------------------------------------------------
@@ -272,14 +309,118 @@ export function screenHtml(profile) {
   `;
 }
 
+// ---------------------------------------------------------------------------
+// T5 -- the celebration, step 3.4. Nothing below runs at module top level, so
+// the module still imports cleanly in node (SK3-6): the DOM is touched only
+// inside showCelebration, and only when `document` exists.
+// ---------------------------------------------------------------------------
+
+// Design T5's storage contract, quoted: "'Already celebrated' lives in
+// localStorage (trophyCelebrated:<id>:<tier> = ISO)".
+function celebrationKey(id, tier) {
+  return `trophyCelebrated:${id}:${tier}`;
+}
+
+// Every localStorage access is wrapped in try/catch -- the public/api.js:3-9
+// precedent. Private mode THROWS on the very first access, and a throw must
+// never break the screen or the quiz. A read that throws means "not
+// celebrated": we fail towards SHOWING the overlay, never towards crashing.
+// There is exactly ONE try/catch on this path, on purpose -- a second, outer
+// one would swallow the first and make its removal undetectable.
+function readCelebrated(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch (err) {
+    return null;
+  }
+}
+
+// A write that throws means "could not record it": the overlay was still
+// shown, and this phone will simply show it again. public/api.js:54-58.
+function writeCelebrated(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch (err) {
+    /* private mode -- the celebration just will not be remembered */
+  }
+}
+
+// The list itself, in TROPHY_VIEW order then TROPHY_TIERS_VIEW order
+// (bronze, silver, gold). A trophy id present in the profile that this build
+// does not know is IGNORED, never shown (T1 forward compatibility).
+function collectUncelebrated(profile, read) {
+  const earnedMap = isPlainObject(profile) && isPlainObject(profile.trophies) ? profile.trophies : {};
+  const reader = typeof read === "function" ? read : readCelebrated;
+  const out = [];
+  for (const trophy of TROPHY_VIEW) {
+    const earned = earnedMap[trophy.id];
+    if (!isPlainObject(earned)) continue;
+    for (const tier of TROPHY_TIERS_VIEW) {
+      if (!Object.prototype.hasOwnProperty.call(earned, tier)) continue;
+      const seen = reader(celebrationKey(trophy.id, tier));
+      if (seen === null || seen === undefined || seen === "") out.push({ id: trophy.id, tier });
+    }
+  }
+  return out;
+}
+
+// The overlay markup: artwork + name (T5). The TIER IS THE RING (SK3-8), so
+// no tier word is authored -- this module's Hebrew inventory stays at the ten
+// strings step 3.2 extracted. The ring arrives through the same
+// .trophy-card--<tier> layer class the shelf card uses.
+function celebrateHtml(trophy, tier) {
+  return `
+      <div class="trophy-celebrate-card trophy-card--${tier}">
+        <img class="trophy-celebrate-art trophy-art" src="/assets/trophies/${trophy.id}.webp" alt="" />
+        <p class="trophy-name">${trophy.name}</p>
+      </div>`;
+}
+
+// document.body.appendChild -- the public/api.js:44 precedent -- so the
+// overlay survives the active view re-rendering its own container.innerHTML.
+// One tap anywhere dismisses it (public/views/reader.js:713-719). T9: this
+// path constructs no audio object and mounts no media element -- the step
+// gate greps this whole file for those two literals, so they may not appear
+// even inside a comment.
+function showCelebration(trophy, tier) {
+  if (typeof document === "undefined" || !document || !document.body) return;
+  const overlay = document.createElement("div");
+  overlay.className = "trophy-celebrate";
+  overlay.innerHTML = celebrateHtml(trophy, tier);
+  overlay.addEventListener("click", () => overlay.remove());
+  document.body.appendChild(overlay);
+}
+
+// SK3-10 as amended by P3-AMENDMENT #2 (owner ruling, 2026-07-30): show the
+// FIRST uncelebrated tier and mark ONLY THAT ONE, so the backlog DRAINS one
+// per earning moment instead of being discarded. Still exactly ONE overlay
+// per pass: no queue object, no parade, no state machine.
+function celebrateFirst(profile) {
+  const pending = collectUncelebrated(profile);
+  if (pending.length === 0) return null;
+  const shown = pending[0];
+  writeCelebrated(celebrationKey(shown.id, shown.tier), new Date().toISOString());
+  const trophy = TROPHY_VIEW.find((t) => t.id === shown.id);
+  if (trophy) showCelebration(trophy, shown.tier);
+  return shown;
+}
+
 // T5 lands in step 3.2's successor: these two are DECLARED here so steps 3.3
 // and 3.4 can name them, and their bodies are step 3.4's. This step ships no
 // celebration behaviour of any kind.
+// STEP 3.4, additive correction (the docs/growth.md:113 precedent): the two
+// bodies below are now live and delegate to the helpers above. Step 3.4's
+// deletion budget for this file is ZERO, so every line of the declarations
+// step 3.2 wrote survives verbatim and the new work is inserted around it.
 export function uncelebrated(profile, read) {
+  const pending = collectUncelebrated(profile, read);
+  if (pending.length > 0) return pending;
   return [];
 }
 
 export function maybeCelebrateTrophy(profile) {
+  const shown = celebrateFirst(profile);
+  if (shown !== null) return shown;
   return null;
 }
 

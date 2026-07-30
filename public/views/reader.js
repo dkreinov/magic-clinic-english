@@ -3,6 +3,7 @@ import { resolveLemma } from "../lemma.js";
 import { getAllowedSet } from "../words-index.js";
 import { startQuiz } from "../quiz.js";
 import { pickQuizWords, knownSetFromProfile, pickCandidateWords } from "../quiz-core.js";
+import { maybeCelebrateTrophy } from "./trophies.js";
 
 const CHAPTER_BANNERS = { 0: "chapter-night", 1: "chapter-clinic", 2: "chapter-forest" };
 
@@ -380,11 +381,27 @@ export async function render(container, ctx) {
       generating = false;
       stage = "chapter";
       draw();
+      await celebrateFromServer();
     } catch (err) {
       generating = false;
       genError = true;
       draw();
     }
+  }
+
+  // T5 + SK3-2. api/chapter.js:66 returns { chapter } and NO profile, so the
+  // phone asks once. Read into a LOCAL: reassigning the module-scope `profile`
+  // here would silently change what latestChapter(), decideStage() and the
+  // already-computed lemmas/knownSet see. A profile provably exists by now
+  // (the server just saved one), so this GET creates nothing.
+  async function celebrateFromServer() {
+    let fresh;
+    try {
+      fresh = await getJson("/api/profile");
+    } catch (err) {
+      return;
+    }
+    maybeCelebrateTrophy(fresh);
   }
 
   function renderLoading() {
@@ -736,9 +753,10 @@ export async function render(container, ctx) {
           knownSet,
           candidateSet,
           count: 4,
-          onDone: () => {
+          onDone: async ({ total }) => {
             qs.done = true;
             draw();
+            if (total > 0) await celebrateFromServer();
           },
         });
       }
