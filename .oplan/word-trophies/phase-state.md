@@ -18,7 +18,10 @@ ACCEPTED (phase 2): 2.1+open 42cbcd5 · 2.2+2.3 67638bf · 2.4 f48e77e · 2.5 83
 STATE OF THE TREE: suite 328 reported / 323 flat / 0 fail (both modes) · contrast 52 ·
   CACHE magic-vet-v17 live AND worktree, public/sw.js md5 f16579d50af8b49a04e45a80975c6acf
   (NOT bumped in phase 2 — see the carried obligation below) · transcripts EMPTY ·
-  no .data/profile.json · NO D25 capture exists (english-app-backups/ empty; phase 4 makes one)
+  no .data/profile.json · A D25 CAPTURE NOW EXISTS, taken early on the owner's authorisation
+  2026-07-30: profile-20260730-114016.json, 13295 bytes, sha256 4e7fe8bc..., HTTP 200, no leak.
+  Phase 4 must still decide whether to re-capture immediately before its deploy (this one will
+  be stale by then) -- but the ritual is proven and the frozen command form works as written.
 PUBLIC/ PINS (both valid, they measure different things):
   · FULL recursive digest, the pin phase 3 inherits:  2371 644f333395566079ef6d0441438c7a4a
   · EXCLUSION digest (everything OUTSIDE public/assets/trophies/), valid forever, unchanged

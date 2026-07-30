@@ -731,3 +731,62 @@ that the tree moved 2ee5ca6 -> 86ae76e with a diff proving no measurement went s
 
 tokens: planner(lost pass) ~unknown · planner=277977 · reviewer=188875.
 AWAITING: owner go-ahead for phase-3 execution.
+
+## D25 CAPTURE TAKEN EARLY (2026-07-30, owner-authorised)
+
+The owner asked what she has already earned. That could not be answered from files -- no capture
+had ever been taken -- so the owner authorised the read. Phase 4 needs this capture regardless;
+it simply happened earlier.
+
+METHOD: the FROZEN capture command from .oplan/word-quiz/plan.md:1573-1586, verbatim, no
+improvisation. The subshell ( set -a; . ./.env; set +a; curl ... ) is the load-bearing part:
+APP_CODE is sourced INSIDE the parentheses and dies with the subshell. The owner also supplied
+the code in chat; it was NOT used and was never written to any file -- .env already held it, so
+the secret never entered a command line. Post-assertions: APP_CODE unset before AND after
+(isAuthorized is open only when it is UNSET, and a leak silently 401s the whole suite);
+no .data/profile.json; repo clean.
+
+RECEIPT (never contents):
+  file   /c/Users/dkreinov/english-app-backups/profile-20260730-114016.json
+  HTTP   200
+  bytes  13295
+  sha256 4e7fe8bca4ac6d577970b69bc047363603b78c6838efe83c9fce999ed080a597
+  profile top-level keys: version, learner, skills, words, placement, story, meta
+  trophies key present: NO (correct -- phase 1's engine is committed but NOT deployed;
+  production still runs the pre-trophies code at CACHE v17)
+DISCLOSED, as the frozen recipe states: this GET can rewrite her stored file into sorted-key
+order -- byte-identical to what her own app does on every load.
+
+WHAT LANDS ON THE FIRST AWARD PASS -- computed with the SHIPPED TROPHY_CATALOG imported from
+lib/profile.js, never a re-implementation (lesson 2), and cross-checked by actually running
+awardTrophies() over a copy (4 stamped, AGREES with the table):
+
+  trophy     count  b/s/g      day one   next
+  chapters   3      5/15/40    LOCKED    2 more to bronze
+  days       3      3/10/30    bronze    7 more to silver
+  streak     2      2/4/7      bronze    2 more to silver
+  known      12     5/15/30    bronze    3 more to silver
+  quizRight  3      10/40/100  LOCKED    7 more to bronze
+  quizzer    5      20/60/150  LOCKED    15 more to bronze
+  curious    28     25/75/200  bronze    47 more to silver
+  proven     0      1/5/15     LOCKED    1 more to bronze
+
+  TOTAL: 4 tiers, all BRONZE, across 4 of the 8 trophies. FOUR, not the "six or eight" the
+  phase-3 planner estimated in SK3-10 and not the "~6" the orchestrator repeated to the owner as
+  if measured. Both were guesses; this is the measurement. The orchestrator's overstatement was
+  corrected to the owner in the same message that reported these numbers.
+
+DESIGN T3'S HONESTY NOTES ARE NOW VERIFIED, not assumed: "she has 12 known today -> אוצרת מילים
+bronze lands on the first award pass" is EXACTLY right (12), and "proven stays 0 until G1
+nominates (candidates=0 today)" is EXACTLY right (0). design.md:98-100 stands as written.
+
+CONSEQUENCE FOR SK3-10 (the day-one backfill rule): the problem it was designed against -- a
+parade of six or eight overlays -- does not exist at this size. Four bronze panels is a different
+question from eight, and it is the owner's call, now being put to him with the real numbers.
+Whatever he rules, SK3-10's selection rule is a few lines inside one view function and changes
+no storage and no engine behaviour.
+
+ALSO WORTH PHASE 4'S ATTENTION: four trophies sit within a few actions of their next tier
+(chapters 2, proven 1, streak 2, known 3). The read-back rule (T8) says a tier may APPEAR
+between capture and read-back only with accompanying activity evidence -- with margins this thin,
+that is likely to happen legitimately, and must not be mistaken for a bug.
