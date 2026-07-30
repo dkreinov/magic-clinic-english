@@ -35,6 +35,60 @@ never pitched younger than 11**.
 
 ## 3. Color palette (tokens to artwork) — AMENDED 2026-07-24
 
+**CORRECTION 2026-07-30 (word-trophies phase 3, T10).** `public/styles.css` is the SOURCE OF
+TRUTH for every token value in this app. Everything in this section below this block -- the
+2026-07-24 amendment paragraph, the token table, the 2026-07-25 background amendment and the
+Superseded table -- is a HISTORICAL RECORD of the sampling method and of the values as they
+stood on 2026-07-24. It is not a live specification, and the values it records are no longer
+the values the app ships.
+
+The live palette, since the visual-polish run, is **Sunrise Parchment**: a LIGHT warm ground
+carrying dark ink -- NOT the warm-DARK ground that the table below records. Read every value
+from `public/styles.css`; the table below tells you only how the 2026-07-24 palette was
+sampled, not what the app paints today.
+
+Live `:root` values, read from `public/styles.css` lines 1-31 at correction time
+(2026-07-30):
+
+| Token | Live value (read from `public/styles.css`) |
+|---|---|
+| `--color-primary` | `#7b3fb5` |
+| `--color-teal` | `#086055` |
+| `--color-accent` | `#8a5600` |
+| `--color-bg` | `#fff4e2` |
+| `--color-ink` | `#3a2412` |
+| `--radius` | `22px` |
+| `--color-primary-ink` | `#fff6e8` |
+| `--color-muted` | `#7a5a3c` |
+| `--color-card` | `#fffaf0` |
+| `--color-surface-2` | `#fdeed6` |
+| `--color-border` | `#96682f` |
+| `--color-nav` | `#fff8ec` |
+| `--color-danger` | `#b3341c` |
+| `--color-glow` | `#ffd98a` |
+| `--color-bg-top` | `#ffe9c9` |
+| `--color-bg-glow-violet` | `#f3e4fb` |
+| `--color-bg-glow-teal` | `#dff4ee` |
+| `--color-bg-glow-amber` | `#ffe4b5` |
+| `--shadow-soft` | `0 0 0 1px rgba(150, 104, 47, 0.16), 0 6px 18px rgba(120, 78, 30, 0.13)` |
+| `--nav-height` | `68px` |
+| `--transition-fast` | `150ms ease` |
+| `--color-bronze` | `#a4622a` |
+| `--color-silver` | `#6f6a63` |
+| `--color-gold` | `#9a7200` |
+
+Three of those tokens are new in this run: `--color-bronze`, `--color-silver` and
+`--color-gold`. They colour the non-text trophy TIER RINGS on the trophies screen --
+the tier is shown as a coloured ring, never as a word -- so they are held to the WCAG 1.4.11
+non-text minimum of 3:1 against both `--color-card` and `--color-surface-2` by
+`scripts/check-contrast.mjs`. They are never consumed through `color-mix()`, which fabricates
+a contrast pass.
+
+`tests/background.test.js:12-18` byte-pins the four background paint tokens
+(`--color-bg-top`, `--color-bg-glow-violet`, `--color-bg-glow-teal`, `--color-bg-glow-amber`)
+to their exact declared strings. This document can therefore go stale again -- as it did
+between 2026-07-24 and today -- but the CSS cannot drift silently underneath it.
+
 **Amendment (warm-dark re-theme, 2026-07-24):** the app moved off the light cream surface
 onto the artwork's own deep warm palette, so the illustrations bleed into the page instead of
 sitting as dark boxes on a pale ground. Every value below was sampled from
@@ -134,6 +188,13 @@ least 4.5:1 for body text, at least 3:1 for large text (>= 1.5rem, or >= 1.2rem 
 non-text control borders must meet 3:1 per WCAG 1.4.11. `node scripts/check-contrast.mjs`
 enforces this mechanically over 52 pairs, reads its token values live from `public/styles.css`,
 and must exit 0.
+
+**CORRECTION 2026-07-30 (word-trophies phase 3, T7).** The paragraph above is left exactly as
+written (SK3-9: this document is corrected additively, never rewritten), but its count is out
+of date: `scripts/check-contrast.mjs` now enforces the gate over **58 pairs**, not 52. The 58
+are the original 52 plus six non-text 3:1 pairs for `--color-bronze`, `--color-silver` and
+`--color-gold` against `--color-card` and `--color-surface-2`, measured at 4.63, 4.22, 5.15,
+4.69, 4.22 and 3.84 respectively.
 
 ## 4. Typography
 

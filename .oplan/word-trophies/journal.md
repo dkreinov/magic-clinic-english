@@ -1000,3 +1000,38 @@ drain harness above), the gate was honoured rather than relaxed, an in-code note
 the alternative is a gate amendment plus re-opening a passing mutation-tested step for a purely
 cosmetic gain. Root cause was a plan drafting artifact: "append-only" was written for 3.4 without
 accounting for the stubs 3.2 was told to ship.
+
+STEP 3.5 T10: the dated additive palette truth-fix in docs/visual-design.md — WORKER
+Two additive inserts spliced by script on bytes: a dated CORRECTION 2026-07-30 block after §3's
+heading recording that styles.css is the source of truth, that the live palette is Sunrise
+Parchment (a LIGHT warm ground, not the warm-dark one the table below records), the full live
+:root table, the three tier tokens with their WCAG 1.4.11 basis, and the background.test.js pin;
+plus a second dated note recording the 58-pair gate. LF 403 -> 464, +61/-0. Test file +48/-0,
++1 flat (18 total). Ledger 340/345 -> 341 flat / 346 reported — the phase's final number.
+gate-3.5.sh exit 0.
+
+EVERY COLOUR VALUE WAS READ FROM public/styles.css BY THE SPLICE SCRIPT, never transcribed —
+which is the whole point of a step whose subject is a document that stated untrue values. The
+worker cross-checked the plan's seventeen quoted hexes against the live CSS first: all seventeen
+matched.
+
+WORKER FINDING (good, and inside scope): the plan's "at minimum" hex list was INCOMPLETE for the
+test it mandates — :root also declares --color-primary-ink: #fff6e8, which the plan did not list,
+and test 18 requires EVERY 6-digit-hex token to appear in the doc. Recording only the seventeen
+would have failed the step's own gate. The worker recorded all 24 :root declarations. Also noted:
+the plan cites styles.css:1-24 as the :root range; it is :1-31 today because step 3.1 added the
+three tier tokens, and the inserted block cites the computed range rather than the stale one.
+
+FAIL-FIRST: M3.5a (--color-card #fffaf0 -> #fffaf1 in the STYLESHEET) failed with
+"docs/visual-design.md does not record the live value of --color-card (#fffaf1)" — i.e. the test
+detects the doc drifting from the stylesheet, which is exactly T10's failure mode; M3.5b (removing
+the date, all THREE occurrences, the strongest form) failed with "the correction must carry its
+date"; M3.5c (deleting the proven.png inventory row) failed with "the trophy inventory row for
+proven must survive". All restored, md5-verified.
+
+ORCHESTRATOR AUDIT (independent): parsed the LIVE :root (24 declarations, 20 of them 6-digit hex)
+and confirmed every live hex value now appears in the doc — so the document no longer contradicts
+the stylesheet on a single token. All 404 original lines survive IN ORDER byte-identical (0 lost,
+0 reordered), which is stronger than "deletions == 0". §6 and §7 — the sections phase 2 wrote —
+extracted from both versions and compared whole: byte-identical. The FROZEN STYLE SUFFIX still
+extracts to 388 bytes md5 51b97a774dc52aa272850bb686c22188. CRLF=0. ACCEPTED.

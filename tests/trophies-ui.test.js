@@ -732,3 +732,51 @@ test('the celebration honours reduced motion, adds no sound, and sits below the 
     'expected exactly ten distinct Hebrew strings in the module, got ' + distinct.size);
   assert.strictEqual(runs.length, 10, 'each of the ten appears exactly once, got ' + runs.length);
 });
+
+// Phase 3, step 3.5 -- T10: the dated, ADDITIVE palette truth-fix in
+// docs/visual-design.md. This asserts the correction is TRUE, not merely
+// present: every 6-digit-hex token declared in the styles.css :root block must
+// appear verbatim in the doc, so the day a token moves without being recorded,
+// this fails.
+test('docs/visual-design.md carries the dated palette correction, cites styles.css as the source of truth, and records the 58-pair gate', () => {
+  const doc = readFileSync(path.join(root, 'docs', 'visual-design.md'), 'utf8');
+  const css = readFileSync(cssPath, 'utf8');
+
+  const rootMatch = css.match(/:root\s*\{([\s\S]*?)\}/);
+  assert.ok(rootMatch, 'could not find the :root block in public/styles.css');
+  const decls = rootMatch[1].match(/--[a-z0-9-]+\s*:\s*[^;]+;/g) || [];
+  assert.ok(decls.length >= 20, 'expected at least 20 :root declarations, got ' + decls.length);
+  let hexCount = 0;
+  for (const decl of decls) {
+    const parts = decl.match(/(--[a-z0-9-]+)\s*:\s*([^;]+);/);
+    const name = parts[1];
+    const value = parts[2].trim();
+    if (!/^#[0-9a-f]{6}$/i.test(value)) continue;
+    hexCount++;
+    assert.ok(doc.includes(value),
+      'docs/visual-design.md does not record the live value of ' + name + ' (' + value + ')');
+  }
+  assert.ok(hexCount >= 20, 'expected at least 20 six-digit-hex tokens in :root, got ' + hexCount);
+
+  // the correction is dated
+  assert.ok(doc.includes('2026-07-30'), 'the correction must carry its date');
+
+  // styles.css is named as the source of truth right under the section-3 heading
+  const docLines = doc.split(String.fromCharCode(10));
+  const h3 = docLines.findIndex((l) => l.indexOf('## 3.') === 0);
+  assert.ok(h3 >= 0, 'the section-3 heading is missing');
+  const near = docLines.slice(h3 + 1, h3 + 41).join(String.fromCharCode(10));
+  assert.ok(near.includes('public/styles.css'),
+    'public/styles.css must be cited as the source of truth within 40 lines of the section-3 heading');
+
+  // the gate size correction
+  assert.ok(/58\W{0,4}pairs/.test(doc), 'the doc must record the 58-pair contrast gate');
+
+  // phase 2's output must have survived a strictly additive edit
+  assert.ok(doc.includes('### FROZEN STYLE SUFFIX'), 'the FROZEN STYLE SUFFIX heading must survive');
+  const trophyIds = ['chapters', 'days', 'streak', 'known', 'quizRight', 'quizzer', 'curious', 'proven', 'shelf-header'];
+  for (const id of trophyIds) {
+    assert.ok(doc.includes('assets/delight/trophies/' + id + '.png'),
+      'the trophy inventory row for ' + id + ' must survive');
+  }
+});
