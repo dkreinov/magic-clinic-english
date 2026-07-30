@@ -83,3 +83,23 @@ FROZEN CONTRACTS IN FORCE: everything in .oplan/word-g1/phase-state.md:34-42 · 
   two planners re-measured).
 OPEN QUESTIONS: phase-4 go-ahead — owner.
 BLOCKED: no.
+
+ROLLBACK (code only) — the deployment live before phase 4, exactly as `vercel inspect` reported it
+(copied verbatim from $HOME/trophies-deploy/outgoing.txt, never retyped from memory — lesson 10):
+  id     = dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw
+  url    = https://english-qh5ne6g96-dkreinovs-projects.vercel.app
+  alias  = https://english-app-three-tan.vercel.app
+  status = Ready · target production · created Tue Jul 28 2026 17:53:37 GMT+0300
+  commit = NOT REPORTED. `vercel inspect` printed no commit line for this deployment; recorded as
+           absent rather than invented. The id and url above are the rollback target and are
+           sufficient — the commit was only ever corroboration.
+  THE COMMAND:
+    "$(npm prefix -g)/vercel" rollback https://english-qh5ne6g96-dkreinovs-projects.vercel.app --yes
+  vercel rollback restores CODE ONLY. There is NO restore path for her profile (D27) — if her data
+  is damaged, rolling back the code does not bring it back. The capture is the only copy.
+
+LIVE BASELINE AT 4.1 (unauthenticated, read-only; $HOME/trophies-deploy/live-baseline.txt):
+  /sw.js -> const CACHE = "magic-vet-v17"
+  /api/health -> {"ok":true,"data":{"status":"up","version":1}} (byte-exact)
+  /api/chapter -> 401 · 14 of 15 PRECACHE paths 200 · /views/trophies.js 404 · all nine
+  /assets/trophies/*.webp 404. Nothing from this run has shipped.
