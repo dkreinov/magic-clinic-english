@@ -1035,3 +1035,87 @@ the stylesheet on a single token. All 404 original lines survive IN ORDER byte-i
 0 reordered), which is stronger than "deletions == 0". §6 and §7 — the sections phase 2 wrote —
 extracted from both versions and compared whole: byte-identical. The FROZEN STYLE SUFFIX still
 extracts to 388 bytes md5 51b97a774dc52aa272850bb686c22188. CRLF=0. ACCEPTED.
+
+STEP 3.6 THE SELF-SERVED VISUAL GATE — HALTED ON A BLOCKING DEFECT, THEN RESUMED
+Lesson 11 followed in order: port 3000 checked FIRST (free), a FABRICATED sandbox profile seeded
+outside the repo (never hers) chosen so all four card states appear at once — streak GOLD,
+known SILVER, days + quizRight BRONZE, chapters/quizzer/proven LOCKED — server run with
+DATA_DIR pointed at the sandbox and APP_CODE unset, service worker unregistered and caches
+cleared before looking.
+
+WHAT THE SCREEN GOT RIGHT (measured from the DOM, not eyeballed): all eight cards render with
+their artwork loaded at natural 640x640; rings resolve to the three frozen tokens
+(bronze rgb(164,98,42), silver rgb(111,106,99), gold rgb(154,114,0)) and locked to
+--color-border with filter grayscale(1) opacity 0.45 — four visually distinct states; progress
+lines read "7 מתוך 10", "15 מתוך 30", "0 מתוך 5"; GOLD cards correctly show NO progress line
+(SK3-4); the four nav tabs are /reader /home /words /trophies with the trophies tab last;
+the shelf-header banner crops well (SK3-3 gate PASSES, no fallback needed); and quizRight — the
+tightest-cropped of the nine, flagged at the phase-2 art gate — survives the circular mask with
+its target centred and nothing important cut. At a 320px column nothing clips and nothing
+overflows (verified after confirming there are NO width-based media queries anywhere in the
+shipped CSS, so constraining the column is a faithful simulation, not a substitute).
+
+*** THE DEFECT — found by the human gate, invisible to all 341 tests ***
+On #/trophies the overlay computed position:fixed z-index:90 display:flex — correct.
+On #/words the SAME overlay computed position:static z-index:auto display:block, no rule
+matching .trophy-celebrate existed in document.styleSheets at all, and it rendered as a raw
+640px image dumped inline at the bottom of the document flow.
+ROOT CAUSE: the house view pattern emits <style>${VIEW_STYLE}</style> INSIDE the view's own
+container.innerHTML (words.js:100, reader.js:246, placement.js:213, parent.js:53,
+trophies.js:299), so that CSS exists only while that view is mounted. The celebration is
+body-appended and fires ONLY from words.js and reader.js — i.e. only on routes where the
+trophies view is NOT mounted. In production it would have been unstyled 100% of the time; the
+one route whose CSS it needed is the one route it never fires on.
+WHY NO TEST SAW IT: test 17 asserted the celebration CSS TEXT exists inside VIEW_STYLE. It did.
+Nothing asserted the CSS was REACHABLE FROM THE DOCUMENT when the overlay appears. Field-guide
+lesson 1 exactly: a format gate standing in for a content gate — and the reason lesson 1 also
+says "if no gate can see the failure, add a human one".
+Per the step's own non-goal ("a defect found by the gate is a NEW STEP with its own frozen
+validation, not an in-place fix inside a gate") the gate was HALTED here.
+
+STEP 3.6a the fix — WORKER, authored by the orchestrator with its own frozen gate
+The ENTIRE VIEW_STYLE block moved from public/views/trophies.js into public/styles.css, inserted
+before the entry-code marker: styles.css CRLF 508 -> 622, trophies.js LF 439 -> 323 (VIEW_STYLE
+and the <style> emission both gone). Precedent: the app's only other body-level overlay, the
+entry-code gate, already lives in styles.css. The rule text was EXTRACTED from the live
+VIEW_STYLE and proven verbatim — md5 of the HEAD block unindented by two spaces equals md5 of
+the block now in styles.css (117382f2e47f447fe3aebacca1171170) — so no rule text changed, no
+contrast pair moved, and the 58 anchor held. Ledger 341/346 -> 342 flat / 347 reported.
+gate-3.6a.sh exit 0.
+
+M3.6a-0 IS THE POINT OF THE STEP: the new test was written FIRST and run against the UNFIXED
+tree, where it failed with
+  not ok 19 - the celebration is styled from the globally-linked stylesheet, not from a view that may not be mounted
+    'public/styles.css must carry .trophy-celebrate -- the overlay fires on routes where the
+     trophies view is not mounted'
+so the new gate provably sees the shipping defect. M3.6a-1 (re-adding a <style> emission) failed
+on assertion 2 as mandated.
+
+ORCHESTRATOR RE-VERIFICATION IN THE BROWSER — the only proof that counts. Sandbox restarted, hard
+reloaded (note: assigning location.href to the same URL with only a hash change does NOT reload
+the document; a cachebust query was needed — worth remembering). On #/words, the route that was
+broken: rule reachable TRUE, overlay position:fixed z-index:90 display:flex justify:center, art
+168px border-radius 50% border rgb(164,98,42). ONE tap dismissed it. Firing repeatedly drained
+streak/silver, streak/gold, known/bronze, known/silver, quizRight/bronze, curious/bronze,
+curious/silver, curious/gold and then returned null forever; 10 keys, all unique, never a repeat.
+The owner's one-per-sitting ruling holds in the real browser, on the real route, styled.
+
+P3-NOTE #7 (gate weakness, RULED, recorded not silently patched). The worker reported that
+M3.6a-2 (deleting the .trophy-celebrate rule) does NOT fail the new test's assertion 1, because
+assertion 1 is a CONTAINMENT check and ".trophy-celebrate" is a strict prefix of
+".trophy-celebrate-card", which survives. It did not silently strengthen frozen test text, and it
+showed the obvious fix is not uniform: four of the nine selectors appear in a comma-separated
+list and never occur followed by " {". RULED: accept for now — the deletion IS still caught, by
+test 17, which failed exactly as mandated; and the new test's actual purpose (catch view-only
+CSS) is proven by M3.6a-0. Remedy if hardened later: per-selector rule-shaped expectations
+(".trophy-celebrate {" for the five standalone rules, ".trophy-card--locked {" for the list
+terminator, ".trophy-card--bronze .trophy-art {" and siblings for the three rings).
+
+P3-NOTE #8 (cosmetic, OWNER'S CALL, deliberately not acted on). The overlay has NO dimmed
+backdrop — .trophy-celebrate is a transparent full-screen tap target, so the screen behind shows
+through around the card. It is functionally correct and matches the signed T5 text ("artwork +
+name + tier, one tap to dismiss"), but it reads as a floating card rather than a moment. Adding
+a scrim is a one-line token-only change. Left for the owner because it is taste on his
+daughter's screen, not a defect. Two stale comments also survived the verbatim move (a
+"public/styles.css:413" self-reference and a "the style tag" mention in screenHtml) — one-line
+corrections for a follow-up, left alone because "no rule text may change" was frozen.

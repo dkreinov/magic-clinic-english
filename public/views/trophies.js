@@ -22,120 +22,6 @@
 
 import { getJson } from "../api.js";
 
-const VIEW_STYLE = `
-  .trophies-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-  }
-
-  .trophy-card {
-    background: var(--color-card);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-soft);
-    padding: 16px 12px;
-  }
-
-  /* The tier layer. It carries the modifier class and lays the card out, so the
-     frozen descendant selectors below apply and the card element itself stays a
-     plain .trophy-card. */
-  .trophy-card--bronze,
-  .trophy-card--silver,
-  .trophy-card--gold,
-  .trophy-card--locked {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
-
-  /* The box is SQUARE and every source webp is 640x640 square, so object-fit:
-     cover crops NOTHING -- not even quizRight, the tightest-framed of the nine. */
-  .trophy-art {
-    width: 96px;
-    height: 96px;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 3px solid var(--color-border);
-  }
-
-  /* T7: the three tier tokens are consumed ONLY as var(--color-...). They are
-     never blended, because a blended colour fabricates a contrast pass. */
-  .trophy-card--bronze .trophy-art {
-    border-color: var(--color-bronze);
-  }
-
-  .trophy-card--silver .trophy-art {
-    border-color: var(--color-silver);
-  }
-
-  .trophy-card--gold .trophy-art {
-    border-color: var(--color-gold);
-  }
-
-  /* T4: a locked trophy is the SAME artwork dimmed -- no separate locked asset.
-     Its ring stays var(--color-border), a pair already gated at 3:1 on card. */
-  .trophy-card--locked .trophy-art {
-    filter: grayscale(1);
-    opacity: 0.45;
-  }
-
-  .trophy-name {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--color-ink);
-    text-align: center;
-  }
-
-  /* T9: progress is plain text. No progress-bar component, no chart machinery. */
-  .trophy-progress {
-    margin: 0;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--color-muted);
-    text-align: center;
-  }
-
-  /* T5: the celebration overlay, appended by step 3.4. The stacking order is
-     deliberate -- BELOW the entry-code gate (public/styles.css:413) and ABOVE
-     the bottom nav (:331), so a celebration can never cover the login gate. */
-  .trophy-celebrate {
-    position: fixed;
-    inset: 0;
-    z-index: 90;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px 16px;
-  }
-
-  .trophy-celebrate-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    background: var(--color-card);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-soft);
-    padding: 24px 20px;
-  }
-
-  /* The SAME square webp the shelf card shows, just bigger. The tier ring
-     arrives through the .trophy-card--<tier> layer class, so no new colour
-     and no new gate pair. */
-  .trophy-celebrate-art {
-    width: 168px;
-    height: 168px;
-  }
-
-  /* T5's reduced-motion clause, the public/views/reader.js:110 precedent. */
-  @media (prefers-reduced-motion: reduce) {
-    .trophy-celebrate-card { animation: none; transition: none; }
-  }
-`;
-
 // ---------------------------------------------------------------------------
 // The metric helpers, re-expressed from lib/profile.js for the view's single
 // job (SK3-6). Defensive in the engine's way: a missing words map, a non-object
@@ -296,8 +182,6 @@ export function screenHtml(profile) {
   const trophies = isPlainObject(profile) && isPlainObject(profile.trophies) ? profile.trophies : {};
   const cards = TROPHY_VIEW.map((trophy) => cardHtml(trophy, profile, trophies)).join("");
   return `
-    <style>${VIEW_STYLE}</style>
-
     <img class="hero-banner" src="/assets/trophies/shelf-header.webp" alt="" />
 
     <header class="app-header">

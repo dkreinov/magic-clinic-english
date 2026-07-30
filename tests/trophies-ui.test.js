@@ -63,7 +63,22 @@ test('the contrast gate covers the six tier-ring pairs at 3:1 and prints exactly
 // tests/words-ui.test.js sets, so this block is a pure append.
 
 const trophiesViewPath = path.join(root, 'public', 'views', 'trophies.js');
-const VIEW_STYLE_RE = /const VIEW_STYLE = `([\s\S]*?)`;/;
+// Step 3.6a: the trophy rules moved OUT of the view and INTO the globally-
+// linked stylesheet, because the celebration overlay is body-appended and
+// fires ONLY on routes where the trophies view is not mounted. Every
+// assertion below that scanned VIEW_STYLE now scans the same rule text in
+// public/styles.css; the meanings are unchanged, only the source file is.
+const TROPHY_CSS_MARKER = '/* ---------- Trophies screen and celebration ---------- */';
+const ENTRY_CSS_MARKER = '/* ---------- Entry code gate ---------- */';
+
+function trophyCss() {
+  const css = readFileSync(cssPath, 'utf8');
+  const from = css.indexOf(TROPHY_CSS_MARKER);
+  assert.ok(from >= 0, 'public/styles.css must carry the trophies section marker');
+  const to = css.indexOf(ENTRY_CSS_MARKER);
+  assert.ok(to > from, 'the trophy rules must sit BEFORE the entry-code gate section');
+  return css.slice(from + TROPHY_CSS_MARKER.length, to);
+}
 const T32_ISO = '2026-01-01T00:00:00.000Z';
 
 function t32Profile(words, chapters) {
@@ -301,27 +316,23 @@ test('a locked trophy is the same artwork dimmed by CSS, never a second asset', 
   assert.ok(!html.includes('-grey'), 'no -grey artwork path may appear');
   assert.ok(!html.includes('.png'), 'no second artwork format may appear');
 
-  const style = readFileSync(trophiesViewPath, 'utf8').match(VIEW_STYLE_RE);
-  assert.ok(style, 'could not find VIEW_STYLE');
-  const lockedAt = style[1].indexOf('.trophy-card--locked .trophy-art');
-  assert.ok(lockedAt >= 0, 'VIEW_STYLE must dim the locked artwork');
-  const lockedBlock = style[1].slice(lockedAt, style[1].indexOf('}', lockedAt));
+  const style = trophyCss();
+  const lockedAt = style.indexOf('.trophy-card--locked .trophy-art');
+  assert.ok(lockedAt >= 0, 'public/styles.css must dim the locked artwork');
+  const lockedBlock = style.slice(lockedAt, style.indexOf('}', lockedAt));
   assert.ok(lockedBlock.includes('grayscale('), 'the locked rule must grayscale the same artwork');
   assert.ok(lockedBlock.includes('opacity:'), 'the locked rule must dim the same artwork');
 });
 
 test('the trophies VIEW_STYLE is token-only and the screen has no progress bar or chart', async () => {
   const { screenHtml } = await import('../public/views/trophies.js');
-  const src = readFileSync(trophiesViewPath, 'utf8');
-  const styleMatch = src.match(VIEW_STYLE_RE);
-  assert.ok(styleMatch, 'could not find VIEW_STYLE');
-  const style = styleMatch[1];
+  const style = trophyCss();
 
-  assert.ok(!style.includes('#'), 'VIEW_STYLE must not contain a raw hex color');
-  assert.ok(!style.includes('color-mix('), 'VIEW_STYLE must not use color-mix()');
-  assert.ok(!style.includes('background-image'), 'VIEW_STYLE must not use background-image');
+  assert.ok(!style.includes('#'), 'the trophy rules must not contain a raw hex color');
+  assert.ok(!style.includes('color-mix('), 'the trophy rules must not use color-mix()');
+  assert.ok(!style.includes('background-image'), 'the trophy rules must not use background-image');
   for (const token of ['var(--color-bronze)', 'var(--color-silver)', 'var(--color-gold)']) {
-    assert.ok(style.includes(token), `VIEW_STYLE must consume ${token}`);
+    assert.ok(style.includes(token), `the trophy rules must consume ${token}`);
   }
 
   // T9: no progress bars, no chart machinery.
@@ -689,14 +700,12 @@ test('the celebration is hooked at exactly the three designed moments, guarded o
 
 test('the celebration honours reduced motion, adds no sound, and sits below the entry-code gate', () => {
   const src = readFileSync(trophiesViewPath, 'utf8');
-  const styleMatch = src.match(VIEW_STYLE_RE);
-  assert.ok(styleMatch, 'could not find VIEW_STYLE');
-  const style = styleMatch[1];
+  const style = trophyCss();
 
   // z-index 90: below the entry-code gate (public/styles.css:413), above the
   // bottom nav (:331). A celebration must never cover the login gate.
   const overlayAt = style.indexOf('.trophy-celebrate {');
-  assert.ok(overlayAt >= 0, 'VIEW_STYLE must carry the .trophy-celebrate overlay rule');
+  assert.ok(overlayAt >= 0, 'public/styles.css must carry the .trophy-celebrate overlay rule');
   const overlayRule = style.slice(overlayAt, style.indexOf('}', overlayAt));
   assert.ok(overlayRule.includes('z-index: 90'), 'the overlay must sit at z-index 90');
   assert.ok(!overlayRule.includes('100'), 'the overlay must stay BELOW the entry-code gate');
@@ -705,7 +714,7 @@ test('the celebration honours reduced motion, adds no sound, and sits below the 
   // T5's reduced-motion clause (the public/views/reader.js:110 precedent).
   const rmAt = style.indexOf('@media (prefers-reduced-motion: reduce)');
   assert.ok(rmAt >= 0, 'T5 requires the reduced-motion block');
-  const rmBlock = style.slice(rmAt, style.indexOf('\n  }', rmAt));
+  const rmBlock = style.slice(rmAt, style.indexOf('\n}', rmAt));
   assert.ok(rmBlock.includes('.trophy-celebrate-card'),
     'the celebration card must be named inside the reduced-motion block');
 
@@ -779,4 +788,42 @@ test('docs/visual-design.md carries the dated palette correction, cites styles.c
     assert.ok(doc.includes('assets/delight/trophies/' + id + '.png'),
       'the trophy inventory row for ' + id + ' must survive');
   }
+});
+
+// ===== step 3.6a: the celebration must be styled WHEREVER IT FIRES ==========
+// The step-3.6 visual gate measured what every mechanical gate missed: the
+// overlay is document.body.appendChild-ed and fires from words.js and
+// reader.js, i.e. only ever on routes where the trophies view is NOT mounted,
+// so a view-local style block emitted inside container.innerHTML is never in
+// the document when the celebration appears. Test 17 asserted the CSS TEXT
+// EXISTED; nothing asserted it was REACHABLE. This is that assertion.
+test('the celebration is styled from the globally-linked stylesheet, not from a view that may not be mounted', () => {
+  const css = readFileSync(cssPath, 'utf8');
+  const view = readFileSync(trophiesViewPath, 'utf8');
+  const html = readFileSync(t33IndexPath, 'utf8');
+  const sw = readFileSync(t33SwPath, 'utf8');
+
+  // 1. every rule the shelf and the celebration need is in the stylesheet
+  for (const selector of [
+    '.trophy-celebrate', '.trophy-celebrate-card', '.trophy-celebrate-art',
+    '.trophy-art', '.trophy-name',
+    '.trophy-card--bronze', '.trophy-card--silver', '.trophy-card--gold', '.trophy-card--locked',
+  ]) {
+    assert.ok(css.includes(selector),
+      'public/styles.css must carry ' + selector + ' -- the overlay fires on routes where the trophies view is not mounted');
+  }
+
+  // 2. the view carries no style block at all, so no rule can be view-local
+  assert.ok(!view.includes('<style>'),
+    'public/views/trophies.js must emit no style block -- it only exists while that view is mounted');
+  assert.ok(!view.includes('VIEW_STYLE'),
+    'public/views/trophies.js must declare no VIEW_STYLE -- the rules live in public/styles.css');
+
+  // 3. the stylesheet really is always present: linked in the shell, precached
+  assert.ok(html.includes('href="/styles.css"'),
+    'public/index.html must link /styles.css on every route');
+  const precacheMatch = sw.match(/PRECACHE\s*=\s*(\[[\s\S]*?\])/);
+  assert.ok(precacheMatch, 'expected to find the PRECACHE array literal in sw.js');
+  assert.ok(JSON.parse(precacheMatch[1]).includes('/styles.css'),
+    'the service worker must precache /styles.css');
 });
