@@ -853,3 +853,53 @@ DECOY CHECK (the risk that a blind 52->58 sweep corrupted unrelated numbers): 52
 styles.css:47 and background.test.js:27, min-height: 52px still at styles.css:457, 0.7152 still
 at check-contrast.mjs:146, and there is no 58px or 0.7158 anywhere. No stale "passLines.length,
 52" remains in tests/. New test file re-measured: 2 flat tests, 0 non-ASCII bytes. ACCEPTED.
+
+STEP 3.2 public/views/trophies.js — the screen module (T4) — WORKER
+Created LF, 298 lines, 11452 bytes, md5 86a3f7196c5115bed6d1266a5fcbadc7. Exports the frozen
+shape; NO ../lib/ import (SK3-6 mirror + agreement test); nothing touches document/localStorage
+at module top level; uncelebrated/maybeCelebrateTrophy are stubs (3.4 fills them). Tests +7 flat
+(9 total in the file), append-only, 0 deletions, 0 raw non-ASCII bytes.
+Ledger 325/330 -> 332 flat / 337 reported · contrast 58 · public/ 2372 · gate-3.2.sh exit 0.
+All TEN Hebrew strings EXTRACTED, every length and decimal codepoint sum matching its SK3-8 pin
+with zero adjustments.
+
+FAIL-FIRST, all five observed failing, each restored to md5 86a3f719...: M3.2a (days bronze
+3->4) failed the catalogue-mirror deepStrictEqual; M3.2b (dropping lastSeen from the day union)
+failed the agreement test ON FIXTURE (e) exactly as predicted -- "days -- view says 3, engine
+says 4"; M3.2c (progress line non-empty at gold) failed the progress test; M3.2d (locked ->
+a second asset) failed BOTH the locked-artwork test and the artwork-presence test; M3.2e (raw
+hex in VIEW_STYLE) failed with "VIEW_STYLE must not contain a raw hex color".
+
+ORCHESTRATOR AUDIT (independent, run from a FILE after an inline attempt had its backslashes
+collapsed in transport -- lesson 8 biting the orchestrator live): the eight names were pulled out
+of the SIGNED design.md table and out of the WRITTEN view separately and compared CODEPOINT BY
+CODEPOINT -- all eight identical. That is the real proof of "never retyped": not that a script was
+used, but that the bytes on screen equal the bytes signed. Also verified: no ../lib/ reference,
+VIEW_STYLE 76 lines token-only (no raw hex, no color-mix(, no background-image), no separate
+locked asset, no persistence token (highWater/bestEver/maxSeen/sessionStorage all absent), view
+CRLF=0 LF=298, test file 9 flat tests and 0 raw non-ASCII. ACCEPTED.
+
+P3-NOTE #1 (orchestrator RULING on a real plan tension the worker surfaced rather than buried).
+Test 7 freezes the counted string `class="trophy-card"` WITH its closing quote = 8, while the
+frozen CSS uses DESCENDANT selectors (.trophy-card--locked .trophy-art). The house BEM form
+(class="trophy-card trophy-card--locked", cf. views/home.js:81) makes the counted string occur
+ZERO times, so the two frozen things cannot both hold with the modifier on the <article>. The
+worker put the modifier on a tier LAYER inside the card and flagged it.
+RULED: ACCEPT as built. Reasons, measured not assumed — every modifier rule either lays out the
+layer itself (flex) or targets the ART through a descendant selector; the card's own background,
+radius, shadow and padding come from .trophy-card on the <article> and are untouched. T4 asks for
+"the SAME artwork dimmed", and .trophy-card--locked .trophy-art { grayscale(1); opacity .45 }
+dims exactly the artwork either way. So the two structures are FUNCTIONALLY IDENTICAL; only the
+class name's placement is unconventional, and the code carries a comment saying why. The
+alternative would weaken a frozen test to an open-ended `class="trophy-card` match for a purely
+cosmetic gain, and would re-open a passing, mutation-tested implementation. Recommendation for
+any future rework: prefer BEM-on-article and amend test 7's counted string in the same change.
+
+P3-NOTE #2 (plan nit, no action): the step body says the extraction script prints TEN sums and
+the COMMANDS comment at plan.md:2469 says ELEVEN. Ten is right (8 names + tab label + the
+progress word), matching SK3-8's inventory. Recorded, not "fixed".
+
+P3-NOTE #3 (FIELD GUIDE candidate, found the hard way): a text-scanning assertion over a style
+block ALSO SEES COMMENTS. The worker's first build failed "VIEW_STYLE must not use color-mix()"
+on an explanatory COMMENT that used no colour at all. No VIEW_STYLE comment may name a forbidden
+construct. Same family as lesson 5's "color-mix fabricates a pass" -- the gate reads text, not CSS.
