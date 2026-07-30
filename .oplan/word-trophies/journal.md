@@ -816,4 +816,5 @@ celebrations spread across four earning moments -- days, streak, known, curious 
 not all at once. The T8 read-back must expect trophies to appear legitimately between capture and
 read-back anyway (four trophies sit 1-3 actions from their next tier).
 
-$BASE (phase 3) = be6eb82 (recorded at the go-ahead; the close diffs against it).
+$BASE (phase 3) = 802230f1b97aa2adbff154c3f8de7d7944af12f2 (the GO commit itself -- the last
+commit before any phase-3 code lands; the close diffs against it).
