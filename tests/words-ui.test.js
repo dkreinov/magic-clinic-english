@@ -158,7 +158,7 @@ test('words.js wires the play affordance, mark-known, and the token-only contras
   const stdout = result.stdout.toString();
   assert.ok(stdout.includes('ALL PASS'), 'contrast gate did not print ALL PASS');
   const passLines = stdout.split('\n').filter((l) => l.startsWith('PASS'));
-  assert.strictEqual(passLines.length, 52, `expected exactly 52 PASS lines, got ${passLines.length}`);
+  assert.strictEqual(passLines.length, 58, `expected exactly 58 PASS lines, got ${passLines.length}`);
 });
 
 // Phase 3 / WB-4: a row only offers a play button when a clip really exists.

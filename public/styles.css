@@ -21,6 +21,13 @@
   --shadow-soft: 0 0 0 1px rgba(150, 104, 47, 0.16), 0 6px 18px rgba(120, 78, 30, 0.13);
   --nav-height: 68px;
   --transition-fast: 150ms ease;
+
+  /* T7. Trophy tier rings. Non-text 3:1 against both --color-card and
+     --color-surface-2 (scripts/check-contrast.mjs). Never consumed through
+     color-mix(): color-mix fabricates a contrast pass. */
+  --color-bronze: #a4622a;
+  --color-silver: #6f6a63;
+  --color-gold: #9a7200;
 }
 
 * {

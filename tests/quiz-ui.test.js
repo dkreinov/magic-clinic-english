@@ -498,7 +498,7 @@ test('source and style: frozen strings, VIEW_STYLE token-only, contrast gate una
   const stdout = result.stdout.toString();
   assert.ok(stdout.includes('ALL PASS'), 'contrast gate did not print ALL PASS');
   const passLines = stdout.split('\n').filter((l) => l.startsWith('PASS'));
-  assert.strictEqual(passLines.length, 52, `expected exactly 52 PASS lines, got ${passLines.length}`);
+  assert.strictEqual(passLines.length, 58, `expected exactly 58 PASS lines, got ${passLines.length}`);
 });
 
 test('B6(iii): a demoted candidate gets the softer line, a demoted claim keeps its own, and neither appears without a demotion', async () => {

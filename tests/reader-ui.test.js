@@ -102,7 +102,7 @@ test('the play affordance: markup, wiring, CSS, and the contrast gate all hold',
   const out = result.stdout.toString();
   assert.ok(out.includes('ALL PASS'), 'contrast gate should print ALL PASS');
   const passLines = out.split('\n').filter((line) => line.startsWith('PASS'));
-  assert.strictEqual(passLines.length, 52, 'contrast gate should print exactly 52 PASS lines');
+  assert.strictEqual(passLines.length, 58, 'contrast gate should print exactly 58 PASS lines');
 });
 
 // Phase 3. The two decisions that are easy to get backwards, pinned by calling

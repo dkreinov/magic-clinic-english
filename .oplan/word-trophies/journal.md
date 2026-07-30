@@ -818,3 +818,38 @@ read-back anyway (four trophies sit 1-3 actions from their next tier).
 
 $BASE (phase 3) = 802230f1b97aa2adbff154c3f8de7d7944af12f2 (the GO commit itself -- the last
 commit before any phase-3 code lands; the close diffs against it).
+
+STEP 3.1 the three tier tokens, six gate pairs, anchor 52 -> 58 (T7) — WORKER
+Frozen blocks EXTRACTED from plan.md by the worker's script (the 7-line styles.css insert from
+:2160-2166, the six PAIRS from :1686-1691), shape-asserted before use, applied byte-preservingly
+via latin1 so no byte was transcoded. Every anchor required to occur EXACTLY ONCE.
+  styles.css   CRLF 501 -> 508 (insert-only), the three tokens LAST in :root
+  check-contrast.mjs  LF 184 -> 190 (insert-only), six new pairs
+  four "52" pins moved: quiz-ui:501, reader-ui:105, words-ui:161, README:45
+  tests/trophies-ui.test.js CREATED, LF, 0 non-ASCII, 2 FLAT tests
+  ledger 323/328 -> 325 flat / 330 reported · contrast 52 -> 58 · deletions 4 (as budgeted)
+Gate gate-3.1.sh (= §VAL-P3 extracted from the plan + the step tail extracted from the plan, by
+build-gate.js — neither retyped) exit 0.
+
+FAIL-FIRST, all four observed failing with their text recorded by the worker: M3.1a gold ->
+#d4af37 gave "FAIL ratio= 1.84 ... gold trophy ring on raised surface" and 2 failing tests;
+M3.1b deleting the silver pairs gave "expected exactly 58 PASS lines, got 56"; M3.1c moving
+--color-bronze out of :root gave "ERROR: token --color-bronze is missing from :root"; M3.1d
+reverting reader-ui:105 gave "58 !== 52". Every file restored and re-verified by md5.
+
+WORKER FINDING (honest, and correct): M3.1b's "and on the missing label" clause is NOT observable
+as the plan wrote it — the PASS-count assertion precedes the label loop and short-circuits it. The
+worker did not reorder or weaken the frozen test; it measured the underlying condition directly
+(grep 'silver trophy ring' = 0) and ran a SUPPLEMENTARY label-rename probe that holds the count at
+58 so only the label assertion can fire, observing "contrast gate must still cover the pair
+labelled ...". Recorded as a plan-quality note for phase 4/future runs, not a defect in the code.
+
+ORCHESTRATOR AUDIT (independent): the three tokens are inside :root with the frozen hexes, each
+hex occurring exactly once in the file. The six contrast ratios were RECOMPUTED FROM THE HEXES
+with a hand-written WCAG relative-luminance implementation (not the repo's gate, not the worker's
+numbers): bronze 4.63/4.22, silver 5.15/4.69, gold 4.22/3.84 against --color-card #fffaf0 and
+--color-surface-2 #fdeed6 — all >= 3:1, tightest is gold on the raised surface at 3.84.
+DECOY CHECK (the risk that a blind 52->58 sweep corrupted unrelated numbers): 520px still at
+styles.css:47 and background.test.js:27, min-height: 52px still at styles.css:457, 0.7152 still
+at check-contrast.mjs:146, and there is no 58px or 0.7158 anywhere. No stale "passLines.length,
+52" remains in tests/. New test file re-measured: 2 flat tests, 0 non-ASCII bytes. ACCEPTED.

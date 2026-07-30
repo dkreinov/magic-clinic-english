@@ -58,6 +58,12 @@ const PAIRS = [
   { fg: "--color-teal", bg: "--color-bg-glow-amber", min: 4.5, label: "teal text on page (amber glow)" },
   { fg: "--color-danger", bg: "--color-bg-glow-amber", min: 4.5, label: "error text on page (amber glow)" },
   { fg: "--color-border", bg: "--color-bg-glow-amber", min: 3, label: "control border on page, WCAG 1.4.11 (amber glow)" },
+  { fg: "--color-bronze", bg: "--color-card", min: 3, label: "bronze trophy ring on card (WCAG 1.4.11)" },
+  { fg: "--color-bronze", bg: "--color-surface-2", min: 3, label: "bronze trophy ring on raised surface (WCAG 1.4.11)" },
+  { fg: "--color-silver", bg: "--color-card", min: 3, label: "silver trophy ring on card (WCAG 1.4.11)" },
+  { fg: "--color-silver", bg: "--color-surface-2", min: 3, label: "silver trophy ring on raised surface (WCAG 1.4.11)" },
+  { fg: "--color-gold", bg: "--color-card", min: 3, label: "gold trophy ring on card (WCAG 1.4.11)" },
+  { fg: "--color-gold", bg: "--color-surface-2", min: 3, label: "gold trophy ring on raised surface (WCAG 1.4.11)" },
 ];
 
 function parseTokens(css) {

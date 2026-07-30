@@ -42,7 +42,7 @@ illustrations now.
 ## Design notes
 
 - **Hebrew-first, RTL throughout.** The interface language is Hebrew; the learning content is English.
-- **Accessibility is enforced, not assumed.** `scripts/check-contrast.mjs` mechanically checks 52
+- **Accessibility is enforced, not assumed.** `scripts/check-contrast.mjs` mechanically checks 58
   text/background pairs against WCAG AA and fails the build if any pair drops below threshold.
 - **Offline-capable PWA** with a precached shell and a versioned service-worker cache.
 - **No build step.** Plain ES modules served straight to the browser.
