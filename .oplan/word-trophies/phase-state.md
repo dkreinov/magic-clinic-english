@@ -1,81 +1,69 @@
-CURRENT: phase 2 "the assets" CLOSED (2026-07-30). Nine owner-approved trophy images are
-  committed as PNG masters and 640x640 webp derivatives; no app code, no test, no CSS, no CACHE
-  bump, no deploy. NEXT: phase 3 "the screen" is PLANNED and REVIEWED (fresh planner + fresh
-  reviewer, verdict "ship with fixes", P3-AMENDMENT #1 applied; committed at 0e5155d) — awaiting
-  the owner's GO. One open owner decision at the GO: the day-one celebration rule (SK3-10), now
-  informed by the real numbers from the 2026-07-30 capture (4 bronze tiers, not 6-8).
-PLAN: .oplan/word-trophies/plan.md (phases 1, 2 and 3 in full; phase 4 still the design §5
-  sketch. Phase 3 begins at the "# WORD-TROPHIES — PHASE 3 IN FULL" header, 7 steps.)
-DESIGN: design.md (SIGNED 2026-07-29) · JOURNAL: journal.md (PHASE 2 CLOSED block has the
-  rulings, the traps and every measurement) · BRIEFING: briefing.md · STATUS: STATUS.md ·
-  FIELD GUIDE: field-guide/index.md (73 lines; phase-2 close added lesson 13, the art-chat
-  driving recipe and its four silent no-op traps. NOTE: lesson 4's claim that public/sw.js is
-  LF is FALSE on disk — measured 2026-07-30, sw.js is CRLF=50 LF=0, and styles.css and
-  index.html are CRLF too; app.js and lib/*.js are LF. The phase-3 planner found this
-  independently. Amend lesson 4 at the phase-3 close.)
+CURRENT: phase 3 "the screen" CLOSED (2026-07-30). The trophies screen, the fourth nav tab, the
+  earn-moment celebration, the three tier tokens and CACHE v18 are all committed and gated.
+  NOTHING IS DEPLOYED — production still serves v17 and has never seen any of this.
+  NEXT: phase 4 "ship" — NOT PLANNED YET (design §5 sketch only; a fresh planner details it on
+  the owner's go-ahead).
+PLAN: .oplan/word-trophies/plan.md (phases 1, 2 and 3 in full; phase 4 still the design §5 sketch)
+DESIGN: design.md (SIGNED 2026-07-29) · JOURNAL: journal.md (PHASE 3 CLOSED block has the pins,
+  the rulings and the defect story) · BRIEFING: briefing.md · STATUS: STATUS.md ·
+  FIELD GUIDE: field-guide/index.md (89 lines; phase-3 close CORRECTED lesson 4's false
+  "sw.js is LF" claim and added lesson 14, view-scoped CSS cannot style a body-level element)
+LEARNER REQUESTS: .oplan/REQUESTS-FROM-THE-LEARNER.md — R1 read the word aloud on tap, R2 do not
+  reload the story when nothing changed. Neither is part of this run.
 BASE (phase 1): 1a30012991130cf0032c1743d0448a4c509509ac
 BASE (phase 2): fe1f78ab1d9e0b92d4d53208f117fa65f4c71c37
+BASE (phase 3): 802230f1b97aa2adbff154c3f8de7d7944af12f2
 ACCEPTED (phase 1): 1.1 f5212c5 · 1.2 344f0de · 1.3 d848aa7 · 1.4 3d19efb · closed 4966d89
-ACCEPTED (phase 2): 2.1+open 42cbcd5 · 2.2+2.3 67638bf · 2.4 f48e77e · 2.5 83e7587 · close <this>
-STATE OF THE TREE: suite 328 reported / 323 flat / 0 fail (both modes) · contrast 52 ·
-  CACHE magic-vet-v17 live AND worktree, public/sw.js md5 f16579d50af8b49a04e45a80975c6acf
-  (NOT bumped in phase 2 — see the carried obligation below) · transcripts EMPTY ·
-  no .data/profile.json · A D25 CAPTURE NOW EXISTS, taken early on the owner's authorisation
-  2026-07-30: profile-20260730-114016.json, 13295 bytes, sha256 4e7fe8bc..., HTTP 200, no leak.
-  Phase 4 must still decide whether to re-capture immediately before its deploy (this one will
-  be stale by then) -- but the ritual is proven and the frozen command form works as written.
-PUBLIC/ PINS (both valid, they measure different things):
-  · FULL recursive digest, the pin phase 3 inherits:  2371 644f333395566079ef6d0441438c7a4a
-  · EXCLUSION digest (everything OUTSIDE public/assets/trophies/), valid forever, unchanged
-    since the phase-1 close:                          2362 74e736d7d83b22a24945eae87cb9fe33
+ACCEPTED (phase 2): 2.1+open 42cbcd5 · 2.2+2.3 67638bf · 2.4 f48e77e · 2.5 83e7587 · closed 2ee5ca6
+ACCEPTED (phase 3): 3.1 dee596d · 3.2 d8ee456 · 3.3 48ee853 · 3.4 4acc8a2 · 3.5 915c107 ·
+  3.6a e6e02bf · closed <this>
 
-WHAT PHASE 2 SHIPPED (all nine owner-approved at the GC-D8 gate, 2026-07-30, verdicts and md5s
-in journal.md):
-  · assets/delight/trophies/<id>.png — nine masters, every one 1254x1254 square PNG, md5-distinct
-    from each other, from the nine existing assets/delight/*.png and from the style anchor.
-  · public/assets/trophies/<id>.webp — nine derivatives, every one 640x640, md5-distinct,
-    byte-reproducible (the build script was run four times; identical bytes every time).
-    Total 256146 bytes for all nine.
-  · scripts/optimize-trophies.js — new, LF-only (CRLF=0 LF=39), sharp / width 640 / quality 72 /
-    effort 4, a sibling of scripts/optimize-placement.js.
-  · docs/visual-design.md — +86 lines, 0 deleted: nine inventory rows, the nine prompts verbatim,
-    one pipeline bullet. §3 provably untouched.
+STATE OF THE TREE (all measured at the phase-3 close):
+  suite 347 reported / 342 flat / 0 fail, identical under APP_CODE=dummy · contrast anchor 58
+  both transcripts diff EMPTY · no .data/profile.json · lib/ api/ data/ untouched all phase
+  public/quiz.js 69b6d71117cf776715374abc6f0abb02 · public/quiz-core.js 9a2131be8b9d1b77c219f1e8c3482a71 (QZ-18)
 
-FOR PHASE 3 TO CONSUME (carried obligations — none of these are optional):
-  1. CACHE v17 -> v18 IS NOW MANDATORY IN PHASE 3, and it covers phase 2's public/ addition as
-     well as phase 3's own (SK2-3, ratified by the owner at the phase-2 GO). No deploy happens
-     before phase 4, so nothing is at risk in the meantime. tests/shell.test.js:58 pins the
-     CACHE string — it moves in the same step (lesson 7).
-  2. THE NINE FILENAMES ARE FROZEN. The eight trophy stems are the TROPHY_CATALOG ids in
-     lib/profile.js EXACTLY, camelCase included: chapters, days, streak, known, quizRight,
-     quizzer, curious, proven. Phase 3 builds the src as `/assets/trophies/${id}.webp`. The
-     ninth is shelf-header. Do not rename anything.
-  3. TROPHY ART IS NOT PRECACHED and must not be added to PRECACHE (design §2(iv), T6): artwork
-     is runtime-fetched. The v18 bump is for the shell, not for these files.
-  4. THE SHELF-HEADER IS SQUARE (1254x1254 master, 640x640 webp) and T4 never places it —
-     RECORD GAP 1 is still open. Phase 3 must RULE on its role, position and framing, and the
-     answer is CSS (object-fit / aspect-ratio), never a regeneration.
-  5. NO ASSET TEST EXISTS. Nothing mechanical would notice if a trophy webp were deleted
-     (SK2-7). Phase 3 introduces the references, so phase 3 adds the existence/distinctness test
-     and moves the ledger ONCE for the whole screen.
-  6. T10 (the docs/visual-design.md §3 palette truth-fix) IS UNASSIGNED BY DESIGN §5 and was
-     handed to phase 3 (SK2-6), which is the phase that works the palette (T7). It was
-     deliberately kept out of phase 2's diff and §3 is byte-identical to the phase-1 close.
-  7. THE LEDGER AND THE ANCHOR DID NOT MOVE: phase 3 starts from 323 flat / 328 reported and
-     contrast 52, exactly where phase 1 left them. T7's three tier tokens WILL move the 52
-     anchor; every pin of that number moves in the same step (design T7, the word-g1 28->52
-     precedent).
-  8. RECORD GAP 1 (the chapter response carries no profile — the celebration source ruling) and
-     risk 1 (progress comes from the LIVE metric, never a stored high-water mark, never shown as
-     a loss) are still open and belong to phase 3.
+PINS PHASE 4 MUST QUOTE (these REPLACE every earlier value):
+  public/ full digest    2372 7de2fc8a4ff87f57f1fa46e2f38912c9
+  public/sw.js           d76f781dc49c5f629aba0f2dfe3304b6   CACHE = "magic-vet-v18"
+  public/styles.css      c244d1aeb04b03b6f9781fc3be50c6c5
+  public/index.html      9976fb94ccda6eb5aa86d90335103337
+  public/app.js          bfa3a8837a2fcdcd1c85502e5f1a86fb
+  DEAD: the phase-1/2 EXCLUSION pin 2362 74e736d7d83b22a24945eae87cb9fe33 — five files inside
+  its scope moved this phase. Never quote it again.
+
+D25 CAPTURE: one exists, taken early on the owner's authorisation —
+  english-app-backups/profile-20260730-114016.json, 13295 bytes,
+  sha256 4e7fe8bca4ac6d577970b69bc047363603b78c6838efe83c9fce999ed080a597.
+  IT WILL BE STALE BY THE DEPLOY. Phase 4 re-captures with the frozen subshell recipe
+  (.oplan/word-quiz/plan.md:1573-1586), which has now run clean twice.
+
+FOR PHASE 4 TO CONSUME (carried obligations):
+  1. v18 IS IN THE WORKTREE, NOT LIVE. Production serves v17. The single bump covers phase 2's
+     assets and phase 3's shell. QZ-22's "returning devices serve the old shell forever" hazard
+     becomes real only at the deploy — which is phase 4's, and it is the first deploy of this run.
+  2. WHAT SHE SEES ON DAY ONE, MEASURED (not estimated): FOUR bronze celebrations — days, streak,
+     known, curious — one per earning moment, in catalogue order, never repeated. This is the
+     owner's P3-AMENDMENT #2 ruling and it was verified end to end in a real browser.
+  3. T8 READ-BACK RULE, sharpened: four trophies sit 1-3 actions from their next tier (chapters
+     2, proven 1, streak 2, known 3). Tiers WILL legitimately APPEAR between capture and
+     read-back, with activity evidence. Only a DISAPPEARING tier or a lost tier is a rollback.
+  4. THE ART IS RUNTIME-FETCHED AND NOT PRECACHED, by design. Nine webps under
+     public/assets/trophies/ are served but never in PRECACHE. A test now asserts this, and
+     asserts the nine filenames CASE-EXACTLY (Vercel is case-sensitive; existsSync here is not).
+  5. docs/visual-design.md:189 still says "over 52 pairs" ON PURPOSE (SK3-9) — history preserved
+     with a dated correction beside it recording 58. Do not "fix" it.
+  6. STILL OPEN, both the owner's call, neither blocking: P3-NOTE #7 (the 3.6a test's assertion 1
+     is a containment check, so it cannot see a single deleted rule — test 17 covers that
+     meanwhile; the remedy is written out in the journal) and P3-NOTE #8 (the celebration overlay
+     has no dimmed backdrop — it reads as a floating card; a one-line token-only change).
 
 FROZEN CONTRACTS IN FORCE: everything in .oplan/word-g1/phase-state.md:34-42 · signed design
-  T1-T10 as amended by SK-1..SK-6, amendment #3, SK2-1..SK2-8 and P2-NOTE #1..#4 · the engine's
-  frozen error strings · the never-regress law · workers never run git writes · the FROZEN STYLE
-  SUFFIX (388 bytes, md5 51b97a774dc52aa272850bb686c22188, heading `### FROZEN STYLE SUFFIX` at
-  docs/visual-design.md:197 — EXTRACTED by heading, never retyped; design's :190-195 line pin is
-  stale) · the ONE art chat (docs/visual-design.md:266) · GC-D8: the owner gates every image and
-  the verdict binds to an md5 · the .oplan awk filter is `awk '$NF !~ /^\.oplan\//'` (P2-NOTE #1:
-  plan.md:989's copy has collapsed backslashes and is a SYNTAX ERROR — never copy that line).
-OPEN QUESTIONS: phase-3 go-ahead — owner. Nothing else is blocked.
+  T1-T10 as amended by SK-1..SK-6, amendment #3, SK2-1..SK2-8, SK3-1..SK3-11, P2-NOTE #1..#4 and
+  P3-AMENDMENT #1..#3 · the never-regress law · workers never run git writes · the FROZEN STYLE
+  SUFFIX (388 bytes, md5 51b97a774dc52aa272850bb686c22188) · the ONE art chat · GC-D8 · the
+  .oplan awk filter is awk '$NF !~ /^\.oplan\//' (plan.md:989's copy is a SYNTAX ERROR) ·
+  MEASURE line endings, never remember them (lesson 4 was wrong and cost nothing only because
+  two planners re-measured).
+OPEN QUESTIONS: phase-4 go-ahead — owner.
 BLOCKED: no.

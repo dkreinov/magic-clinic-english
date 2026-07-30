@@ -1119,3 +1119,74 @@ a scrim is a one-line token-only change. Left for the owner because it is taste 
 daughter's screen, not a defect. Two stale comments also survived the verbatim move (a
 "public/styles.css:413" self-reference and a "the style tag" mention in screenHtml) — one-line
 corrections for a follow-up, left alone because "no rule text may change" was frozen.
+
+PHASE 3 CLOSED (2026-07-30)
+
+Every acceptance criterion re-run on the COMMITTED tree (gate-3.7.sh = §VAL-P3 verbatim + step
+3.5's assertion set + the frozen close block with BASE substituted). EXIT 0. Measured:
+  suite 347 reported / 0 fail / plan 1..342, identical under APP_CODE=dummy · flat ledger 342
+  contrast 58 PASS · public/ full pin 2372 7de2fc8a4ff87f57f1fa46e2f38912c9 (2371 + the one new
+  file public/views/trophies.js) · both transcripts diff EMPTY · no .data/profile.json ·
+  15 files changed vs BASE, 8 deletions total, ZERO files deleted, lib/ api/ data/ untouched ·
+  quiz.js 69b6d711... and quiz-core.js 9a2131be... unmoved (QZ-18) · endings all at their pins.
+
+P3-AMENDMENT #3 (orchestrator, at the close): the phase ledger is 342 flat / 347 reported, not
+the planned 341/346. Step 3.6a added exactly ONE flat test — the one that catches the defect the
+visual gate found. Nothing else in the pin set moved: 15 files and 8 deletions are exactly as
+planned, because git diff against BASE compares END STATES and trophies.js is a new file, so
+3.6a's internal churn (VIEW_STYLE out of the view, into styles.css) nets to zero against BASE.
+
+WHAT THIS PHASE SHIPPED
+  · public/views/trophies.js (NEW, LF, 323 lines) — the screen: shelf-header banner, one card per
+    trophy with artwork, the signed Hebrew name, a tier ring and a live progress line; locked
+    trophies are the SAME artwork dimmed; plus the celebration selection/drain logic.
+  · public/styles.css CRLF 501 -> 622 — three tier tokens in :root, and (from 3.6a) every trophy
+    and celebration rule, so body-level UI is styled on every route.
+  · scripts/check-contrast.mjs LF 184 -> 190 — six new non-text 3:1 pairs; anchor 52 -> 58.
+  · public/app.js, public/index.html, public/sw.js — route, fourth tab, PRECACHE, CACHE v18.
+  · public/views/words.js, public/views/reader.js — the three celebration hooks, each guarded.
+  · tests/trophies-ui.test.js (NEW, 829 lines, 19 flat tests, ZERO raw non-ASCII bytes).
+  · docs/visual-design.md +61/-0 — T10's dated palette correction.
+
+THE PHASE'S REAL LESSON. 341 automated tests passed on a celebration that would have been
+unstyled on every route it can actually fire on. The defect was invisible to every mechanical
+gate because the gate checked that the CSS TEXT existed, not that it was REACHABLE when the
+element appears. It took a human opening a browser. That is field-guide lesson 1 restated, and
+it is now lesson 14. The corollary worth carrying: when a step's gate and a step's purpose can
+be satisfied by different facts, the gate is measuring the wrong thing.
+
+Also corrected at this close: field-guide lesson 4 asserted public/sw.js is LF. It is CRLF, and
+so are styles.css and index.html. TWO INDEPENDENT PLANNERS caught this before any code moved —
+the reason the phase edited five CRLF files without a single normalisation.
+
+FOR PHASE 4 (ship) TO CONSUME
+  1. NEW PINS, all measured at this close and all REPLACING the phase-2 values:
+       public/ full digest   2372 7de2fc8a4ff87f57f1fa46e2f38912c9   (was 2371 644f3333...)
+       public/sw.js md5      d76f781dc49c5f629aba0f2dfe3304b6        (was f16579d5..., v17)
+       public/styles.css md5 c244d1aeb04b03b6f9781fc3be50c6c5
+       public/index.html md5 9976fb94ccda6eb5aa86d90335103337
+       public/app.js md5     bfa3a8837a2fcdcd1c85502e5f1a86fb
+     The phase-1/2 EXCLUSION pin 2362 74e736d7... is now DEAD — five files inside its scope moved.
+     Do not quote it again.
+  2. CACHE = "magic-vet-v18" IS IN THE WORKTREE BUT NOT LIVE. Production still serves v17. The
+     v18 bump covers phase 2's assets AND phase 3's shell. QZ-22's hazard becomes real only at
+     the deploy, which is phase 4's.
+  3. THE D25 CAPTURE OF 2026-07-30 WILL BE STALE. Re-capture immediately before deploying, with
+     the frozen subshell recipe (proven twice now). Receipt of the existing one is in this journal.
+  4. WHAT SHE WILL SEE ON DAY ONE, measured not guessed: FOUR bronze celebrations — days, streak,
+     known, curious — delivered ONE PER EARNING MOMENT (the owner's P3-AMENDMENT #2 ruling),
+     drained in catalogue order, never repeated. Verified end to end in the browser.
+  5. T8 READ-BACK: four trophies sit 1-3 actions from their next tier (chapters 2, proven 1,
+     streak 2, known 3), so tiers WILL legitimately appear between capture and read-back. That is
+     expected; only a DISAPPEARING tier is a rollback trigger.
+  6. docs/visual-design.md:189 still reads "over 52 pairs". That is DELIBERATE (SK3-9): the line
+     is preserved as history and a dated correction recording 58 sits beside it. Do not "fix" it.
+  7. Still open and unactioned: P3-NOTE #7 (the new test's assertion 1 is a containment check and
+     cannot see a single deleted rule — test 17 covers it meanwhile) and P3-NOTE #8 (the overlay
+     has no dimmed backdrop; the owner's call, one token-only line).
+  8. Two requests from the learner are recorded in .oplan/REQUESTS-FROM-THE-LEARNER.md and are
+     NOT part of this run: R1 read the word aloud on tap, R2 do not reload the story when nothing
+     changed (probably a defect, not a feature).
+
+NOT DONE, DELIBERATELY: no deploy, no fresh capture, no touch of her live profile, no server or
+lib change of any kind.

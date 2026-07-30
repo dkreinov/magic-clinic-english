@@ -1,4 +1,4 @@
-# Field guide — word-g1 (amended: word-trophies phase-1 close widened lessons 4 and 8; phase-2 close added lesson 13) (budget: 40 lines; at 66 because these are commands+mechanisms that do not compress — justification in word-trophies journal)
+# Field guide — word-g1 (amended: word-trophies phase-1 close widened lessons 4 and 8; phase-2 close added lesson 13; phase-3 close corrected lesson 4 and added lesson 14) (budget: 40 lines; at 89 because these are commands+mechanisms that do not compress — justification in word-trophies journal)
 
 1. A FORMAT GATE IS NOT A CONTENT GATE — bitten three times. Gate what the CHILD experiences
    (phase 3 gated `knownLemmaSet`, not `status`). If no gate can see the failure, add a human one.
@@ -15,8 +15,12 @@
    (`.oplan/word-quiz/plan.md:1573-1586`) is the ONLY sanctioned live read — its post-assert
    proves no leak, and a leak silently 401s the whole suite.
 4. Windows/Git Bash: forward slashes; git's CRLF warnings are noise but FILE line endings are law
-   (`quiz-core.js`/`quiz.js`/`views/words.js`/`views/reader.js` are CRLF, `sw.js` LF — one
-   normalisation turns the deploy's md5 proof into a whole-file hunt); `curl` needs
+   (MEASURE, never remember: the WORKTREE is law and `git diff` normalises it away. Measured
+   2026-07-30: `sw.js` **CRLF**, `styles.css` **CRLF**, `index.html` **CRLF**, `quiz.js`/
+   `quiz-core.js`/`views/words.js`/`views/reader.js` CRLF; `app.js`, `lib/*.js`, `tests/*.js`,
+   `scripts/*.mjs`, `*.md` LF. This guide previously asserted `sw.js` was LF and was WRONG —
+   two independent phase-3 planners caught it. One normalisation turns the deploy's md5 proof
+   into a whole-file hunt); `curl` needs
    `--ssl-no-revoke`; `vercel` via `"$(npm prefix -g)/vercel"`; Git Bash `/tmp` is NOT node's;
    never write scratch into the repo. core.autocrlf=true makes DISK endings unstable: checkout
    materialises CRLF, an Edit-tool insert CRLF'd a whole LF file, and `git diff` normalises so
@@ -71,3 +75,15 @@
     stuck "Stop answering" clears with a plain reload (the draft survives, re-verify it); (d)
     naturalWidth does NOT separate a PREVIEW from a final — a preview was already 1254x1254. Gate
     on no-Preview-label AND no-stop-button AND the fetched blob's byte length stable across ~7s.
+14. VIEW-SCOPED CSS CANNOT STYLE A BODY-LEVEL ELEMENT — and no format gate will tell you.
+    Every view here emits `<style>${VIEW_STYLE}</style>` INSIDE its own `container.innerHTML`
+    (`words.js`, `reader.js`, `placement.js`, `parent.js`), so that CSS exists only while that
+    view is mounted. word-trophies phase 3 put the celebration overlay's rules there while
+    `document.body.appendChild`-ing the overlay from OTHER views — so in production it would
+    have been unstyled 100% of the time (a raw 640px image dumped inline), and the one route
+    whose CSS it needed was the one route it never fires on. 342 tests passed: the test asserted
+    the CSS TEXT existed in `VIEW_STYLE`, never that it was REACHABLE FROM THE DOCUMENT when the
+    element appears. Body-level UI goes in `public/styles.css` (the entry-code gate's precedent).
+    GATE IT by asserting the rules live in the globally-linked sheet AND that the view emits no
+    `<style>` — and write that test BEFORE the fix so you watch it fail. Lesson 1, again, with a
+    new costume: only the human visual gate could see this one.
