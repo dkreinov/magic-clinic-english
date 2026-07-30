@@ -450,3 +450,86 @@ is NOT pure ASCII overall; only the body is. The em-dash sits near the END of th
 start, which is the opposite end from delight-pass lesson 14's observed composer em-dash
 prepending -- so a stray leading em-dash remains detectable by the mandated read-back
 ("must start with Square image (1:1):").
+
+STEP 2.2 the nine masters (ORCHESTRATOR, browser, the ONE frozen chat)
+Generated one at a time in https://chatgpt.com/c/6a632008-2d04-83ed-8557-370a2881a0dc (title
+resolved "Image Request Cartoon Style"; identity confirmed BY CONTENT, not just URL). Free web
+route, Plus account, no paid API, no new chat. Every image came back 1254x1254 -- the calibration
+figure the smoke test predicted. Generation crossed midnight: the run's date stays 2026-07-29
+(doc headings are frozen to it); the assets landed 2026-07-29 23:10 .. 23:30 local.
+
+TROPHY-ART-MD5 chapters bfd7c13132c4069f800b25a0256b38c5
+TROPHY-ART-MD5 days 2a9c7fdd306238a72877470fb480d22d
+TROPHY-ART-MD5 streak e20ca13d954263c37d3da74e8aae9982
+TROPHY-ART-MD5 known b09436a6944048b3512ec5d797df0a4c
+TROPHY-ART-MD5 quizRight 362bffc797c8db82d477506f5d274b7b
+TROPHY-ART-MD5 quizzer 43424e7bcbda79e68d7d7d5971795149
+TROPHY-ART-MD5 curious 915a14363023324e412e6836bbaf0e49
+TROPHY-ART-MD5 proven 10b412511593d395105f12144bb5bca0
+TROPHY-ART-MD5 shelf-header 5c5aa6d0e0a654723ce2a72a7aed7e25
+
+FROZEN GATE (validate-2.2.sh = §VAL-P2 verbatim + the 2.2 tail, ONE script per P2-AMENDMENT #1a):
+MASTERS-OK 9 square png, all >=1024, all byte-distinct; suite 328/0 plan 1..323 both modes; flat
+323; contrast 52; public/ exclusion digest 2362 74e736d7d83b22a24945eae87cb9fe33; sw.js md5
+unchanged; both transcripts EMPTY; no .data/profile.json; write set exactly the nine ?? masters.
+Exit 0.
+
+HOW THE PROMPT TEXT REACHED THE COMPOSER (stronger than the plan's mandated read-back).
+The plan required reading the composer back and confirming it starts with "Square image (1:1):"
+and ends with "no frame or border." -- an ENDS-ONLY check that a dropped middle word survives.
+Route actually used, which removes the transport entirely: powershell Set-Clipboard reads the
+prompt FILE and puts it on the system clipboard -> in-page navigator.clipboard.readText() ->
+synthetic ClipboardEvent('paste') with a DataTransfer into div#prompt-textarea. The bytes never
+pass through a tool-call JSON string at any point. Then the composer was verified BYTE-EXACTLY:
+character count + two independent checksums (plain sum of charCodeAt, and a position-weighted
+sum mod 1e9) computed shell-side from the file and recomputed in-page, and the send was gated on
+all three matching. Every one of the nine matched first try:
+  chapters 824/83821/37078072 · days 785/80297/33868991 · streak 783/79971/33714128
+  known 829/84317/37465576 · quizRight 797/81695/34896325 · quizzer 838/84991/38225568
+  curious 780/79976/33521572 · proven 786/80363/33974285 · shelf-header 944/94762/47760720
+Checksums are DECIMAL on purpose: the extension redacts hex digests as "[BLOCKED: Base64 encoded
+data]" (the smoke test's own trap), so hex would have been unreadable evidence.
+
+CAPTURE: for each asset, C:/Users/dkreinov/Downloads/trophy-<id>.png was confirmed ABSENT, then
+one in-page fetch of the image blob and EXACTLY ONE synthetic <a download> click, never re-clicked
+and never the Download control. Page-side byte count was compared with the shell's wc -c on the
+landed file for all nine -- identical every time -- and the staging directory was re-counted to 0
+after every move. Magic bytes 137,80,78,71 (decimal, same redaction reason) on all nine.
+
+TRAPS MET (for the field guide at the close):
+  (a) SCREENSHOT SPACE != PAGE CSS PIXELS. getBoundingClientRect returns CSS px (viewport
+      1745x777) but computer-tool coordinates are screenshot px (1568x699) -- factor 0.8985. The
+      first click used raw CSS coords and silently hit nothing; the paste then "failed" for a
+      reason that had nothing to do with the clipboard. Convert: screenshot = css * 1568/innerWidth.
+  (b) SYNTHETIC ctrl+v CARRIES NO CLIPBOARD. The extension's key event does not give the page
+      clipboard access; the composer stayed empty. navigator.clipboard.readText() inside the page
+      works (needs document focus -- it throws NotAllowedError right after any shell command
+      steals focus, so click the page first).
+  (c) THE SEND CONTROL IS THE STOP CONTROL WHILE ANSWERING. Pressing Return while the previous
+      turn still streamed did NOT send; the prompt sat in the composer and was silently carried
+      forward. Detect by re-reading the composer AFTER sending, not before. A stuck "Stop
+      answering" state cleared with a plain page reload, and ChatGPT restored the draft
+      byte-exactly (re-verified by the same three checksums before sending).
+  (d) naturalWidth DOES NOT DISTINGUISH A PREVIEW FROM A FINAL -- quizRight's "Preview" was
+      already 1254x1254. Gate on the absence of the Preview label AND the stop button AND
+      byte-stability of the fetched blob across ~7s, not on pixel size.
+
+STEP 2.3 the owner gate (GC-D8) -- ORCHESTRATOR + OWNER
+Artifacts built OUTSIDE the repo at $HOME/trophies-art/preview/: per-asset previews at 160px and
+320px (the sizes T4's cards use) and one 960x960 3x3 contact sheet, grid order row1 chapters days
+streak / row2 known quizRight quizzer / row3 curious proven shelf-header. The owner was shown the
+contact sheet at card size, with the orchestrator's own three reservations stated BEFORE the
+verdict rather than after: days does not show the prompt's three growth stages; quizRight crops
+tight against a prompt that demands generous margin, with small low-contrast arrows; streak's flat
+haze background reads apart from the other eight. The remaining six were called clean hits.
+OWNER RULING (2026-07-30): approve all nine as generated, including the three flagged.
+
+TROPHY-ART chapters: APPROVED
+TROPHY-ART days: APPROVED
+TROPHY-ART streak: APPROVED
+TROPHY-ART known: APPROVED
+TROPHY-ART quizRight: APPROVED
+TROPHY-ART quizzer: APPROVED
+TROPHY-ART curious: APPROVED
+TROPHY-ART proven: APPROVED
+TROPHY-ART shelf-header: APPROVED
