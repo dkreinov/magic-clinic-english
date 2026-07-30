@@ -1306,3 +1306,52 @@ The remedy is one constraint on the ray element (cap it to the app column width,
 square of min(100vw, 480px)) which leaves the phone rendering byte-identical. NOT applied: a
 defect found by a visual check becomes its own gated change, never an in-place edit. Raised with
 the owner alongside step 3.9.
+
+STEP 3.9 the earned sound (A2/A3) and the desktop ray cap — WORKER
+trophies.js LF 330 -> 368: playEarnedSound() extracted from the step file (never retyped) and
+called from showCelebration behind the same typeof-window guard the DOM uses. styles.css CRLF
+699 -> 707: margin-inline:auto + max-width:480px on the rays. tests LF 913 -> 982: the "adds no
+sound" test RENAMED to drop the false claim and its three needles removed, +1 flat test.
+Ledger 343/348 -> 344 flat / 349 reported. Contrast 58. public/ still 2372. gate-3.9.sh exit 0.
+
+*** A3 PROVEN IN BOTH DIRECTIONS (M3.9a), which was the point of the step ***
+  old needles vs an <audio> implementation : "new Audio(" true, ".play(" true  -> WOULD have caught
+  old needles vs the REAL Web Audio one    : all three FALSE                   -> did NOT catch
+So the retired test, named "adds no sound", would have stayed green over a shipping arpeggio. The
+new test asserts the real constraint instead: Web Audio present, and no media element / Audio
+object / audio asset anywhere, including a recursive walk of public/assets for audio extensions.
+
+*** THE WORKER'S OWN NEAR-MISS, and the best evidence in this phase for the mutation discipline ***
+Its first ray-cap assertion matched "max-width: 480px" inside the explanatory CSS COMMENT it had
+just written, so M3.9c PASSED with the declaration deleted. It caught this only by actually
+running the mandated mutation, then fixed the ASSERTION (strip /* */ before testing) rather than
+weakening the mutation. A blind assertion would otherwise have shipped inside the very step whose
+purpose was repairing a blind assertion. Recorded because it is the third instance in this run of
+the same defect class: an assertion that names a property it does not observe.
+
+ORCHESTRATOR AUDIT (independent, static): playEarnedSound present, wrapped in try/catch, exactly
+the frozen C5-E5-G5-C6 note list, uses createOscillator + AudioContext, called from
+showCelebration, guarded by typeof window; NONE of <audio/new Audio(/.mp3/.wav/.ogg/.aac/.m4a;
+no mute/settings token smuggled in; ray cap present as real DECLARATIONS not comments (checked
+after stripping comments -- the same trap the worker hit); zero width media queries in the file.
+HEBREW RE-COUNTED PROPERLY: my first count said 16 distinct and was WRONG -- it counted Hebrew
+WORD RUNS, so two-word names counted twice. Counting quoted STRING LITERALS instead (from a FILE,
+because the Hebrew range mangled in a shell heredoc -- lesson 8 again) gives exactly 10 distinct,
+with every codepoint sum matching its SK3-8 pin. SK3-8 intact, no Hebrew added.
+
+BROWSER VERIFICATION (the gate cannot hear sound or measure a viewport).
+  SOUND ACTUALLY FIRES: AudioContext.prototype.createOscillator was spied on BEFORE the celebration
+  ran; the earn moment produced FOUR oscillators at 523/659/784/1047 Hz (C5-E5-G5-C6), sine, 85ms
+  apart -- exactly the frozen arpeggio, measured rather than assumed.
+  RAY CAP MEASURED AT THREE WIDTHS: 1920 viewport -> rays 480px, centred (margin-inline 712.5px
+  each side); overlay constrained to 390 -> rays 390px; to 430 -> rays 430px. The cap binds ONLY
+  above the app column, so every phone width is untouched, as designed. Desktop now resolves the
+  fan around the app column instead of spanning the screen.
+
+P3-NOTE #9 (worker finding, no action): the frozen A2 comment introduced one non-ASCII character
+into trophies.js -- "§" in "design.md §9". It is the only non-Hebrew non-ASCII byte in the file and
+no gate observes it. Left as written rather than sanitised, since the block was frozen.
+P3-NOTE #10 (housekeeping): STANDING-RULES.md's ending table is now stale -- styles.css 501 -> 707,
+sw.js 50 -> 51, index.html 81 -> 90, words.js 281 -> 289, reader.js 749 -> 767. The gates assert
+CRLF/LF KIND rather than counts, so nothing broke, but the table should be refreshed before it
+misleads a future worker.

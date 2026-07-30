@@ -529,6 +529,14 @@ a {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  /* Owner ruling 2026-07-30: the desktop ray cap. .trophy-celebrate is
+     fixed/inset:0, so on a laptop the fan spanned the whole 1905px window
+     while the app column is max-width: 480px (:75, :336). With left:0,
+     right:0 and auto horizontal margins the box centres itself once the cap
+     binds. On a 390px phone 480px does not bind, so the phone rendering is
+     IDENTICAL -- which is why this is not a width media query. */
+  margin-inline: auto;
+  max-width: 480px;
   background: repeating-conic-gradient(from 0deg, rgba(255, 217, 138, 0.28) 0deg 5deg, transparent 5deg 16deg);
   -webkit-mask-image: radial-gradient(circle at 50% 44%, rgba(0, 0, 0, 1) 18%, transparent 62%);
   mask-image: radial-gradient(circle at 50% 44%, rgba(0, 0, 0, 1) 18%, transparent 62%);

@@ -698,7 +698,7 @@ test('the celebration is hooked at exactly the three designed moments, guarded o
   }
 });
 
-test('the celebration honours reduced motion, adds no sound, and sits below the entry-code gate', () => {
+test('the celebration honours reduced motion and sits below the entry-code gate', () => {
   const src = readFileSync(trophiesViewPath, 'utf8');
   const style = trophyCss();
 
@@ -736,11 +736,6 @@ test('the celebration honours reduced motion, adds no sound, and sits below the 
   // `animation: none` on the rays is NOT an acceptable substitute here.
   assert.ok(/\.trophy-celebrate-rays\s*\{[^}]*display:\s*none/.test(rmBlock),
     'A1: under reduced motion the ray fan must be display: none, not merely un-animated');
-
-  // T9: no sound in v1, anywhere on the celebration path.
-  for (const needle of ['new Audio(', '<audio', '.play(']) {
-    assert.ok(!src.includes(needle), 'T9 forbids sound, found ' + needle);
-  }
 
   // the overlay markup: artwork + name. The tier is the RING, never a word.
   const markupAt = src.indexOf('function celebrateHtml(');
@@ -881,6 +876,23 @@ test('the celebration is a floating medallion, not a shelf card, and its name is
   assert.ok(!celBlock.includes('box-shadow: var(--shadow-soft)'),
     'A1: the medallion floats on a drop-shadow -- found box-shadow: var(--shadow-soft)');
 
+  // 1b. the desktop ray cap (owner ruling 2026-07-30). .trophy-celebrate is
+  //     fixed/inset:0, so on a laptop the fan spanned the whole window while
+  //     the app column is 480px. The cap is a max-width plus auto inline
+  //     margins, NOT a media query -- on a 390px phone 480px does not bind
+  //     and the phone rendering is unchanged.
+  const raysAt = css.indexOf('.trophy-celebrate-rays {');
+  assert.ok(raysAt >= 0, 'public/styles.css must carry the .trophy-celebrate-rays rule');
+  // the rule with its /* ... */ comments STRIPPED: this rule carries an
+  //     explanatory comment that names max-width itself, and a comment is not
+  //     a declaration -- reading one is the A3 defect all over again.
+  const raysRule = css.slice(raysAt, css.indexOf('\n}', raysAt))
+    .replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.ok(/max-width:\s*480px/.test(raysRule),
+    'the ray fan must be capped to the app column width on desktop');
+  assert.ok(/margin-inline:\s*auto/.test(raysRule),
+    'the capped ray fan must centre itself with auto inline margins');
+
   // 2. the celebration name outranks the shelf caption
   const remOf = (selector) => {
     const at = css.indexOf(selector + ' {');
@@ -910,4 +922,61 @@ test('the celebration is a floating medallion, not a shelf card, and its name is
     'A1: the name is a sibling that FOLLOWS the medallion');
   assert.ok(!markup.includes('class=\"trophy-name\"'),
     'A1: the celebration must not reuse the shelf caption class');
+});
+
+// ===== step 3.9: design.md section 9, amendments A2 and A3. A2 REINSTATES the
+// celebration sound, reversing signed T5 and T9; A3 records why the assertion
+// that used to guard this ground was blind. It forbade three needles -- an
+// Audio constructor, a media element and a play() call -- and Web Audio uses
+// none of them, so sound could have shipped in full while a test named 'adds
+// no sound' stayed green. Below is the REAL constraint: synthesis, and
+// nothing but synthesis.
+test('the celebration sound is Web Audio only -- no media element, no Audio object, and no audio asset', () => {
+  const view = readFileSync(trophiesViewPath, 'utf8');
+
+  // 1. the sound exists, and it is synthesised
+  assert.ok(view.includes('createOscillator('),
+    'A2: the celebration must synthesise its arpeggio with Web Audio');
+  assert.ok(view.includes('AudioContext'),
+    'A2: the celebration must obtain a Web Audio context');
+
+  // 2. ...and it is synthesised ONLY: no media element, no Audio object, no
+  //    src assignment and no audio file extension anywhere in the module.
+  for (const needle of ['<audio', 'new Audio(', '.src =', '.mp3', '.wav', '.ogg', '.aac']) {
+    assert.ok(!view.includes(needle),
+      'A2: the sound path must stay Web-Audio-only, found ' + needle);
+  }
+
+  // 3. it can never break the celebration, the screen or the quiz: silence is
+  //    an acceptable outcome of a blocked AudioContext, an exception is not.
+  const soundAt = view.indexOf('function playEarnedSound() {');
+  assert.ok(soundAt >= 0, 'A2: the celebration must carry playEarnedSound');
+  const soundBody = view.slice(soundAt, view.indexOf('\n}', soundAt));
+  assert.ok(soundBody.includes('try {'),
+    'A2: the whole sound path must sit inside a try block');
+  assert.ok(soundBody.includes('catch'),
+    'A2: playEarnedSound must catch, so a blocked context costs only silence');
+
+  // 4. nothing audio-shaped joined the precache list
+  const sw = readFileSync(t33SwPath, 'utf8');
+  const precacheMatch = sw.match(/PRECACHE\s*=\s*(\[[\s\S]*?\])/);
+  assert.ok(precacheMatch, 'expected to find the PRECACHE array literal in sw.js');
+  for (const entry of JSON.parse(precacheMatch[1])) {
+    assert.ok(!/audio/i.test(entry),
+      'A2: PRECACHE must gain no audio entry, found ' + entry);
+  }
+
+  // 5. and no audio ASSET was added. public/assets is WALKED, not counted, so
+  //    a file dropped into any sub-directory of it is caught too.
+  const audioAssets = [];
+  const walkAssets = (dir) => {
+    for (const name of readdirSync(dir).sort()) {
+      const full = path.join(dir, name);
+      if (statSync(full).isDirectory()) walkAssets(full);
+      else if (/[.](mp3|wav|ogg|aac|m4a)$/i.test(name)) audioAssets.push(name);
+    }
+  };
+  walkAssets(t33AssetsDir);
+  assert.deepStrictEqual(audioAssets, [],
+    'A2: the celebration ships no audio asset, found ' + audioAssets.join(', '));
 });

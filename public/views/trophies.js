@@ -267,6 +267,39 @@ function celebrateHtml(trophy, tier) {
       <p class="trophy-celebrate-name">${trophy.name}</p>`;
 }
 
+// A2 (design.md §9). Reinstates sound, which signed T5/T9 had cut. Synthesised with
+// Web Audio so nothing is downloaded, shipped, precached, versioned or licensed --
+// the app has no audio-asset pipeline for anything but word pronunciation, and a
+// celebration chime does not justify inventing one.
+// C5-E5-G5-C6, ~85ms apart, each note short. Silence is an acceptable outcome of a
+// blocked or unavailable AudioContext; an exception is NOT -- it must never break
+// the celebration, the screen or the quiz.
+function playEarnedSound() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    for (let i = 0; i < notes.length; i++) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = notes[i];
+      const at = ctx.currentTime + i * 0.085;
+      gain.gain.setValueAtTime(0.0001, at);
+      gain.gain.exponentialRampToValueAtTime(0.15, at + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.42);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(at);
+      osc.stop(at + 0.47);
+    }
+  } catch (err) {
+    // Deliberately silent. A2: no mute setting exists, and a device that blocks or
+    // has no audio must still get the whole celebration.
+  }
+}
+
 // document.body.appendChild -- the public/api.js:44 precedent -- so the
 // overlay survives the active view re-rendering its own container.innerHTML.
 // One tap anywhere dismisses it (public/views/reader.js:713-719). T9: this
@@ -280,6 +313,11 @@ function showCelebration(trophy, tier) {
   overlay.innerHTML = celebrateHtml(trophy, tier);
   overlay.addEventListener("click", () => overlay.remove());
   document.body.appendChild(overlay);
+  // A2: the earn moment gets its sound the instant the overlay lands.
+  // Guarded exactly the way the DOM is guarded above -- under node there is
+  // no window, so nothing is attempted at all.
+  if (typeof window === "undefined") return;
+  playEarnedSound();
 }
 
 // SK3-10 as amended by P3-AMENDMENT #2 (owner ruling, 2026-07-30): show the
