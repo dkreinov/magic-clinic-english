@@ -711,12 +711,31 @@ test('the celebration honours reduced motion, adds no sound, and sits below the 
   assert.ok(!overlayRule.includes('100'), 'the overlay must stay BELOW the entry-code gate');
   assert.ok(overlayRule.includes('position: fixed'), 'the overlay must cover the screen');
 
+  // A1 (design.md 9): the whole celebration block stays TOKEN-ONLY. The only
+  // raw colour it may carry is rgba() -- the scrim and the two shadows -- and
+  // it may reach for neither color-mix() nor a background-image.
+  const celBlock = style.slice(overlayAt);
+  assert.ok(!celBlock.includes('color-mix('),
+    'the celebration rules must not use color-mix()');
+  assert.ok(!celBlock.includes('background-image'),
+    'the celebration rules must not use background-image');
+  for (const token of ['var(--color-glow)', 'var(--color-primary-ink)']) {
+    assert.ok(celBlock.includes(token), 'the celebration must consume ' + token);
+  }
+
   // T5's reduced-motion clause (the public/views/reader.js:110 precedent).
   const rmAt = style.indexOf('@media (prefers-reduced-motion: reduce)');
   assert.ok(rmAt >= 0, 'T5 requires the reduced-motion block');
   const rmBlock = style.slice(rmAt, style.indexOf('\n}', rmAt));
   assert.ok(rmBlock.includes('.trophy-celebrate-card'),
     'the celebration card must be named inside the reduced-motion block');
+  assert.ok(rmBlock.includes('.trophy-celebrate-name'),
+    'the name entrance must be stilled inside the reduced-motion block');
+  // A1: the ray fan is REMOVED under reduced motion, not merely stopped -- a
+  // frozen pinwheel reads as a rendering bug, not as a still image, so
+  // `animation: none` on the rays is NOT an acceptable substitute here.
+  assert.ok(/\.trophy-celebrate-rays\s*\{[^}]*display:\s*none/.test(rmBlock),
+    'A1: under reduced motion the ray fan must be display: none, not merely un-animated');
 
   // T9: no sound in v1, anywhere on the celebration path.
   for (const needle of ['new Audio(', '<audio', '.play(']) {
@@ -803,14 +822,25 @@ test('the celebration is styled from the globally-linked stylesheet, not from a 
   const html = readFileSync(t33IndexPath, 'utf8');
   const sw = readFileSync(t33SwPath, 'utf8');
 
-  // 1. every rule the shelf and the celebration need is in the stylesheet
+  // 1. every rule the shelf and the celebration need is in the stylesheet.
+  //
+  // P3-NOTE #7, hardened (owner-approved 2026-07-30). This used to be
+  // css.includes(selector), which CANNOT see a whole rule being deleted:
+  // '.trophy-celebrate' is a PREFIX of '.trophy-celebrate-card', so the
+  // containment form kept passing over the corpse. It is now RULE-SHAPED --
+  // the selector must OPEN ITS OWN RULE at the start of a line, which is what
+  // a top-level rule looks like in this stylesheet. The copies inside the
+  // reduced-motion media query are indented, and are deliberately not counted:
+  // they modify a rule, they are not one.
+  const ownRule = (selector) => css.indexOf(String.fromCharCode(10) + selector + ' {') >= 0;
   for (const selector of [
     '.trophy-celebrate', '.trophy-celebrate-card', '.trophy-celebrate-art',
-    '.trophy-art', '.trophy-name',
-    '.trophy-card--bronze', '.trophy-card--silver', '.trophy-card--gold', '.trophy-card--locked',
+    '.trophy-art', '.trophy-name', '.trophy-celebrate-name', '.trophy-celebrate-rays',
+    '.trophy-card--locked',
+    '.trophy-card--bronze .trophy-art', '.trophy-card--silver .trophy-art', '.trophy-card--gold .trophy-art',
   ]) {
-    assert.ok(css.includes(selector),
-      'public/styles.css must carry ' + selector + ' -- the overlay fires on routes where the trophies view is not mounted');
+    assert.ok(ownRule(selector),
+      'public/styles.css must carry a rule of its OWN for ' + selector + ' -- the overlay fires on routes where the trophies view is not mounted');
   }
 
   // 2. the view carries no style block at all, so no rule can be view-local
@@ -826,4 +856,58 @@ test('the celebration is styled from the globally-linked stylesheet, not from a 
   assert.ok(precacheMatch, 'expected to find the PRECACHE array literal in sw.js');
   assert.ok(JSON.parse(precacheMatch[1]).includes('/styles.css'),
     'the service worker must precache /styles.css');
+});
+
+// ===== step 3.8: design.md section 9 amendment A1 -- the celebration is a
+// MOMENT, not a list item. Phase 3 built the overlay out of shelf parts: the
+// celebration card was the .trophy-card recipe (--color-card, --radius,
+// --shadow-soft) and the name was the same 1rem/700 it has in the grid, so the
+// reward carried no signal that it outranked a row. This is the assertion that
+// the rebuild actually happened. The two font sizes are PARSED and compared,
+// never hard-coded, so the test stays honest if either side is retuned.
+test('the celebration is a floating medallion, not a shelf card, and its name is not caption-sized', () => {
+  const css = readFileSync(cssPath, 'utf8');
+  const view = readFileSync(trophiesViewPath, 'utf8');
+
+  const celAt = css.indexOf('.trophy-celebrate {');
+  assert.ok(celAt >= 0, 'public/styles.css must carry the .trophy-celebrate overlay rule');
+  const entryAt = css.indexOf(ENTRY_CSS_MARKER);
+  assert.ok(entryAt > celAt, 'the celebration rules must sit BEFORE the entry-code gate section');
+  const celBlock = css.slice(celAt, entryAt);
+
+  // 1. it is not built from shelf parts any more
+  assert.ok(!celBlock.includes('background: var(--color-card)'),
+    'A1: the celebration is not a card -- found background: var(--color-card)');
+  assert.ok(!celBlock.includes('box-shadow: var(--shadow-soft)'),
+    'A1: the medallion floats on a drop-shadow -- found box-shadow: var(--shadow-soft)');
+
+  // 2. the celebration name outranks the shelf caption
+  const remOf = (selector) => {
+    const at = css.indexOf(selector + ' {');
+    assert.ok(at >= 0, 'public/styles.css must carry ' + selector);
+    const rule = css.slice(at, css.indexOf('}', at));
+    const found = /font-size:\s*([0-9.]+)rem/.exec(rule);
+    assert.ok(found, selector + ' must declare a font-size in rem');
+    return parseFloat(found[1]);
+  };
+  const celebrateRem = remOf('.trophy-celebrate-name');
+  const shelfRem = remOf('.trophy-name');
+  assert.ok(celebrateRem > shelfRem,
+    'A1: the celebration name (' + celebrateRem + 'rem) must outrank the shelf name (' + shelfRem + 'rem)');
+
+  // 3. the name is a SIBLING of the medallion, not a child of it -- that is
+  //    what lets the card BE the medallion.
+  const markupAt = view.indexOf('function celebrateHtml(');
+  assert.ok(markupAt >= 0, 'the overlay markup must live in celebrateHtml');
+  const markup = view.slice(markupAt, view.indexOf('\n}', markupAt));
+  const cardAt = markup.indexOf('<div class=\"trophy-celebrate-card');
+  assert.ok(cardAt >= 0, 'the overlay must still carry the medallion element');
+  const cardEnd = markup.indexOf('</div>', cardAt);
+  assert.ok(cardEnd > cardAt, 'the medallion element must be closed');
+  assert.ok(!markup.slice(cardAt, cardEnd).includes('trophy-celebrate-name'),
+    'A1: the name must sit OUTSIDE .trophy-celebrate-card');
+  assert.ok(markup.indexOf('trophy-celebrate-name') > cardEnd,
+    'A1: the name is a sibling that FOLLOWS the medallion');
+  assert.ok(!markup.includes('class=\"trophy-name\"'),
+    'A1: the celebration must not reuse the shelf caption class');
 });

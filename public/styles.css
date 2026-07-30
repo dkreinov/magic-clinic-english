@@ -465,6 +465,17 @@ a {
   border-color: var(--color-gold);
 }
 
+/* A1: per-tier ring WEIGHT, on the medallion only -- gold reads heavier. The
+   colour still arrives from the tier rules above; nothing is duplicated. */
+.trophy-card--gold .trophy-celebrate-art {
+  border-width: 5px;
+}
+
+.trophy-card--silver .trophy-celebrate-art,
+.trophy-card--bronze .trophy-celebrate-art {
+  border-width: 4px;
+}
+
 /* T4: a locked trophy is the SAME artwork dimmed -- no separate locked asset.
    Its ring stays var(--color-border), a pair already gated at 3:1 on card. */
 .trophy-card--locked .trophy-art {
@@ -491,39 +502,105 @@ a {
 
 /* T5: the celebration overlay, appended by step 3.4. The stacking order is
    deliberate -- BELOW the entry-code gate (public/styles.css:413) and ABOVE
-   the bottom nav (:331), so a celebration can never cover the login gate. */
+   the bottom nav (:331), so a celebration can never cover the login gate.
+
+   A1 (design.md 9, owner 2026-07-30): the moment is no longer built from
+   shelf parts. It is a free-floating medallion on a scrim -- no card, no
+   --color-card, no --shadow-soft -- and the name is a headline, not a
+   caption. */
 .trophy-celebrate {
   position: fixed;
   inset: 0;
   z-index: 90;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 16px;
-}
-
-.trophy-celebrate-card {
-  display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  background: var(--color-card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-soft);
-  padding: 24px 20px;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px 16px;
+  background: rgba(58, 36, 18, 0.72);
 }
 
-/* The SAME square webp the shelf card shows, just bigger. The tier ring
-   arrives through the .trophy-card--<tier> layer class, so no new colour
-   and no new gate pair. */
+/* A1: the slow ray fan. Masked to a soft disc so it never reaches the edges,
+   and removed entirely under reduced motion -- a frozen pinwheel reads as a
+   bug. */
+.trophy-celebrate-rays {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 217, 138, 0.28) 0deg 5deg, transparent 5deg 16deg);
+  -webkit-mask-image: radial-gradient(circle at 50% 44%, rgba(0, 0, 0, 1) 18%, transparent 62%);
+  mask-image: radial-gradient(circle at 50% 44%, rgba(0, 0, 0, 1) 18%, transparent 62%);
+  animation: trophy-rays 40s linear infinite;
+}
+
+/* A1: no card. The medallion floats; the glow sits behind it. */
+.trophy-celebrate-card {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  animation: trophy-pop 320ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+.trophy-celebrate-card::before {
+  content: "";
+  position: absolute;
+  inset: -38%;
+  z-index: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-glow) 0%, transparent 62%);
+  opacity: 0.5;
+  filter: blur(12px);
+  pointer-events: none;
+}
+
+/* drop-shadow, NOT box-shadow: it follows the circle's alpha, so the medal
+   hangs in space instead of sitting on furniture. */
 .trophy-celebrate-art {
+  position: relative;
+  z-index: 2;
   width: 168px;
   height: 168px;
+  filter: drop-shadow(0 14px 26px rgba(58, 36, 18, 0.45));
 }
 
-/* T5's reduced-motion clause, the public/views/reader.js:110 precedent. */
+/* A1: the name is a headline here, not the caption it is on the shelf. */
+.trophy-celebrate-name {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--color-primary-ink);
+  text-align: center;
+  animation: trophy-rise 300ms ease-out 120ms both;
+}
+
+@keyframes trophy-pop {
+  from { transform: scale(0.72); opacity: 0; }
+  60% { transform: scale(1.04); }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes trophy-rise {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes trophy-rays {
+  to { transform: rotate(360deg); }
+}
+
+/* T5's reduced-motion clause, the public/views/reader.js:110 precedent. A1:
+   the rays are REMOVED, not merely stopped -- a frozen pinwheel reads as a
+   rendering bug, not as a still image. */
 @media (prefers-reduced-motion: reduce) {
-  .trophy-celebrate-card { animation: none; transition: none; }
+  .trophy-celebrate-card,
+  .trophy-celebrate-name { animation: none; }
+  .trophy-celebrate-rays { display: none; }
 }
 
 /* ---------- Entry code gate ---------- */

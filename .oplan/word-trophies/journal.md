@@ -1254,3 +1254,55 @@ PLAN: split into two gated steps rather than one, so the design-amending part is
     approved ("harden it", "now, before phase 4").
   STEP 3.9 -- the sound: Web Audio rising arpeggio, no asset, no mute setting; and the honest
     rewrite of the no-sound test into a no-media-element test.
+
+STEP 3.8 the celebration becomes a moment (design amendment A1) + the P3-NOTE #7 hardening — WORKER
+styles.css CRLF 622 -> 699 (scrim rgba(58,36,18,.72), rays, glow ::before, drop-shadow art,
+headline name, three keyframes, reduced-motion hiding the rays); trophies.js LF 323 -> 330 (name
+moved OUT of the card so the card can be the medallion; rays element added; no Hebrew touched);
+tests LF 829 -> 913, +1 flat. Ledger 342/347 -> 343 flat / 348 reported. Contrast 58.
+gate-3.8.sh exit 0.
+
+WORKER STOPPED CORRECTLY ON A FROZEN-vs-FROZEN CONFLICT (orchestrator error). My frozen CSS block
+used #000 in the ray mask while the SAME SENTENCE said "token-only -- no raw hex except inside
+rgba()". Existing test 327 bans any "#" inside the trophies block and caught it. The worker
+refused to edit either the frozen CSS or a test it was not authorised to touch, and escalated
+with both resolutions costed. RULED (A): rgba(0, 0, 0, 1) -- the mask colour is only an alpha
+stencil so it is pixel-identical, and option (B) would have weakened a simple blanket invariant
+for a cosmetic reason. Added M3.8e to make test 327 a LIVE guard on exactly this regression:
+putting #000 back in ONE of the two mask lines fails it. Confirmed six PRE-EXISTING #000 elsewhere
+in styles.css (lines 388-389, 404-405) are outside the trophies block and untouched.
+
+FAIL-FIRST, five mutations, five observed failures, five byte-exact restores. M3.8c is the one
+that mattered: with the .trophy-celebrate-rays RULE deleted but its indented reduced-motion clause
+left in place, the HARDENED rule-shaped assertion failed --
+  'public/styles.css must carry a rule of its OWN for .trophy-celebrate-rays'
+-- while the OLD containment form was measured on the same mutated file and WOULD HAVE PASSED
+(css.includes -> true). The worker's phrase for it: "the old check was reading the corpse's own
+funeral notice." That is P3-NOTE #7 closed, with the contrast demonstrated rather than asserted.
+
+ORCHESTRATOR AUDIT (independent): zero raw hex inside the 192-line trophies block; the medallion
+declares neither background nor box-shadow (it is no longer a shelf tile); type escalates 1rem ->
+1.7rem, parsed from the file not hard-coded; the reduced-motion block hides the rays with
+display:none rather than merely stopping the animation.
+
+BROWSER VERIFICATION (the gate proves rule shape; only a human sees pixels). Sandbox, hard
+reload. Every device confirmed LIVE on the /words route: overlay rgba(58,36,18,0.72) fixed
+z-index 90; rays animating trophy-rays with the radial mask; card background transparent and
+box-shadow none; card animation trophy-pop; art 168px with drop-shadow and a 4px BRONZE ring;
+name 27.2px (=1.7rem) in --color-primary-ink animating trophy-rise; name outside the card.
+CACHE TRAP RE-MET, worth remembering: three separate caches had to be busted independently --
+the service worker, then the JS module (import with a ?bust query), then the STYLESHEET (swap the
+<link> href). Busting only the page URL left a mix of new markup with old CSS, which looked like a
+broken implementation and was not.
+
+*** FINDING, NOT FIXED, OWNER'S CALL: THE RAYS DO NOT SCALE DOWN TO A DESKTOP WINDOW. ***
+.trophy-celebrate is position:fixed inset:0, so on a 1905px-wide laptop the ray fan spans the
+whole screen and reads as garish -- while the app's own column is max-width:480px (styles.css:75,
+:336). At TRUE PHONE GEOMETRY (measured by constraining the overlay box to 390x844, which is
+exact because the mask and spread are relative to the element box) the rays fade well before the
+edges and read correctly -- the mock was right for the phone and wrong for the desktop.
+Her device is a phone, so this is not a defect on the target; but the app is openable on a laptop.
+The remedy is one constraint on the ray element (cap it to the app column width, e.g. a centred
+square of min(100vw, 480px)) which leaves the phone rendering byte-identical. NOT applied: a
+defect found by a visual check becomes its own gated change, never an in-place edit. Raised with
+the owner alongside step 3.9.

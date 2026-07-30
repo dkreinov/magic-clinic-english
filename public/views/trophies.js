@@ -252,12 +252,19 @@ function collectUncelebrated(profile, read) {
 // no tier word is authored -- this module's Hebrew inventory stays at the ten
 // strings step 3.2 extracted. The ring arrives through the same
 // .trophy-card--<tier> layer class the shelf card uses.
+//
+// A1 (design.md 9, owner 2026-07-30): the name is a SIBLING of the card, not
+// a child of it, so the card can be the medallion itself; and it carries
+// .trophy-celebrate-name, the headline class, instead of the shelf caption
+// class. The rays element is empty and decorative -- it is painted entirely
+// by CSS. No Hebrew string is added or changed by any of this.
 function celebrateHtml(trophy, tier) {
   return `
+      <div class="trophy-celebrate-rays"></div>
       <div class="trophy-celebrate-card trophy-card--${tier}">
         <img class="trophy-celebrate-art trophy-art" src="/assets/trophies/${trophy.id}.webp" alt="" />
-        <p class="trophy-name">${trophy.name}</p>
-      </div>`;
+      </div>
+      <p class="trophy-celebrate-name">${trophy.name}</p>`;
 }
 
 // document.body.appendChild -- the public/api.js:44 precedent -- so the
