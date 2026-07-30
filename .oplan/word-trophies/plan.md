@@ -1884,12 +1884,23 @@ measured (12 known, 0 candidates, per `journal.md:294-296`) at minimum `known` b
 `known` silver, and plausibly `days`, `streak`, `curious` and `quizzer` tiers too. A naive
 "celebrate each uncelebrated tier" would queue six or eight overlays.
 
-**FROZEN selection rule:** on each celebration pass the view collects every `(id, tier)` present
-in `profile.trophies` that has no `localStorage` key `trophyCelebrated:<id>:<tier>`, **shows the
-FIRST one in `TROPHY_VIEW` order × `TROPHY_TIERS` order (`bronze, silver, gold`)**, and
-**marks ALL of them celebrated in the same pass** (writing `trophyCelebrated:<id>:<tier>` =
-`new Date().toISOString()` for each). One overlay, deterministic, no queue, no state machine,
-and the next earning moment celebrates the next NEW tier rather than replaying a backlog.
+**FROZEN selection rule — SUPERSEDED BY P3-AMENDMENT #2 (owner ruling, 2026-07-30).**
+SK3-10 as drafted showed the first uncelebrated tier and marked ALL of them celebrated in the
+same pass, so a backlog was silently discarded. It was written against an ESTIMATE of six to
+eight day-one tiers. The estimate was wrong: the 2026-07-30 capture measures **four**, all
+bronze (`days`, `streak`, `known`, `curious`) — see journal.md "D25 CAPTURE TAKEN EARLY".
+The owner, shown the real numbers, ruled: **one per sitting until caught up.**
+
+**FROZEN selection rule, as amended:** on each celebration pass the view collects every
+`(id, tier)` present in `profile.trophies` that has no `localStorage` key
+`trophyCelebrated:<id>:<tier>`, **shows the FIRST one in `TROPHY_VIEW` order × `TROPHY_TIERS`
+order (`bronze, silver, gold`)**, and **marks ONLY THAT ONE celebrated** (writing
+`trophyCelebrated:<id>:<tier>` = `new Date().toISOString()` for exactly that entry). Still ONE
+overlay per pass — there is still no parade and no queue object and no state machine — but the
+backlog DRAINS one per earning moment instead of being thrown away. Day one therefore yields four
+celebrations spread across four earning moments, not one celebration and three silent trophies.
+The `uncelebrated()` helper still returns the whole list (it is what makes the ordering testable);
+only the WRITE narrows to the shown entry.
 
 Design T5's storage contract is quoted and honoured verbatim:
 
@@ -2802,10 +2813,10 @@ celebration can be seen in the step-3.6 gate).
 // `read` is injected so the test never needs a DOM.
 export function uncelebrated(profile, read)
 
-// T5 + SK3-10. Shows exactly ONE overlay -- the FIRST entry uncelebrated()
-// returns -- and marks EVERY entry it returned as celebrated in the same pass,
-// so the day-one backfill produces one celebration, not eight. Returns the shown
-// { id, tier } or null. Every localStorage access is wrapped in try/catch (the
+// T5 + SK3-10 as amended by P3-AMENDMENT #2 (owner ruling). Shows exactly ONE
+// overlay -- the FIRST entry uncelebrated() returns -- and marks ONLY THAT ONE
+// celebrated. The backlog drains one per earning moment; it is never discarded.
+// Returns the shown { id, tier } or null. Every localStorage access is wrapped in try/catch (the
 // public/api.js:3-9 precedent); a storage throw means "not celebrated, and could
 // not record it" and must never break the screen or the quiz.
 export function maybeCelebrateTrophy(profile)
@@ -2957,11 +2968,16 @@ becomes the same five lines with one appended after `draw();`:
     empty store → `[{id:'chapters',tier:'bronze'},{id:'known',tier:'bronze'},{id:'known',tier:'silver'}]`
     (`chapters` precedes `known` in `TROPHY_VIEW`); an unknown trophy id in the profile is
     IGNORED (forward compatibility, T1) and must not appear.
-14. `'maybeCelebrateTrophy shows exactly ONE overlay and marks every earned tier celebrated in the same pass'` —
-    SK3-10. Six uncelebrated tiers in → return value is the FIRST; the injected writer received
-    **six** keys, each named `trophyCelebrated:<id>:<tier>` with a parseable ISO value; a second
-    call returns `null` and writes nothing. **Negative control:** a profile with `trophies: {}`
-    returns `null` and writes nothing.
+14. `'maybeCelebrateTrophy shows exactly one overlay per pass and drains the backlog one at a time'` —
+    SK3-10 as amended by P3-AMENDMENT #2. Four uncelebrated tiers in (the REAL day-one set:
+    `days`, `streak`, `known`, `curious`, all bronze) → the return value is the FIRST in
+    `TROPHY_VIEW` × `TROPHY_TIERS` order and the injected writer received **exactly ONE** key,
+    named `trophyCelebrated:<id>:<tier>` with a parseable ISO value. Feeding that key back into
+    the reader and calling again returns the **SECOND**, writing exactly one more — and so on
+    through all four; the fifth call returns `null` and writes nothing. This is the drain, and it
+    is the whole point of the amendment. **Negative controls:** a profile with `trophies: {}`
+    returns `null` and writes nothing; and the writer must NEVER receive a key for a tier that
+    was not the one shown (assert the written key equals the returned selection, every call).
 15. `'a localStorage failure never breaks the celebration path'` — a reader that throws and a
     writer that throws; `maybeCelebrateTrophy` must return without throwing, and with a throwing
     reader it must treat the tier as uncelebrated (fail towards showing, never towards crashing).

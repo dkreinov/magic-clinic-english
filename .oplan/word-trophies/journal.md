@@ -790,3 +790,30 @@ ALSO WORTH PHASE 4'S ATTENTION: four trophies sit within a few actions of their 
 (chapters 2, proven 1, streak 2, known 3). The read-back rule (T8) says a tier may APPEAR
 between capture and read-back only with accompanying activity evidence -- with margins this thin,
 that is likely to happen legitimately, and must not be mistaken for a bug.
+
+## PHASE 3 GO (2026-07-30)
+
+OWNER RULINGS AT THE GO:
+  1. DAY-ONE CELEBRATIONS: "one per sitting until caught up." This OVERRULES SK3-10 as drafted,
+     which showed one overlay and marked all uncelebrated tiers as seen in the same pass --
+     discarding the backlog. Recorded as P3-AMENDMENT #2 and applied to plan.md in all THREE
+     places that encoded the old rule: SK3-10's frozen selection rule, the frozen contract
+     comment on maybeCelebrateTrophy, and step 3.4's test 14 (which now asserts the DRAIN:
+     four tiers in, one key written per call, the fifth call returns null -- plus a new negative
+     control that the written key always equals the returned selection).
+     Note the honest provenance: SK3-10 was written to prevent a parade of "six or eight"
+     overlays. That number was an ESTIMATE and it was wrong -- the capture measured FOUR. The
+     defect it guarded against was smaller than assumed, and the cure (silently dropping three
+     earned trophies) was worse than the disease at that size. Measurement changed the decision.
+  2. EXECUTION MODE: autonomous across the whole phase, with the work pushed to SUBAGENTS as the
+     oplan discipline intends, so this orchestrator thread stays context-light. Owner's words:
+     "autonomous all, with subagents like /oplan intended, so this thread will not be too context
+     window thin." Practical consequence: every WORKER-tier step is dispatched with a packet and
+     a gate delivered as FILES; the orchestrator reads only the reports and runs the audits.
+
+CONSEQUENCE FOR PHASE 4 (write into the close): after the deploy, her phone will show FOUR bronze
+celebrations spread across four earning moments -- days, streak, known, curious -- not one, and
+not all at once. The T8 read-back must expect trophies to appear legitimately between capture and
+read-back anyway (four trophies sit 1-3 actions from their next tier).
+
+$BASE (phase 3) = be6eb82 (recorded at the go-ahead; the close diffs against it).
