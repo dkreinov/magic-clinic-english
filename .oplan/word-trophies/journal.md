@@ -601,3 +601,64 @@ section 7, after the Superseded capture method bullet") was unambiguous and inde
 anchored, so the worker executed it correctly and flagged the false aside instead of adapting
 around it -- the stop-rule behaving exactly as intended, and §8 was not touched (audit confirms).
 The error was the orchestrator's packet prose, not the plan.
+
+PHASE 2 CLOSED (2026-07-30)
+
+Every acceptance criterion re-run by the orchestrator on the COMMITTED tree (validate-2.6.sh =
+§VAL-P2 verbatim + the frozen close tail with BASE=fe1f78ab substituted per P2-AMENDMENT #1c,
+plus criteria 8 and 11 which the frozen tail does not cover). Exit 0. Measured, not asserted:
+  suite 328 reported / 0 fail / plan 1..323 · identical under APP_CODE=dummy · flat ledger 323
+  contrast 52 PASS · public/ EXCLUSION digest 2362 74e736d7d83b22a24945eae87cb9fe33 (identical
+  to the phase-1 pin, so the invariant is real and not a tautology) · public/sw.js md5
+  f16579d50af8b49a04e45a80975c6acf with CACHE = "magic-vet-v17" · both transcripts diff EMPTY ·
+  no .data/profile.json · NEW FULL public/ PIN 2371 644f333395566079ef6d0441438c7a4a (2362 + 9,
+  count asserted) · BINARY-OK all 18 committed binaries worktree bytes == git blob bytes (the
+  autocrlf trap, SK2-5, which git diff cannot see) · write set vs BASE exactly the 20 expected
+  paths, nothing deleted, tree clean · docs/visual-design.md deletions vs BASE = 0 · lib/ api/
+  tests/ public/views/ public/*.js styles.css sw.js all untouched · optimize-trophies.js
+  CRLF=0 LF=39.
+
+Criteria 1-11 all satisfied. 1: nine 1254x1254 square PNG masters, md5-distinct from each other,
+from the nine existing assets/delight/*.png and from the dragon-clinic anchor. 2: nine 640x640
+webps, md5-distinct, byte-reproducible across four total runs of the script. 3: nine
+TROPHY-ART APPROVED verdicts, each paired with a TROPHY-ART-MD5 line the gate re-checked against
+the bytes on disk. 4-7 and 9-11 as measured above. 8: exactly nine masters, nine webps, one new
+script, one modified doc.
+
+WHAT WAS DECIDED, NOT GUESSED, DURING EXECUTION
+  P2-NOTE #1 plan.md:989's .oplan awk filter is a syntax error (collapsed backslashes); every
+    phase-2 use took the §VAL-P2:919 form instead. Escalated, ruled, logged -- not silently fixed.
+  P2-NOTE #2 the nine prompt bodies are EXTRACTED from plan.md, never retyped, closing a hole in
+    the frozen 2.1 gate (which only checked shape, so a dropped middle word would have passed).
+  P2-NOTE #3 the frozen 2.4 gate asserts CRLF=0 but not LF=39; covered by binary read-backs.
+  P2-NOTE #4 PACKET-2.5.md contained a false aside ("last content of the file"); the worker
+    flagged it rather than adapting -- the stop-rule working. Orchestrator's error, not the plan's.
+  OWNER RULINGS: GO autonomous-within-phase; SK2-3 ratified (no CACHE bump this phase); all nine
+    images APPROVED as generated, including the three the orchestrator flagged.
+
+THE THREE FLAGGED IMAGES, RECORDED SO PHASE 3 IS NOT SURPRISED. The orchestrator raised these
+BEFORE the verdict and the owner approved them anyway: days does not show the prompt's three
+growth stages (it is one finished flower); quizRight crops tighter than the prompt's "generous
+empty margin on all four sides" and its arrows are small and low-contrast; streak's flat haze
+background reads apart from the other eight, which sit in the wooden clinic world. None is a
+defect against any frozen gate. If phase 3's card CSS crops hard, quizRight is the one most
+likely to suffer -- it is the tightest of the nine.
+
+EVIDENCE DISCIPLINE THAT PAID OFF. Nine prompts reached the composer byte-exactly on the first
+try, verified by char count plus two independent checksums, with the text never passing through a
+tool-call JSON string (clipboard -> in-page read -> synthetic paste). Every capture was one
+synthetic <a download> click against a pre-verified-absent filename, with the page-side byte
+count compared to the shell's wc -c on the landed file. Two audits found things no frozen gate
+would have: that each webp matches ITS OWN master (a mis-wired NAMES loop passes md5-distinctness
+because nine wrong files are still nine different files), and that all 318 original doc lines
+survive IN ORDER byte-identical (a rewrite-in-place passes "deletions == 0").
+
+FIELD GUIDE: lesson 13 added (the art-chat driving recipe and its four silent-no-op traps:
+screenshot-vs-CSS coordinates, synthetic ctrl+v carrying no clipboard, send-is-stop-while-
+streaming, and preview-vs-final being indistinguishable by pixel size). Guide is at 66 lines
+against a 40-line budget; justified because each is a command or mechanism that does not compress
+and each one silently produced a NO-OP rather than an error.
+
+NOT DONE, DELIBERATELY: no deploy, no D25 capture, no CACHE bump, no test, no CSS, no app code,
+no touch of her profile. The eight carried obligations for phase 3 are enumerated in
+phase-state.md.

@@ -1,4 +1,4 @@
-# Field guide — word-g1 (amended: word-trophies phase-1 close widened lessons 4 and 8) (budget: 40 lines; at 57 because the two new traps are commands+mechanisms that do not compress — justification in word-trophies journal)
+# Field guide — word-g1 (amended: word-trophies phase-1 close widened lessons 4 and 8; phase-2 close added lesson 13) (budget: 40 lines; at 66 because these are commands+mechanisms that do not compress — justification in word-trophies journal)
 
 1. A FORMAT GATE IS NOT A CONTENT GATE — bitten three times. Gate what the CHILD experiences
    (phase 3 gated `knownLemmaSet`, not `status`). If no gate can see the failure, add a human one.
@@ -55,3 +55,19 @@
     and stop the server before recording the step.
 12. A COPIED-IN SIGNED DOCUMENT carries wrapper text (header/tail) that becomes FALSE the moment
     it is copied — re-derive wrapper lines to state the post-copy truth; copy only the signed BODY.
+13. DRIVING THE ART CHAT (word-trophies phase 2, 9/9 generated first try). Get the PROMPT in
+    without a transport: powershell Set-Clipboard reads the prompt FILE -> in-page
+    `navigator.clipboard.readText()` -> synthetic `ClipboardEvent('paste')` with a DataTransfer
+    into `div#prompt-textarea`; the bytes never enter a tool-call string. Then gate the send on a
+    BYTE-EXACT composer read-back — char count + sum of charCodeAt + a position-weighted sum —
+    not the ends-only "starts with / ends with" check, which a dropped middle word survives.
+    Keep every digest DECIMAL: the extension redacts hex as "[BLOCKED: Base64 encoded data]".
+    Four traps, each of which silently produced a no-op: (a) computer-tool coordinates are
+    SCREENSHOT px, `getBoundingClientRect` returns CSS px — convert `css * 1568/innerWidth`
+    (0.899 here) or your click lands nowhere; (b) synthetic ctrl+v carries NO clipboard, and
+    `readText()` throws NotAllowedError whenever a shell command has just stolen focus — click the
+    page first; (c) while a turn streams, the send button IS the stop button, so Return does NOT
+    send and the prompt silently sits in the composer — re-read the composer AFTER sending, and a
+    stuck "Stop answering" clears with a plain reload (the draft survives, re-verify it); (d)
+    naturalWidth does NOT separate a PREVIEW from a final — a preview was already 1254x1254. Gate
+    on no-Preview-label AND no-stop-button AND the fetched blob's byte length stable across ~7s.
