@@ -23,14 +23,25 @@ STATE OF THE TREE (all measured at the phase-3 close):
   both transcripts diff EMPTY · no .data/profile.json · lib/ api/ data/ untouched all phase
   public/quiz.js 69b6d71117cf776715374abc6f0abb02 · public/quiz-core.js 9a2131be8b9d1b77c219f1e8c3482a71 (QZ-18)
 
-PINS PHASE 4 MUST QUOTE (these REPLACE every earlier value):
-  public/ full digest    2372 7de2fc8a4ff87f57f1fa46e2f38912c9
-  public/sw.js           d76f781dc49c5f629aba0f2dfe3304b6   CACHE = "magic-vet-v18"
-  public/styles.css      c244d1aeb04b03b6f9781fc3be50c6c5
-  public/index.html      9976fb94ccda6eb5aa86d90335103337
-  public/app.js          bfa3a8837a2fcdcd1c85502e5f1a86fb
-  DEAD: the phase-1/2 EXCLUSION pin 2362 74e736d7d83b22a24945eae87cb9fe33 — five files inside
-  its scope moved this phase. Never quote it again.
+PINS PHASE 4 MUST QUOTE (re-measured 2026-07-30 AFTER steps 3.8 and 3.9 -- these SUPERSEDE the
+values written at the phase-3 close, which moved when the celebration was rebuilt):
+  public/ full digest    2372 25db383385172d14d512e8f3695bdd33   (was 2372 7de2fc8a... at the close)
+  public/sw.js           d76f781dc49c5f629aba0f2dfe3304b6   CACHE = "magic-vet-v18"   (unchanged)
+  public/styles.css      21386f241459f7cc8ca353e9571c0490   (was c244d1ae... at the close)
+  public/views/trophies.js 3e45fe68b6a1e03b3072a63121c98a24 (was 13f3bbd6... at the close)
+  public/index.html      9976fb94ccda6eb5aa86d90335103337   (unchanged)
+  public/app.js          bfa3a8837a2fcdcd1c85502e5f1a86fb   (unchanged)
+  LEDGER 344 flat / 349 reported · CONTRAST 58
+  DEAD: the phase-1/2 EXCLUSION pin 2362 74e736d7... -- never quote it again.
+
+LIVE PRODUCTION RIGHT NOW (verified read-only 2026-07-30, no auth, no /api/profile):
+  https://english-app-three-tan.vercel.app/sw.js  ->  const CACHE = "magic-vet-v17"
+  /assets/trophies/days.webp -> 404
+  i.e. NOTHING from this entire run has ever shipped. Phase 4 is the first deploy.
+
+ACCEPTED (post-close, owner-directed): 3.8 d53e7f2 (celebration = floating medallion, design A1;
+  P3-NOTE #7 hardening) · 3.9 0115260 (earned sound via Web Audio, design A2; desktop ray cap;
+  the no-sound test rewritten per A3). Design amended additively at 1473b4c (design.md §9).
 
 D25 CAPTURE: one exists, taken early on the owner's authorisation —
   english-app-backups/profile-20260730-114016.json, 13295 bytes,
