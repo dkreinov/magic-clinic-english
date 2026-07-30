@@ -533,3 +533,40 @@ TROPHY-ART quizzer: APPROVED
 TROPHY-ART curious: APPROVED
 TROPHY-ART proven: APPROVED
 TROPHY-ART shelf-header: APPROVED
+
+STEP 2.4 the derivative script and the nine webps (WORKER, packet + gate delivered as FILES)
+scripts/optimize-trophies.js was EXTRACTED from plan.md's step-2.4 frozen fence (never retyped,
+same rule as P2-NOTE #2): 39 lines, 1131 bytes, 0 non-ASCII, written with fs.writeFileSync and
+verified by a BINARY read-back (CRLF=0 LF=39) rather than grep/file/git diff (lesson 4).
+node scripts/optimize-trophies.js wrote the nine webps. Frozen gate validate-2.4.sh (= §VAL-P2
+verbatim + the 2.4 tail) exit 0: DERIVATIVES-OK 9 webp all 640x640 byte-distinct and
+byte-reproducible across two further runs; ENDINGS CRLF=0 LF=39; suite 328/0 plan 1..323 both
+modes; flat 323; contrast 52; public/ exclusion digest unchanged; sw.js md5 unchanged; both
+transcripts EMPTY; write set exactly the ten new files.
+
+  id            webp bytes  md5
+  chapters           31694  b4c070d288c200c6f26a0c0c961b5b4c
+  curious            39078  3f9935023eef9ef6deb14a75ea82bec5
+  days               26524  66dfa4f1f6bf8679a47f48db108a595b
+  known              30970  ecc46b410abbd807eaf5867ece787926
+  proven             26210  70c7d7bf68646578cff41e1f9f910fc0
+  quizRight          29008  2767b30ba681f4e89a04e9df597aeb93
+  quizzer            32220  58012695cde0da036c4a7664b0fd43b4
+  shelf-header       24318  97828550ac3d1e529d6e1ff1d30be2fb
+  streak             16124  2f23cf2efda2c122c90631cca090eea9
+  total 256146 bytes for the nine (masters were 17.0 MB; derivatives are 0.25 MB).
+
+ORCHESTRATOR AUDIT (independent): a second extractor located the fence from the "STEP 2.4:"
+heading (a different route than the worker's anchor) and rebuilt the expected buffer -- the file
+on disk is byte-identical to the frozen plan source; endings re-measured CRLF=0 LF=39, 0 non-ASCII.
+PLUS a check the frozen plan does NOT contain: each derivative was decoded and compared against
+ITS OWN master at 64x64 -- mean absolute pixel difference 1.43..2.20 (pure webp quantisation).
+This catches a mis-wired NAMES loop (e.g. nine derivatives all made from one master), which
+md5-distinctness alone cannot see, because nine wrong-but-different files still pass distinctness.
+ACCEPTED.
+
+P2-NOTE #3 (gate-coverage observation, raised by the worker, no action). The 2.4 tail asserts
+CRLF=0 via case "$ENDS" in *"CRLF=0 "*) but never asserts LF=39, so a truncated script with
+CRLF=0 would pass that guard. Covered here by the worker's binary read-back and by the
+orchestrator's byte-identity audit, both of which pin LF=39 exactly. Recorded rather than
+silently patched (the gate is frozen); phase 3 may tighten it if it reuses this shape.
