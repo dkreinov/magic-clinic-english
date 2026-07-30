@@ -16,10 +16,10 @@ BASE (phase 3): 802230f1b97aa2adbff154c3f8de7d7944af12f2
 ACCEPTED (phase 1): 1.1 f5212c5 · 1.2 344f0de · 1.3 d848aa7 · 1.4 3d19efb · closed 4966d89
 ACCEPTED (phase 2): 2.1+open 42cbcd5 · 2.2+2.3 67638bf · 2.4 f48e77e · 2.5 83e7587 · closed 2ee5ca6
 ACCEPTED (phase 3): 3.1 dee596d · 3.2 d8ee456 · 3.3 48ee853 · 3.4 4acc8a2 · 3.5 915c107 ·
-  3.6a e6e02bf · closed <this>
+  3.6a e6e02bf · closed 05a2e1b
 
-STATE OF THE TREE (all measured at the phase-3 close):
-  suite 347 reported / 342 flat / 0 fail, identical under APP_CODE=dummy · contrast anchor 58
+STATE OF THE TREE (re-measured 2026-07-30 after 3.9 -- NOT the phase-3-close numbers):
+  suite 349 reported / 344 flat / 0 fail, identical under APP_CODE=dummy · contrast anchor 58
   both transcripts diff EMPTY · no .data/profile.json · lib/ api/ data/ untouched all phase
   public/quiz.js 69b6d71117cf776715374abc6f0abb02 · public/quiz-core.js 9a2131be8b9d1b77c219f1e8c3482a71 (QZ-18)
 
@@ -64,10 +64,15 @@ FOR PHASE 4 TO CONSUME (carried obligations):
      asserts the nine filenames CASE-EXACTLY (Vercel is case-sensitive; existsSync here is not).
   5. docs/visual-design.md:189 still says "over 52 pairs" ON PURPOSE (SK3-9) — history preserved
      with a dated correction beside it recording 58. Do not "fix" it.
-  6. STILL OPEN, both the owner's call, neither blocking: P3-NOTE #7 (the 3.6a test's assertion 1
-     is a containment check, so it cannot see a single deleted rule — test 17 covers that
-     meanwhile; the remedy is written out in the journal) and P3-NOTE #8 (the celebration overlay
-     has no dimmed backdrop — it reads as a floating card; a one-line token-only change).
+  6. BOTH FORMERLY-OPEN COSMETIC ITEMS ARE NOW CLOSED. P3-NOTE #7 (containment assertion) was
+     HARDENED to per-selector rule-shaped expectations in step 3.8, with the old form measured
+     passing on the same mutated file to prove the difference. P3-NOTE #8 (no dimmed backdrop) is
+     superseded entirely: design amendment A1 rebuilt the celebration as a floating medallion on a
+     72% scrim with rays, glow and a 320ms entrance, and A2 added the earned sound.
+  7. THE CELEBRATION NOW MAKES SOUND (design A2, reversing signed T5/T9). Web Audio only, no
+     asset, no mute setting -- the device's own volume is the only control. Measured firing: four
+     oscillators at 523/659/784/1047 Hz, sine, 85ms apart. Phase 4 must NOT expect any audio file
+     in the deploy, and must not add one.
 
 FROZEN CONTRACTS IN FORCE: everything in .oplan/word-g1/phase-state.md:34-42 · signed design
   T1-T10 as amended by SK-1..SK-6, amendment #3, SK2-1..SK2-8, SK3-1..SK3-11, P2-NOTE #1..#4 and
