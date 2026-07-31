@@ -1,4 +1,4 @@
-# Field guide — word-g1 (amended: word-trophies phase-1 close widened lessons 4 and 8; phase-2 close added lesson 13; phase-3 close corrected lesson 4 and added lesson 14) (budget: 40 lines; at 89 because these are commands+mechanisms that do not compress — justification in word-trophies journal)
+# Field guide — word-g1 (amended: word-trophies phase-1 close widened lessons 4 and 8; phase-2 close added lesson 13; phase-3 close corrected lesson 4 and added lesson 14; phase-4 close added lesson 15) (budget: 40 lines; at 115 because these are commands+mechanisms that do not compress — justification in word-trophies journal)
 
 1. A FORMAT GATE IS NOT A CONTENT GATE — bitten three times. Gate what the CHILD experiences
    (phase 3 gated `knownLemmaSet`, not `status`). If no gate can see the failure, add a human one.
@@ -87,3 +87,29 @@
     GATE IT by asserting the rules live in the globally-linked sheet AND that the view emits no
     `<style>` — and write that test BEFORE the fix so you watch it fail. Lesson 1, again, with a
     new costume: only the human visual gate could see this one.
+15. THE THREE WAYS A GREEN SUITE STILL SHIPS A BROKEN SCREEN — all three happened in
+    word-trophies, all three were found by a HUMAN LOOKING, none by 349 tests.
+    (a) EXISTENCE IS NOT EFFECT. The celebration test asserted the CSS TEXT was in VIEW_STYLE.
+        It was — in a string that never reached the document, so the overlay was unstyled on
+        every route it can actually fire on. Same shape: a no-sound test forbidding `new Audio(`
+        while Web Audio sails past; a ray-cap assertion matching its own CSS COMMENT.
+    (b) PARTS CORRECT, WHOLE INCOHERENT. The tier ring reads STORED state, the progress number is
+        computed LIVE. Both had passing tests. Nothing asserted they AGREE, so four cards read
+        "12 out of 5" while greyed out. Bugs live in the SEAM between two correct things.
+    (c) CORRECT BUT NOT COMPREHENSIBLE. The shelf banner passed every check — right file, size,
+        class, tokens — while `.hero-banner`'s bottom fade erased the shelf edge that identifies
+        it AS a shelf. The image was gated; the CSS was gated; THE COMPOSITE WAS GATED BY NOBODY.
+    THE CAUSE UNDER ALL THREE: the assertions were written from the SAME MENTAL MODEL, at the same
+    moment, as the implementation — so both encode the same error and agree perfectly. A test
+    written by the implementer catches deviations FROM the model, never errors IN it. Note that
+    lesson 1 was known and in force throughout and did NOT prevent this; a remembered lesson is
+    not a countermeasure, only a mechanical habit is. The habits:
+    · AT WRITE TIME ask "what would make this assertion PASS while the feature is BROKEN?" — that
+      one question finds (a) instantly.
+    · ASSERT THE SEAM, not the parts: "no card may show metric >= target while locked" is one
+      line and kills (b) forever.
+    · PREFER EXECUTING the shipped code over reading it as text (this run: 13 of 20 executed,
+      and the disaster was in the 7 that only read source — source-needle tests fail OPEN).
+    · TWO APPROVED THINGS MAKE AN UNAPPROVED THIRD. Wherever approved art meets approved CSS, or
+      approved code meets approved config, there is a surface nobody signed off — gate it or look
+      at it.
