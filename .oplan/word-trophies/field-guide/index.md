@@ -1,4 +1,4 @@
-# Field guide — word-g1 (amended: word-trophies phase-1 close widened lessons 4 and 8; phase-2 close added lesson 13; phase-3 close corrected lesson 4 and added lesson 14; phase-4 close added lesson 15) (budget: 40 lines; at 115 because these are commands+mechanisms that do not compress — justification in word-trophies journal)
+# Field guide — word-g1 (amended: word-trophies phase-1 close widened lessons 4 and 8; phase-2 close added lesson 13; phase-3 close corrected lesson 4 and added lesson 14; phase-4 close added lesson 15) (budget: 40 lines; at 133 because these are commands+mechanisms that do not compress — justification in word-trophies journal)
 
 1. A FORMAT GATE IS NOT A CONTENT GATE — bitten three times. Gate what the CHILD experiences
    (phase 3 gated `knownLemmaSet`, not `status`). If no gate can see the failure, add a human one.
@@ -110,6 +110,24 @@
       line and kills (b) forever.
     · PREFER EXECUTING the shipped code over reading it as text (this run: 13 of 20 executed,
       and the disaster was in the 7 that only read source — source-needle tests fail OPEN).
+    WHY THE AUDITORS DID NOT CATCH THESE (they caught ~10 other real defects, so this matters):
+    every catch was about the ARTIFACT — is this script correct, is this claim true, is this
+    assertion sound. All three misses were about the RUNNING SYSTEM. Two specific causes:
+    · VERIFIABLE CLAIMS CROWD OUT JUDGEMENT QUESTIONS. The phase-3 review brief explicitly said
+      "does each step's gate actually observe the behaviour, or only its shape?" — and the review
+      still spent its effort re-measuring digests, endings, ratios and arithmetic, because those
+      yield concrete findings and judgement does not. The SAME reviewer found a can-never-fail
+      gate in phase 4, where the brief named the concrete SHAPE ("distinguish GATES that were seen
+      to fail from GUARDS that cannot be tested"). Abstract instructions get abstract attention:
+      name the shape, not the principle.
+    · AUDIT AT THE LAYER THE FEATURE LIVES IN. Step 3.4's audit DID execute the celebration — in
+      node, where there is no CSS. The module was audited; the bug was in the page. A UI feature
+      audited in node is audited at the wrong layer, and the browser check was two steps late.
+    SO ADD TO EVERY REVIEW BRIEF, as concrete questions: (i) for each artifact the plan creates,
+    trace its RUNTIME path — where does it exist, who needs it, can they reach it AT THE MOMENT
+    they need it? (ii) for each value shown to the user, name its SOURCE; where two shown values
+    have different sources, prove they cannot contradict each other. (iii) name every place an
+    approved asset meets approved styling and require someone to LOOK at the composite.
     · TWO APPROVED THINGS MAKE AN UNAPPROVED THIRD. Wherever approved art meets approved CSS, or
       approved code meets approved config, there is a surface nobody signed off — gate it or look
       at it.
