@@ -1610,3 +1610,41 @@ PENDING ITEMS NOW QUEUED FOR A FUTURE SMALL RUN (none urgent, none blocking):
   3. R1 read the word aloud on tap, R2 do not reload the story when nothing changed
      (.oplan/REQUESTS-FROM-THE-LEARNER.md).
 Items 1 and 2 both touch public/ and would share one CACHE bump and one deploy.
+
+## STEP 4.6 CLOSED — THE OWNER'S DEVICE GATE: PASS (2026-07-31)
+
+TROPHY-SCREEN-DEVICE: APPROVED — with one cosmetic defect recorded, not blocking.
+
+Owner's verdict, verbatim: "all working good except small niptak, the image if shelf is not fully
+understandable that this is a shelf because of fade out at the buttom, but fix it when you have
+time."
+
+So of the four things only a person could check:
+  1. four tabs, the trophy cup last, matching the other three icons ....... PASS
+  2. the shelf-header banner ............................................. FAIL (cosmetic) --
+     the .hero-banner bottom fade erases the shelf edge and the amber lights; diagnosed in the
+     entry above, fix deferred at the owner's instruction
+  3. all eight cards present, no broken or missing artwork ............... PASS
+  4. quizRight, the tightest-cropped of the nine, survives the circular
+     mask without losing anything important ............................. PASS
+Also implicitly confirmed by his session: the screen loads on a real device against the live
+deployment, the Hebrew renders correctly RTL, and the nine webps resolve (a broken path would have
+shown as missing artwork).
+
+LOOK-ONLY WAS HONOURED. He was told not to tap words or run a quiz because his taps write to her
+profile and would consume one of her four first celebrations. Consistent with that, read-back R1
+showed her profile BYTE-IDENTICAL to the pre-deploy capture, and the trophies map is still empty --
+i.e. no write has occurred from any source since the deploy.
+
+WHAT THE HUMAN GATE FOUND THAT 349 TESTS DID NOT, across this run: (1) the celebration rendering
+completely unstyled on every route it can actually fire on (phase 3, step 3.6); (2) the stored-ring
+/ live-number contradiction on the shelf (4.6); (3) this banner framing (4.6). Three real defects,
+none visible to any mechanical gate, all found by somebody looking at the real thing. Field-guide
+lesson 1's closing clause -- "if no gate can see the failure, add a human one" -- paid for itself
+three times in one run.
+
+PHASE 4 STATUS: 4.1-4.6 all closed. ONLY 4.7 REMAINS -- read-back R2, which cannot be run until
+she has actually used the app. Awarding in production is therefore still UNPROVEN, and is stated
+as such rather than assumed. The deploy itself is fully verified: v18 live, all 16 files
+byte-identical to the gated tree, all 15 PRECACHE entries and all nine webps serving, her profile
+unchanged.
