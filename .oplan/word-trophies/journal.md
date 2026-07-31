@@ -1648,3 +1648,77 @@ she has actually used the app. Awarding in production is therefore still UNPROVE
 as such rather than assumed. The deploy itself is fully verified: v18 live, all 16 files
 byte-identical to the gated tree, all 15 PRECACHE entries and all nine webps serving, her profile
 unchanged.
+
+## STEP 4.7 — READ-BACK R2: AWARDING IS PROVEN IN PRODUCTION (2026-07-31)
+
+She used the app, so R2 became possible. Both frozen comparisons rc=0.
+
+  C2 -> R2 (the whole deploy window) and R1 -> R2 (since the deploy), identical verdicts:
+    READBACK OK words=40 candidates=6 trophyIds=5
+    TIERS APPEARED (allowed): days.bronze, streak.bronze, known.bronze, known.silver,
+      curious.bronze, chapters.bronze | evidence: chapters=true words=true meta=true
+    STATUS CHANGES (reported, not gated): 7 words moved -- does/forward/her/move learning ->
+      candidate (G1 nominating), loud/shadow/show learning -> known.
+    Nothing lost: no key, no trophy, no tier, no rewritten date.
+
+  AWARD CHECK OK live=chapters.bronze,curious.bronze,days.bronze,known.bronze,known.silver,
+    streak.bronze | not-yet-stamped=none
+  i.e. recomputing from her real data with the SHIPPED engine yields EXACTLY the set production
+  stamped -- no tier exists that the engine cannot justify, and none is owed.
+
+SHE EARNED MORE THAN PROJECTED. Step 4.2 projected FOUR bronzes; she got SIX levels, because she
+kept using the app between the projection and the read-back: words 32 -> 40 took her past
+known.silver (15), and a fifth chapter unlocked chapters.bronze. The projection was not wrong --
+the input moved. This is exactly the case SK4-1 was written for: appearances are allowed WITH
+activity evidence, and the evidence flags all fired.
+
+ORCHESTRATOR ERROR, caught by the gate, recorded because it is the same class this run keeps
+finding. I HAND-WROTE the correctness block in my step script instead of EXTRACTING the frozen one
+from the plan. Mine computed the right answer and printed "AWARDING-CORRECT"; the gate greps for
+"^AWARD CHECK OK ". So the gate failed -- correctly -- on a step whose substance was fine: the
+required ARTIFACT had not been produced in its frozen form. Precisely blocking-finding #2 from the
+phase-4 review ("gated artifacts produced by no command"), committed by me, one step after
+enforcing "extract, never retype" on every worker. Fixed by extracting the block from plan.md and
+running it with its own variables bound; the botched partial output was truncated out of the log
+first so the log carries only real runs. Gate then STEP-4.7-OK, exit 0.
+
+## PHASE 4 CLOSED (2026-07-31) — THE RUN IS COMPLETE
+
+All eight steps closed. 4.7, which the owner and I both expected to leave open, closed the same
+day because she used the app.
+
+FINAL STATE, measured:
+  LIVE          dpl_AVmWnh3XxBZPhLJKnjTUZT9r5EXB
+                https://english-1jnh1sn5e-dkreinovs-projects.vercel.app
+                aliased https://english-app-three-tan.vercel.app · CACHE magic-vet-v18
+  ROLLBACK      dpl_88eKj1qha7SWcsuHwsNCmh7NHfvw
+                https://english-qh5ne6g96-dkreinovs-projects.vercel.app
+                "$(npm prefix -g)/vercel" rollback <that url> --yes   (CODE ONLY; no data restore)
+  QZ-22         v18 IS SPENT. The next bump is v19 and the next phase that moves a precached file
+                owes it.
+  PAYLOAD       16 files, all md5 live == WORKTREE · 15/15 PRECACHE 200 · 9/9 webps 200 image/webp
+                md5 OK including quizRight.webp CASE-EXACT · negative control 404 · health
+                byte-exact · /api/chapter 401
+  REPO          349 reported / 344 flat / 0 fail · contrast 58 · public/ 2372
+                25db383385172d14d512e8f3695bdd33 · phase 4 changed ZERO files outside .oplan/
+  HER DATA      captured before the deploy (C2), read back twice. R1 byte-identical to C2. R2
+                shows only growth, all of it evidenced. Receipts (sha256 + counts, never contents)
+                in backup-receipt.txt.
+
+WHAT THE RUN DELIVERED: a signed design; a trophy engine with 8 trophies x 3 tiers awarded
+server-side and never regressing; nine owner-gated images made through the free ChatGPT web route;
+a trophies screen; an earn-moment celebration with a synthesised sound; three colour tokens with
+their contrast pairs; and one deploy, verified byte for byte, that cost her nothing.
+
+WHAT IT COST TO GET RIGHT, honestly: three defects that 349 passing tests could not see, all found
+by a person looking (field-guide lesson 15); two blocking defects in the phase-4 plan found by a
+fresh reviewer, one of which was a read-back gate that could never fail; and roughly ten smaller
+defects caught by audits, mutations and re-measurement. The mechanical layer caught the artifact
+bugs. Every bug that reached the child was a system bug, and only eyes found those.
+
+OPEN, none blocking: the shelf-banner fade; the stored-ring/live-number contradiction (returns
+whenever the catalogue grows); the chapter-end quiz repetition (R3 -- owner has ruled it should ask
+about the chapter's own words); and the learner's R1/R2. Items 1-3 share a deploy and a v19 bump.
+
+OUTSTANDING QUESTION FOR THE OWNER (D27): keep or delete the capture of her profile. Deleted the
+last three times; not assumed this time.

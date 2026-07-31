@@ -1,29 +1,54 @@
-# STATUS — word-trophies (photograph of now, 2026-07-29)
+# STATUS — word-trophies (photograph of now, 2026-07-31)
 
-PHASE 2 (the artwork) IS PLANNED AND WAITING FOR YOUR GO. Phase 1's engine is done and
-committed; nothing visible or deployed has changed; her live profile has never been touched.
-Production still runs v17.
+**IT IS LIVE, AND IT WORKS.** Mika's trophies screen shipped, and her first six trophy levels have
+been awarded by the real server and verified. The whole run — engine, artwork, screen, celebration,
+sound, deploy — is done. Nothing is outstanding except a short list of small improvements you have
+already seen and parked.
 
-The phase-2 plan, in one breath: nine picture requests are written down word-for-word in the
-plan (eight trophies + one shelf header, all objects from her app's world — no people, no
-metal cups, because the app's own colors mark bronze/silver/gold). I generate them one at a
-time in the SAME ChatGPT chat that drew every existing picture, you say yes or no to each
-one, a tiny script shrinks the approved nine for the web, and the design document records
-everything so a tenth trophy can be made months from now without asking anyone.
+## What she has now
 
-```mermaid
-flowchart LR
-    P1[Phase 1 ENGINE<br/>DONE] --> P2[Phase 2 artwork<br/>PLANNED - needs your GO<br/>you approve every image]
-    P2 -.-> P3[Phase 3 the screen<br/>+ celebration + cache v18]
-    P3 -.-> P4[Phase 4 ship<br/>capture, deploy, read-back]
-```
+A fourth tab, `הגביעים שלי`, with a shelf of eight trophies. Six levels are earned and ringed:
 
-Checked today before planning: all 328 tests green, color check 52, production untouched,
-no local copy of her profile, no backup capture yet (correct — phase 4 makes one).
+| trophy | level |
+|---|---|
+| מתמידה — showing up | bronze |
+| רצף קסום — days in a row | bronze |
+| אוצרת מילים — words known | bronze **and silver** |
+| בלשית מילים — words investigated | bronze |
+| הרפתקנית — chapters read | bronze |
 
-One decision folded into your GO: this phase does NOT touch the phone's cache version.
-The new images are never pre-cached, nothing deploys until phase 4, and the signed design
-puts the one cache bump in phase 3 — so bumping now would be needless. Saying GO ratifies
-that; say otherwise and the plan has the exact fallback written in.
+The other three (`אלופת התרגול`, `מתאמנת אמיצה`, `באמת יודעת`) are still to come, shown greyed —
+the same picture dimmed, never a sadder one.
 
-WAITING ON YOU: say GO to start phase 2 — or ask anything about the plan first.
+When she earns one, the screen dims, a ray fan turns behind the trophy, it pops in with its
+bronze ring, her Hebrew name for it rises underneath, and a short rising chime plays. One tap
+dismisses it. She gets one at a time, never a pile.
+
+## Proof, not assurance
+
+- Her profile was photographed before the deploy and read back twice after. **Nothing was lost.**
+  Immediately after shipping it was **byte-identical** to the photograph.
+- Every one of the 16 changed files is **byte-identical** live to what was tested.
+- All 15 pre-downloaded files answer; all 9 trophy pictures answer with the correct bytes.
+- Every trophy level the server stamped is one the engine agrees she earned — **no invented
+  awards**, checked by recomputing from her real data.
+- 349 tests pass, the colour-contrast gate passes 58 pairs.
+
+## Known and parked (nothing here blocks anything)
+
+1. **The shelf picture doesn't read as a shelf** — the frame it borrows fades out its bottom,
+   erasing the shelf edge and lights. Your call, recorded, fix pending.
+2. **Trophy cards can briefly show "target reached" while greyed** — harmless now, self-cleared
+   when she used the app, but it returns whenever a NEW trophy is added to the list.
+3. **The end-of-chapter quiz repeats** (she reported this). Diagnosed: the questions are picked
+   in a fixed order and one word is pinned to the top because she once got it wrong. You have
+   decided the fix — it should ask about the words from the chapter she just read.
+4. **Read the word aloud when she taps it** — she asked for this; the app already has the audio.
+5. **Coming back from the dictionary reloads the story** — she is right, and this is a defect.
+
+Items 1-3 touch the shipped folder and would share one deploy.
+
+## One question outstanding
+
+The backup photograph of her profile is still on this machine. **Keep it or delete it?** You have
+deleted it the last three times. Deleting ends the safety net; keeping it leaves her data here.
