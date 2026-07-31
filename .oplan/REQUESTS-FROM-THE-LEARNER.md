@@ -62,3 +62,49 @@ usually also means "and I lost my place". Worth asking her.
   this entry gets a line saying which run took it and where the design lives.
 - If she raises something and it is a defect (like R2 probably is), say so plainly rather than
   filing it as a nice-to-have.
+
+---
+
+## R3 — "at the end of each chapter I get the same exact questions" — CONFIRMED DEFECT
+**Raised:** 2026-07-31, via the owner. **Status:** diagnosed, not fixed.
+
+**She is right, and it is not the comprehension questions.** Measured against her real profile:
+her four chapters each carry their OWN three questions (four distinct sets, verified by
+fingerprint). Those are fine. The repetition is in the **word quiz that runs after them**.
+
+**Root cause, measured with the shipped code against her real data:**
+
+1. `public/views/reader.js:344` builds the chapter-end quiz from
+   `candidateLemmas.concat(pickQuizWords(profile, 20))` — i.e. **her whole vocabulary**, exactly
+   the same pool the words screen uses. **The end-of-chapter quiz has nothing to do with the
+   chapter she just read.**
+2. `pickQuizWords` (`public/quiz-core.js:50`) is **fully deterministic**: sort by strikes desc,
+   then needsReview, then never-quizzed-first, then oldest `lastQuizAt`, then alphabetical.
+3. `startQuiz` (`public/quiz.js:232`) then walks that list **in order and takes the first four
+   that load**. `rand` is used only to shuffle the multiple-choice OPTIONS and to pick among
+   alternate bank items — **never to choose WHICH words are asked**.
+4. Her word `dad` has `strikes: 1` (she answered it wrong once). Strikes sort FIRST and
+   unconditionally, and `applyQuizAnswer` only clears a strike on a CORRECT answer
+   (`lib/profile.js`). So **`dad` is question #1 in every single quiz until she gets it right** --
+   and if she gets it wrong again the strike rises and it stays pinned.
+
+Her live pool at the time of the report: 12 known words, 7 of which had NEVER been quizzed. The
+[REDACTED: her vocabulary -- D27/R-F3-5, counts only]
+unchanged profile (verified by calling it twice).
+
+**So the mechanism is: one word is literally identical every time, and the other three rotate only
+as fast as she finishes quizzes.** To a child that is "the same exact questions".
+
+**Two separable problems, and they want different fixes:**
+- *(a) selection is first-N of a fixed order, never sampled.* Small, safe fix: keep the priority
+  ranking as a WEIGHTING but choose from a wider slice — e.g. take the top ~8 and sample 4 — so a
+  struggling word stays likely without being guaranteed every single sitting. Note `quiz.js` and
+  `quiz-core.js` are QZ-18-frozen and md5-pinned by the phase-3/4 gates, so this needs process,
+  not a quick edit.
+- *(b) the chapter-end quiz is not about the chapter.* Bigger, and a design question for the
+  owner: should finishing a story quiz the words from THAT story (the chapter carries a
+  `glossary`), or stay a global review? Today it is global, and nothing in the record says that
+  was deliberate.
+
+**Not a regression from the trophies run** — this behaviour predates it entirely; nothing in
+phases 1-4 touched quiz selection. Recorded here rather than hot-fixed.
