@@ -1571,3 +1571,42 @@ STATUS OF 4.6: the owner has LOOKED. The defect above is recorded. Not yet confi
 the four-tab nav, the shelf-header banner, and that no artwork is broken -- i.e. the rest of the
 4.6 checklist. 4.7 (read-back R2) remains OPEN and awarding in production remains UNPROVEN until
 she uses the app.
+
+## OWNER FINDING 2026-07-31 — the shelf banner does not read as a shelf (RECORDED, NOT FIXED)
+
+Owner, looking at the sandbox reproduction: "the image of shelf is not fully understandable that
+this is a shelf because of fade out at the bottom, but fix it when you have time."
+
+DIAGNOSED PRECISELY. The banner is rendered as
+  public/views/trophies.js:185   <img class="hero-banner" src="/assets/trophies/shelf-header.webp">
+and .hero-banner shares a rule with .chapter-banner and .celebrate-image at
+public/styles.css:380-390, which applies BOTH of these to it:
+  aspect-ratio: 3 / 2;  object-fit: cover;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 74%, transparent 100%);
+So the bottom 26% of the image is faded to transparent, and a SQUARE source is cropped to 3:2,
+losing roughly a third of its height. On the shelf artwork the bottom band is precisely where the
+shelf's front edge and the string of amber lights sit -- the two features that identify it AS a
+shelf. The frame is erasing the part that carries the meaning. The artwork itself is fine; it was
+approved at the GC-D8 gate and it is unchanged.
+
+THIS IS SK3-3's COST, now visible. That skeleton change chose .hero-banner deliberately to avoid
+writing new CSS ("zero new CSS; spot-image is the one-word fallback"). The fade was designed for
+story banners that blend down into the page, and it is wrong for an object that must be legible
+to its bottom edge. Nobody could have seen this from the plan -- it needed a human looking at the
+real thing, which is what step 4.6 is for. Second defect this phase found only by a person.
+
+CANDIDATE FIX (not applied; owner said "when you have time"): give the shelf-header its own class
+rather than borrowing .hero-banner -- same width/radius, but NO bottom mask, and a taller aspect
+ratio (or object-position tuned to keep the shelf edge) so the lights survive the crop. It must be
+a NEW class: .hero-banner is shared with .chapter-banner and .celebrate-image, and those two WANT
+the fade. Costs: one new CSS block in public/styles.css, one class name in trophies.js, an updated
+assertion, and -- because it changes public/ -- a CACHE bump to v19 and a second deploy to reach
+her. That is why it is worth BUNDLING with anything else pending rather than shipping alone.
+
+PENDING ITEMS NOW QUEUED FOR A FUTURE SMALL RUN (none urgent, none blocking):
+  1. this shelf-banner framing fix;
+  2. the stored-ring / live-number contradiction, which self-heals for her but RECURS on every
+     existing profile whenever the catalogue grows (see the 4.6 entry above);
+  3. R1 read the word aloud on tap, R2 do not reload the story when nothing changed
+     (.oplan/REQUESTS-FROM-THE-LEARNER.md).
+Items 1 and 2 both touch public/ and would share one CACHE bump and one deploy.
