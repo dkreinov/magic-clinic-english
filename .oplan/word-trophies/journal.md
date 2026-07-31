@@ -1505,3 +1505,69 @@ between it and HEAD is one of this run's own.
 STILL OPEN: 4.6 (the owner looks at it on a real device, LOOK-ONLY -- his taps would write to her
 profile and burn one of her first celebrations) and 4.7 (read-back R2, only possible after she has
 used it). Awarding in production remains UNPROVEN until R2. Said plainly rather than assumed.
+
+## STEP 4.6 — THE OWNER LOOKED, AND FOUND A REAL DEFECT (2026-07-31)
+
+The owner opened her trophies room on a real device (look-only, as mandated) and reported: every
+card grey, one showing a completed-looking count. He was right, and no automated gate in this run
+would ever have caught it.
+
+REPRODUCED EXACTLY, offline, by driving the SHIPPED view functions (TROPHY_VIEW, tierOf,
+nextThreshold, progressLine, imported from public/views/trophies.js) against her real captured
+profile. No network, no new read.
+
+  id          live  bronze  ring   line she sees
+  chapters       4       5  grey   4 מתוך 5      sensible
+  days           3       3  grey   3 מתוך 3      CONTRADICTION
+  streak         2       2  grey   2 מתוך 2      CONTRADICTION
+  known         12       5  grey   12 מתוך 5     CONTRADICTION, and nonsense on its face
+  quizRight      4      10  grey   4 מתוך 10     sensible
+  quizzer        6      20  grey   6 מתוך 20     sensible
+  curious       28      25  grey   28 מתוך 25    CONTRADICTION
+  proven         0       1  grey   0 מתוך 1      sensible
+
+FOUR cards simultaneously say "target reached" and "not earned". One says "12 out of 5".
+
+ROOT CAUSE — two sources of truth on one card. The RING is read from the STORED trophies map
+(tierOf, T1); the NUMBER is computed LIVE on the device (progressLine -> trophy.metric(profile)).
+awardTrophies runs on the POST paths only (T2, api/profile.js:143 and api/chapter.js) -- never on
+a read -- so a profile that PREDATES the engine has an empty trophies map while its live counts
+have already passed four thresholds. This is design T9's "free backfill" working exactly as
+specified; what nobody thought through is what the shelf LOOKS LIKE during the gap before her
+first write.
+
+IT SELF-HEALS, AND CANNOT RECUR FOR HER. Every metric derives from fields that change only on a
+write, and every write path awards before saving -- so a count can only get ahead of the ring if
+it crossed a threshold while the engine was not live. That is this one-time window and nothing
+else. Her first word tap, quiz answer or new chapter stamps all four bronzes, lights the rings,
+and switches the numbers to counting toward silver.
+
+*** BUT IT WILL RECUR, PREDICTABLY, AND THAT IS THE PART WORTH KEEPING ***
+The same contradiction reappears on EVERY EXISTING PROFILE the next time the CATALOGUE GROWS. Add
+a ninth trophy whose threshold her history already exceeds, and it ships grey showing "N מתוך N"
+until her next write. So this is not a one-off curiosity -- it is a standing hazard of the
+stored-ring / live-number split, and any future run that adds a trophy must decide what the shelf
+shows in the gap BEFORE it ships.
+
+OWNER RULING (2026-07-31): LEAVE IT. No code change and no write to her profile; it clears the
+moment she acts, and her four celebrations then queue exactly as designed. He also declined a
+re-read of her live profile -- last night's capture is sufficient and the numbers cannot have
+moved without the rings lighting up.
+
+CANDIDATE FIXES, recorded for whoever revisits this (none applied):
+  (a) clamp the displayed number so it can never exceed its target -- kills "12 מתוך 5" but leaves
+      "3 מתוך 3 while grey";
+  (b) ring = max(stored tier, tier implied by the live metric) -- makes the card self-consistent,
+      but a live-derived ring can VANISH for days/streak, whose metrics are non-monotonic, and a
+      disappearing ring is exactly what the never-regress law forbids her to see;
+  (c) award on the read path -- rejected by T2 on purpose ("a read stays a read");
+  (d) a one-off no-op write to force the award pass -- fixes the display but writes data she did
+      not create and back-dates nothing, so the tiers carry today's timestamp rather than the day
+      she earned them.
+None is free. (b) is the most honest display but collides with never-regress; that tension is the
+real design question and it should be settled deliberately, not in a hotfix.
+
+STATUS OF 4.6: the owner has LOOKED. The defect above is recorded. Not yet confirmed by him:
+the four-tab nav, the shelf-header banner, and that no artwork is broken -- i.e. the rest of the
+4.6 checklist. 4.7 (read-back R2) remains OPEN and awarding in production remains UNPROVEN until
+she uses the app.
