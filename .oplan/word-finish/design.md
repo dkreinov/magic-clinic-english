@@ -16,8 +16,24 @@ Five items. Four are on record; the fifth was found today while deleting the bac
 | **D** | a trophy card can read "target reached" while greyed out | owner, word-trophies; recurs whenever the catalogue grows | defect |
 [REDACTED: her vocabulary -- D27/R-F3-5, counts only]
 
-D27 is **answered and done**: all 10 profile backups were deleted 2026-08-01, receipt in
-`.oplan/word-polish/backup-receipt.txt`. E is the last copy of her data on this machine.
+D27 is answered: the owner said delete. **CORRECTED 2026-08-01 — the first deletion was INCOMPLETE
+and the orchestrator's claim that E was "the last copy" was FALSE.** The first sweep looked only in
+`english-app-backups`, `polish-deploy` and `trophies-deploy` and deleted 10 files. A fresh planner
+found four more; a machine-wide sweep then found a fifth. All five are now deleted too:
+`g1-scratch/sandbox-profile.bak`, `g1-scratch/sandbox-profile-p2.bak`,
+`g1-deploy/live-readback.json`, `g1-deploy2/live-readback.json`,
+`trophies-val/sandbox/profile.backup.json` — the two `live-readback.json` files held **20 words and
+2 chapters read from the live service**, more of her data than anything in the original receipt.
+Receipts for all 15 are in `.oplan/word-polish/backup-receipt.txt`.
+
+**E IS TWO FILES, NOT ONE** (this is a scope change to step 1.1): `english-app-sandbox/profile.json`
+(12 words) and `trophies-val/sandbox/profile.json` (15 words). Both are dev fixtures rather than
+backups, so both are replaced with synthetic data rather than deleted. After 1.1 there is no copy
+of her data on this machine.
+
+**LESSON, recorded because it is the shape of the mistake:** a deletion scoped to the directories I
+happened to remember is not a deletion. The only trustworthy form is a sweep that asks every file
+"are you a profile?" — which is what found the last five.
 
 ## 2. The decision that shapes the whole run: build-time, not run-time
 
@@ -95,8 +111,11 @@ decides the exact invalidation signal and **must state what happens when the sig
 takes time" almost always also means "and I lost my place".
 
 ### D — the trophy card cannot contradict itself
-Measured: `public/views/trophies.js:100-114` computes each card's number **live** from the profile
-(`metric: (p) => …`), while the ring/earned state is read from **stored** `profile.trophies`. Two
+Measured — **CORRECTED 2026-08-01, the original line numbers in this design were WRONG.**
+`trophies.js:100-114` is the catalogue literal, which is pinned by a `deepStrictEqual` test; an
+executor sent there would break a pin and fix nothing. **The real seam is `cardHtml:163-167`**,
+where the card's number is computed **live** from the profile while the ring/earned state is read
+from **stored** `profile.trophies`. Two
 sources for one card, so they can disagree — and they did, showing "target reached" on a greyed
 card. It self-clears when she next acts, and returns whenever a new trophy is added.
 

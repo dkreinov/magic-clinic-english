@@ -14,3 +14,14 @@ D27 ANSWERED 2026-08-01: the owner said delete all backups. Deleted:
   deleted /c/Users/dkreinov/trophies-deploy/readback-1.json bytes=15133 sha256=f7befc3833cdbfdfb24ce4a785c81fedadf9c72dc493acf94f60c6385557d049
   deleted /c/Users/dkreinov/trophies-deploy/readback-2.json bytes=20900 sha256=400d67d2d96802dc4d84370cfd0be53b79d354ba9352944abcbb8ea28b3670d2
 
+D27 SUPPLEMENT 2026-08-01: five MORE copies of her profile found after the first sweep.
+The first sweep only looked in english-app-backups, polish-deploy and trophies-deploy.
+  deleted /c/Users/dkreinov/g1-scratch/sandbox-profile.bak bytes=4783 sha256=c0fc3f727d1cf87335613a6557a8838ae5a4b8560151791efe3f43461dc104eb
+  deleted /c/Users/dkreinov/g1-scratch/sandbox-profile-p2.bak bytes=4783 sha256=c0fc3f727d1cf87335613a6557a8838ae5a4b8560151791efe3f43461dc104eb
+  deleted /c/Users/dkreinov/g1-deploy/live-readback.json bytes=8115 sha256=58870a1b059512c747452fa8114a904bf1c210930f671edd1e77deba65cd51c2
+  deleted /c/Users/dkreinov/g1-deploy2/live-readback.json bytes=8115 sha256=58870a1b059512c747452fa8114a904bf1c210930f671edd1e77deba65cd51c2
+  deleted /c/Users/dkreinov/trophies-val/sandbox/profile.backup.json bytes=5963 sha256=8da4a514b1a739a4c1f6d8b5bc482154ce030b5c04207c4eeda2e194630d9385
+  REMAINING (dev fixtures, not backups; replaced with synthetic by word-finish step 1.1):
+    english-app-sandbox/profile.json (12 words)
+    trophies-val/sandbox/profile.json (15 words)
+

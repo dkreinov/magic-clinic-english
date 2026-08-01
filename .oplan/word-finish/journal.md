@@ -68,3 +68,42 @@ retried and never surfaced. Recorded; not scheduled.
 
 NEEDS A REAL SESSION, could not be verified statically: generation wall-clock (no maxDuration in
 vercel.json), and whether her live checkLog holds duplicates.
+
+## 2026-08-01 — phase 1 planned; THREE orchestrator errors caught by the planner
+
+PLANNER (opus, fresh) wrote FINISH-P1-DRAFT.md, 2159 lines, 6 steps. It verified by EXECUTION:
+reproduced defect D on the shipped module (`known` locked while reading `12 מתוך 5`), swept the fix
+over 6644 combinations with 0 violations; reproduced defect C in a harness (today: 2 paints, first
+without the story; after: 1 paint WITH the story and still exactly 1 profile fetch); extracted E's
+generator from the plan and ran it to the frozen md5; measured endings two ways on 20 files.
+
+ORCHESTRATOR ERRORS IT CAUGHT — all three were mine:
+1. **"E is the last copy of her data" was FALSE.** It found four more; my follow-up machine-wide
+   sweep found a fifth. Two of them (g1-deploy*/live-readback.json) held 20 words and 2 chapters
+   read from the LIVE service. All five now deleted, receipts appended. THE LESSON: a deletion
+   scoped to the directories I remembered is not a deletion. Only a sweep that asks every file
+   "are you a profile?" is trustworthy — that is what found them.
+2. **The D line numbers in design.md and the briefing were WRONG.** trophies.js:100-114 is the
+   catalogue literal, pinned by a deepStrictEqual; the real seam is cardHtml:163-167. An executor
+   sent to my address would have broken a pin and fixed nothing. design.md corrected in place.
+3. **E is TWO files, not one** — trophies-val/sandbox/profile.json (15 words) was missed entirely.
+   Step 1.1's scope grows to cover both.
+
+PLANNER FOUND A DEFECT IN ITS OWN GATE BY RUNNING IT: §VAL-F1 printed 4 FAIL: lines and EXITED 0,
+because the preamble carries no `exit $RC` — run alone it is a REPORT, not a gate. Verified correct
+with the tail appended (clean->0, mutated->1). This is the same family as field-guide 16 and is a
+field-guide candidate: A PREAMBLE IS NOT A GATE; ONLY PREAMBLE+TAIL IS.
+
+BLOCKERS ANSWERED BY THE ORCHESTRATOR:
+- B-F1-1 (the other copies): DELETE, done — 5 deleted; the 2 remaining are dev fixtures and are
+  step 1.1's job. Step 1.1 now covers BOTH sandbox files.
+- B-F1-2 (R4): CONFIRMED, the planner is right and it corrects my correction. Its mechanism fixes
+  R4(i) (state lost on a tab switch) for free. R4(ii) (reading checkLog back) must NOT be folded in:
+  it needs an owner-level ruling on first-attempt vs best-attempt and a de-dup rule, and it writes
+  SCREEN state from DURABLE data, which is a different risk class. Separate step 1b, after 1.6.
+- B-F1-3 (no live measurement): correct and accepted. magic-vet-v20 stays a hypothesis that phase 4
+  confirms with `vercel inspect`, exactly as word-polish phase 3 did.
+
+RECORD GAPS PATCHED: design.md's "last copy" claim and its D line numbers (both above).
+STILL STALE, patched next: word-polish/plan.md quotes reader.js 845 (now 857), reader-ui.test.js
+492 (now 511) and an old sw.js md5; word-finish/phase-state.md still says BASE 0c0f32a.
