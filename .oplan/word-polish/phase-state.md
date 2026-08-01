@@ -15,3 +15,14 @@ FROZEN CONTRACTS IN FORCE: public/quiz.js md5 69b6d71117cf776715374abc6f0abb02 a
   happens EXACTLY ONCE, in step 3.1.
 OPEN QUESTIONS: D27 (delete or keep the profile captures on this machine) — asked at 3.9.
 BLOCKED: no.
+
+ROLLBACK: (code only) — the deployment live before phase 3, exactly as `vercel inspect` reported it:
+  id  = dpl_AVmWnh3XxBZPhLJKnjTUZT9r5EXB
+  url = https://english-1jnh1sn5e-dkreinovs-projects.vercel.app
+  command:
+    "$(npm prefix -g)/vercel" rollback https://english-1jnh1sn5e-dkreinovs-projects.vercel.app --yes
+  vercel rollback restores CODE ONLY. There is no restore path for her profile (D27).
+  Measured at pre-flight: live /sw.js first line `const CACHE = "magic-vet-v18";`,
+  Etag "d76f781dc49c5f629aba0f2dfe3304b6" (== the pre-bump worktree md5 of public/sw.js),
+  Cache-Control "public, max-age=0, must-revalidate", Age 161184. All 16 probed paths 200,
+  /api/chapter 401 (auth required, correct), /api/health ok.
