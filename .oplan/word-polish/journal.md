@@ -211,3 +211,43 @@ WHAT THIS PHASE FOUND THAT NO GATE WOULD HAVE:
     wiring instead of executing it, so deleting the single line that fixes the child's complaint
     left all 358 tests green. Lesson 15(a), inside a step citing lesson 15. Now guarded, and the
     guard was seen to fail before it was trusted.
+
+## PHASE 2 (the audio) — STOPPED BEFORE GENERATION, ON A DESIGN FINDING (2026-08-01)
+
+NOT A FAILURE, AND NOTHING WAS SPENT. The owner had approved the paid TTS (B3) and the ten-word
+list (B2). Before running anything I checked what the script actually does, using ITS OWN
+`deriveWordList()` rather than re-implementing it (lesson 2). Two facts, both measured:
+
+  1. `deriveWordList()` returns EXACTLY the current 2254-entry manifest -- 0 additions, 0 drops.
+     So running scripts/build-word-audio.js is a manifest no-op and is safe in that respect.
+  2. NONE of the ten target words is in that derived list:
+       after · deer · feet · glow · growl · harm · moon · nervous · scary · tight
+     So the script would generate NOTHING for them. The ten are not "missing clips" -- they are
+     OUTSIDE THE VOCABULARY THE AUDIO SYSTEM IS DEFINED OVER.
+
+THE REAL SHAPE OF R1, and it is architectural, not a gap. The audio vocabulary is DERIVED from the
+curriculum bands (data/band1.json + data/band2.json, filtered by buildAllowedSet to her level) and
+`build-word-audio.js:97` REWRITES public/audio/words/index.json from that derivation on every run.
+So the set of words that can ever be heard is exactly the curated curriculum. But her CHAPTERS are
+written by an LLM, which naturally reaches outside the bands for story words -- `nervous`, `moon`,
+`scary`, `growl`. Those words appear in her glossary, she can tap them, and they can NEVER have
+audio under the present design.
+
+Hand-adding the ten to index.json would appear to work and would be silently DESTROYED by the next
+`build-word-audio.js` run, which rewrites the file from the bands. That is a trap, not a fix, and I
+will not lay it at 3am against a paid API.
+
+THE ACTUAL DECISION, which belongs to the owner and to a design pass, not to this run:
+  (a) EXTEND THE CURRICULUM: add story words to band2 so they become first-class vocabulary --
+      they then get audio, and also enter placement, quizzes and the whole word system. That is a
+      curriculum change with reach far beyond audio.
+  (b) SPLIT THE MANIFEST: keep the band-derived list as the curriculum, and add a SECOND,
+      additive source for "story words that have audio", with build-word-audio.js taught to union
+      them instead of overwriting. Contained, but it is a real change to a shipped pipeline.
+  (c) ACCEPT THE BOUND: story words outside the curriculum simply have no speaker, which is what
+      happens today and is at least honest -- step 1.2 now proves the button is never dead.
+None is a 3am change. (b) is my recommendation if she is to hear her story words.
+
+STATUS: phase 2 NOT STARTED. No API call was made, no clip generated, no byte written to
+public/audio/. Phase 3 (ship) is unaffected and can carry phase 1 alone whenever the owner wants
+it -- phase 1's three changes are complete, gated and committed.
