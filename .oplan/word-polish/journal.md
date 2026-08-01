@@ -171,3 +171,43 @@ be suppressed where it previously ran. A child cannot be left stuck on a dead qu
 ORCHESTRATOR AUDIT: celebrateFromServer 3; wiring line present once and guarded once; quiz.js and
 quiz-core.js md5s frozen; reader.js CRLF=845 LF=0; tests LF=492; ledger 353/358; contrast 58.
 ACCEPTED.
+
+STEP 1.4 the self-served sandbox visual gate — ORCHESTRATOR (field-guide lesson 11)
+Port 3000 checked and cleared first; fabricated sandbox profile (never hers); service worker
+unregistered and caches cleared. THE THREE-CACHE TRAP BIT AGAIN and is worth the field guide: after
+busting only the STYLESHEET the banner still computed `class="hero-banner"` with the mask intact,
+because the VIEW MODULE was still cached. A full document reload with a fresh query fixed it. Three
+caches -- service worker, JS module, stylesheet -- must each be busted independently, and busting
+one gives a convincing mix of new-and-old that looks exactly like a broken implementation.
+
+MEASURED AFTER THE PROPER RELOAD: banner class `shelf-banner`, `mask-image: none`,
+aspect-ratio 3/2, source 640x640 loaded, 8 cards present.
+LOOKED AT: the wooden plank edge now runs unbroken across the bottom of the banner and the string
+of amber lights along its front edge is sharp and bright -- the two features that make the picture
+read AS a shelf, and precisely the two the fade was erasing. The dragon sleeps at the right end.
+VERDICT: PASS. The owner's complaint ("not fully understandable that this is a shelf because of
+fade out at the bottom") is answered.
+Not provable here and stated plainly: that two chapters finished in ONE sitting ask DIFFERENT
+words. That needs a real reading session and is the only real proof the T2 wiring RUNS (the
+step-1.3 guard catches deletion, not re-implementation). Carried to the ship phase's read-back.
+
+## PHASE 1 CLOSED (2026-08-01)
+
+All three code changes in, each independently gated, ledger 344 -> 353 flat / 358 reported,
+contrast 58 throughout, public/quiz.js and public/quiz-core.js byte-frozen the whole phase.
+  1.1 2ebb862  .shelf-banner, no bottom fade, .hero-banner byte-unchanged
+  1.2 d86b89d  canSay's honesty asserted over 11282 inputs
+  1.3 cea19de  chapter words first, already-asked to the tail, + a seen-to-fail wiring guard
+  1.4 (this)   visual gate PASS
+CARRIED: CACHE is still v18 and this phase moved three PRECACHED files. The single v18 -> v19 bump
+is owed by the ship phase, once, after the audio.
+
+WHAT THIS PHASE FOUND THAT NO GATE WOULD HAVE:
+  · a frozen test broken by a COMMENT (P1-AMENDMENT #2) -- the pin was right, the comment was the
+    intruder;
+  · the same stale-baseline defect twice (P1-AMENDMENT #1 and #3) -- I fixed EXPECT and failed to
+    carry it to DELS, and a worker caught my omission;
+  · and the one that matters: the test meant to prove the repeat-fix is WIRED re-implements the
+    wiring instead of executing it, so deleting the single line that fixes the child's complaint
+    left all 358 tests green. Lesson 15(a), inside a step citing lesson 15. Now guarded, and the
+    guard was seen to fail before it was trusted.
