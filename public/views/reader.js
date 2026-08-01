@@ -254,7 +254,7 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
-function normalizeWord(raw) {
+export function normalizeWord(raw) {
   return raw.toLowerCase().replace(/[^a-z]/g, "");
 }
 

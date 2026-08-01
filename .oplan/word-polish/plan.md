@@ -973,11 +973,13 @@ PIN344="$(grep -c 'lemmas = candidateLemmas.concat(pickQuizWords(profile, 20));'
 case "$PIN344" in 1) ;; *) fail "the frozen line reader.js:344 must survive byte-identical, got '$PIN344'";; esac
 CLIPS="$(node -e 'const fs=require("fs");const m=JSON.parse(fs.readFileSync("public/audio/words/index.json","utf8"));const f=fs.readdirSync("public/audio/words");const a=new Set(f.filter(x=>x.endsWith(".aac")).map(x=>x.slice(0,-4)));const miss=m.filter(w=>!a.has(w));const orph=[...a].filter(w=>!m.includes(w));console.log(m.length+" "+a.size+" "+miss.length+" "+orph.length);')"
 case "$CLIPS" in "2254 2254 0 0") ;; *) fail "manifest/clip correspondence broken, expected '2254 2254 0 0', got '$CLIPS'";; esac
-EXPECT=' M public/styles.css
- M public/views/reader.js
- M public/views/trophies.js
- M tests/reader-ui.test.js
- M tests/trophies-ui.test.js'
+# P1-AMENDMENT #1 (orchestrator, 2026-08-01, after the worker STOPPED on it -- correctly).
+# The block below was written for a tree where step 1.1 is still UNCOMMITTED. This run commits
+# every step at acceptance (the house discipline), so by the time 1.2 runs, 1.1's three files are
+# CLEAN and can never appear in git status. The plan's own note at :939-943 claims the opposite
+# and is wrong. The measured write set for 1.2 is the TWO files below, and it is correct.
+EXPECT=' M public/views/reader.js
+ M tests/reader-ui.test.js'
 case "$PORC" in "$EXPECT") ;; *) fail "write set wrong. got:
 $PORC";; esac
 exit $RC

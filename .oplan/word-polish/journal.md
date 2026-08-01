@@ -92,3 +92,35 @@ step. For 1.1 I ran my own audit and the frozen gate with four observed mutation
 dispatch a separate auditor, because this step is fully mechanically gated cosmetic CSS and the
 deadline is real. The auditor WILL be dispatched for 1.2, which is the behavioural change. Recorded
 rather than silently skipped.
+
+STEP 1.2 T3(a): the gate that makes canSay's honesty an assertion — WORKER
+reader.js CRLF 767 unchanged, +7 bytes (`export ` on normalizeWord, 1/1 net zero); tests/
+reader-ui.test.js LF 224 -> 349, +125/-0, 3 flat tests. Ledger 346 -> 349 flat / 354 reported.
+Contrast 58. Frozen reader.js:344 re-read after the write and byte-identical.
+The premise held: reader.js:670 resolves against the manifest-derived allowedWords and :674 sets
+canSay from it, so NO new manifest lookup was needed and none was added. Test 2 executes that
+predicate over 11282 inputs (2254 x 5 forms + 12 fixed) with 22 nulls -- a real negative control.
+
+WORKER STOPPED, CORRECTLY, ON A STALE GATE EXPECTATION. The 1.2 gate's $PORC block listed FIVE
+files, including step 1.1's three. But this run COMMITS every step at acceptance, so by the time
+1.2 runs those three are clean and can never appear in git status. The measured two-file write set
+was RIGHT and the expectation was STALE; the plan's own note at :939-943 asserts the opposite and
+is simply wrong. The worker did not trim EXPECT, did not re-run a modified copy, and escalated.
+P1-AMENDMENT #1 (orchestrator): the 1.2 write set is the two-file set; recorded IN plan.md beside
+the block it corrects, with the reason. Gate re-run: exit 0.
+
+WORKER FINDING, and a good one (lesson 2 applied unprompted): M1.2a and M1.2b BOTH failed on a
+COUNT pin that fires before the offender-naming assertion the plan actually wanted to see fail --
+so that assertion would have shipped never having been observed failing. The worker invented an
+extra COUNT-PRESERVING mutation (swap manifest entry "cat" -> "zzzznotaword", so every count stays
+put) and got exactly the frozen text: `manifest entries with no clip: zzzznotaword`. It also
+reported that the sibling assertion `clips missing from the manifest:` CANNOT be seen to fail at
+all -- orphans-without-missing requires |clips| > |manifest|, which trips a count pin first -- and
+labelled it a GUARD, not a gate. That is the phase's own lesson-15 discipline being applied by a
+worker without being asked.
+M1.2c produced the plan's exact predicted text (`resolveLemma returned "aed" which has no clip`).
+All mutations restored byte-exact, md5-verified, including a renamed .aac restored so PUBX returned
+to its pin.
+
+ORCHESTRATOR AUDIT: write set exactly the two files; reader.js CRLF=767 preserved; ledger 349/354;
+contrast 58; quiz.js and quiz-core.js md5s frozen; manifest md5 back to its pin. ACCEPTED.
