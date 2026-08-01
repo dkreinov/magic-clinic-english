@@ -43,3 +43,24 @@ PHASE 3 EVIDENCE (all gates exit 0):
   Authenticated GETs used: 2 of the 3 the plan budgeted (3.3 capture, 3.6 R1). 3.8 uses the third.
   MEASURED FOR THE FIRST TIME: live /sw.js is `Cache-Control: public, max-age=0, must-revalidate`,
   and its Etag equals the file's md5 — so the new worker is revalidated on every visit.
+
+--- POST-3.7 ADDENDUM (2026-08-01, owner reported "working" on his phone) ---
+3.7 PASSED by the owner's eyes: the shelf reads as a shelf, the speaker button behaves.
+NEW DEFECT he found in the same sitting: a LONG press on a story word raised the browser's own
+"Copy" callout instead of opening her word popup. Fixed and shipped in the same session:
+  · public/views/reader.js — .reader-text gains -webkit-touch-callout/-webkit-user-select/
+    user-select: none, and the .reader-text container refuses `contextmenu`, so the release still
+    reaches the existing click handler. Same pattern already used at public/views/home.js:47.
+  · 2 tests added to tests/reader-ui.test.js, BOTH SEEN TO FAIL FIRST (not ok 251, not ok 252).
+  · ACCEPTED SIDE EFFECT (owner's call): story text can no longer be selected/copied at all.
+  · CACHE magic-vet-v19 -> v20; half-applied state seen to fail (not ok 256).
+  · Commits 427c054 (fix) and ead427e (bump).
+SECOND DEPLOY: dpl_6pFjJ8LrcyaFodRELCa46BzATUXy READY, aliased. Capture age at deploy 12s.
+  2/2 MD5 OK live==worktree · v20 count 1, v19 count 0 · 15/15 PRECACHE · manifest + 3/3 clips ·
+  9/9 webps · notafile=404. Live reader.js carries 1 touch-callout rule and 1 contextmenu handler.
+READ-BACK R2 clean. HER PROFILE IS BYTE-IDENTICAL ACROSS BOTH DEPLOYS — all four receipt lines
+  share sha256 400d67d2d96802dc4d84370cfd0be53b79d354ba9352944abcbb8ea28b3670d2.
+AWARDING-CORRECT: production stamps exactly the six tiers the engine justifies, none invented.
+STATE OF THE TREE: 360 reported / 355 flat / 0 fail · contrast 58 · LIVE magic-vet-v20.
+STILL OPEN: 3.8's original intent (a read-back AFTER she next reads a chapter) — R2 was taken
+  before she used the app, so the quiz fix is still unverified in a real sitting. D27 unanswered.
