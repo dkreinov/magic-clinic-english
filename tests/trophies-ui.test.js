@@ -980,3 +980,88 @@ test('the celebration sound is Web Audio only -- no media element, no Audio obje
   assert.deepStrictEqual(audioAssets, [],
     'A2: the celebration ships no audio asset, found ' + audioAssets.join(', '));
 });
+
+// Step 1.1 (word-polish) T1. The trophies screen stops borrowing .hero-banner.
+// .hero-banner's bottom mask fades the shelf plank's front edge to about 57%
+// opacity and the string of lights to about 49% -- the two features that make
+// the artwork read AS a shelf -- but .chapter-banner and .celebrate-image share
+// that rule and want the fade, so T1 adds a sibling class rather than editing
+// it. Test 1 pins the new rule AND that .hero-banner did not move; test 2
+// EXECUTES screenHtml and proves the markup asks for the new class, because two
+// approved things (an approved image, approved CSS) make an unapproved third
+// unless somebody asserts the wiring (field guide 15a/15c).
+// public/styles.css is CRLF on disk, so the one multi-line needle below is
+// matched against a line-ending-normalised copy; the endings themselves are
+// byte-counted by this step's validation, never asserted here.
+
+test('the shelf banner has its own class, no bottom mask, and .hero-banner is byte-unchanged', () => {
+  const style = trophyCss();
+  const at = style.indexOf('.shelf-banner {');
+  assert.ok(at >= 0, 'the trophies CSS section must define .shelf-banner');
+
+  const rule = style.slice(at, style.indexOf('}', at));
+  for (const declaration of [
+    'display: block;',
+    'width: 100%;',
+    'aspect-ratio: 3 / 2;',
+    'object-fit: cover;',
+    'border-radius: var(--radius);',
+    'box-shadow: none;',
+    'margin-bottom: 16px;',
+  ]) {
+    assert.ok(rule.includes(declaration), 'the shelf banner rule must declare ' + declaration);
+  }
+  for (const banned of ['mask-image', '-webkit-mask-image', 'linear-gradient', 'object-position']) {
+    assert.ok(!rule.includes(banned), 'the shelf banner must carry no bottom mask, found ' + banned);
+  }
+
+  const css = readFileSync(cssPath, 'utf8');
+  const flat = css.split('\r\n').join('\n');
+  assert.strictEqual(
+    flat.split('.hero-banner,\n.chapter-banner,\n.celebrate-image {').length - 1,
+    1,
+    '.hero-banner must still open its five-line group with .chapter-banner and .celebrate-image',
+  );
+  assert.strictEqual(
+    css.split('mask-image: linear-gradient(to bottom, #000 0%, #000 74%, transparent 100%);').length - 1,
+    2,
+    'the shared bottom mask must not move: the -webkit- line and the plain one',
+  );
+  assert.strictEqual(
+    css.split('.hero-banner { margin-bottom: 16px; }').length - 1,
+    1,
+    '.hero-banner keeps its own margin rule',
+  );
+  assert.strictEqual(
+    css.split('.shelf-banner').length - 1,
+    1,
+    'exactly one .shelf-banner definition in the sheet, never a second one',
+  );
+});
+
+test('the trophies screen uses .shelf-banner, emits no style tag of its own, and .hero-banner is gone from it', async () => {
+  const { screenHtml } = await import('../public/views/trophies.js');
+  const html = screenHtml(t32Profile({}, []));
+
+  const img = '<img class="shelf-banner" src="/assets/trophies/shelf-header.webp" alt="" />';
+  assert.strictEqual(
+    html.split(img).length - 1,
+    1,
+    'expected the shelf-header to use .shelf-banner, exactly once',
+  );
+  assert.strictEqual(
+    html.split('hero-banner').length - 1,
+    0,
+    'expected the shelf-header to use .shelf-banner, not the masked .hero-banner',
+  );
+  assert.ok(
+    html.indexOf(img) < html.indexOf('class="trophy-card"'),
+    'the shelf banner must still come before the first trophy card',
+  );
+
+  const source = readFileSync(trophiesViewPath, 'utf8');
+  assert.ok(
+    !source.includes('<style>'),
+    'field guide 14: this view may emit no style tag -- its CSS must stay in the globally-linked sheet, the only place it can reach an element written into container.innerHTML',
+  );
+});

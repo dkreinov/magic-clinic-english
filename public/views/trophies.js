@@ -182,7 +182,7 @@ export function screenHtml(profile) {
   const trophies = isPlainObject(profile) && isPlainObject(profile.trophies) ? profile.trophies : {};
   const cards = TROPHY_VIEW.map((trophy) => cardHtml(trophy, profile, trophies)).join("");
   return `
-    <img class="hero-banner" src="/assets/trophies/shelf-header.webp" alt="" />
+    <img class="shelf-banner" src="/assets/trophies/shelf-header.webp" alt="" />
 
     <header class="app-header">
       <h1 class="app-title">${SCREEN_TITLE}</h1>

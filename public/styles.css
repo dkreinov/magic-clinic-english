@@ -414,6 +414,28 @@ a {
 
 /* ---------- Trophies screen and celebration ---------- */
 
+/* T1 (word-polish). The trophies screen's own banner: the same box, radius and
+   shadow treatment as .hero-banner, and NO bottom mask. .hero-banner's
+   linear-gradient fades its bottom 26 percent out, which on this 640x640 source
+   renders the shelf's front edge at about 57 percent opacity and the string of
+   lights at about 49 percent -- the two features that make the picture read AS
+   a shelf (field guide 15c: the image was gated, the CSS was gated, the
+   composite was gated by nobody). .hero-banner itself must not move:
+   .chapter-banner and .celebrate-image want that fade. The CROP is deliberately
+   identical to .hero-banner's -- aspect-ratio 3/2, object-fit cover, default
+   object-position 50% 50% -- which shows source rows 107-533 and so contains
+   the shelf edge (rows 425-470) and the whole light string (rows 465-500).
+   Only the mask is dropped. */
+.shelf-banner {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius);
+  box-shadow: none;
+  margin-bottom: 16px;
+}
+
 .trophies-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

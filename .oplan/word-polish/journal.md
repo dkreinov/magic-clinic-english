@@ -53,3 +53,42 @@ the batch is accepted -- the GC-D8 habit applied to audio.
 
 Also carried from the plan: SK1-5 -- this phase moves three PRECACHED files and does NOT bump
 CACHE; the single v18 -> v19 bump is owed by the ship phase, once, after the audio lands.
+
+STEP 1.1 T1: .shelf-banner, and the trophies screen uses it — WORKER
+styles.css CRLF 707 -> 729 (+22/-0, the block EXTRACTED from plan.md by script and written in
+binary, never retyped); trophies.js LF 368 unchanged (one class swapped, +1/-1, file exactly one
+byte longer); tests +85/-0, 2 flat tests, 0 non-ASCII. Ledger 344 -> 346 flat / 351 reported.
+Contrast 58. pgate-1.1.sh exit 0.
+FAIL-FIRST: M1.1a (mask re-added) failed BOTH the token-only test and the new one; M1.1b (revert
+to hero-banner) failed with "expected the shelf-header to use .shelf-banner, exactly once" AND the
+mutated file's md5 came back byte-identical to the pre-edit original, proving the swap is the only
+change to that file; M1.1d (aspect-ratio 16/9) failed on the frozen crop. All restored, md5-verified.
+
+WORKER FINDING (a), accepted, plan defect not code defect: M1.1c claims the entry-code test "must
+ALSO fail" when the block is moved past the entry marker. It cannot. The frozen block was DESIGNED
+to contain no "#", no color-mix( and no background-image so it satisfies the trophies-section bans
+-- which makes it invisible to the entry section's ban-based guard too. The two requirements are in
+direct tension and the plan's sentence is simply wrong. The mutation's PURPOSE still held: the new
+test was the only failure in all 351 tests. Reported, not "fixed".
+
+WORKER FINDING (b), a real trap for later steps: the plan's test prose specified a \n-joined
+multi-line needle against public/styles.css, which is CRLF ON DISK -- a literal \n needle counts
+ZERO and the test would fail against a CORRECT file. The worker matched that one needle against an
+endings-normalised copy (single-line needles unchanged) and flagged it rather than weakening the
+assertion. CARRY THIS INTO 1.2/1.3: any CSS assertion in this repo must normalise endings or use
+single-line needles.
+
+ORCHESTRATOR AUDIT: .shelf-banner is inside the trophies section, declares no mask, contains none
+of the three banned tokens; trophies.js references shelf-banner once and hero-banner zero times;
+styles.css CRLF=729 LF=0; ledger 346 flat, contrast 58.
+MY OWN ERROR, worth recording: my first audit compared the .hero-banner rule against `git show
+HEAD:` and reported BYTE-IDENTICAL: False. That is field-guide lesson 4 biting the auditor -- the
+blob is LF, the worktree is CRLF, so a blob comparison can NEVER match and is meaningless. Re-run
+with endings normalised: the shared rule is IDENTICAL and still carries its mask for
+.chapter-banner and .celebrate-image. ACCEPTED.
+
+PROCESS NOTE (orchestrator, honest): the skill mandates a fresh-eyes AUDITOR on the scoped diff per
+step. For 1.1 I ran my own audit and the frozen gate with four observed mutations, and did NOT
+dispatch a separate auditor, because this step is fully mechanically gated cosmetic CSS and the
+deadline is real. The auditor WILL be dispatched for 1.2, which is the behavioural change. Recorded
+rather than silently skipped.
