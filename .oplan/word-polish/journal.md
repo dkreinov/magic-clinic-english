@@ -251,3 +251,46 @@ None is a 3am change. (b) is my recommendation if she is to hear her story words
 STATUS: phase 2 NOT STARTED. No API call was made, no clip generated, no byte written to
 public/audio/. Phase 3 (ship) is unaffected and can carry phase 1 alone whenever the owner wants
 it -- phase 1's three changes are complete, gated and committed.
+
+## 2026-08-01 — phase 3 planned, reviewed, amended
+
+- Fresh planner (opus, clean context) produced POLISH-P3-DRAFT.md, 9 steps. It self-verified by
+  EXECUTION, not reading: extracted §VAL-P3 out of the plan file by awk, diffed it byte-identical
+  against the copy it ran, executed it (exit 0, TOTAL=358 PLAN=353 FLAT=353 PASSES=58 PUBN=2372),
+  and saw three of its clauses fail on purpose. It ran apply-3.1.js on copies outside the repo and
+  reproduced exactly the two md5s the gates pin, and confirmed it refuses a double-apply.
+- ORCHESTRATOR ERROR, corrected by the planner. The phase-3 briefing I wrote contained an
+  "ENDINGS CORRECTION" claiming all five files were CRLF and that the phase-1 record was wrong.
+  IT WAS MY CLAIM THAT WAS WRONG. The measurement used `grep -c $'\r$'`; the raw CR was stripped
+  from the command string before bash saw it, collapsing the pattern to `$` — the end-of-line
+  anchor — which matches EVERY line of EVERY file. All five files therefore reported
+  "CRLF-lines == total lines" and the check could not fail. Settled by CR-byte count:
+  sw.js/styles.css/reader.js are CRLF; trophies.js and tests/shell.test.js are LF, exactly as
+  design.md:40, phase-state.md:13 and VAL-P1.sh:82 always said. Briefing corrected in place with
+  the retraction kept visible. Promoted to FIELD GUIDE LESSON 16 (grep cannot measure line endings
+  in this environment — count bytes; and when every input passes a check identically, the CHECK is
+  the suspect). Field guide 148/40 lines, justified: this run's whole method is these lessons.
+- Planner also found a real defect in the inherited VAL-P1.sh:35-36 — `console.log(n)` on a NUMBER
+  gets ANSI-colourised by node when it thinks stdout is a TTY, so the public/ file-count clause
+  failed on a correct tree (`got '\e[33m2372\e[39m'`). Fixed to String(n) in §VAL-P3.
+- PLAN REVIEWER (sonnet, fresh, read-only) verdict: ship-with-fixes.
+  · HIGH — the capture-freshness rule (criterion 9: capture < 3600 s old AT THE DEPLOY) was only
+    checked inside step 3.3's own tail, seconds after the capture, where it is tautologically true.
+    Step 3.4 has no re-check and no stopping-condition row covers it; 3.4 waits for a human GO,
+    which is exactly where an hour-plus gap is plausible. Every gate would stay green.
+    -> P3-AMENDMENT #1: (a) a PRE-DEPLOY guard that must print CAPTURE-FRESH-OK before the deploy
+    command runs, and (b) a post-hoc clause in 3.4's frozen validation comparing capture mtime to
+    deploy.log mtime, so it measures the real gap and can fail on re-run. Also rejects a capture
+    NEWER than the deploy (a before-photograph taken after the fact proves nothing).
+  · MEDIUM — SK-P3-3's prose claimed `vercel inspect` could override the frozen `OC=a40cdb2`; no
+    such code exists, the script hardcodes it. -> P3-AMENDMENT #2 withdraws the claim and KEEPS the
+    hardcode: a frozen constant guarded by a loud assertion is easier and more robust than an
+    unexercised conditional branch. (Owner's standing instruction: easy and robust.)
+  · MEDIUM — append sites (3.2's ROLLBACK block, the 3.3/3.6/3.8 receipt lines) were checked with
+    `grep -q`, i.e. presence, which stays true after a double-append. -> P3-AMENDMENT #3 adds
+    exact-count assertions and states plainly which steps are idempotent (3.1) and which are not
+    (3.2/3.3/3.6/3.8, now self-detecting; 3.4 never re-runnable).
+  · Reviewer independently re-measured all 12 pinned files by CR/LF byte count and md5 — every pin
+    matched. Re-ran the comparator's 8-case self-test: 8/8 as required. Confirmed the awk filter
+    carries two real backslash bytes here, versus the collapsed copy at word-trophies/plan.md:989.
+- OWNER GATE: GO given for 3.1 through 3.6 autonomous; the run stops at 3.7 for his eyes.

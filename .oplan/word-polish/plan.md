@@ -1583,3 +1583,2236 @@ the service worker, the audio recordings and the whole server have not moved by 
 exactly **5** files changed with exactly **5** deleted lines in the whole phase; a human has looked
 at the screen, listened to a word and read two chapters in a row; and nothing was deployed, no
 capture was taken, and your real profile was never touched.
+
+
+# PLAN — word-polish PHASE 3 "ship" (draft)
+
+Planned 2026-08-01 by a fresh planner (files only, read-only mandate — this planner changed nothing
+in the repository, ran no `vercel` command, made no request to production, and never opened `.env`).
+
+Repo `C:/Users/dkreinov/claude/english-app`, clean at `ae349c6`. Workspace `.oplan/word-polish/`.
+Owner's standing instruction today: **"always think easy and robust."** Every decision below names
+which of the two it serves, and says so out loud where they pull apart.
+
+**THE ONE SENTENCE:** phase 1 changed three shipped files and they are still only on this machine;
+this phase bumps the service-worker cache so returning devices actually pick them up, deploys once
+with the ritual that was proven in production on 2026-07-30, and proves — by bytes, by
+reachability, and by reading her profile back — that nothing was lost.
+
+---
+
+## WHAT THIS PLANNER MEASURED TODAY (nothing below is inherited or remembered)
+
+Every number in this plan came out of one of these commands, run today against the clean tree at
+`ae349c6`:
+
+| measured | command | result |
+|---|---|---|
+| suite, plain | `npm test` | `1..353`, `# tests 358`, `# pass 358`, `# fail 0`, exit 0 |
+| suite, gated | `APP_CODE=dummy npm test` | `1..353`, `# tests 358`, `# fail 0`, exit 0 |
+| flat ledger | `grep -h -c '^test(' tests/*.js \| awk '{s+=$1} END{print s+0}'` | **353** |
+| contrast | `node scripts/check-contrast.mjs` | `ALL PASS`, `grep -c '^PASS'` = **58** |
+| quiz bank | `node scripts/check-quiz-bank.mjs` | `QUIZ BANK OK: 62 files, 84 items` |
+| npm scripts | `node -e 'console.log(JSON.stringify(require("./package.json").scripts))'` | `{"test":"node --test","dev":"node scripts/dev-server.js"}` — **there is no `contrast` script** |
+| `public/` digest | the walk-and-md5 one-liner in §VAL-P3 | `2372 d5f035bc48093f320b44099e879e1610` |
+| `public/` minus `sw.js` | same walk with `public/sw.js` skipped | `2371 d82e7f9761991b66cbf5139422f6acba` |
+| endings + bytes + md5 | a byte-scanning `node -e` over 12 files, and independently `tr -dc '\r' \| wc -c` | table below |
+| the shipped payload | `git diff --name-only --diff-filter=ACMR a40cdb2..HEAD -- public/ \| LC_ALL=C sort` | `public/styles.css`, `public/views/reader.js`, `public/views/trophies.js` |
+| the phase-1 write set | `git diff --name-only 1e470bd HEAD \| awk '$NF !~ /^\.oplan\//' \| LC_ALL=C sort` | 5 paths (below) |
+| transcripts | both `.mjs` transcripts vs their expected files | both diff EMPTY |
+| audio manifest | `JSON.parse(public/audio/words/index.json)` | array, **2254** entries, md5 `8735a3c499508b04415046e2be4ad159` |
+| manifest honesty | every entry checked for its `.aac` on disk | **0 entries have no clip** |
+| `readback.js` | read in full at `C:/Users/dkreinov/trophies-deploy/readback.js` | **IS the repaired version** — see SK-P3-4 |
+| previous captures | `ls /c/Users/dkreinov/english-app-backups/` | `profile-20260730-114016.json`, `profile-20260730-201842.json` — **both still present** |
+| previous work dir | `ls $HOME/trophies-deploy/` | 21 artifacts from the PREVIOUS run, incl. `capture-path.txt` naming `profile-20260730-201842.json` |
+
+**NOT measured, and therefore never asserted as fact anywhere in this plan:** anything about
+production. This planner was forbidden to `curl` the live site or run `vercel`, so every live value
+(the outgoing deployment id, the live `sw.js`, the live md5s, the HTTP headers on `/sw.js`) is
+written as a *thing the executor must measure*, never as a thing already known. The one live value
+this plan quotes — `dpl_AVmWnh3XxBZPhLJKnjTUZT9r5EXB` — is quoted **from the record**
+(`.oplan/word-polish/phase-state.md:9`, corroborated by `$HOME/trophies-deploy/incoming.txt`) and
+step 3.2 treats it as a **hypothesis to confirm**, exactly as word-trophies step 4.1 did.
+
+---
+
+## ⚠ BLOCKING RECORD ERROR — THE BRIEFING'S "ENDINGS CORRECTION" IS ITSELF WRONG
+
+`BRIEFING-POLISH-P3.md:81-85` says:
+
+> "**ENDINGS CORRECTION — the phase-1 brief was WRONG and you must not inherit its error.** It
+> stated `trophies.js LF=368` and `tests/*.js LF`. Measured today on disk: **every one of these five
+> files is CRLF** …"
+
+**That correction is false for two of the five files.** Measured today, twice, by two independent
+methods (a byte scan in `node`, and `tr -dc '\r' | wc -c` in the shell):
+
+| file | CR bytes | LF bytes | verdict | bytes | md5 |
+|---|---|---|---|---|---|
+| `public/styles.css` | 729 | 729 | **CRLF** ✓ briefing right | 17846 | `b6aa9c229ca269f39f468c60f50c45b4` |
+| `public/views/reader.js` | 845 | 845 | **CRLF** ✓ briefing right | 27597 | `b5b37fc370436f4c6ad62244cc298bde` |
+| `public/sw.js` | 51 | 51 | **CRLF** ✓ briefing right | 1136 | `d76f781dc49c5f629aba0f2dfe3304b6` |
+| `public/views/trophies.js` | **0** | 368 | **LF** ✗ **briefing WRONG** | 16333 | `1c601eb05071edf7413d0d738067d1ea` |
+| `tests/shell.test.js` | **0** | 96 | **LF** ✗ **briefing WRONG** | 3604 | `cbb33bfeb08574024c374a6288fbfed8` |
+
+Three independent corroborations that the *original* record was right and the briefing's correction
+is the error:
+
+1. `.oplan/word-polish/design.md:40-41` — *"`reader.js` CRLF, `styles.css` CRLF, `sw.js` CRLF,
+   `trophies.js` LF, `tests/*.js` LF."*
+2. `.oplan/word-polish/phase-state.md:13` — *"endings on disk: reader.js CRLF, styles.css CRLF,
+   sw.js CRLF, trophies.js LF, tests LF."*
+3. **The strongest one:** `C:/Users/dkreinov/trophies-art/VAL-P1.sh:82` — the gate that actually
+   RAN, five times, through all of phase 1 — carries
+   `case "$ENDS" in *"tests/shell.test.js CRLF=0 LF=96"*)` . A gate that ran clean five times cannot
+   have been asserting an ending the file does not have. Word-trophies `§VAL-P4` likewise pins
+   `public/views/trophies.js CRLF=0 LF=368` (`.oplan/word-trophies/plan.md:4155`).
+
+The briefing's own byte counts also disprove its own claim: `trophies.js` is 368 lines at 16333
+bytes. If those 368 line breaks were CRLF the file would be 16701 bytes.
+
+**WHY THIS IS BLOCKING AND NOT A NIT.** `tests/shell.test.js` is one of the two files this phase
+edits, and it is **LF in a repository with `core.autocrlf=true` and no `.gitattributes`**
+(both measured today). Field-guide lesson 4: *"an Edit-tool insert CRLF'd a whole LF file, and
+`git diff` normalises so the damage is INVISIBLE to any git-based gate."* A plan written on the
+briefing's belief would have pinned `tests/shell.test.js CRLF=96 LF=0` — a gate that **can only be
+satisfied by corrupting the file**, and that would then have passed while the deploy shipped from a
+tree whose test file had silently flipped. Step 3.1 below therefore edits `sw.js` and
+`shell.test.js` by **two different byte-preserving mechanisms** and pins both endings explicitly.
+
+Nothing else in the briefing was found wrong. The rest of its measured values reproduced exactly.
+
+---
+
+## GOAL, AND EXACTLY WHAT MOVES
+
+**GOAL** (design §T4): *"All three changes ship together. `CACHE` `magic-vet-v18` →
+`magic-vet-v19`, and `tests/shell.test.js`'s pin moves in the same step. The ship phase repeats the
+proven ritual: fresh D25 capture, one deploy to a file, md5 live-vs-worktree over the changed
+payload, PRECACHE and asset reachability, and a read-back that must show nothing lost."*
+
+**THE ONLY REPOSITORY WRITE OUTSIDE `.oplan/` IN THIS ENTIRE PHASE IS STEP 3.1.** Two files, one
+commit. From step 3.2 to the close, the tree is frozen and `§VAL-P3` enforces that mechanically at
+every step. If a defect is found after 3.1, the fix is a NEW gated step on a NEW plan, never an
+in-place edit inside a deploy phase (the word-trophies precedent, `journal.md:1298-1308`).
+
+**Phase-1's payload, already committed and waiting (measured, `a40cdb2..HEAD -- public/`):**
+
+| path | endings | lines | bytes | md5 | in PRECACHE? |
+|---|---|---|---|---|---|
+| `public/styles.css` | CRLF | 729 | 17846 | `b6aa9c229ca269f39f468c60f50c45b4` | **yes** (`/styles.css`) |
+| `public/views/reader.js` | CRLF | 845 | 27597 | `b5b37fc370436f4c6ad62244cc298bde` | **yes** (`/views/reader.js`) |
+| `public/views/trophies.js` | **LF** | 368 | 16333 | `1c601eb05071edf7413d0d738067d1ea` | **yes** (`/views/trophies.js`) |
+
+All three are in `PRECACHE` (verified against `public/sw.js:2-18`). That is what makes the bump
+mandatory under QZ-22, and it is not a formality: a returning device holds the whole `magic-vet-v18`
+cache and `sw.js:49` serves `caches.match(request)` **before** the network, so without a new cache
+name she would go on being served the three OLD files indefinitely.
+
+**What step 3.1 adds to the payload:**
+
+| path | endings | lines | bytes | md5 BEFORE | md5 AFTER (computed in memory today, not written) |
+|---|---|---|---|---|---|
+| `public/sw.js` | CRLF | 51 | 1136 → 1136 | `d76f781dc49c5f629aba0f2dfe3304b6` | `6d836788d379e7872ce730cfec5db51a` |
+| `tests/shell.test.js` | **LF** | 96 | 3604 → 3604 | `cbb33bfeb08574024c374a6288fbfed8` | `ca6c242a97ba1904994d491b5a04aaf8` |
+
+Both edits are pure single-character substitutions (`v18`→`v19`, `v17`→`v18`), so **the byte count
+must not change**: 1136 and 3604 before and after. That is the cheapest possible corruption
+detector and both gates assert it.
+
+**Test files are NOT deployed.** `tests/reader-ui.test.js` and `tests/trophies-ui.test.js` changed
+in phase 1 and `tests/shell.test.js` changes here; none of them may ever appear in a live-vs-worktree
+comparison. The mechanism that guarantees this is structural, not vigilance — see SK-P3-3.
+
+---
+
+## ACCEPTANCE CRITERIA (mechanical — all re-run at the phase close, step 3.9)
+
+1. `STEP-3.1-OK` … `STEP-3.9-OK` all print (3.7 is a human gate and prints nothing).
+2. **The repository moved exactly once, by exactly two files.**
+   `git diff --name-only 1e470bd HEAD | awk '$NF !~ /^\.oplan\//' | LC_ALL=C sort` equals, from step
+   3.1 onward and at the close, exactly these seven lines and no others:
+   ```
+   public/styles.css
+   public/sw.js
+   public/views/reader.js
+   public/views/trophies.js
+   tests/reader-ui.test.js
+   tests/shell.test.js
+   tests/trophies-ui.test.js
+   ```
+   (the first five are phase 1's, already committed; `public/sw.js` and `tests/shell.test.js` are
+   this phase's). Nothing is ever deleted. The tree is clean outside `.oplan/` at every step.
+   **This clause lives inside `§VAL-P3` itself**, so "at every step" is literally true rather than a
+   claim only the close checks.
+3. `npm test` → `# tests 358`, `# fail 0`, plan `1..353`; identical under `APP_CODE=dummy`; flat
+   ledger **353**; `node scripts/check-contrast.mjs` prints `ALL PASS` with `grep -c '^PASS'` =
+   **58**. **Unchanged all phase — this phase adds no test and no colour token.** (There is no
+   `npm run contrast`; a gate that calls it exits non-zero for the wrong reason.)
+4. Both transcripts diff EMPTY; `.data/profile.json` absent; **no `profile-*.json` anywhere inside
+   the repository** at any point.
+5. `public/` file count is **2372** all phase; `public/` minus `sw.js` is byte-frozen at
+   `2371 d82e7f9761991b66cbf5139422f6acba` all phase; `public/sw.js` is in exactly one of its two
+   known states and in the POST state from 3.1 onward.
+6. **QZ-18 re-pinned:** `public/quiz.js` md5 `69b6d71117cf776715374abc6f0abb02`, `public/quiz-core.js`
+   md5 `9a2131be8b9d1b77c219f1e8c3482a71`, untouched at every step.
+7. **The audio manifest never moves:** `public/audio/words/index.json` md5
+   `8735a3c499508b04415046e2be4ad159`, 2254 entries. **No audio is generated in this phase.**
+8. **The outgoing deployment was frozen BEFORE the deploy**: `vercel inspect` ran first, output to a
+   FILE, and its id + url were copied verbatim into `.oplan/word-polish/phase-state.md` **and
+   committed** before step 3.4.
+9. **The D25 capture exists and is proven, taken AFTER 3.2 and BEFORE the deploy**, with the frozen
+   subshell verbatim: HTTP 200, ≥200 bytes, parseable, non-empty `words` map,
+   `validateProfile(prof).ok`, prints `BACKUP OK bytes=… words=… known=… candidate=…`; receipt
+   (path + bytes + sha256 + counts) appended to `.oplan/word-polish/backup-receipt.txt`;
+   **contents never recorded**; the `APP_CODE` post-assertion passed; the capture is **less than
+   3600 s old at the moment of the deploy**.
+10. **The deploy ran exactly ONCE**, `--prod --yes`, output to a FILE.
+    `grep -o 'dpl_[A-Za-z0-9]*' deploy.log | LC_ALL=C sort -u | wc -l` = **1**, and `vercel inspect`
+    on the alias afterwards reports that same id, and it is **not** the outgoing id.
+11. **THE MD5 PROOF.** For every one of the **4** enumerated payload paths under `public/`, live
+    bytes md5 == **worktree** bytes md5 (never a git blob, never `git show HEAD:`). Enumerated by
+    `git diff --name-only --diff-filter=ACMR "$OC"..HEAD -- public/ | LC_ALL=C sort`, and that
+    enumeration is additionally asserted equal to the frozen four-path literal. The shell would be
+    fetched as `/`, not `/index.html` (`cleanUrls` 308s) — it does not appear this time because
+    `index.html` did not change.
+12. **THE CACHE BUMP IS PROVEN.** Live `/sw.js` md5 == worktree `6d836788d379e7872ce730cfec5db51a`,
+    contains `magic-vet-v19` exactly once, and does **not** contain `magic-vet-v18`.
+13. **THE PRECACHE IS INSTALLABLE.** All **15** `PRECACHE` URLs — **derived from the `sw.js`
+    production actually serves**, not hard-coded — return 200. `public/sw.js:24` is
+    `cache.addAll(PRECACHE)`, which rejects as a whole if any one URL fails, leaving every returning
+    device on the v18 shell **forever**.
+14. **THE SPEAKER BUTTON'S SOURCE OF TRUTH IS REACHABLE.** `/audio/words/index.json` returns 200
+    with md5 == worktree `8735a3c499508b04415046e2be4ad159`, and the three frozen sample clips
+    `/audio/words/a.aac`, `/audio/words/kitchen.aac`, `/audio/words/zoo.aac` return 200 with md5 ==
+    worktree. See SK-P3-6 — this is the criterion that answers review question 1 for the one
+    artifact that is fetched at runtime and is in nobody's precache list.
+15. **THE TROPHY ART STILL ANSWERS.** All nine `/assets/trophies/<id>.webp` return 200 with
+    `content-type: image/webp` and md5 == worktree, fetched with the exact camelCase filenames
+    (`quizRight.webp`). None of them is in `PRECACHE`; that is by design (T6) and must not be
+    "fixed".
+16. **The function bundle loaded**: `/api/health` returns exactly
+    `{"ok":true,"data":{"status":"up","version":1}}` and unauthenticated `/api/chapter` returns
+    **401**. **`/api/profile` is never requested unauthenticated.** A negative control
+    (`/assets/trophies/zzznotatrophy.webp`) still 404s.
+17. **READ-BACK R1 (immediately post-deploy)**, via the frozen subshell, with the two compared files
+    bound to distinct explicit paths, and only after the comparator's 8-case self-test has written
+    `SELFTEST 8/8 AS REQUIRED` **in this phase's own directory**: 200; `validateProfile(live).ok`;
+    live word-key count ≥ the capture's; the set difference `capture \ live` is EMPTY; every status
+    change carries activity evidence; every trophy tier present in the capture is still present
+    live with a **byte-identical timestamp**.
+18. **READ-BACK R2 (after her first real session)**: the same assertions, plus every tier that
+    appeared carries activity evidence, plus the shipped engine re-run over R2 agrees that nothing
+    is stamped which it would not award. A DISAPPEARING tier, a changed timestamp, or a lost word
+    key at either read-back → **STOP, roll back, owner**.
+19. **HUMAN GATE (step 3.7)**: the owner opened the app on a real device against the written
+    checklist and said yes. No agent in this run may open a browser on production (lesson 11).
+20. **Exactly THREE authenticated requests to `/api/profile` happen in the whole phase** — C2, R1,
+    R2 — each a deliberate, counted GET. `APP_CODE` is asserted unset before and after each one, and
+    appears nowhere in any file, log, receipt or record.
+21. The rollback command is in `.oplan/word-polish/phase-state.md` verbatim before the deploy and
+    re-confirmed after, with the new deployment recorded at the top of the rollback ladder at the
+    close.
+22. **D27 rider re-asked, not assumed:** the owner is asked whether the capture files are deleted at
+    the close. Two older captures already sit in `/c/Users/dkreinov/english-app-backups/`; deletion,
+    if ruled, happens strictly AFTER R2 and the criteria re-run.
+
+---
+
+## DEPENDS ON (every row read or measured today)
+
+| thing | where | verified |
+|---|---|---|
+| design §T4, and §T3(b) which is **NOT in this phase** | `.oplan/word-polish/design.md:84-88`, `:70-83` | read in full |
+| the phase-2 STOP and why no audio is generated | commit `ae349c6` message; briefing §"WHAT CHANGED" | read; re-measured (manifest still 2254, md5 unchanged) |
+| field guide, all 15 lessons | `.oplan/word-polish/field-guide/index.md` (`wc -l` = **133**, matching `phase-state.md:5`) | read in full |
+| **lesson 4 (endings are law; `git show HEAD:` is the LF blob)** | `field-guide/index.md:17-31` | quoted below; **it is what caught the briefing's error** |
+| **lesson 10 (DEPLOY)** | `field-guide/index.md:52-55` | quoted verbatim below |
+| **lesson 3 (the profile is live; a GET CREATES one)** | `field-guide/index.md:11-16` | quoted verbatim below |
+| lesson 11 (visual gates are sandbox-only, NEVER production) | `field-guide/index.md:56-59` | quoted verbatim below |
+| lesson 14 (view-scoped CSS cannot style a body-level element) | `field-guide/index.md:78-89` | read; discharged in SK-P3-7 |
+| lesson 15 (the three ways a green suite ships a broken screen) | `field-guide/index.md:90-133` | read in full; it is why 3.7 exists and why SK-P3-6 exists |
+| **the template: word-trophies PHASE 4 in full** | `.oplan/word-trophies/plan.md:3638-5396` | read in full — criteria, SK4-1…SK4-11, §VAL-P4, steps 4.1-4.8, the 22-row stopping table |
+| the ritual scripts **as executed** | `$HOME/trophies-art/step-4.2.sh`, `step-4.4.sh`, `step-4.7.sh` | read in full; adapted, not rewritten |
+| the read-back comparator | `$HOME/trophies-deploy/readback.js` (3660 bytes) | read in full; **repaired version confirmed** (SK-P3-4) |
+| the previous run's artifacts, which must NOT be reused as evidence | `$HOME/trophies-deploy/` — `capture-path.txt`, `precache-urls.txt`, `selftest/`, `readback-{1,2}.{json,log}`, `deploy.log`, `outgoing.txt`, `incoming.txt` | listed and read; SK-P3-5 forces new paths |
+| **the run's own preamble, which this one adapts** | `$HOME/trophies-art/VAL-P1.sh` (99 lines, ran clean 5x) | read in full |
+| `public/sw.js` (51 lines) and `tests/shell.test.js` (96 lines) | the repo | read in full |
+| the service-worker update path | `public/sw.js:20-51`, `public/app.js:57-67` | read in full; SK-P3-8 |
+| the speaker button's runtime source of truth | `public/words-index.js` (26 lines), `public/views/reader.js:3,:391,:738,:742,:600,:789` | read in full; SK-P3-6 |
+| `.shelf-banner` lives in the globally-linked sheet | `public/styles.css:429`, used at `public/views/trophies.js:185`; `grep VIEW_STYLE public/views/trophies.js` gives **no match** | measured; lesson 14 discharged |
+| `.btn-say` lives in the globally-linked sheet | `public/styles.css:693`, `:708` | measured |
+| the outgoing deployment, per the record | `.oplan/word-polish/phase-state.md:9`; `$HOME/trophies-deploy/incoming.txt` | read; **treated as a hypothesis for 3.2 to confirm** |
+| the frozen CAPTURE COMMAND | `.oplan/word-quiz/plan.md:1573-1586`, as executed in `step-4.2.sh:13-26` | read; quoted verbatim below, unchanged |
+| the frozen DEPLOY RECIPE | `.oplan/word-audio/phase-state.md:55-66` | read via the word-trophies quotation at `plan.md:4214-4223`; the version value re-stated for this run |
+| the rollback ladder form | `.oplan/word-g1/phase-state.md:19-25`, via `plan.md:3945-3986` | read; SK-P3-9 rules the target |
+
+**Nothing in phase 3 is already done:** `public/sw.js:1` still says `magic-vet-v18`,
+`tests/shell.test.js:58-59` still pin v18-present/v17-absent, no fresh capture exists,
+`.oplan/word-polish/phase-state.md` carries no rollback line, and
+`.oplan/word-polish/backup-receipt.txt` does not exist.
+
+---
+
+## SKELETON DECISIONS — where the record is silent, decided HERE, not left to an executor
+
+### SK-P3-1 — ORDERING: the bump commits FIRST, before the capture. Why.
+
+**The question the briefing asks:** *"does the bump commit before or after the capture?"*
+
+**RULED: BUMP (3.1) then PRE-FLIGHT (3.2) then CAPTURE (3.3) then DEPLOY (3.4).** Three reasons, in
+order of weight:
+
+1. **The capture has a freshness rule and the bump has an unbounded duration.** The inherited rule
+   (word-trophies 4.2, from `.oplan/word-g1/plan.md:868-870`) is: if more than an hour passes
+   between the capture and the deploy, **re-capture**. Step 3.1 runs the full suite twice inside
+   `§VAL-P3`, plus a fail-first mutation, plus an audit, and it can escalate to the owner. Putting
+   it after a capture means either racing a clock or spending a second authenticated GET on her live
+   profile for no reason. **Every GET is a counted act** (criterion 20); a plan that makes one of
+   them likely-wasted is not robust.
+2. **A capture must photograph the moment before an irreversible act, and the bump is reversible.**
+   Everything in 3.1 is `git`-recoverable. The capture exists to bound the risk of the *deploy*, so
+   it belongs as close to the deploy as possible and after every reversible thing is already done.
+   Capturing first would put a `git reset` between the photograph and the event it is meant to bound.
+3. **It makes the frozen-tree claim simple, which is the "easy" half.** From 3.2 onward the tree
+   never moves, so `§VAL-P3` can hard-code one write-set literal for every remaining step, and the
+   phase inherits word-trophies phase 4's strongest structural property — *"changes no file in the
+   repository except `.oplan/` records"* — verbatim, just shifted by one step.
+
+**The cost, stated:** between the 3.1 commit and the 3.4 deploy the repository is in a state
+(`v19` in `sw.js`) that production is not. That is harmless (nobody serves from this machine) and it
+is exactly the state word-trophies was in for the whole of its phase 4.
+
+### SK-P3-2 — THE TWO EDITS OF STEP 3.1, AND WHY THE APPLY SCRIPT IS BINARY
+
+`public/sw.js` is **CRLF** and `tests/shell.test.js` is **LF** (measured; see the blocking-error
+section). Field-guide lesson 4: *"edit LF files byte-preservingly (python `newline=''`) and verify
+endings with an `rb` byte count, never grep/`file`."*
+
+**RULED — one apply script, run once, written to a FILE outside the repo
+(`$HOME/polish-art/apply-3.1.js`), doing both edits in binary and asserting its own work:**
+
+* it reads each file as a **Buffer**, converts with `toString("binary")`, substitutes, and writes
+  back with `Buffer.from(s, "binary")` — no encoding round trip, no line-ending normalisation, and
+  no editor in the loop, so the CRLF file and the LF file are both safe under one mechanism;
+* `public/sw.js`: the single occurrence of `magic-vet-v18` becomes `magic-vet-v19`. Measured today:
+  that string occurs **exactly once** in that file;
+* `tests/shell.test.js`: `magic-vet-v18` becomes `magic-vet-v19` **and** `magic-vet-v17` becomes
+  `magic-vet-v18`. Measured today: each occurs **exactly once**, at lines 58 and 59. Both
+  substitutions are computed against the ORIGINAL string and applied in one pass, never chained —
+  a chained `replace` would rewrite the freshly written `v18` a second time and leave the file
+  pinning `v19` twice with nothing forbidden;
+* it **asserts each source string occurs exactly once before replacing** and aborts if not;
+* it re-reads both files and prints bytes, CR count, LF count and md5, and **exits non-zero** unless
+  they are exactly `1136 / CR=51 / LF=51 / 6d836788d379e7872ce730cfec5db51a` and
+  `3604 / CR=0 / LF=96 / ca6c242a97ba1904994d491b5a04aaf8`. (Both targets were computed today, in
+  memory, from the real files; nothing was written.)
+
+**`tests/trophies-ui.test.js:349-351` also contains the string `magic-vet-v18`** — in a comment
+describing what step 3.3 of the PREVIOUS run did. Measured today. **It must NOT be touched:** it is
+a historical note, not a pin. Consequence, and this is the trap worth naming: **a gate of the form
+"no file under `tests/` may contain `magic-vet-v18`" would be WRONG and would fire on a correct
+tree.** The gate is instead an md5 pin on `tests/trophies-ui.test.js`
+(`d0ca049b9dfab39d0f61c787f5be313b`, measured today), which says the same thing with no false
+positive.
+
+### SK-P3-3 — WHAT "THE CHANGED PAYLOAD" MEANS FOR MD5, AND HOW TESTS ARE EXCLUDED
+
+**The briefing asks:** *"Exactly which URLs are fetched live and compared against which worktree
+files — and how test files are excluded."*
+
+**RULED. The enumeration is `-- public/`-scoped, so test files are excluded STRUCTURALLY, not by
+vigilance and not by a filter someone could forget:**
+
+```
+git diff --name-only --diff-filter=ACMR "$OC"..HEAD -- public/ | LC_ALL=C sort
+```
+
+`tests/` is not under `public/`, so no test file can ever enter this list. That is the whole
+mechanism. **And because "structural" is exactly the kind of claim that fails open**, the step
+additionally asserts the enumeration equals this frozen literal, byte for byte:
+
+```
+public/styles.css
+public/sw.js
+public/views/reader.js
+public/views/trophies.js
+```
+
+so a wrong `$OC`, a dropped `--diff-filter=ACMR`, or a stray file cannot silently change what gets
+proved. Four paths, four URLs, four comparisons:
+
+| worktree file | URL fetched live | worktree md5 that must match |
+|---|---|---|
+| `public/styles.css` | `/styles.css` | `b6aa9c229ca269f39f468c60f50c45b4` |
+| `public/sw.js` | `/sw.js` | `6d836788d379e7872ce730cfec5db51a` |
+| `public/views/reader.js` | `/views/reader.js` | `b5b37fc370436f4c6ad62244cc298bde` |
+| `public/views/trophies.js` | `/views/trophies.js` | `1c601eb05071edf7413d0d738067d1ea` |
+
+`--diff-filter=ACMR` is kept from the template even though all four are `M` this time: it costs
+nothing, and its absence is a known way to skip an ADDED file (word-quiz plan finding 3).
+
+**`$OC`, the enumeration base.** The live deployment was created 2026-07-30 20:21
+(`$HOME/trophies-deploy/incoming.txt`); `HEAD` at that moment was `a40cdb2` (committed 20:17; the
+next commit is `869a78d` at 20:28). Measured today: `a40cdb2..HEAD -- public/` and
+`678dbc8..HEAD -- public/` give the **same** three paths, because `a40cdb2` touches only `.oplan/`.
+So `OC=a40cdb2` is correct and `OC=678dbc8` would also be correct; the step freezes `OC=a40cdb2`.
+
+**P3-AMENDMENT #2 (orchestrator, 2026-08-01, from the plan reviewer's MEDIUM finding).** This
+paragraph previously claimed the step "lets `vercel inspect` override it only if inspect actually
+prints a commit". **No such override exists in the frozen script** — line ~1487 hardcodes
+`OC="a40cdb2"` unconditionally, and nothing reads `incoming.txt`/`outgoing.txt` for a commit. The
+prose was aspirational; the script is what runs. **The hardcode is kept, not the prose** — a frozen
+constant that a loud assertion checks is easier and more robust than a conditional override with a
+branch nobody has seen fail. The claim is withdrawn: `$OC` is a frozen literal, full stop, and the
+4-path enumeration assertion below is what makes a wrong `$OC` fail loudly instead of proving less.
+
+**`OC` is assigned to a
+visible shell variable, never written as an angle-bracket placeholder** — bash would read the
+brackets as redirections, create a junk file and enumerate nothing (`plan.md:4571-4573`).
+`git cat-file -e "$OC^{commit}"` guards a typo. And the frozen-literal assertion above means that
+even if `$OC` were wrong, the step fails loudly instead of proving less.
+
+**md5 is taken against the WORKTREE file, never `git show HEAD:<file>`** (lesson 4 — the blob is
+LF-normalised, so for `styles.css`, `reader.js` and `sw.js` the blob differs from disk by hundreds
+of bytes and every such comparison is meaningless). `index.html` does not appear this time because
+it did not change; the `cleanUrls` `/index.html` to `/` rewrite is therefore not exercised, and the
+step keeps the `case` clause anyway so a future payload cannot lose it.
+
+### SK-P3-4 — THE COMPARATOR: it IS the repaired version. Proved, not assumed.
+
+**The briefing asks:** *"Read `trophies-deploy/readback.js` and state whether it is the REPAIRED
+version."*
+
+**IT IS.** Read in full today. Lines 10-12 carry the repair:
+
+```javascript
+if (fs.realpathSync(A) === fs.realpathSync(B)) {
+  fail("SAME FILE TWICE: '" + A + "' and '" + B + "' resolve to one path -- a file compared with itself can never fail (P4-AMENDMENT #1)");
+}
+```
+
+That is the P4-AMENDMENT #1 clause, the fix for the defect where the whole read-back gate compared
+her capture with itself and printed `READBACK OK` for any input. Corroborations measured today:
+
+* it also carries the SK4-1 trophy block (lines 32-40: `trophy LOST`, `tier LOST`, `tier RESTAMPED`)
+  and the SK4-2 evidence block with the `meta.updatedAt` WARNING (lines 41-63) — i.e. the full
+  post-amendment feature set, not a stub;
+* it uses `pathToFileURL(REPO + "/lib/profile.js")`, the fix for running as CommonJS from outside
+  the repo;
+* `md5 d3f76f2cf0b187791cb5d1d0fe59aa28`, **byte-identical** to
+  `$HOME/trophies-art/extracted-readback.js` (`cmp` clean), which is the copy that was extracted
+  back out of the plan file and run — so the file on disk is the file the record signed off.
+
+**RULED, and this is the "robust" half:** *"it is the repaired version"* is a claim about a file,
+and this run does not ship claims about files. **Step 3.6 re-runs the 8-case self-test, in this
+phase's own directory, against today's `lib/profile.js`, and refuses to touch her data until
+`SELFTEST 8/8 AS REQUIRED` has been written by THIS run.** The previous run's
+`$HOME/trophies-deploy/selftest/result.txt` is from 2026-07-30 and is **not** accepted as evidence.
+
+The self-test harness is reused unchanged: `make-fixtures.js`
+(md5 `7b16fa18c614d33b3178d560b0b86112`) and `run-selftest.sh`
+(md5 `f6076457e566f7091a437f13fc1e4d14`), both copied into the new directory and `cmp`-verified
+against their originals before use. Note `run-selftest.sh:7` invokes `"$D/../make-fixtures.js"`, so
+the fixture builder must sit one level above the selftest directory — the new layout below honours
+that.
+
+### SK-P3-5 — NEW PATHS, AND THE PROOF THAT THEY ARE NEW
+
+**The briefing requires:** *"New captures must go to NEW paths, and your plan must assert the new
+paths differ from the old."*
+
+**RULED — this phase gets its own working directory and never writes into the previous run's.**
+
+| role | THIS phase | the PREVIOUS run (must never be written, read only as reference) |
+|---|---|---|
+| work dir | `$HOME/polish-deploy/` | `$HOME/trophies-deploy/` |
+| scratch/apply scripts | `$HOME/polish-art/` | `$HOME/trophies-art/` |
+| capture C2 | `/c/Users/dkreinov/english-app-backups/profile-<ts>.json`, path written to `$HOME/polish-deploy/capture-path.txt` | `profile-20260730-201842.json` (and an older `profile-20260730-114016.json`) — **both still on disk today** |
+| read-back R1 | `$HOME/polish-deploy/readback-1.json` | `$HOME/trophies-deploy/readback-1.json` |
+| read-back R2 | `$HOME/polish-deploy/readback-2.json` | `$HOME/trophies-deploy/readback-2.json` |
+| deploy log | `$HOME/polish-deploy/deploy.log` | `$HOME/trophies-deploy/deploy.log` |
+| inspect out/in | `$HOME/polish-deploy/outgoing.txt`, `incoming.txt` | same names under `trophies-deploy/` |
+| precache list | `$HOME/polish-deploy/precache-urls.txt` | same name under `trophies-deploy/` |
+| selftest | `$HOME/polish-deploy/selftest/` | `$HOME/trophies-deploy/selftest/` |
+
+**The assertions that make this mechanical**, carried in `§VAL-P3` so they hold at every step:
+
+1. `case "$HOME/polish-deploy" in *trophies-deploy*) fail ...` — the new dir is not the old one.
+2. Step 3.3 asserts the capture path is **not** `/c/Users/dkreinov/english-app-backups/profile-20260730-201842.json`
+   and **not** `/c/Users/dkreinov/english-app-backups/profile-20260730-114016.json`, and that it does
+   **not** equal the content of `$HOME/trophies-deploy/capture-path.txt`.
+3. Step 3.3 asserts the capture file's mtime is **less than 3600 s old**, so a stale file cannot be
+   silently adopted even if its name looked new.
+4. Steps 3.6 and 3.8 assert `C2`, `R1` and `R2` are three pairwise-distinct paths **before** any
+   comparison runs (the `step-4.7.sh:11-13` clauses, kept verbatim), and the comparator itself
+   refuses `realpath(A) == realpath(B)`. Two independent layers, because this is the exact defect
+   class that shipped last time.
+5. Every artifact the gates read is under `$HOME/polish-deploy/`. **No gate in this phase reads a
+   file under `$HOME/trophies-deploy/`**, so no stale success can be mistaken for a fresh one.
+
+**Why a new directory rather than new filenames in the old one (easy vs robust):** new filenames
+would be "easier" by one `mkdir`, but every gate would then have to distinguish `readback-1.json`
+from `readback-3.json` by name, and a mistyped digit would read last run's proof. A separate
+directory makes the whole class impossible. Robust wins; the cost is one line.
+
+### SK-P3-6 — RUNTIME REACHABILITY OF THE SPEAKER BUTTON'S SOURCE OF TRUTH (review question 1)
+
+**Traced today, in full, because this is the artifact whose runtime path nobody has gated.**
+
+`public/views/reader.js:3` imports `getAllowedSet` from `../words-index.js`. At `:391`, inside
+`boot()`, it does `allowedWords = await getAllowedSet()`. `public/words-index.js:17` is
+`await fetch('/audio/words/index.json')` — **a network fetch, in the browser, at runtime.** At
+`:738` the tap handler does `const lemma = resolveLemma(dataWord, allowedWords)`, at `:742`
+`canSay: lemma !== null`, at `:600` the button is rendered only when `canSay`, and at `:789` the
+player builds `/audio/words/${encodeURIComponent(lemma)}.aac` **from that same `lemma`**.
+
+So the chain is: manifest over HTTP → a `Set` → `resolveLemma` → `canSay` → the button → the URL.
+
+**Where does it exist at runtime, and can everyone reach it when they need it?**
+
+* `/audio/words/index.json` exists as a static file under `public/` and is served by Vercel. It is
+  **NOT in `PRECACHE`** (verified against the 15-entry list in `public/sw.js:2-18`). The service
+  worker's fetch handler (`sw.js:48-50`) is `caches.match(request).then(cached || fetch)`, and only
+  precached entries are ever in the cache, so this request **always goes to the network**.
+* **Consequence, stated plainly and NOT hidden:** offline, or on a flaky connection, `getAllowedSet`
+  throws, `words-index.js:22` sets `cached = new Set()`, `resolveLemma` returns `null` for
+  everything, `canSay` is false for every word, and **no speaker button appears anywhere**. That is
+  the documented, deliberate design (`words-index.js:7-10`: *"Failure is never fatal … A dictionary
+  that loads without audio beats one that does not load"*), and it is a *degradation*, not a defect.
+  It is also **not new** in this phase and this phase must not "fix" it.
+* **What this phase DOES owe:** proof that the file answers in production at all. Nothing in the
+  previous deploy's evidence covers it — `deploy-verify.txt` probed the 15 precache URLs, the nine
+  webps, `/api/health` and `/api/chapter`, and never touched the manifest. **A 404 there would make
+  every speaker button in the app disappear, silently, with a green test suite.** That is criterion
+  14, and step 3.5 fetches:
+  * `/audio/words/index.json` → 200, md5 == worktree `8735a3c499508b04415046e2be4ad159`;
+  * three frozen sample clips, chosen today as manifest indices 0, 1127 and 2253 (first, middle,
+    last) and verified to exist on disk: **`/audio/words/a.aac`** (md5
+    `a85f523c231a7d39a01c7c4d1f189906`), **`/audio/words/kitchen.aac`** (md5
+    `061f4c1ea845148f7331ed9c348f25b6`), **`/audio/words/zoo.aac`** (md5
+    `7ead5fb8a25942605a72e1c65f9ec5d7`) → each 200 with md5 == worktree.
+
+  This is the frozen deploy recipe's own *"spot-check several `/audio/words/<lemma>.aac`"*
+  (`.oplan/word-audio/phase-state.md`), made specific and deterministic instead of left to
+  improvisation.
+
+**The other three artifacts, for completeness:** `/styles.css`, `/views/reader.js` and
+`/views/trophies.js` are all three in `PRECACHE`, so after the v19 worker installs they exist in the
+device's cache and are reachable with no network at the moment the router mounts a view. The nine
+trophy webps are runtime-fetched and deliberately not precached (T6); criterion 15 probes them.
+
+### SK-P3-7 — CONTRADICTORY SOURCES (review question 2)
+
+*"For each value shown to the child, name its source; where two shown values have different sources,
+prove they cannot disagree."*
+
+| shown to her | its source | the value it could contradict | why they cannot disagree |
+|---|---|---|---|
+| the speaker button appearing | `canSay = (resolveLemma(dataWord, allowedWords) !== null)`, `reader.js:738,742` | the clip URL actually fetched, `reader.js:789` | **They are the same variable.** `:789` builds the URL from the identical `lemma` binding that made `canSay` true. There is no second computation to drift. Phase 1 step 1.2 asserted exactly this over 11282 inputs. |
+| the speaker button appearing | the audio manifest, over HTTP | whether the `.aac` file exists | Measured today: **every one of the 2254 manifest entries has its `.aac` on disk** (0 exceptions). The manifest is generated from the same derivation that writes the clips (`scripts/build-word-audio.js`). The residual seam is *delivery*, not *content* — and that is precisely what criterion 14's four probes close. |
+| the Hebrew gloss in the popup | `findInGlossary(chapter, dataWord)` on the chapter's own `glossary`, else `POST /api/translate` | the word she tapped | Keyed on the printed surface form, and `:735-737`'s comment records the split deliberately: `surface` for the glossary/sentence search, `lemma` for speaking and saving. Unchanged this phase. |
+| the four quiz questions | `lemmas` — one array, built once in `boot()` and memoised in `quizLemmasByChapter` | the count shown by `afterChapterStage` | `reader.js:378-382` (the phase-1 comment) states the rule and the code implements it: *"computed ONCE and memoised, so the count afterChapterStage sees and the array startQuiz receives are the SAME array object and cannot disagree (field guide 15b)."* Already gated by phase 1's tests; **re-run unchanged by `§VAL-P3` at every step**, which is this phase's whole contribution to it. |
+| a trophy card's ring vs its progress number | stored `trophies` vs a live `metric(profile)` | each other | This is the word-trophies 15(b) defect, fixed in the previous run. **Phase 3 changes neither.** `public/views/trophies.js` md5 is pinned and its bytes are proved live-vs-worktree. |
+
+**Nothing in this phase creates a new pair of sources.** The bump changes one string in a file no
+user ever reads. That is the honest answer to question 2 and it is worth saying out loud: the risk
+surface of THIS phase is delivery, not computation.
+
+### SK-P3-8 — HOW THE NEW SERVICE WORKER ACTUALLY REACHES HER DEVICE (and when she sees it)
+
+**The briefing insists this be answered plainly. Here it is, traced from the code, today.**
+
+`/sw.js` is **not** in its own `PRECACHE` list (measured). The sequence on her phone, after the
+deploy:
+
+1. She opens the app. The **old v18 worker is already in control** and `sw.js:49`
+   `caches.match(request)` serves the shell, `styles.css`, `reader.js` and `trophies.js` from the
+   `magic-vet-v18` cache. **Her first paint of that visit is still the OLD app.**
+2. `public/app.js:58-60` — on `load`, `navigator.serviceWorker.register("/sw.js")` runs. The browser
+   fetches `/sw.js` itself (worker-script requests do not go through the worker's fetch handler) and
+   byte-compares it with the installed script.
+3. It differs (`v19`), so the new worker **installs**: `sw.js:20-27` opens the `magic-vet-v19` cache,
+   `cache.addAll(PRECACHE)`, then `self.skipWaiting()`.
+4. **`activate`** (`sw.js:29-38`) deletes every cache key that is not `magic-vet-v19` — the old v18
+   cache goes — then `self.clients.claim()`.
+5. Claiming fires `controllerchange`, and `public/app.js:62-66` reloads the page **once**
+   (`refreshing` guards against a loop).
+6. The reload is served by the v19 worker from the v19 cache. **Now she sees the new app.**
+
+**So the honest answer: not instantly. She gets it on the NEXT visit after the deploy, and within
+that visit only after one automatic reload — the first paint of that visit is still the old app.**
+The owner should expect a brief flash-and-reload, not an immediate change, and should not conclude
+from an unchanged first screen that the deploy failed.
+
+**Three things that can defer it further, stated rather than glossed:**
+
+* **If `cache.addAll` rejects** because any single one of the 15 URLs fails, the new worker never
+  installs, step 4 never happens, and **she stays on v18 indefinitely** — silently. This is why the
+  15/15 sweep (criterion 13) is the highest-value gate in the phase, and why a confirmed-dead
+  PRECACHE URL is one of only two pre-authorised automatic rollbacks.
+* **The browser's HTTP cache on `/sw.js`.** **NOT MEASURED — this planner may not curl production**,
+  so the response headers Vercel serves for `/sw.js` are unknown to this plan. The spec caps
+  service-worker script freshness at 24 hours regardless of headers, and current Chrome and Safari
+  bypass the HTTP cache for the worker script by default, so the realistic worst case is *one
+  further visit, or up to 24 hours*. Step 3.5 **records** the `cache-control` header it observes on
+  `/sw.js` as evidence for the record; it does not gate on it, because no threshold has ever been
+  agreed and inventing one at ship time is how a good deploy gets rolled back.
+* **A device that never revisits never updates.** Nothing can fix that from here.
+
+**What the owner must do to see it NOW (step 3.7's first instruction):** fully close the installed
+app and every tab, then reopen; if the screen still looks old, close and reopen once more (the first
+open installs, the second is served by v19). A hard reload does the same on desktop.
+
+### SK-P3-9 — THE ROLLBACK: exact command, exact target, who decides
+
+**The briefing requires a written rollback naming `dpl_AVmWnh3XxBZPhLJKnjTUZT9r5EXB`.**
+
+**RULED:**
+
+* **The rollback target is the outgoing deployment as `vercel inspect` reports it in step 3.2, and
+  nothing else.** The record's value is a *hypothesis to confirm*: `.oplan/word-polish/phase-state.md:9`
+  and `$HOME/trophies-deploy/incoming.txt` both say the live deployment is
+  **`dpl_AVmWnh3XxBZPhLJKnjTUZT9r5EXB`** at url
+  **`https://english-1jnh1sn5e-dkreinovs-projects.vercel.app`**. If step 3.2's inspect reports any
+  other id, **STOP** — something deployed outside this run's knowledge and the whole baseline must
+  be re-established before anything ships.
+* **The command, frozen. The url is pasted in from `outgoing.txt`, never hand-built** (lesson 10:
+  *"a hand-constructed url once pointed at the WRONG deployment"*), and the recorded line must carry
+  the literal url — an angle-bracket placeholder left in place would be read by bash as a redirect
+  and would roll back nothing:
+
+  ```bash
+  "$(npm prefix -g)/vercel" rollback https://english-1jnh1sn5e-dkreinovs-projects.vercel.app --yes
+  ```
+
+  That literal is written here from `incoming.txt`, and step 3.2 **re-derives it from its own fresh
+  `outgoing.txt` and must produce the same string**. If the two disagree, the fresh one wins and the
+  step STOPS for a ruling.
+* **Written into `.oplan/word-polish/phase-state.md` AND COMMITTED in step 3.2, before the deploy** —
+  not composed under pressure afterwards.
+* **WHO DECIDES: the owner.** The orchestrator STOPS and reports; it does not roll back on its own
+  initiative. **Exactly two pre-authorised exceptions**, both requiring a
+  **three-attempt confirmation ≥10 s apart** before firing (P4-AMENDMENT #3 — one `curl` over a
+  corporate TLS proxy against a CDN seconds after a deploy is not evidence):
+  1. a `PRECACHE` URL confirmed non-200 three times;
+  2. `/` confirmed not serving three times.
+  Anything that recovers on retry is **recorded and reported, never rolled back on**.
+* **What rollback does and does not do, plainly (D27, owner-accepted): `vercel rollback` restores
+  CODE ONLY. There is no restore path for her profile. The capture is a photograph, not a spare.**
+
+### SK-P3-10 — FAIL-FIRST WHERE POSSIBLE; GUARDS NAMED AS GUARDS WHERE NOT
+
+Field-guide lesson 2 and lesson 15's *"distinguish GATES that were seen to fail from GUARDS that
+cannot be tested"*.
+
+**GATES that will be SEEN to fail, with the mutation written into the step:**
+
+* **step 3.1's test move.** Before the edit, `tests/shell.test.js:58-59` pin `v18` present / `v17`
+  absent, and `public/sw.js:1` says `v18` — so the suite is green. The step's fail-first is
+  explicit and cheap: run the apply script on `public/sw.js` ONLY, run `npm test`, and **watch
+  `tests/shell.test.js` fail** (`assert.ok(sw.includes('magic-vet-v18'))` on a file that now says
+  v19). Then apply the test edit and watch it go green. **That is a real watched failure of the
+  exact assertion the step exists to move**, obtained with no fixture and no throwaway file. The
+  step's script performs both halves in order and records both outputs.
+* **step 3.1's second mutation, the one that matters more:** apply ONLY the `v17`→`v18` half of the
+  test edit (leaving line 58 pinning `v18` while `sw.js` says `v19`) and confirm the suite still
+  fails — this proves the gate is not satisfied by half the edit.
+* **the comparator's 8-case self-test** (step 3.6-A), re-run in this phase's directory: five watched
+  failures (key loss, status-without-evidence, trophy loss, tier restamp, evidence-free appearance),
+  one self-comparison refusal, and two positive controls. It must print `SELFTEST 8/8 AS REQUIRED`
+  before her data is touched.
+* **`§VAL-P3`'s `APP_CODE` guard** and **its stray-`profile-*.json` guard**: both demonstrated
+  firing in the previous run and re-demonstrable here in a throwaway shell and a scratch directory,
+  without touching anything.
+
+**GUARDS, not gates — their failure has never been observed and cannot be staged here:**
+
+* the md5 / PRECACHE / webp / manifest probes **before the deploy has happened**. Unlike
+  word-trophies phase 4 — where `/views/trophies.js` 404'd and all nine webps 404'd, so the checks
+  were demonstrably false on the day — **this deploy adds no new URL**. Every URL these checks probe
+  already answers today. **So the reachability sweep is a GUARD in this phase, not a gate**, and the
+  plan says so rather than borrowing the previous run's fail-first evidence. The ONE exception is
+  genuinely fail-first: **live `/sw.js` will contain `magic-vet-v18` and not `v19` before the
+  deploy**, so criterion 12 is demonstrably false at step 3.2 and must become true at step 3.5.
+  Step 3.2's baseline records exactly that, which converts criterion 12 into a watched transition.
+* the deploy's own success or failure. Production cannot be mutated to watch a check fail.
+* the comparator against **her real data**. The script is proven; the data path is not, and cannot
+  be without damaging a profile to watch the alarm work.
+* everything about her actual experience. Only the owner at 3.7 can see it.
+
+### SK-P3-11 — THE MISSING AUDIO: what this deploy does and does not fix
+
+Design §T3(b) said the 17 missing clips get generated before the ship. **They were not, and they are
+not generated here.** Phase 2 stopped at `ae349c6`: the missing words are outside the band-derived
+audio vocabulary and `scripts/build-word-audio.js` rewrites `public/audio/words/index.json` from that
+derivation on every run, so generating them naively would rewrite the manifest. Verified today: the
+manifest is **2254 entries, md5 `8735a3c499508b04415046e2be4ad159`, unchanged**, and none of the
+missing clips exists.
+
+**Consequence after this deploy, stated so nobody can read the plan as claiming otherwise:** for
+those ~17 story words the speaker button is **ABSENT rather than dead**. That is exactly the
+behaviour T3(a) was built for and it is a strict improvement — she never presses a button that does
+nothing — but **the child still cannot hear those words.** That work is a separate future run.
+
+`§VAL-P3` pins the manifest md5 at every step precisely so that no step of this phase can quietly
+change it.
+
+### SK-P3-12 — UNGATED COMPOSITES: where an approved asset meets approved styling (review question 3)
+
+*"Name every place an approved asset meets approved styling — those get a human look, not an
+assertion."* Lesson 15(c) is the defect this whole run exists to fix, so this list is not optional.
+
+| composite | the asset | the styling | who looks |
+|---|---|---|---|
+| **the trophies shelf banner** | `/assets/trophies/shelf-header.webp` (runtime fetch, `trophies.js:185`) | `.shelf-banner`, `public/styles.css:429` — the new class phase 1 added, with **no bottom fade** | **the owner, step 3.7, item 2.** This is D1 itself. No CSS assertion can see whether the shelf reads as a shelf. |
+| the speaker button in the word popup | the 🔊 glyph rendered by the device font | `.btn-say`, `public/styles.css:693,708` | **the owner, step 3.7, item 4** — it is a new affordance on her tap popup and nobody has seen it on a phone |
+| the eight trophy cards | the nine webps | `public/styles.css` card rules | the owner, step 3.7, item 5 (a broken-image sweep) — unchanged this phase, but the v19 cache is new, so it gets one glance |
+| the chapter-end quiz | no asset | existing quiz styling | **not visible at 3.7** — it needs a real chapter-end, which is a WRITE. Deferred to her own use and reported at R2. Said plainly rather than pretended. |
+
+**Both style rules were verified today to live in the globally-linked `public/styles.css`, not in a
+view's `VIEW_STYLE` string** (`grep VIEW_STYLE public/views/trophies.js` gives no match;
+`.btn-say` is at `styles.css:693`). That discharges field-guide lesson 14 for both.
+
+---
+
+### SK-P3-13 — APPEND-ONLY WRITES MUST ASSERT UNIQUENESS, NOT PRESENCE
+**P3-AMENDMENT #3 (orchestrator, 2026-08-01, from the plan reviewer's second MEDIUM finding).**
+
+Step 3.1's apply script asserts an exact occurrence count before every substitution. The plan's
+*append* sites do not: step 3.2's ROLLBACK block appended to `phase-state.md`, and the
+`backup-receipt.txt` appends in 3.3, 3.6 and 3.8. §VAL-P3 checks these with `grep -q`, which asks
+**"is it present?"** — a question that stays true after a double-append. If 3.2 is interrupted
+after the append but before the commit and is then re-run, the block silently lands twice and every
+gate stays green. That is the same shape as the bug that produced field-guide lesson 16: a check
+that cannot fail on the thing it is supposed to catch.
+
+**THE RULE, applied to every append site in this phase:** after appending, assert the count is
+**exactly 1** (for the ROLLBACK block) or **exactly N** where N is the number of appends the phase
+has made so far (for the receipt). Presence is never sufficient.
+
+**FROZEN FORM — the ROLLBACK block (step 3.2), run after the append, before the commit:**
+```bash
+N=$(grep -c '^ROLLBACK:' .oplan/word-polish/phase-state.md)
+echo "ROLLBACK block occurrences: $N"
+[ "$N" -eq 1 ] || { echo "FAIL: expected exactly 1 ROLLBACK line, found $N -- a re-run double-appended; remove the duplicate by hand, do not append again"; exit 1; }
+```
+
+**FROZEN FORM — the receipt (steps 3.3, 3.6, 3.8).** Each of those three steps appends exactly one
+line, so the expected count is known in advance and is passed in as `$WANT` (3.3 → 1, 3.6 → 2,
+3.8 → 3):
+```bash
+R=.oplan/word-polish/backup-receipt.txt
+N=$(grep -c '^[a-z]' "$R")
+echo "receipt lines: $N (want $WANT)"
+[ "$N" -eq "$WANT" ] || { echo "FAIL: receipt has $N lines, expected $WANT -- a step was run twice or skipped"; exit 1; }
+```
+
+**Idempotence, stated plainly rather than assumed:** step 3.1 is idempotent (its apply script
+refuses a double-apply, proven today). Steps 3.2, 3.3, 3.6 and 3.8 are **NOT** idempotent — each
+appends. With the assertions above they are *self-detecting*: a second run fails loudly instead of
+corrupting the record. Step 3.4 is emphatically not idempotent and must never be re-run; that is
+already covered by its own "do NOT re-run the deploy" guards.
+
+---
+
+## §VAL-P3 — THE FROZEN VALIDATION PREAMBLE
+
+**Deliver this to any executor as a FILE, never inline in a JSON packet** — backslashes collapsed in
+transit twice in this project's history. **Every step's validation is ONE script = §VAL-P3 verbatim
++ that step's tail, in the SAME file.** A child `bash` cannot supply `fail` / `$RC` / `$PORC` /
+`$SWSTATE` to a tail, so a tail invoked as a separate process exits 0 unconditionally — the
+silent-pass class (P2-AMENDMENT #1a).
+
+**THE `.oplan` FILTER IS `awk '$NF !~ /^\.oplan\//'` — TWO BACKSLASHES, at `\.` and at `\/`.**
+(The word-trophies plan calls this "four characters of backslash" at `plan.md:4055`; counted today,
+the correct filter contains exactly **two** backslash bytes. Count them, do not trust either number.)
+`.oplan/word-trophies/plan.md:989` carries a collapsed-backslash copy that is a bash **syntax
+error** and makes every gate exit 0. Never copy that line. The copy below is the one that ran.
+
+It hard-codes every number, because this phase moves none of them: the suite, the ledger, the
+contrast anchor, the `public/` digest and every file's endings are frozen for the whole phase. The
+one thing that legitimately has two values — the CACHE bump — is modelled as an explicit **two-state
+machine with a seam assertion**, rather than as a pin that would have to be edited mid-phase.
+
+Note: it is named `§VAL-P3` for *this* run's phase 3. `.oplan/word-trophies/plan.md:1929` also has a
+`§VAL-P3`, for the previous run's phase 3. They are different scripts; do not cross them.
+
+```bash
+#!/usr/bin/env bash
+set -o pipefail
+cd C:/Users/dkreinov/claude/english-app || { echo "FAIL: cannot cd to the repo"; exit 1; }
+RC=0
+fail() { echo "FAIL: $*"; RC=1; }
+
+# --- APP_CODE must NOT exist in this shell (lesson 3: a leak silently 401s the whole suite) ---
+if [ -n "${APP_CODE:-}" ]; then fail "APP_CODE is set in this shell -- it may only ever live inside the frozen capture subshell"; fi
+
+# --- this phase writes to polish-deploy, NEVER to the previous run's trophies-deploy ---
+WD="$HOME/polish-deploy"
+case "$WD" in *trophies-deploy*) fail "the work dir resolves into the PREVIOUS run's directory: $WD";; esac
+
+# --- suite (plain) ---
+OUT="$(npm test 2>&1)"; STAT=$?
+case "$STAT" in 0) ;; *) fail "npm test exited $STAT";; esac
+TOTAL="$(printf '%s\n' "$OUT" | sed -n 's/^# tests \([0-9][0-9]*\).*$/\1/p')"
+FAILED="$(printf '%s\n' "$OUT" | sed -n 's/^# fail \([0-9][0-9]*\).*$/\1/p')"
+PLAN="$(printf '%s\n' "$OUT" | sed -n 's/^1\.\.\([0-9][0-9]*\).*$/\1/p')"
+case "$TOTAL" in 358) ;; *) fail "suite reported $TOTAL, expected 358";; esac
+case "$FAILED" in 0) ;; *) fail "suite had $FAILED failures";; esac
+case "$PLAN" in 353) ;; *) fail "top-level plan is 1..$PLAN, expected 1..353";; esac
+
+# --- suite (gated) ---
+GOUT="$(APP_CODE=dummy npm test 2>&1)"; GSTAT=$?
+case "$GSTAT" in 0) ;; *) fail "APP_CODE=dummy npm test exited $GSTAT";; esac
+GTOTAL="$(printf '%s\n' "$GOUT" | sed -n 's/^# tests \([0-9][0-9]*\).*$/\1/p')"
+GFAILED="$(printf '%s\n' "$GOUT" | sed -n 's/^# fail \([0-9][0-9]*\).*$/\1/p')"
+case "$GTOTAL" in 358) ;; *) fail "gated suite reported $GTOTAL, expected 358";; esac
+case "$GFAILED" in 0) ;; *) fail "gated suite had $GFAILED failures";; esac
+
+# --- flat ledger: this phase adds NO test ---
+FLAT="$(grep -h -c '^test(' tests/*.js | awk '{s+=$1} END{print s+0}')"
+case "$FLAT" in 353) ;; *) fail "flat ledger is $FLAT, expected 353 (phase 3 adds no test)";; esac
+
+# --- contrast: there is NO 'npm run contrast'; the gate is the script itself ---
+CON="$(node scripts/check-contrast.mjs 2>&1)"; CSTAT=$?
+case "$CSTAT" in 0) ;; *) fail "check-contrast exited $CSTAT";; esac
+PASSES="$(printf '%s\n' "$CON" | grep -c '^PASS')"
+case "$PASSES" in 58) ;; *) fail "contrast anchor is $PASSES, expected 58";; esac
+case "$CON" in *"ALL PASS"*) ;; *) fail "check-contrast did not print ALL PASS";; esac
+
+# --- public/ file count: nothing is created or deleted under public/ this phase ---
+PUBN="$(node -e 'const fs=require("fs"),path=require("path");let n=0;(function walk(d){for(const e of fs.readdirSync(d).sort()){const f=path.join(d,e);if(fs.statSync(f).isDirectory())walk(f);else n++;}})("public");console.log(String(n));')"
+case "$PUBN" in 2372) ;; *) fail "public/ file count must stay 2372 all phase, got '$PUBN'";; esac
+
+# --- public/ EXCEPT sw.js is byte-frozen all phase (sw.js is the only public file phase 3 moves) ---
+PUBX="$(node -e 'const fs=require("fs"),path=require("path"),crypto=require("crypto");const SKIP=new Set(["public/sw.js"]);const out=[];(function walk(d){for(const e of fs.readdirSync(d).sort()){const f=path.join(d,e);const p=f.split(path.sep).join("/");if(fs.statSync(f).isDirectory())walk(f);else if(!SKIP.has(p))out.push(p+" "+crypto.createHash("md5").update(fs.readFileSync(f)).digest("hex"));}})("public");console.log(out.length+" "+crypto.createHash("md5").update(out.join(String.fromCharCode(10))).digest("hex"));')"
+case "$PUBX" in "2371 d82e7f9761991b66cbf5139422f6acba") ;; *) fail "public/ moved outside sw.js: expected '2371 d82e7f9761991b66cbf5139422f6acba', got '$PUBX'";; esac
+
+# --- the CACHE bump is a TWO-STATE thing, and the two files must be in the SAME state ---
+SWMD5="$(md5sum public/sw.js | cut -d' ' -f1)"
+case "$SWMD5" in
+  d76f781dc49c5f629aba0f2dfe3304b6) SWSTATE=PRE ;;
+  6d836788d379e7872ce730cfec5db51a) SWSTATE=POST ;;
+  *) SWSTATE=UNKNOWN; fail "public/sw.js is in neither known state: $SWMD5";;
+esac
+STMD5="$(md5sum tests/shell.test.js | cut -d' ' -f1)"
+case "$STMD5" in
+  cbb33bfeb08574024c374a6288fbfed8) STSTATE=PRE ;;
+  ca6c242a97ba1904994d491b5a04aaf8) STSTATE=POST ;;
+  *) STSTATE=UNKNOWN; fail "tests/shell.test.js is in neither known state: $STMD5";;
+esac
+# ASSERT THE SEAM (field guide 15b): a half-applied bump is the one failure a per-file pin misses
+case "$SWSTATE:$STSTATE" in
+  PRE:PRE|POST:POST) ;;
+  *) fail "HALF-APPLIED BUMP: sw.js is $SWSTATE but tests/shell.test.js is $STSTATE -- the worker and its pin must move together";;
+esac
+
+# --- the shipped payload phase 1 produced must not move by one byte ---
+CSSMD5="$(md5sum public/styles.css | cut -d' ' -f1)"
+case "$CSSMD5" in b6aa9c229ca269f39f468c60f50c45b4) ;; *) fail "public/styles.css moved: $CSSMD5";; esac
+RDMD5="$(md5sum public/views/reader.js | cut -d' ' -f1)"
+case "$RDMD5" in b5b37fc370436f4c6ad62244cc298bde) ;; *) fail "public/views/reader.js moved: $RDMD5";; esac
+TRMD5="$(md5sum public/views/trophies.js | cut -d' ' -f1)"
+case "$TRMD5" in 1c601eb05071edf7413d0d738067d1ea) ;; *) fail "public/views/trophies.js moved: $TRMD5";; esac
+
+# --- QZ-18 frozen, re-pinned by this phase ---
+QMD5="$(md5sum public/quiz.js | cut -d' ' -f1)"
+case "$QMD5" in 69b6d71117cf776715374abc6f0abb02) ;; *) fail "public/quiz.js moved: $QMD5 (QZ-18 frozen)";; esac
+QCMD5="$(md5sum public/quiz-core.js | cut -d' ' -f1)"
+case "$QCMD5" in 9a2131be8b9d1b77c219f1e8c3482a71) ;; *) fail "public/quiz-core.js moved: $QCMD5 (QZ-18 frozen)";; esac
+
+# --- the audio manifest is the speaker button's source of truth and NO audio is generated here ---
+MANMD5="$(md5sum public/audio/words/index.json | cut -d' ' -f1)"
+case "$MANMD5" in 8735a3c499508b04415046e2be4ad159) ;; *) fail "the audio manifest moved: $MANMD5 -- phase 3 generates no audio";; esac
+
+# --- the two phase-1 test files must not move. This also protects the magic-vet-v18 COMMENT at
+# --- tests/trophies-ui.test.js:351, which is a historical note and must NOT be rewritten (SK-P3-2)
+RTMD5="$(md5sum tests/reader-ui.test.js | cut -d' ' -f1)"
+case "$RTMD5" in 39aa0d69a5d93e6067ff404c546d94a8) ;; *) fail "tests/reader-ui.test.js moved: $RTMD5";; esac
+TTMD5="$(md5sum tests/trophies-ui.test.js | cut -d' ' -f1)"
+case "$TTMD5" in d0ca049b9dfab39d0f61c787f5be313b) ;; *) fail "tests/trophies-ui.test.js moved: $TTMD5";; esac
+
+# --- the server the deploy carries must not move during the phase ---
+SRV="$(git diff --name-only HEAD -- lib api data scripts)"
+case "$SRV" in "") ;; *) fail "lib/ api/ data/ or scripts/ changed, which phase 3 must never do: $SRV";; esac
+
+# --- awarding stays server-side only ---
+CLIENTAWARD="$(grep -rl 'awardTrophies' public/ | wc -l | tr -d ' ')"
+case "$CLIENTAWARD" in 0) ;; *) fail "awardTrophies appears under public/ -- awarding is server-side only";; esac
+
+# --- both transcripts must diff EMPTY ---
+VD="$HOME/polish-val"; mkdir -p "$VD"
+node .oplan/word-quiz/quiz-transcript.mjs > "$VD/qz.out" 2>&1 || fail "quiz-transcript.mjs exited non-zero"
+QZ="$(diff "$VD/qz.out" .oplan/word-quiz/quiz-transcript-expected.txt)"
+case "$QZ" in "") ;; *) fail "QZ-21 transcript moved";; esac
+node .oplan/word-g1/g1-transcript.mjs > "$VD/g1.out" 2>&1 || fail "g1-transcript.mjs exited non-zero"
+G1="$(diff "$VD/g1.out" .oplan/word-g1/g1-transcript-expected.txt)"
+case "$G1" in "") ;; *) fail "G1 transcript moved";; esac
+rm -f "$VD/qz.out" "$VD/g1.out"
+
+# --- NOT ONE BYTE OF HER PROFILE MAY EXIST INSIDE THE REPOSITORY ---
+if [ -e .data/profile.json ]; then fail ".data/profile.json exists -- a local write leaked"; fi
+STRAY="$(find . -path ./node_modules -prune -o -name 'profile-*.json' -print | head -5)"
+case "$STRAY" in "") ;; *) fail "a capture file is inside the repo: $STRAY";; esac
+
+# --- line endings are LAW and git normalises them away (field guide lesson 4) ---
+ENDS="$(node -e 'const fs=require("fs");const out=[];for(const f of process.argv.slice(1)){if(!fs.existsSync(f)){out.push(f+" MISSING");continue;}const b=fs.readFileSync(f);let c=0,l=0;for(let i=0;i<b.length;i++){if(b[i]===10){if(i>0&&b[i-1]===13)c++;else l++;}}out.push(f+" CRLF="+c+" LF="+l);}console.log(out.join("; "));' public/sw.js public/styles.css public/index.html public/app.js public/views/words.js public/views/reader.js public/views/trophies.js public/quiz.js public/quiz-core.js tests/shell.test.js tests/reader-ui.test.js tests/trophies-ui.test.js)"
+echo "ENDINGS: $ENDS"
+case "$ENDS" in *"public/sw.js CRLF=51 LF=0"*)               ;; *) fail "public/sw.js endings moved: $ENDS";; esac
+case "$ENDS" in *"public/styles.css CRLF=729 LF=0"*)         ;; *) fail "public/styles.css endings moved: $ENDS";; esac
+case "$ENDS" in *"public/index.html CRLF=90 LF=0"*)          ;; *) fail "public/index.html endings moved: $ENDS";; esac
+case "$ENDS" in *"public/app.js CRLF=0 LF=67"*)              ;; *) fail "public/app.js endings moved: $ENDS";; esac
+case "$ENDS" in *"public/views/words.js CRLF=289 LF=0"*)     ;; *) fail "public/views/words.js endings moved: $ENDS";; esac
+case "$ENDS" in *"public/views/reader.js CRLF=845 LF=0"*)    ;; *) fail "public/views/reader.js endings moved: $ENDS";; esac
+case "$ENDS" in *"public/views/trophies.js CRLF=0 LF=368"*)  ;; *) fail "public/views/trophies.js endings moved (it is LF, not CRLF): $ENDS";; esac
+case "$ENDS" in *"public/quiz.js CRLF=346 LF=0"*)            ;; *) fail "public/quiz.js endings moved: $ENDS";; esac
+case "$ENDS" in *"public/quiz-core.js CRLF=99 LF=0"*)        ;; *) fail "public/quiz-core.js endings moved: $ENDS";; esac
+case "$ENDS" in *"tests/shell.test.js CRLF=0 LF=96"*)        ;; *) fail "tests/shell.test.js endings moved (it is LF, not CRLF): $ENDS";; esac
+case "$ENDS" in *"tests/reader-ui.test.js CRLF=0 LF=492"*)   ;; *) fail "tests/reader-ui.test.js endings moved: $ENDS";; esac
+case "$ENDS" in *"tests/trophies-ui.test.js CRLF=0 LF=1067"*) ;; *) fail "tests/trophies-ui.test.js endings moved: $ENDS";; esac
+
+# --- nothing deleted, ever ---
+GONE="$(git diff --diff-filter=D --name-only HEAD)"
+case "$GONE" in "") ;; *) fail "files were deleted in the worktree: $GONE";; esac
+GONEB="$(git diff --diff-filter=D --name-only 1e470bd HEAD)"
+case "$GONEB" in "") ;; *) fail "files were deleted since the run base: $GONEB";; esac
+
+# --- the phase write set vs the run BASE, at EVERY step: it may only ever be one of two literals ---
+WROTESET="$(git diff --name-only 1e470bd HEAD | awk '$NF !~ /^\.oplan\//' | LC_ALL=C sort | tr '\n' ' ')"
+case "$WROTESET" in
+  "public/styles.css public/views/reader.js public/views/trophies.js tests/reader-ui.test.js tests/trophies-ui.test.js ") WROTE=PRE ;;
+  "public/styles.css public/sw.js public/views/reader.js public/views/trophies.js tests/reader-ui.test.js tests/shell.test.js tests/trophies-ui.test.js ") WROTE=POST ;;
+  *) WROTE=UNKNOWN; fail "the write set since 1e470bd is neither the PRE nor the POST literal: [$WROTESET]";;
+esac
+
+# --- computed here, ASSERTED in each step's tail (a step that is mid-edit is legitimately dirty) ---
+PORC="$(git status --porcelain -uall | awk '$NF !~ /^\.oplan\//' | LC_ALL=C sort)"   # .oplan is the orchestrator record, never the executor write set
+
+echo "VAL-P3: TOTAL=$TOTAL PLAN=$PLAN FLAT=$FLAT PASSES=$PASSES GTOTAL=$GTOTAL PUBN=$PUBN PUBX='$PUBX' SW=$SWSTATE ST=$STSTATE WROTE=$WROTE"
+```
+
+Per-step tails continue from here with their own assertions and end with `exit $RC`.
+
+### THIS PREAMBLE WAS RUN TODAY, FROM THE FORM WRITTEN ABOVE — 151 lines, exit 0
+
+Not described, not hand-simulated. **And not merely "a copy of it was run": the block above was
+extracted back OUT of this plan file by `awk`, diffed byte-for-byte against the copy that had been
+run (identical), and executed again from that extraction** against the clean tree at `ae349c6`, exit
+0. That closes the phase-2 failure mode where the plan's copy of a frozen script differed from the
+copy that worked (P2-NOTE #1's collapsed backslash). **Its complete stdout, copied from the run:**
+
+```
+ENDINGS: public/sw.js CRLF=51 LF=0; public/styles.css CRLF=729 LF=0; public/index.html CRLF=90 LF=0; public/app.js CRLF=0 LF=67; public/views/words.js CRLF=289 LF=0; public/views/reader.js CRLF=845 LF=0; public/views/trophies.js CRLF=0 LF=368; public/quiz.js CRLF=346 LF=0; public/quiz-core.js CRLF=99 LF=0; tests/shell.test.js CRLF=0 LF=96; tests/reader-ui.test.js CRLF=0 LF=492; tests/trophies-ui.test.js CRLF=0 LF=1067
+VAL-P3: TOTAL=358 PLAN=353 FLAT=353 PASSES=58 GTOTAL=358 PUBN=2372 PUBX='2371 d82e7f9761991b66cbf5139422f6acba' SW=PRE ST=PRE WROTE=PRE
+```
+
+Two lines and nothing else on a clean pass; a failure adds `FAIL:` lines. **`SW=PRE ST=PRE
+WROTE=PRE` is the correct reading before step 3.1**; from 3.1 onward it must read
+`SW=POST ST=POST WROTE=POST`, and each step's tail pins which.
+
+**THE FIRST RUN FOUND A REAL BUG IN THIS PREAMBLE, WHICH IS WHY IT WAS RUN.** The `public/` file
+count used `console.log(n)` on a **number**, and node colourises numbers through `util.inspect`
+whenever it thinks stdout is a terminal. The observed output was:
+
+```
+FAIL: public/ file count must stay 2372 all phase, got '<ESC>[33m2372<ESC>[39m'
+```
+
+— a gate that fails on a perfectly correct tree, for a reason that depends on the executor's
+terminal. **`$HOME/trophies-art/VAL-P1.sh:35-36` carries the identical defect** and got away with it
+only because phase 1's executor happened not to have a TTY there. The fix in the block above is
+`console.log(String(n))`, and the second run was clean. This is field-guide lesson 9 (*"a frozen
+VALIDATION can itself be the bug"*) landing again, caught only because the script was executed
+rather than read.
+
+### CLAUSES SEEN TO FAIL TODAY (fail-first evidence for the preamble itself)
+
+| clause | how it was made to fire | observed |
+|---|---|---|
+| the `APP_CODE` guard | the written lines 1-12 run in a throwaway shell with `APP_CODE=notarealcode` | `FAIL: APP_CODE is set in this shell -- it may only ever live inside the frozen capture subshell`, RC=1; with it unset, RC=0 |
+| the stray-capture guard | the written clause run against a scratch directory containing `profile-20260801-000000.json` | `FAIL: a capture file is inside the repo: ./profile-20260801-000000.json`, RC=1; the same clause against the real repo, RC=0 |
+| the `public/` file-count clause | the pre-fix run above | fired on a correct tree — which is how the colour bug was found |
+
+**The `HALF-APPLIED BUMP` seam clause has NOT been seen to fail, because making it fire requires
+editing the repository and this planner may not.** It does not stay a guard: **step 3.1 makes it
+fire for free.** That step's fail-first mutation applies the `sw.js` edit ONLY, and §VAL-P3 run in
+that state must print
+`FAIL: HALF-APPLIED BUMP: sw.js is POST but tests/shell.test.js is PRE -- the worker and its pin
+must move together`. Step 3.1 records that line as evidence. This is the lesson-15 habit applied at
+write time: *what would make this assertion pass while the feature is broken?* — a per-file md5 pin
+on each of the two files passes happily when only one of them has moved, which is exactly the state
+that ships a service worker whose test no longer guards it.
+
+---
+
+## FROZEN CONTRACTS — quoted, in force for every step
+
+**Field guide lesson 10 (DEPLOY)** — `field-guide/index.md:52-55`:
+> "DEPLOY: `vercel inspect` FIRST and record the id AND the url exactly as inspect reports it (a
+> hand-constructed url once pointed at the WRONG deployment); deploy ONCE with output to a FILE
+> (truncated output once caused a double deploy); md5 the WORKTREE vs live, never a git blob;
+> recipe: `.oplan/word-audio/phase-state.md:55-66`."
+
+**Field guide lesson 3 (the profile is live)** — `field-guide/index.md:11-16`:
+> "THE PROFILE IS LIVE (Vercel Blob behind `APP_CODE`). NEVER probe it. `GET /api/profile` CREATES
+> one — a read that writes … `isAuthorized` is open only when `APP_CODE` is UNSET; the frozen
+> subshell capture (`.oplan/word-quiz/plan.md:1573-1586`) is the ONLY sanctioned live read — its
+> post-assert proves no leak, and a leak silently 401s the whole suite."
+
+**Field guide lesson 4 (endings)** — `field-guide/index.md:17-31`, the clause this phase turns on:
+> "FILE line endings are law (MEASURE, never remember: the WORKTREE is law and `git diff`
+> normalises it away) … core.autocrlf=true makes DISK endings unstable … an Edit-tool insert CRLF'd
+> a whole LF file, and `git diff` normalises so the damage is INVISIBLE to any git-based gate — edit
+> LF files byte-preservingly (python `newline=''`) and verify endings with an `rb` byte count, never
+> grep/`file`."
+
+**Field guide lesson 11** — `field-guide/index.md:56-59`:
+> "VISUAL GATES ARE SELF-SERVED (owner directive): sandbox browser only, NEVER production."
+
+**THE FROZEN DEPLOY RECIPE** — `.oplan/word-audio/phase-state.md:55-66`, binding:
+> "· `vercel inspect <canonical-url>` FIRST and record id+url+commit — the only rollback target.
+> · `"$(npm prefix -g)/vercel" deploy --prod --yes` (npm global bin is off PATH).
+> · Verify live files by md5 against the WORKTREE, never a git blob (index.html is CRLF on disk, LF
+> in git). `cleanUrls` 308s every *.html, so fetch the shell as `/`.
+> · live /sw.js must contain magic-vet-v11 · spot-check several /audio/words/<lemma>.aac …
+> · /api/health exact payload · /api/chapter -> 401 (proves the function and its bundled JSON
+> loaded, free). · curl needs --ssl-no-revoke on this machine. · WATCH THE DEPLOY SIZE …
+> · NEVER request /api/profile (a GET CREATES one), never open a browser on production, never run
+> `vercel env`."
+
+**THE TWO VALUES THAT MUST BE RE-STATED FOR THIS RUN:**
+1. that recipe says *"live /sw.js must contain magic-vet-v11"* because it was written for the
+   word-audio run. **For THIS phase the value is `magic-vet-v19`, and `magic-vet-v18` must be
+   ABSENT.** Production serves v18 today (per the record; step 3.2 measures it), the worktree
+   carries v18 until step 3.1 and v19 after it. **QZ-22's next bump after this one is v20**, and the
+   next phase that moves a precached file owes it.
+2. *"spot-check several /audio/words/<lemma>.aac"* is made specific by SK-P3-6: `a`, `kitchen`,
+   `zoo`, plus the manifest itself. Improvisation at run time is what "spot-check several" invites
+   and what this plan removes.
+
+**THE FROZEN CAPTURE COMMAND** — `.oplan/word-quiz/plan.md:1573-1586`, as executed in
+`step-4.2.sh:13-26`, verbatim, **no improvisation at run time** (it has now run clean four times):
+
+```bash
+set -o pipefail
+mkdir -p /c/Users/dkreinov/english-app-backups   # Git-Bash path form -- a Windows-style path here creates a stray repo file (field guide 4)
+BK="/c/Users/dkreinov/english-app-backups/profile-$(date +%Y%m%d-%H%M%S).json"
+code=$( ( set -a; . ./.env; set +a
+          curl -s --ssl-no-revoke -H "x-app-code: $APP_CODE" \
+               -o "$BK" -w '%{http_code}' \
+               https://english-app-three-tan.vercel.app/api/profile ) )
+case "$code" in 200) ;; 401) echo "FAIL: 401 - local .env APP_CODE != production (B2: stop, owner supplies it out of band)"; exit 1;;
+                *) echo "FAIL: GET -> $code"; exit 1;; esac
+[ -z "${APP_CODE:-}" ] || { echo "FAIL: APP_CODE leaked into this shell"; exit 1; }
+```
+
+> "The subshell `( set -a; . ./.env; set +a; curl ... )` is the load-bearing part: `.env` is sourced
+> INSIDE the parentheses so `APP_CODE` dies with the subshell … `$APP_CODE` is never echoed, never
+> logged. … Stated openly: this GET can rewrite her stored file into sorted-key order —
+> byte-identical to what her own app does on every load."
+
+**IT MUST RUN DIRECTLY, NEVER ON THE LEFT OF A PIPE** (P4-AMENDMENT #6): anything left of `|` runs
+in a subshell, so its `401) … exit 1` would exit only that subshell and the step would sail past a
+401, and `$BK` would die before `cp` could use it.
+
+**`APP_CODE` RULES, ABSOLUTE:** never echoed, never logged, never written to any file, never
+exported into a shell, never passed on a command line, never `vercel env`. §VAL-P3's first clause
+asserts it is unset before every step; every step that uses it asserts it is unset again after.
+**`.env` is never read by anything in this plan except that subshell.**
+
+**THE THREE AUTHENTICATED REQUESTS, AND NOTHING ELSE (criterion 20).** `GET /api/profile` CREATES a
+profile and writes it; it is never casual. This phase makes exactly three:
+
+| # | step | file it writes to | why it is necessary |
+|---|---|---|---|
+| 1 | 3.3 | `/c/Users/dkreinov/english-app-backups/profile-<ts>.json` (C2) | T8 forbids deploying without a fresh capture. There is no other way to have one. |
+| 2 | 3.6 | `$HOME/polish-deploy/readback-1.json` (R1) | the only way to prove the deploy cost her nothing |
+| 3 | 3.8 | `$HOME/polish-deploy/readback-2.json` (R2) | the only way to prove the server half still awards correctly after the deploy |
+
+**No fourth request for any reason** — not "just to check", not a retry loop, not a 401 control
+(`/api/chapter` serves that purpose unauthenticated). If a step needs a value it did not capture, it
+STOPS and the owner rules.
+
+**Executor stop-rule (lesson 9):** never silently "fix" a frozen command, a pinned number, a url or
+a string. If a gate contradicts reality, STOP, report, wait for a ruling. In this phase the
+stop-rule is worth more than in any other: two things here are irreversible — **a bad deploy she
+opens, and any write to her live profile.**
+
+**Commits are the ORCHESTRATOR's.** No step's commands contain `git add` / `git commit`. There are
+exactly three commits in this phase: step 3.1's code commit, step 3.2's rollback-record commit, and
+step 3.9's close commit. Their messages are written into the steps below.
+
+---
+
+# STEP 3.1 — THE CACHE BUMP: `magic-vet-v18` → `magic-vet-v19`, and its pin, in one step
+
+**GOAL:** make the three files phase 1 changed actually reach her device. They are all three in
+`PRECACHE`, and `sw.js:49` serves `caches.match(request)` **before** the network, so without a new
+cache name a returning device would go on being served the OLD files indefinitely (QZ-22).
+
+**TIER:** WORKER (a mechanical two-string edit) with ORCHESTRATOR acceptance.
+**DEPENDS ON:** the owner's phase-3 go-ahead; tree clean at `ae349c6`.
+
+**FILES (exhaustive):** `public/sw.js` (line 1), `tests/shell.test.js` (lines 58-59). Nothing else,
+in the repository or out of it. This is **the only step in the phase that writes to the repository
+outside `.oplan/`.**
+
+**THE EXACT BEFORE AND AFTER, quoted rather than named:**
+
+`public/sw.js:1`
+```
+const CACHE = "magic-vet-v18";        ->        const CACHE = "magic-vet-v19";
+```
+
+`tests/shell.test.js:58-59`
+```
+  assert.ok(sw.includes('magic-vet-v18'));
+  assert.ok(!sw.includes('magic-vet-v17'), 'the old cache name must be gone, not merely joined');
+```
+becomes
+```
+  assert.ok(sw.includes('magic-vet-v19'));
+  assert.ok(!sw.includes('magic-vet-v18'), 'the old cache name must be gone, not merely joined');
+```
+
+Nothing else on either line moves — not the quoting style, not the message string. Both files keep
+their byte count exactly (1136 and 3604), because both edits are `18`→`19` and `17`→`18`.
+
+**COMMANDS — the apply script, written to `$HOME/polish-art/apply-3.1.js`, run twice:**
+
+```javascript
+// STEP 3.1 -- the CACHE bump, applied in BINARY so that a CRLF file and an LF file are both
+// byte-safe under one mechanism (field guide lesson 4: an editor insert once CRLF'd a whole LF
+// file and git normalised the damage out of every git-based gate).
+//
+// Usage:  node apply-3.1.js <repo-root> [--sw-only]
+//   --sw-only applies ONLY the public/sw.js edit. That is step 3.1's fail-first mutation: it
+//   leaves tests/shell.test.js pinning magic-vet-v18 while sw.js says v19, so the suite MUST fail
+//   and VAL-P3 MUST print the HALF-APPLIED BUMP line. Never commit in that state.
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
+
+const ROOT = process.argv[2];
+const SW_ONLY = process.argv.includes("--sw-only");
+if (!ROOT) { console.log("FAIL: apply-3.1.js needs the repo root as argv[2]"); process.exit(1); }
+
+const md5 = (b) => crypto.createHash("md5").update(b).digest("hex");
+const die = (w) => { console.log("FAIL: " + w); process.exit(1); };
+
+// Replace exactly ONE occurrence of `from`, asserting first that it occurs exactly once.
+function once(s, from, to, label) {
+  const n = s.split(from).length - 1;
+  if (n !== 1) die(label + ": expected exactly 1 occurrence of '" + from + "', found " + n);
+  return s.replace(from, to);
+}
+
+function edit(rel, mutate, want) {
+  const p = path.join(ROOT, rel);
+  const before = fs.readFileSync(p);                 // Buffer -- no encoding guess
+  const s = before.toString("binary");               // 1 byte -> 1 code unit, reversible
+  const out = Buffer.from(mutate(s, rel), "binary"); // and back, byte for byte
+  fs.writeFileSync(p, out);
+  const after = fs.readFileSync(p);
+  let cr = 0, lf = 0;
+  for (let i = 0; i < after.length; i++) {
+    if (after[i] === 10) { if (i > 0 && after[i - 1] === 13) cr++; else lf++; }
+  }
+  const got = { bytes: after.length, cr, lf, md5: md5(after) };
+  console.log(rel + " bytes=" + got.bytes + " CRLF=" + got.cr + " LF=" + got.lf + " md5=" + got.md5);
+  for (const k of ["bytes", "cr", "lf", "md5"]) {
+    if (got[k] !== want[k]) die(rel + ": " + k + " is " + got[k] + ", expected " + want[k]);
+  }
+}
+
+// public/sw.js -- CRLF, 51 lines, one occurrence of the cache name
+edit("public/sw.js",
+  (s) => once(s, "magic-vet-v18", "magic-vet-v19", "public/sw.js"),
+  { bytes: 1136, cr: 51, lf: 0, md5: "6d836788d379e7872ce730cfec5db51a" });
+
+if (SW_ONLY) {
+  console.log("SW-ONLY MUTATION APPLIED -- the tree is now deliberately HALF-BUMPED. Run npm test and VAL-P3, record both failures, then re-run without --sw-only.");
+  process.exit(0);
+}
+
+// tests/shell.test.js -- LF, 96 lines. BOTH substitutions are computed against the ORIGINAL
+// string in one pass; a chained replace would rewrite the freshly written v18 a second time.
+edit("tests/shell.test.js",
+  (s) => {
+    let t = once(s, "magic-vet-v18", " PIN ", "tests/shell.test.js (new-present pin)");
+    t = once(t, "magic-vet-v17", "magic-vet-v18", "tests/shell.test.js (old-absent pin)");
+    return once(t, " PIN ", "magic-vet-v19", "tests/shell.test.js (sentinel)");
+  },
+  { bytes: 3604, cr: 0, lf: 96, md5: "ca6c242a97ba1904994d491b5a04aaf8" });
+
+console.log("APPLY-3.1 OK");
+```
+
+**THIS SCRIPT WAS BUILT AND RUN TODAY, on byte-copies of the two real files placed outside the
+repository — the repository itself was never written to. Observed output, verbatim:**
+
+```
+public/sw.js bytes=1136 CRLF=51 LF=0 md5=6d836788d379e7872ce730cfec5db51a
+tests/shell.test.js bytes=3604 CRLF=0 LF=96 md5=ca6c242a97ba1904994d491b5a04aaf8
+APPLY-3.1 OK
+```
+and the resulting lines, read back off the copies:
+```
+const CACHE = "magic-vet-v19";
+  assert.ok(sw.includes('magic-vet-v19'));
+  assert.ok(!sw.includes('magic-vet-v18'), 'the old cache name must be gone, not merely joined');
+```
+and, run a second time on the already-edited copy, it refuses instead of corrupting:
+```
+FAIL: public/sw.js: expected exactly 1 occurrence of 'magic-vet-v18', found 0
+```
+
+**So the two md5 targets in `§VAL-P3` are not predictions.** They are the values this exact script
+produced from these exact files.
+
+**THE ORDER OF OPERATIONS, frozen:**
+
+1. **`node "$HOME/polish-art/apply-3.1.js" C:/Users/dkreinov/claude/english-app --sw-only`**
+   — the fail-first mutation. Then, and this is the point of the step:
+2. **`npm test`** — it **MUST FAIL**, in `tests/shell.test.js`, on
+   `assert.ok(sw.includes('magic-vet-v18'))`, because `sw.js` now says v19. Record the failing test
+   name and the `# fail` count.
+3. **`bash "$HOME/polish-art/pgate-3.1.sh"`** (= §VAL-P3 verbatim + this step's tail) — it **MUST
+   FAIL** and its output **MUST CONTAIN** the literal line
+   `FAIL: HALF-APPLIED BUMP: sw.js is POST but tests/shell.test.js is PRE -- the worker and its pin must move together`.
+   **Record it.** This is the seam gate being watched to fail (SK-P3-10), and it is free.
+4. **`git checkout -- public/sw.js`** — back to a clean tree. Confirm `git status --porcelain` is
+   empty outside `.oplan/`.
+5. **`node "$HOME/polish-art/apply-3.1.js" C:/Users/dkreinov/claude/english-app`** — the real edit,
+   both files, from the ORIGINAL state. The script's own assertions are the first gate.
+6. **`bash "$HOME/polish-art/pgate-3.1.sh"`** — must now print `STEP-3.1-OK` and exit 0.
+
+Step 4 matters: the real edit is applied to a **restored** tree, never on top of the mutation, so
+the committed bytes are the ones the script was proved to produce in one pass.
+
+**FROZEN VALIDATION:** §VAL-P3 verbatim, then, in the SAME file:
+
+```bash
+# --- the two files are in the POST state and the seam holds (VAL-P3 already asserted the seam) ---
+case "$SWSTATE" in POST) ;; *) fail "public/sw.js is $SWSTATE -- step 3.1 must leave it POST";; esac
+case "$STSTATE" in POST) ;; *) fail "tests/shell.test.js is $STSTATE -- step 3.1 must leave it POST";; esac
+
+# --- the strings themselves, quoted not named ---
+SW="$(cat public/sw.js)"
+case "$SW" in *'const CACHE = "magic-vet-v19";'*) ;; *) fail "public/sw.js line 1 is not the frozen v19 literal";; esac
+case "$SW" in *magic-vet-v18*) fail "public/sw.js still contains magic-vet-v18";; esac
+case "$SW" in *magic-vet-v17*) fail "public/sw.js contains magic-vet-v17";; esac
+ST="$(cat tests/shell.test.js)"
+case "$ST" in *"assert.ok(sw.includes('magic-vet-v19'));"*) ;; *) fail "shell.test.js does not pin v19 present";; esac
+case "$ST" in *"assert.ok(!sw.includes('magic-vet-v18'), 'the old cache name must be gone, not merely joined');"*) ;; *) fail "shell.test.js does not pin v18 absent, with the frozen message";; esac
+case "$ST" in *magic-vet-v17*) fail "shell.test.js still mentions magic-vet-v17";; esac
+
+# --- the PRECACHE array did not move: this step touches the CACHE name and nothing else ---
+PC="$(node -e 'const s=require("fs").readFileSync("public/sw.js","utf8");const m=s.match(/const PRECACHE = \[([^\]]*)\]/);if(!m){console.log("NOPRECACHE");process.exit(0);}const q=m[1].match(/"[^"]*"/g)||[];console.log(q.length+" "+q.map(x=>x.slice(1,-1)).join(","));')"
+case "$PC" in "15 /,/styles.css,/app.js,/api.js,/lemma.js,/words-index.js,/quiz-core.js,/quiz.js,/views/home.js,/views/placement.js,/views/reader.js,/views/words.js,/views/trophies.js,/manifest.webmanifest,/icons/icon.svg") ;; *) fail "the PRECACHE array moved: $PC";; esac
+
+# --- the write set and the tree ---
+case "$WROTE" in POST) ;; *) fail "the write set since 1e470bd is $WROTE, expected POST";; esac
+case "$PORC" in "") ;; *) fail "the tree is dirty outside .oplan/ -- the edit must be COMMITTED before 3.2:
+$PORC";; esac
+git log -1 --format=%s | grep -q 'step 3.1' || fail "the bump is not committed"
+echo STEP-3.1-OK
+exit $RC
+```
+
+**COMMIT (orchestrator, at acceptance):**
+`step 3.1: CACHE magic-vet-v18 -> magic-vet-v19 and its pin move together — two byte-preserving edits, the half-applied state seen to fail; ledger 353 flat / 358 reported`
+
+**STOP IF:**
+* the apply script's own byte/CRLF/md5 assertion fails → STOP. Something is not the file this plan
+  measured. `git checkout --` both files and report; do not "fix" the expected md5.
+* `npm test` **passes** after the `--sw-only` mutation → **STOP, and treat it as serious.** It would
+  mean `tests/shell.test.js:58` does not actually observe `public/sw.js`, and the pin that has been
+  guarding the cache name for four deploys is decorative.
+* §VAL-P3 does **not** print `HALF-APPLIED BUMP` in the half-applied state → STOP. The seam clause
+  is broken and the phase has no protection against shipping a worker whose test no longer guards
+  it.
+* the endings of either file move (`sw.js` CRLF=51/LF=0, `shell.test.js` CRLF=0/LF=96) → STOP.
+  That is lesson 4's silent corruption and `git diff` will not show it.
+
+**NON-GOALS:** no other file · no `PRECACHE` change · no new test · no touching
+`tests/trophies-ui.test.js:351`'s historical `magic-vet-v18` comment · no deploy · no network.
+
+---
+
+# STEP 3.2 — PRE-FLIGHT: freeze the outgoing deployment and write the rollback down
+
+**GOAL:** know exactly what is live, exactly what we would roll back to, and have that command
+committed to the record BEFORE anything can go wrong. Nothing is deployed; nothing authenticated is
+done.
+
+**TIER:** ORCHESTRATOR. **DEPENDS ON:** 3.1 OK and committed.
+
+**FILES:** `.oplan/word-polish/phase-state.md` (APPEND the rollback block) — the only repository
+write in this step, and it is an `.oplan` record. Everything else goes to `$HOME/polish-deploy/`,
+outside the repo (lesson 4: never write scratch into the repo).
+
+**COMMANDS, frozen:**
+```bash
+mkdir -p "$HOME/polish-deploy" "$HOME/polish-art"
+D="$HOME/polish-deploy"
+# 1. the outgoing deployment, from inspect's own mouth (lesson 10) -- output to a FILE
+"$(npm prefix -g)/vercel" inspect https://english-app-three-tan.vercel.app > "$D/outgoing.txt" 2>&1
+# 2. live baselines, unauthenticated, read-only. NEVER /api/profile.
+B=https://english-app-three-tan.vercel.app
+{
+  curl -s --ssl-no-revoke "$B/sw.js" | head -1
+  curl -s --ssl-no-revoke -D - -o /dev/null "$B/sw.js" | grep -i '^cache-control\|^age\|^etag' || echo "no cache-control/age/etag on /sw.js"
+  curl -s --ssl-no-revoke "$B/api/health"; echo
+  curl -s --ssl-no-revoke -o /dev/null -w 'chapter=%{http_code}\n' "$B/api/chapter"
+  for p in / /styles.css /app.js /api.js /lemma.js /words-index.js /quiz-core.js /quiz.js \
+           /views/home.js /views/placement.js /views/reader.js /views/words.js \
+           /views/trophies.js /manifest.webmanifest /icons/icon.svg /audio/words/index.json; do
+    printf '%s ' "$p"; curl -s --ssl-no-revoke -o /dev/null -w '%{http_code}\n' "$B$p"
+  done
+} > "$D/live-baseline.txt" 2>&1
+```
+The `cache-control` probe on `/sw.js` is **recorded, never gated** (SK-P3-8): no threshold has ever
+been agreed, and inventing one at ship time is how a good deploy gets rolled back. It goes into the
+journal so the next run has a measured value instead of a guess.
+
+Then, by hand, into `.oplan/word-polish/phase-state.md`, copied from `outgoing.txt` **verbatim** —
+never retyped from memory, never hand-constructed (lesson 10):
+```
+ROLLBACK (code only) — the deployment live before phase 3, exactly as `vercel inspect` reported it:
+  id  = <OUTGOING_ID, pasted>
+  url = <OUTGOING_URL, pasted>
+  `"$(npm prefix -g)/vercel" rollback <OUTGOING_URL, pasted> --yes`
+  vercel rollback restores CODE ONLY. There is no restore path for her profile (D27).
+```
+and commit it:
+`oplan: word-polish 3.2 pre-flight — outgoing deployment frozen, rollback command recorded before any deploy`
+
+**FROZEN VALIDATION:** §VAL-P3 verbatim, then:
+```bash
+case "$SWSTATE:$STSTATE:$WROTE" in POST:POST:POST) ;; *) fail "the bump is not in place: SW=$SWSTATE ST=$STSTATE WROTE=$WROTE";; esac
+case "$PORC" in "") ;; *) fail "the tree is dirty outside .oplan/:
+$PORC";; esac
+D="$HOME/polish-deploy"
+OUT3="$D/outgoing.txt"
+[ -s "$OUT3" ] || fail "vercel inspect produced no output"
+OID="$(grep -o 'dpl_[A-Za-z0-9]*' "$OUT3" | head -1)"
+case "$OID" in
+  dpl_AVmWnh3XxBZPhLJKnjTUZT9r5EXB) ;;
+  "") fail "no deployment id in inspect output";;
+  *) fail "LIVE DEPLOYMENT IS NOT THE ONE THE RECORD KNOWS ABOUT: got '$OID', record says dpl_AVmWnh3XxBZPhLJKnjTUZT9r5EXB (.oplan/word-polish/phase-state.md:9) -- STOP";;
+esac
+OURL="$(grep -o 'https://english-[A-Za-z0-9-]*\.vercel\.app' "$OUT3" | head -1)"
+[ -n "$OURL" ] || fail "inspect printed no deployment url -- never hand-build one (lesson 10)"
+BL="$D/live-baseline.txt"
+grep -q 'magic-vet-v18' "$BL" || fail "live /sw.js is not v18 -- the baseline moved, STOP"
+grep -q 'magic-vet-v19' "$BL" && fail "live /sw.js ALREADY says v19 -- someone deployed this tree, STOP"
+grep -q '{"ok":true,"data":{"status":"up","version":1}}' "$BL" || fail "/api/health payload is not byte-exact"
+grep -q 'chapter=401' "$BL" || fail "/api/chapter is not 401"
+BAD="$(grep -c ' 200$' "$BL")"
+case "$BAD" in 16) ;; *) fail "only $BAD of the 16 baseline URLs (15 PRECACHE + the audio manifest) are 200 BEFORE the deploy -- production is already unhealthy, STOP";; esac
+grep -q 'vercel" rollback' .oplan/word-polish/phase-state.md || fail "the rollback command is not in phase-state.md"
+grep -q "$OID" .oplan/word-polish/phase-state.md || fail "the outgoing id is not recorded in phase-state.md"
+grep -q "$OURL" .oplan/word-polish/phase-state.md || fail "the outgoing URL is not recorded VERBATIM in phase-state.md"
+grep -q '<' .oplan/word-polish/phase-state.md && fail "an angle-bracket placeholder survived into the rollback record -- bash would read it as a redirect and roll back nothing" || true
+git log -1 --format=%s | grep -q '3.2 pre-flight' || fail "the rollback record is not committed"
+echo STEP-3.2-OK
+exit $RC
+```
+
+**Note on the `grep -q '<'` clause:** `.oplan/word-polish/phase-state.md` today contains no `<`
+character (checked). If a future edit legitimately introduces one, the clause is narrowed to the
+rollback block rather than deleted — the executor STOPS and the orchestrator rules (lesson 9).
+
+**STOP IF:**
+* inspect reports any id other than `dpl_AVmWnh3XxBZPhLJKnjTUZT9r5EXB` → STOP. Something deployed
+  outside this run's knowledge; the whole baseline is re-established before anything ships.
+* inspect prints no url → STOP. **Do not hand-build one** (lesson 10's exact incident). Without a
+  url there is no rollback target, and without a rollback target there is no deploy.
+* live `/sw.js` already says `magic-vet-v19` → STOP; someone shipped this tree already.
+* `/api/health` is not byte-exact, or `/api/chapter` is not 401, or fewer than 16 baseline URLs
+  answer 200 → STOP. Production is already unhealthy and deploying into that is strictly worse.
+* §VAL-P3 fails for any reason → STOP. The tree that would ship is not the tree that was gated.
+
+**NON-GOALS:** no deploy · no authenticated request · no `/api/profile` in any form · no
+`vercel env` · no browser · no repository change outside `.oplan/`.
+
+---
+
+# STEP 3.3 — THE FRESH D25 CAPTURE, to a NEW path
+
+**GOAL:** her profile is safely captured, proven and receipted, minutes before the deploy — to a
+path that has never been used before, so no gate downstream can accidentally read last run's file.
+
+**TIER:** ORCHESTRATOR. **DEPENDS ON:** 3.2 OK. **This step must be immediately followed by 3.4.**
+If more than an hour passes before the deploy, **re-capture** with the same command and use the
+later file.
+
+**FILES:** `.oplan/word-polish/backup-receipt.txt` (CREATE — counts and digests only, **never
+contents**). The capture itself lives at `/c/Users/dkreinov/english-app-backups/profile-<ts>.json`,
+outside the repo.
+
+**COMMANDS:** `$HOME/polish-art/step-3.3.sh`, which is `$HOME/trophies-art/step-4.2.sh` with four
+substitutions and nothing else changed:
+
+| in `step-4.2.sh` | in `step-3.3.sh` | why |
+|---|---|---|
+| `D="$HOME/trophies-deploy"` | `D="$HOME/polish-deploy"` | SK-P3-5 |
+| `.oplan/word-trophies/backup-receipt.txt` | `.oplan/word-polish/backup-receipt.txt` | this run's record |
+| the projection block's `TROPHY_CATALOG` walk | **kept verbatim** | it gives R2 an expectation to be checked against, costs nothing, and imports the engine rather than re-implementing it (lesson 2) |
+| — | **added:** the three new-path assertions below | SK-P3-5 |
+
+Everything else — the frozen capture subshell, the direct (unpiped) invocation, the `BACKUP OK`
+proof block, `capture-path.txt`, `capture-copy.json`, the sha256 receipt, the `.data/profile.json`
+check — is copied byte-for-byte from the script that ran successfully on 2026-07-30.
+
+The added assertions, run immediately after `capture-path.txt` is written:
+```bash
+CP="$(cat "$D/capture-path.txt")"
+case "$CP" in
+  /c/Users/dkreinov/english-app-backups/profile-20260730-201842.json) echo "FAIL: the capture path is the PREVIOUS run's C2"; exit 1;;
+  /c/Users/dkreinov/english-app-backups/profile-20260730-114016.json) echo "FAIL: the capture path is the 2026-07-30 morning capture"; exit 1;;
+  /c/Users/dkreinov/english-app-backups/profile-*.json) ;;
+  *) echo "FAIL: the capture path is not in the backups folder: $CP"; exit 1;;
+esac
+OLDCP="$(cat "$HOME/trophies-deploy/capture-path.txt" 2>/dev/null || echo NONE)"
+[ "$CP" != "$OLDCP" ] || { echo "FAIL: the capture path equals the previous run's recorded path"; exit 1; }
+[ "$CP" != "$D/readback-1.json" ] && [ "$CP" != "$D/readback-2.json" ] || { echo "FAIL: the capture path collides with a read-back path"; exit 1; }
+```
+
+**FROZEN VALIDATION:** §VAL-P3 verbatim, then:
+```bash
+case "$SWSTATE:$STSTATE:$WROTE" in POST:POST:POST) ;; *) fail "the bump is not in place";; esac
+case "$PORC" in "") ;; *) fail "the tree is dirty outside .oplan/";; esac
+D="$HOME/polish-deploy"
+grep -q 'BACKUP OK' "$D/capture.log" || fail "the capture proof block did not print BACKUP OK"
+grep -q '^capture C2 ' .oplan/word-polish/backup-receipt.txt || fail "no C2 receipt line"
+grep -q 'sha256=' .oplan/word-polish/backup-receipt.txt || fail "receipt has no sha256"
+[ -s "$D/projection.txt" ] || fail "no projection recorded"
+[ -s "$D/capture-path.txt" ] || fail "capture-path.txt was not written -- 3.6/3.8 have no C2 to bind"
+CP="$(cat "$D/capture-path.txt")"
+[ -s "$CP" ] || fail "capture-path.txt points at '$CP', which is missing or empty"
+case "$CP" in /c/Users/dkreinov/english-app-backups/profile-*.json) ;; *) fail "capture-path.txt does not point into the backups folder: $CP";; esac
+case "$CP" in *20260730*) fail "capture-path.txt points at a 2026-07-30 capture -- that is the PREVIOUS run's file";; esac
+cmp -s "$CP" "$D/capture-copy.json" || fail "capture-copy.json is not a byte-copy of the capture"
+NEWEST="$(ls -1t /c/Users/dkreinov/english-app-backups/profile-*.json | head -1)"
+[ "$NEWEST" = "$CP" ] || fail "the newest capture on disk is '$NEWEST', not the one this step recorded"
+AGE=$(( $(date +%s) - $(stat -c %Y "$CP") ))
+[ "$AGE" -lt 3600 ] || fail "the capture is $AGE seconds old -- re-capture before deploying"
+[ -z "${APP_CODE:-}" ] || fail "APP_CODE leaked into this shell"
+grep -riq 'x-app-code\|APP_CODE=' .oplan/word-polish/backup-receipt.txt "$D/" && fail "a secret may have been written to a file" || true
+echo STEP-3.3-OK
+exit $RC
+```
+
+**STOP IF:**
+* **HTTP 401** → STOP immediately (B2). The local `.env` code no longer matches production; the
+  owner supplies the production code out of band. **Never `vercel env`.** No deploy until a capture
+  exists — T8 is not optional.
+* **any code other than 200** → STOP. Production is not answering; deploying into that is worse.
+* **the `APP_CODE` post-assertion fails** → STOP, close the shell, start a fresh one, re-run. A
+  leaked code silently 401s everything afterwards and the failure will look like something else.
+* **`BACKUP OK` does not print**, or `validateProfile` fails on her live data → STOP and report. A
+  profile that does not validate BEFORE we deploy is a pre-existing condition that must be
+  understood before new code touches it.
+
+**NON-GOALS:** no deploy · no second GET "just to check" · never open, print, paste or summarise the
+capture's CONTENTS anywhere — receipts are bytes, sha256 and counts only · never copy the capture
+into the repository · no restore attempt (there is no restore path).
+
+---
+
+# STEP 3.4 — THE DEPLOY (once)
+
+**GOAL:** ship the committed tree to production, exactly once, with the evidence of what shipped
+written to a file rather than read off a scrolling terminal.
+
+**TIER:** ORCHESTRATOR, **with the owner's explicit GO in the same session.**
+**DEPENDS ON:** 3.1-3.3 OK, the capture less than an hour old, tree clean at the 3.1 commit.
+
+**FILES:** none in the repository. Output to `$HOME/polish-deploy/deploy.log`.
+
+**COMMANDS, frozen — this is the whole step, and it runs ONCE:**
+```bash
+cd C:/Users/dkreinov/claude/english-app
+"$(npm prefix -g)/vercel" deploy --prod --yes > "$HOME/polish-deploy/deploy.log" 2>&1
+echo "deploy exit=$?"
+```
+`"$(npm prefix -g)/vercel"` because the npm global bin is off PATH on this machine (lesson 4).
+**Output to a FILE because truncated output once caused a double deploy** (lesson 10).
+
+**IF THE COMMAND APPEARS TO HANG OR ITS OUTPUT IS LOST: DO NOT RE-RUN IT.** Read
+`$HOME/polish-deploy/deploy.log`, then run
+`"$(npm prefix -g)/vercel" inspect https://english-app-three-tan.vercel.app` and compare ids. That
+is the exact mistake the field guide records, and re-running is how it happened.
+
+**P3-AMENDMENT #1 (orchestrator, 2026-08-01, from the plan reviewer's HIGH finding).**
+Acceptance criterion 9 requires the capture to be under 3600 s old *at the moment of the deploy*,
+but the only mechanical check lived in step 3.3's own tail, seconds after the capture — where it is
+tautologically true and can never fail. Step 3.4 waits for the owner's explicit GO, which is exactly
+where an hour-plus gap is plausible, and nothing stopped it. Two additions, because a gate that only
+reports after the fact cannot prevent anything:
+
+**(a) PRE-DEPLOY GUARD — run this and see it print `CAPTURE-FRESH-OK` BEFORE the deploy command.**
+If it fails, do NOT deploy: go back to step 3.3, take a new capture to a new path, then return.
+```bash
+D="$HOME/polish-deploy"; CP="$(cat "$D/capture-path.txt")"
+[ -s "$CP" ] || { echo "FAIL: capture missing at $CP"; exit 1; }
+NOW=$(date +%s); CT=$(stat -c %Y "$CP"); AGE=$(( NOW - CT ))
+echo "capture age at deploy time: ${AGE}s (limit 3600)"
+[ "$AGE" -lt 3600 ] || { echo "FAIL: capture is ${AGE}s old -- STALE. Re-capture (3.3) before deploying."; exit 1; }
+echo CAPTURE-FRESH-OK
+```
+
+**(b) POST-HOC PROOF, added to the frozen validation below** — it compares the capture's mtime
+against `deploy.log`'s mtime, so it measures the real gap and CAN fail on a stale run.
+
+**FROZEN VALIDATION:** §VAL-P3 verbatim, then:
+```bash
+D="$HOME/polish-deploy"; DL="$D/deploy.log"
+case "$SWSTATE:$STSTATE:$WROTE" in POST:POST:POST) ;; *) fail "the bump is not in place";; esac
+[ -s "$DL" ] || fail "deploy.log is empty -- do NOT re-run the deploy; inspect the alias instead"
+
+# P3-AMENDMENT #1(b): the capture must have been fresh AT THE MOMENT THE DEPLOY RAN.
+# Measured from mtimes, not from "now", so this stays true whenever the gate is re-run.
+CP="$(cat "$D/capture-path.txt")"
+[ -s "$CP" ] || fail "capture missing at $CP -- the deploy has no before-photograph"
+CT=$(stat -c %Y "$CP"); DT=$(stat -c %Y "$DL"); GAP=$(( DT - CT ))
+echo "CAPTURE->DEPLOY GAP: ${GAP}s (limit 3600)"
+[ "$GAP" -ge 0 ] || fail "the capture is NEWER than the deploy log -- the before-photograph was taken after the deploy, it proves nothing"
+[ "$GAP" -lt 3600 ] || fail "the capture was ${GAP}s old when the deploy ran -- criterion 9 violated"
+
+# COUNT the ids: `head -1` would hide a double deploy behind a coin flip (P4-AMENDMENT #4)
+NIDS="$(grep -o 'dpl_[A-Za-z0-9]*' "$DL" | LC_ALL=C sort -u | wc -l | tr -d ' ')"
+case "$NIDS" in
+  1) NID="$(grep -o 'dpl_[A-Za-z0-9]*' "$DL" | head -1)" ;;
+  0) NID="" ;;
+  *) fail "deploy.log names $NIDS distinct deployment ids -- a DOUBLE DEPLOY happened; do NOT deploy again, record both and report";;
+esac
+
+"$(npm prefix -g)/vercel" inspect https://english-app-three-tan.vercel.app > "$D/incoming.txt" 2>&1
+AID="$(grep -o 'dpl_[A-Za-z0-9]*' "$D/incoming.txt" | head -1)"
+
+# written fallback: if the CLI's log carries no id at all, take it from inspect (never re-deploy)
+if [ -z "$NID" ]; then
+  echo "NOTE: deploy.log carried no dpl_ id; falling back to the alias inspect (do NOT re-run the deploy)"
+  NID="$AID"
+  [ -n "$NID" ] || fail "neither deploy.log nor inspect yields a deployment id -- STOP, do not deploy again"
+fi
+case "$NID" in dpl_AVmWnh3XxBZPhLJKnjTUZT9r5EXB) fail "the live id is still the OUTGOING one -- nothing new shipped";; esac
+case "$AID" in "$NID") ;; *) fail "the alias points at '$AID' but the deploy created '$NID' -- ONE of these is the wrong deployment, STOP";; esac
+
+grep -q 'https://' "$DL" || fail "deploy.log carries no production URL -- the deploy did not report success"
+grep -qi 'ready' "$D/incoming.txt" || fail "inspect does not report the new deployment Ready"
+SIZE="$(grep -Eio '[0-9.]+ *[KMG]?B' "$DL" | tail -1)"
+echo "UPLOAD SIZE (recorded): ${SIZE:-not reported}"
+ERRS="$(grep -in 'error\|failed' "$DL" | head -5)"
+echo "ERROR-SUBSTRING OBSERVATIONS (reported, NOT a gate -- build logs legitimately print '0 errors'): ${ERRS:-none}"
+echo "NEW DEPLOYMENT: $NID"
+echo STEP-3.4-OK
+exit $RC
+```
+The alias-vs-log comparison is the mechanical form of lesson 10's warning: it is the only thing that
+distinguishes "we deployed and it is live" from "we deployed and something else is live".
+
+**STOP IF:**
+* the deploy exits non-zero or the log carries a build error → **STOP. Nothing shipped; production
+  is untouched and still healthy at v18.** Read the log, report, do not retry blindly. A failed
+  Vercel build does not change the alias, so no rollback is needed.
+* the alias id ≠ the new deploy id → **STOP.** Do not deploy again. Report both ids; this is the
+  wrong-deployment failure lesson 10 exists for.
+* two `dpl_` ids appear in `deploy.log` → the double-deploy happened. Record both, verify which one
+  the alias carries, proceed only after the owner is told.
+
+**NON-GOALS:** no second invocation for any reason · no `--force` · no `vercel env` · no commit ·
+no browser · no `/api/profile`.
+
+---
+
+# STEP 3.5 — THE MD5 PROOF, THE CACHE-BUMP PROOF, AND THE REACHABILITY SWEEP
+
+**GOAL:** prove that what production now serves is byte-for-byte the tree that 358 tests gated; that
+the `v19` bump took effect; and that every URL the new app will ask for actually answers — including
+the one the previous deploy never probed. **No authenticated request in this step.**
+
+**TIER:** ORCHESTRATOR. **DEPENDS ON:** 3.4 OK.
+
+**FILES:** none in the repository. Evidence to `$HOME/polish-deploy/deploy-verify.txt`.
+
+**COMMANDS:** `$HOME/polish-art/step-3.5.sh` = `$HOME/trophies-art/step-4.4.sh` with `D` repointed
+to `$HOME/polish-deploy`, `OC` set to `a40cdb2`, the two `magic-vet` counts moved to v19/v18, the
+`MD5 OK` expectation moved from 16 to 4, **plus the enumeration-literal assertion (SK-P3-3) and the
+audio block (SK-P3-6), which are new.** Everything else is byte-identical to the script that ran.
+
+```bash
+B=https://english-app-three-tan.vercel.app
+# The outgoing deployment's commit, if `vercel inspect` printed one; otherwise the MEASURED value.
+# a40cdb2 was HEAD when the live deployment was created (2026-07-30 20:21; a40cdb2 committed 20:17,
+# the next commit is 869a78d at 20:28). Measured today: a40cdb2..HEAD and 678dbc8..HEAD -- public/
+# give the same paths, because a40cdb2 touches only .oplan/.
+OC="a40cdb2"
+[ -n "$OC" ] || { echo "FAIL: set OC before running this step"; exit 1; }
+git cat-file -e "$OC^{commit}" 2>/dev/null || { echo "FAIL: OC='$OC' is not a commit in this repo"; exit 1; }
+D="$HOME/polish-deploy"; mkdir -p "$D/live"
+{
+  echo "=== payload enumeration (public/-scoped, so no test file can ever enter it) ==="
+  git diff --name-only --diff-filter=ACMR "$OC"..HEAD -- public/ | LC_ALL=C sort
+
+  echo "=== md5 live vs WORKTREE (never a git blob, never git show HEAD:) ==="
+  for f in $(git diff --name-only --diff-filter=ACMR "$OC"..HEAD -- public/ | LC_ALL=C sort); do
+    url="${f#public}"
+    case "$url" in /index.html) url=/ ;; esac      # cleanUrls 308s every *.html
+    curl -s --ssl-no-revoke -o "$D/live/probe" "$B$url"
+    a="$(md5sum "$D/live/probe" | cut -d' ' -f1)"
+    b="$(md5sum "$f" | cut -d' ' -f1)"
+    if [ "$a" = "$b" ]; then echo "MD5 OK   $url"; else echo "MD5 BAD  $url live=$a work=$b"; fi
+  done
+
+  echo "=== the cache bump ==="
+  curl -s --ssl-no-revoke -o "$D/live/sw.js" "$B/sw.js"
+  echo "sw.js live md5 $(md5sum "$D/live/sw.js" | cut -d' ' -f1)  worktree $(md5sum public/sw.js | cut -d' ' -f1)"
+  grep -c 'magic-vet-v19' "$D/live/sw.js" | sed 's/^/v19 count /'
+  grep -c 'magic-vet-v18' "$D/live/sw.js" | sed 's/^/v18 count /'
+  echo "--- /sw.js response headers, RECORDED not gated (SK-P3-8) ---"
+  curl -s --ssl-no-revoke -D - -o /dev/null "$B/sw.js" | grep -i '^cache-control\|^age\|^etag\|^last-modified' || echo "none reported"
+
+  echo "=== PRECACHE reachability (sw.js:24 is cache.addAll -- all or nothing) ==="
+  # the list is DERIVED from the sw.js production actually serves, not hard-coded
+  node -e 'const s=require("fs").readFileSync(process.argv[1],"utf8");const m=s.match(/const PRECACHE = \[([^\]]*)\]/);if(!m){console.error("NOPRECACHE");process.exit(1);}for(const q of m[1].match(/"[^"]*"/g)||[])console.log(q.slice(1,-1));' "$D/live/sw.js" > "$D/precache-urls.txt"
+  echo "PRECACHE ENTRIES DERIVED $(wc -l < "$D/precache-urls.txt" | tr -d ' ')"
+  while read -r p; do
+    printf 'PRECACHE %s ' "$p"; curl -s --ssl-no-revoke -o /dev/null -w '%{http_code}\n' "$B$p"
+  done < "$D/precache-urls.txt"
+
+  echo "=== the speaker button's source of truth, which NO previous deploy probed (SK-P3-6) ==="
+  curl -s --ssl-no-revoke -o "$D/live/manifest.json" -w 'MANIFEST %{http_code} %{content_type} ' "$B/audio/words/index.json"
+  a="$(md5sum "$D/live/manifest.json" | cut -d' ' -f1)"; b="$(md5sum public/audio/words/index.json | cut -d' ' -f1)"
+  if [ "$a" = "$b" ]; then echo "md5 OK"; else echo "md5 BAD live=$a work=$b"; fi
+  for w in a kitchen zoo; do
+    curl -s --ssl-no-revoke -o "$D/live/clip" -w "CLIP $w.aac %{http_code} " "$B/audio/words/$w.aac"
+    a="$(md5sum "$D/live/clip" | cut -d' ' -f1)"; b="$(md5sum "public/audio/words/$w.aac" | cut -d' ' -f1)"
+    if [ "$a" = "$b" ]; then echo "md5 OK"; else echo "md5 BAD live=$a work=$b"; fi
+  done
+
+  echo "=== the nine trophy webps, case-exact (Vercel is case-sensitive; this filesystem is not) ==="
+  for f in chapters curious days known proven quizRight quizzer shelf-header streak; do
+    curl -s --ssl-no-revoke -o "$D/live/art" -w "ART $f.webp %{http_code} %{content_type} " "$B/assets/trophies/$f.webp"
+    a="$(md5sum "$D/live/art" | cut -d' ' -f1)"; b="$(md5sum "public/assets/trophies/$f.webp" | cut -d' ' -f1)"
+    if [ "$a" = "$b" ]; then echo "md5 OK"; else echo "md5 BAD live=$a work=$b"; fi
+  done
+
+  echo "=== the function bundle (never /api/profile) ==="
+  curl -s --ssl-no-revoke "$B/api/health"; echo
+  curl -s --ssl-no-revoke -o /dev/null -w 'chapter=%{http_code}\n' "$B/api/chapter"
+  curl -s --ssl-no-revoke -o /dev/null -w 'notafile=%{http_code}\n' "$B/assets/trophies/zzznotatrophy.webp"
+} > "$D/deploy-verify.txt" 2>&1
+```
+The last line is the **negative control**: a path that must still 404, so a "200 for everything"
+misconfiguration cannot masquerade as success.
+
+**FROZEN VALIDATION:** §VAL-P3 verbatim, then:
+```bash
+D="$HOME/polish-deploy"; V="$D/deploy-verify.txt"; B=https://english-app-three-tan.vercel.app
+case "$SWSTATE:$STSTATE:$WROTE" in POST:POST:POST) ;; *) fail "the bump is not in place";; esac
+
+# NOTHING auto-rolls-back on ONE curl. A failing URL is re-probed twice more, >=10s apart, and all
+# three attempts must fail before the pre-authorised rollback fires (P4-AMENDMENT #3).
+confirm_dead() {   # $1 = path. Returns 0 only if it fails three times in a row.
+  local p="$1" c1 c2 c3
+  c1="$(curl -s -m 20 --ssl-no-revoke -o /dev/null -w '%{http_code}' "$B$p")"
+  case "$c1" in 200) return 1;; esac
+  sleep 10
+  c2="$(curl -s -m 20 --ssl-no-revoke -o /dev/null -w '%{http_code}' "$B$p")"
+  case "$c2" in 200) echo "RECOVERED ON RETRY 2: $p ($c1 -> 200) -- recorded, NOT a rollback"; return 1;; esac
+  sleep 10
+  c3="$(curl -s -m 20 --ssl-no-revoke -o /dev/null -w '%{http_code}' "$B$p")"
+  case "$c3" in 200) echo "RECOVERED ON RETRY 3: $p ($c1/$c2 -> 200) -- recorded, NOT a rollback"; return 1;; esac
+  echo "CONFIRMED DEAD after 3 attempts >=10s apart: $p ($c1/$c2/$c3)"
+  return 0
+}
+
+# --- the enumeration is exactly the four frozen paths (SK-P3-3) ---
+ENUM="$(sed -n '/^=== payload enumeration/,/^=== md5 live/p' "$V" | grep '^public/' | tr '\n' ' ')"
+case "$ENUM" in "public/styles.css public/sw.js public/views/reader.js public/views/trophies.js ") ;; *) fail "the payload enumeration is not the frozen four: [$ENUM]";; esac
+case "$ENUM" in *tests/*) fail "a test file entered the payload enumeration -- impossible unless the -- public/ scope was dropped";; esac
+
+N="$(grep -c '^MD5 OK ' "$V")"
+case "$N" in 4) ;; *) fail "expected 4 MD5 OK lines, got $N";; esac
+grep -q '^MD5 BAD' "$V" && fail "at least one live file does not match the worktree: $(grep '^MD5 BAD' "$V")"
+grep -q '^v19 count 1' "$V" || fail "live sw.js does not contain magic-vet-v19 exactly once"
+grep -q '^v18 count 0' "$V" || fail "live sw.js still contains magic-vet-v18"
+grep -q '^PRECACHE ENTRIES DERIVED 15$' "$V" || fail "the PRECACHE list derived from the LIVE sw.js is not 15 entries"
+
+P="$(grep -c '^PRECACHE .* 200$' "$V")"
+if [ "$P" != "15" ]; then
+  DEAD=""
+  for p in $(grep '^PRECACHE ' "$V" | grep -v ' 200$' | awk '{print $2}'); do
+    if confirm_dead "$p"; then DEAD="$DEAD $p"; fi
+  done
+  if [ -n "$DEAD" ]; then
+    fail "PRECACHE urls CONFIRMED DEAD three times:$DEAD -- cache.addAll will REJECT, the v19 worker will never install, and every returning device stays on the v18 shell FOREVER. THIS IS THE PRE-AUTHORISED ROLLBACK (SK-P3-9)."
+  else
+    echo "NOTE: $((15-P)) PRECACHE url(s) failed once and recovered on retry -- recorded and REPORTED to the owner, no rollback"
+  fi
+fi
+
+grep -q '^MANIFEST 200 application/json' "$V" || grep -q '^MANIFEST 200 ' "$V" || fail "/audio/words/index.json did not return 200 -- EVERY speaker button in the app would silently disappear (SK-P3-6)"
+grep -q '^MANIFEST 200 .* md5 OK$' "$V" || fail "the live audio manifest does not match the worktree"
+C="$(grep -c '^CLIP .* 200 md5 OK$' "$V")"
+case "$C" in 3) ;; *) fail "only $C of the 3 frozen sample clips are 200 + md5-matched";; esac
+
+A="$(grep -c '^ART .* 200 image/webp md5 OK$' "$V")"
+case "$A" in 9) ;; *) fail "only $A of 9 trophy webps are 200 + image/webp + md5-matched";; esac
+grep -q '{"ok":true,"data":{"status":"up","version":1}}' "$V" || fail "/api/health payload is not byte-exact"
+grep -q 'chapter=401' "$V" || fail "/api/chapter is not 401 -- the function bundle may not have loaded"
+grep -q 'notafile=404' "$V" || fail "the negative control did not 404 -- a 200-for-everything rule would fake this whole step"
+grep -q 'x-app-code' "$V" && fail "a secret appears in the evidence file" || true
+echo STEP-3.5-OK
+exit $RC
+```
+
+**STOP IF (this step owns the most dangerous outcomes):**
+* **any `PRECACHE` URL ≠ 200, CONFIRMED DEAD on three attempts ≥10 s apart** → **ROLL BACK
+  IMMEDIATELY** under SK-P3-9's pre-authorised exception, then report. A URL that fails once and
+  answers on retry is RECORDED and REPORTED, **never rolled back on**.
+* **`/` does not serve, CONFIRMED on three attempts** → **ROLL BACK IMMEDIATELY**; that is the app
+  itself. An md5 mismatch on `/` is **not** auto-rollback — a mismatch is a stable fact, not a
+  transient one, so it goes to the owner like every other `MD5 BAD`.
+* **any `MD5 BAD`** → STOP and report first. One file = a partial upload; many = the wrong tree
+  shipped. The owner decides; the default recommendation is rollback, because byte-identity is the
+  ONLY evidence this phase has that the screen works.
+* **live `sw.js` still contains `magic-vet-v18`** → STOP. The bump did not ship and returning
+  devices keep the old shell. Rollback is not urgent (they are no worse off than yesterday) but
+  nothing further in this plan may proceed.
+* **`/audio/words/index.json` is not 200, or its md5 differs** → STOP and report. Every speaker
+  button in the app would vanish, silently, with a green suite. Recommend rollback; the owner
+  decides.
+* **a trophy webp 404s or has the wrong case** → STOP and report; a locked card renders as a broken
+  image on her shelf. **Do not "fix" it by adding the art to `PRECACHE`** (T6).
+* **the negative control returns 200** → STOP; every other 200 in this file is now meaningless.
+
+**NON-GOALS:** no authenticated request · no `/api/profile` · no browser · no repository change ·
+no "helpful" re-deploy.
+
+---
+
+# STEP 3.6 — READ-BACK R1: nothing she had was lost
+
+**GOAL:** the first of the two checks ever run against her real data. Prove the deploy cost her
+nothing. It cannot and does not try to prove that awarding works.
+
+**TIER:** ORCHESTRATOR. **DEPENDS ON:** 3.5 OK.
+
+**FILES:** `.oplan/word-polish/backup-receipt.txt` (APPEND, counts only). The read-back file is
+`$HOME/polish-deploy/readback-1.json`, outside the repo.
+
+## 3.6-A — the comparator and its self-test, in THIS phase's directory
+
+The comparator is **copied, not rewritten** (SK-P3-4). The previous run's `result.txt` is dated
+2026-07-30 and is **not** accepted as this phase's evidence:
+
+```bash
+D="$HOME/polish-deploy"; mkdir -p "$D/selftest"
+cp "$HOME/trophies-deploy/readback.js"      "$D/readback.js"
+cp "$HOME/trophies-deploy/make-fixtures.js" "$D/make-fixtures.js"
+cp "$HOME/trophies-deploy/run-selftest.sh"  "$D/run-selftest.sh"
+cmp "$HOME/trophies-deploy/readback.js"      "$D/readback.js"      || { echo "FAIL: readback.js copy differs";      exit 1; }
+cmp "$HOME/trophies-deploy/make-fixtures.js" "$D/make-fixtures.js" || { echo "FAIL: make-fixtures.js copy differs"; exit 1; }
+cmp "$HOME/trophies-deploy/run-selftest.sh"  "$D/run-selftest.sh"  || { echo "FAIL: run-selftest.sh copy differs";  exit 1; }
+# the three md5s this planner measured today, re-asserted so a swapped file cannot slip through
+case "$(md5sum "$D/readback.js"      | cut -d' ' -f1)" in d3f76f2cf0b187791cb5d1d0fe59aa28) ;; *) echo "FAIL: readback.js is not the repaired version";      exit 1;; esac
+case "$(md5sum "$D/make-fixtures.js" | cut -d' ' -f1)" in 7b16fa18c614d33b3178d560b0b86112) ;; *) echo "FAIL: make-fixtures.js is not the known builder";   exit 1;; esac
+case "$(md5sum "$D/run-selftest.sh"  | cut -d' ' -f1)" in f6076457e566f7091a437f13fc1e4d14) ;; *) echo "FAIL: run-selftest.sh is not the known runner";     exit 1;; esac
+# and it must literally carry the self-comparison refusal
+grep -q 'SAME FILE TWICE' "$D/readback.js" || { echo "FAIL: readback.js lacks the self-comparison refusal (P4-AMENDMENT #1)"; exit 1; }
+bash "$D/run-selftest.sh" "$D/selftest" "$D/readback.js"
+```
+`run-selftest.sh:7` invokes `"$D/../make-fixtures.js"`, which is why the builder sits at
+`$HOME/polish-deploy/make-fixtures.js` and the fixtures at `$HOME/polish-deploy/selftest/`.
+
+The eight cases, and what each proves: 1 key LOST, 2 status change with no activity evidence,
+3 trophy LOST, 4 tier RESTAMPED, 5 tier APPEARED with no evidence, 6 tier appeared WITH evidence
+(positive control), 7 **the same file passed twice is refused**, 8 an unchanged profile still passes
+(the control without which a comparator that failed on everything would score 8/8). It must write
+`SELFTEST 8/8 AS REQUIRED` before her data is touched.
+
+## 3.6-B — the read of her data, with both sides bound explicitly
+
+```bash
+D="$HOME/polish-deploy"
+C2="$(cat "$D/capture-path.txt")"            # written by 3.3 -- NEVER carried in a variable across steps
+RB1="$D/readback-1.json"
+[ -s "$C2" ] || { echo "FAIL: no C2 capture at '$C2'"; exit 1; }
+[ "$C2" != "$RB1" ] || { echo "FAIL: the read-back would compare a file with itself"; exit 1; }
+case "$C2" in *trophies-deploy*|*20260730*) echo "FAIL: C2 points at the PREVIOUS run's data"; exit 1;; esac
+
+# the frozen capture subshell, with -o pointed at RB1 and the backups folder untouched
+code=$( ( set -a; . ./.env; set +a
+          curl -s --ssl-no-revoke -H "x-app-code: $APP_CODE" \
+               -o "$RB1" -w '%{http_code}' \
+               https://english-app-three-tan.vercel.app/api/profile ) )
+case "$code" in 200) ;; 401) echo "FAIL: 401 - local .env APP_CODE != production (B2)"; exit 1;;
+                *) echo "FAIL: GET -> $code"; exit 1;; esac
+[ -z "${APP_CODE:-}" ] || { echo "FAIL: APP_CODE leaked into this shell"; exit 1; }
+
+node "$D/readback.js" "$C2" "$RB1" 2>&1 | tee "$D/readback-1.log"
+case "${PIPESTATUS[0]}" in 0) ;; *) echo "FAIL: the read-back comparator exited non-zero"; exit 1;; esac
+printf "readback R1 %s bytes=%s sha256=%s\n" "$RB1" "$(wc -c < "$RB1")" "$(sha256sum "$RB1" | awk '{print $1}')" \
+  >> .oplan/word-polish/backup-receipt.txt
+```
+`${PIPESTATUS[0]}` rather than `$?` because `tee` is on the right of the pipe.
+
+**FROZEN VALIDATION:** §VAL-P3 verbatim, then:
+```bash
+D="$HOME/polish-deploy"
+case "$SWSTATE:$STSTATE:$WROTE" in POST:POST:POST) ;; *) fail "the bump is not in place";; esac
+grep -q 'SELFTEST 8/8 AS REQUIRED' "$D/selftest/result.txt" || fail "the read-back was not proven able to fail IN THIS PHASE"
+NEWER="$(find "$D/selftest/result.txt" -newermt '2026-08-01' | wc -l | tr -d ' ')"
+case "$NEWER" in 1) ;; *) fail "selftest/result.txt is not from today -- a stale 8/8 is not evidence";; esac
+L="$D/readback-1.log"
+grep -q '^READBACK OK ' "$L" || fail "the read-back did not print READBACK OK"
+grep -q '^FAIL: ' "$L" && fail "the read-back reported a failure: $(grep '^FAIL: ' "$L")"
+C2="$(cat "$D/capture-path.txt")"
+[ "$C2" != "$D/readback-1.json" ] || fail "C2 and R1 are the same path -- the comparison was vacuous"
+case "$C2" in *20260730*) fail "C2 is a 2026-07-30 file -- the previous run's capture";; esac
+[ -z "${APP_CODE:-}" ] || fail "APP_CODE leaked into this shell"
+grep -q '^readback R1 ' .oplan/word-polish/backup-receipt.txt || fail "no R1 receipt line"
+echo STEP-3.6-OK
+exit $RC
+```
+
+**WHAT TO EXPECT, AND HOW IT DIFFERS FROM LAST TIME.** In word-trophies phase 4 the expected result
+was `trophyIds=0`, because the awarding engine had never run in production. **That is no longer
+true:** the engine has been live since 2026-07-30 and R2 of that run proved it awards. **So R1 here
+will very likely show a non-empty `trophies` key, and `TIERS APPEARED: none` relative to a capture
+taken minutes earlier.** Neither is a failure. The failures are: anything LOST, anything RESTAMPED,
+a status change with no activity evidence, or a tier appearing with no evidence at all.
+
+**STOP IF:**
+* **any key LOST, any trophy LOST, any tier LOST or RESTAMPED** → **STOP. This is the T8 rollback
+  trigger.** Roll back the code with the step-3.2 command, tell the owner immediately, and state —
+  because it is true and must not be softened — that **rollback restores code only; if her data was
+  damaged, this does not undo it.** Then stop the phase.
+* **a status change with no activity evidence** → same: STOP, report, owner decides.
+* **HTTP 401 or non-200** → STOP; do not retry in a loop against her profile.
+* **the self-test does not reach 8/8** → STOP before the GET. An unproven comparator pointed at her
+  data is worse than no check, because it produces a false all-clear.
+
+**NON-GOALS:** no POST of any kind, ever, to her profile · no third read "to be sure" · no contents
+in any record · no rollback on the orchestrator's own initiative except the two pre-authorised cases
+in 3.5.
+
+---
+
+# STEP 3.7 — HUMAN GATE: the owner looks at it on a real device
+
+**GOAL:** the one thing no agent in this run may do, and the gate that lesson 15 says is the only
+one that catches "correct but not comprehensible" — which is precisely defect D1, the reason this
+run exists.
+
+**TIER:** OWNER. **DEPENDS ON:** 3.6 OK. Prints nothing; its output is a yes or a named defect.
+
+**WHAT IS AND IS NOT A WRITE — measured today, and it is better news than last time.** There is ONE
+profile behind `APP_CODE`; the owner's phone and the child's phone are the same account. Traced in
+`public/views/reader.js`:
+
+| action | writes her profile? | evidence |
+|---|---|---|
+| opening the app | a `GET /api/profile` — the same read her own app does on every load | `reader.js:392` |
+| **tapping a word to open the popup** | **NO** | `:728-757` — it reads the glossary and may `POST /api/translate`; `api/translate.js` contains no reference to `loadProfile`, `saveProfile` or `profile` at all |
+| **pressing the 🔊 speaker button** | **NO** | `:783-793` — it constructs `new Audio(...)` and plays it. Nothing leaves the device. |
+| pressing SAVE in the popup | **YES** | `:772` `postJson("/api/profile", body)` |
+| answering a quiz question | **YES** | `:712` `postJson("/api/profile", {action:"log-check", …})` |
+| generating a chapter | **YES** | `:447` `postJson("/api/chapter", …)`, which also runs `awardTrophies` |
+
+**RULED: 3.7 is LOOK-AND-LISTEN, not look-only.** The owner may open the app, tap a word and press
+the speaker button, because none of those three writes her profile — and the speaker button is one
+of the three things this run fixed, so a gate that forbade pressing it would be a gate that cannot
+see the feature. He may **not** press SAVE, answer a quiz question, or generate a chapter.
+
+**THE CHECKLIST, frozen — the orchestrator hands it over exactly like this:**
+
+> **BEFORE ANYTHING: you and she share one profile.** Opening the app is a read and is harmless.
+> **Tapping a word and pressing the little speaker are also harmless** — I checked the code today,
+> neither one saves anything. But **pressing "save" on a word, answering a quiz question, or making
+> a new chapter WRITES to her profile** and would use up a moment that belongs to her. Please do the
+> first three and none of the last three.
+>
+> 1. **Defeat the old app first.** Her phone is holding the previous version in a cache. Close the
+>    installed app and every tab, then open it fresh. **The new version reloads itself once when it
+>    takes over — a brief flash — and that is it working, not a glitch.** If the screen still looks
+>    unchanged, close it and open it once more: the first open installs the new version, the second
+>    is served by it.
+> 2. **The trophies tab — the shelf picture at the top.** This is the whole point of the change.
+>    Does it read as a **shelf**? You should see its front edge and its string of lights; before,
+>    a fade wiped them out and it looked like a floating picture. Say if it still does.
+> 3. **The rest of the trophies screen** should look exactly as it did before — same cards, same
+>    Hebrew names, same progress lines. If anything else moved, that is a defect.
+> 4. **Open a chapter and tap an English word.** A little card comes up with the Hebrew. **If that
+>    word has a recording, a small speaker button appears — press it and you should hear the word.**
+>    If a speaker button appears and pressing it does nothing, say so; that is exactly the bug this
+>    change was supposed to end.
+> 5. **Tap two or three more words.** Some will have a speaker and some will not. **A word with no
+>    speaker button is CORRECT now** — it means we have no recording for that word yet. About
+>    seventeen words in her current chapters are in that state, including `moon`, `deer`, `wings`
+>    and `scary`. **She still cannot hear those words.** That is honest, not fixed.
+> 6. **Look for a broken image** anywhere — a broken-image icon instead of a picture is a defect,
+>    not a style choice.
+> 7. **Turn the phone / try a narrow window** if it is easy. The layout is built for a phone column.
+> 8. **What you will NOT see today:** the end-of-chapter quiz drawing from that chapter's own words.
+>    Seeing it needs an actual chapter ending, which is a write, so it belongs to her. It is covered
+>    by tests, and step 3.8 reports it after she next uses the app.
+>
+> **Say "yes" or name what is wrong.** A defect found here does not get fixed in place — it becomes
+> its own planned, gated step.
+
+**STOP IF:** the owner names any defect → STOP the phase here. The orchestrator brings him two
+options with costs — (a) roll back now with the step-3.2 command and fix in a new gated step, or
+(b) leave it live and fix forward — and **he chooses.** The recommendation is rollback for anything
+a child would notice (broken image, unreadable text, a dead speaker button) and fix-forward for
+anything cosmetic, but the decision is his.
+
+**NON-GOALS:** no agent-driven browser on production · no SAVE, no quiz answer, no chapter
+generation · no screenshot of her data · no in-gate edit.
+
+---
+
+# STEP 3.8 — READ-BACK R2: the engine still agrees with what production stamped
+
+**GOAL:** the only evidence that can exist that the server half is unharmed after the deploy. It
+requires her to have used the app at least once after it.
+
+**TIER:** ORCHESTRATOR. **DEPENDS ON:** 3.6 OK and 3.7 yes, **and at least one real session by
+her.** The orchestrator does not manufacture that session.
+
+**FILES:** `.oplan/word-polish/backup-receipt.txt` (APPEND, counts only). Read-back file
+`$HOME/polish-deploy/readback-2.json`.
+
+**COMMANDS:** `$HOME/polish-art/step-3.8.sh` = `$HOME/trophies-art/step-4.7.sh` with `D` repointed
+to `$HOME/polish-deploy` and the receipt path repointed to `.oplan/word-polish/backup-receipt.txt`.
+**Nothing else changes** — its three-way path-distinctness block (`step-4.7.sh:11-13`), its frozen
+capture subshell, its two comparisons (C2→R2 and R1→R2) and its `AWARDING-CORRECT` recomputation are
+copied byte-for-byte from the script that ran on 2026-07-31.
+
+The recomputation is the sharp half: it re-runs the shipped `awardTrophies` over R2 and asks whether
+production stamped any tier the engine would **not** award. `extra` non-empty means a trophy awarded
+on a metric nobody can reproduce — design §6's *"a trophy awarded on a buggy metric shows the child
+a lie"*. `owed` (earned but not yet stamped) is expected and harmless.
+
+**FROZEN VALIDATION:** §VAL-P3 verbatim, then:
+```bash
+D="$HOME/polish-deploy"; L2="$D/readback-2.log"
+case "$SWSTATE:$STSTATE:$WROTE" in POST:POST:POST) ;; *) fail "the bump is not in place";; esac
+OKN="$(grep -c '^READBACK OK ' "$L2")"
+case "$OKN" in 2) ;; *) fail "expected TWO READBACK OK lines (C2->R2 and R1->R2), got $OKN";; esac
+RCN="$(grep -c '^rc=0$' "$L2")"
+case "$RCN" in 2) ;; *) fail "expected both comparisons to exit 0, got $RCN";; esac
+grep -q '^FAIL: ' "$L2" && fail "R2 reported a failure: $(grep '^FAIL: ' "$L2")"
+grep -q '^AWARDING-CORRECT ' "$L2" || fail "the award recomputation did not pass"
+grep -q '^stamped but NOT earned: none$' "$L2" || fail "production stamped a tier the shipped engine would not award"
+grep -q 'SELFTEST 8/8 AS REQUIRED' "$D/selftest/result.txt" || fail "the comparator's self-test result is missing"
+grep -q '^readback R2 ' .oplan/word-polish/backup-receipt.txt || fail "no R2 receipt line"
+[ -z "${APP_CODE:-}" ] || fail "APP_CODE leaked into this shell"
+echo STEP-3.8-OK
+exit $RC
+```
+
+**WHAT R2 CAN AND CANNOT SEE, said plainly.** It can see that nothing was lost, nothing was
+restamped, and that every stamped tier is one the shipped engine justifies. **It cannot see whether
+the chapter-end quiz now draws from the chapter's own words** — the profile records `quizRight`,
+`quizWrong` and `lastQuizAt`, not which lemmas were asked. That behaviour is covered by phase 1's
+tests and by her own experience; the record must say so rather than imply R2 proved it.
+
+**STOP IF:**
+* **anything LOST or RESTAMPED** → the T8 rollback trigger, exactly as in 3.6.
+* **`stamped but NOT earned` is non-empty** → STOP. A wrong award **cannot be silently retracted**
+  (never-regress), so it is an **OWNER decision**: keep it, or authorise a one-time correction as
+  its own gated work. The orchestrator never touches her trophies.
+* **she has not used the app within the phase window** → **do not force it and do not fake it.**
+  Close the phase with R2 explicitly OPEN and the record saying that post-deploy awarding is
+  unre-verified. A phase that closes honestly with one open item is worth more than one that closes
+  on an unmeasured claim.
+
+**NON-GOALS:** never POST to trigger an award · never edit her trophies · no retry loop.
+
+---
+
+# STEP 3.9 — PHASE CLOSE
+
+**GOAL:** re-run every criterion, write the record the next run starts from, and put the D27
+question to the owner.
+
+**TIER:** ORCHESTRATOR-authoring. **DEPENDS ON:** 3.1-3.8 (3.8 may be OPEN).
+
+**FILES (exhaustive):** `.oplan/word-polish/journal.md` (APPEND),
+`.oplan/word-polish/phase-state.md` (REWRITE), `.oplan/word-polish/field-guide/index.md` (amend, if
+the phase produced a lesson), `.oplan/word-polish/STATUS.md` (create/rewrite for the owner).
+
+**COMMANDS:** §VAL-P3 verbatim plus the close tail; then the records commit
+`oplan: word-polish PHASE 3 CLOSED — magic-vet-v19 live at <NEW_ID>, 4/4 md5 proofs, 15/15 precache, audio manifest reachable, read-back intact`.
+
+```bash
+# TAIL of the close script, which BEGINS with §VAL-P3 verbatim in the SAME file
+case "$SWSTATE:$STSTATE:$WROTE" in POST:POST:POST) ;; *) fail "the tree is not in the shipped state";; esac
+case "$PORC" in "") ;; *) fail "tree not clean at the close:
+$PORC";; esac
+B=https://english-app-three-tan.vercel.app
+# never `cmd | grep -q` under set -o pipefail (lesson 6, SIGPIPE) -- capture first, match with case
+SW="$(curl -s -m 20 --ssl-no-revoke "$B/sw.js")"
+case "$SW" in *magic-vet-v19*) ;; *) fail "live sw.js is not v19 at the close";; esac
+case "$SW" in *magic-vet-v18*) fail "live sw.js still carries v18";; esac
+MAN="$(curl -s -m 20 --ssl-no-revoke -o /dev/null -w '%{http_code}' "$B/audio/words/index.json")"
+case "$MAN" in 200) ;; *) fail "/audio/words/index.json is $MAN at the close -- every speaker button would vanish";; esac
+grep -q 'vercel" rollback' .oplan/word-polish/phase-state.md || fail "the rollback ladder is missing from the record"
+echo STEP-3.9-OK
+exit $RC
+```
+
+**THE RECORD MUST STATE, for whatever comes next:**
+* the NEW deployment id and url **exactly as inspect reported them**, at the top of the rollback
+  ladder, with `dpl_AVmWnh3XxBZPhLJKnjTUZT9r5EXB` /
+  `https://english-1jnh1sn5e-dkreinovs-projects.vercel.app` beneath it, **full urls, never a bare
+  project-name fragment**;
+* `magic-vet-v19` is LIVE; **QZ-22's next bump is v20** and the next phase that moves a precached
+  file owes it — phase 3 spent v19 and nothing else;
+* the 4 md5-proved payload paths, the 15/15 precache result, the manifest + 3 clips result, the nine
+  webp results, and the `/sw.js` `cache-control` header **as measured** (it has never been recorded);
+* the capture receipts (C2, R1, R2 — bytes, sha256, counts, **never contents**);
+* what R1 and R2 actually showed, including any tiers that appeared and the evidence for each;
+* **whether R2 ran at all**, plainly, and if not, that post-deploy awarding is unre-verified;
+* the owner's 3.7 verdict, verbatim;
+* **THE AUDIO DEBT, in the owner's words and at the top of the open items:** ~17 story words still
+  have no clip, the speaker button is correctly absent for them, and she cannot hear them. The
+  blocker is that `scripts/build-word-audio.js` rewrites the manifest from a band derivation on every
+  run (`ae349c6`). That is a whole planned run, not a follow-up;
+* the D27 answer, verbatim, and — if "delete" — that the deletion happened strictly AFTER R2 and the
+  criteria re-run, with the pre-delete sha256 verified against the receipt first;
+* anything worth promoting into the field guide. **Three candidates from this phase:**
+  (a) *"A CORRECTION CAN BE THE ERROR. The phase-3 briefing 'corrected' the endings record to say
+  five files were CRLF; two of them are LF, and the run's own gate (`VAL-P1.sh:82`) had been
+  asserting LF successfully five times. Re-measure the correction, not just the claim."*
+  (b) *"`console.log(n)` on a NUMBER emits ANSI colour when node thinks stdout is a terminal, so a
+  frozen gate that pins a count can fail on a correct tree in one executor's shell and pass in
+  another's. Always `console.log(String(n))`."* — measured today; `VAL-P1.sh:35-36` still carries it.
+  (c) *"A per-file md5 pin cannot see a HALF-APPLIED change. When two files must move together
+  (a service worker and the test that pins it), assert the SEAM: derive a state from each and
+  require the states to be equal."*
+
+**THE D27 QUESTION, asked verbatim at this step:** *"Do the capture files in
+`C:/Users/dkreinov/english-app-backups/` get deleted now, as at the end of earlier phases, or kept?
+There are now three of them (two from 2026-07-30 and this phase's). They are the only copies of her
+profile that exist. Deleting ends the safety net; keeping leaves her data sitting on this machine."*
+
+**NON-GOALS:** no code change · no deploy · no further read of her profile · no `public/` change ·
+no "small fix while we are here".
+
+---
+
+## STOPPING CONDITIONS — the whole phase on one page
+
+| # | observation | verdict | who decides | next action |
+|---|---|---|---|---|
+| 1 | the apply script's byte/CRLF/md5 assertion fails at 3.1 | STOP | orchestrator | `git checkout --` both files; never "fix" the expected md5 |
+| 2 | `npm test` PASSES in the half-applied state | **STOP, serious** | owner | the cache-name pin does not observe `sw.js`; it has been decorative for four deploys |
+| 3 | §VAL-P3 does not print `HALF-APPLIED BUMP` in the half-applied state | STOP | orchestrator | the seam clause is broken; the phase has no protection against a half-bump |
+| 4 | either file's endings move | STOP | orchestrator | lesson 4's silent corruption; `git diff` will not show it |
+| 5 | `vercel inspect` reports an id other than `dpl_AVmWnh3XxBZPhLJKnjTUZT9r5EXB` | STOP before anything | owner rules | re-establish the entire live baseline |
+| 6 | inspect gives no url | STOP | orchestrator | never hand-build one; no rollback target = no deploy |
+| 7 | live `/sw.js` already says v19 at 3.2 | STOP | owner | something shipped outside the run; re-plan |
+| 8 | fewer than 16 baseline URLs answer 200 at 3.2 | STOP | owner | production is already unhealthy |
+| 9 | capture returns **401** | STOP | owner supplies the code out of band | never `vercel env`; no deploy without a capture |
+| 10 | capture fails `validateProfile` | STOP | owner | understand a pre-existing data problem before adding code to it |
+| 11 | `APP_CODE` leaked into the shell | STOP | orchestrator | new shell, re-run; a leak silently 401s everything after it |
+| 12 | deploy build fails | STOP; **nothing shipped**, production still v18 | orchestrator reports | read the log; no blind retry; no rollback needed |
+| 13 | deploy log lost / command seems to hang | **DO NOT RE-RUN** | orchestrator | read the log, then `vercel inspect` the alias |
+| 14 | alias id ≠ new deploy id, or two ids in the log | STOP | owner | the wrong-deployment / double-deploy failures lesson 10 exists for |
+| 15 | **any PRECACHE URL ≠ 200, confirmed dead 3× ≥10 s apart** | **ROLL BACK IMMEDIATELY**, then report | pre-authorised (SK-P3-9) | `cache.addAll` rejects as a whole; every returning device keeps the v18 shell forever |
+| 15b | a PRECACHE URL fails once and recovers on retry | **no rollback** — record and report | orchestrator records, owner informed | a blip must not burn the one rollback |
+| 16 | **`/` does not serve, confirmed 3×** | **ROLL BACK IMMEDIATELY**, then report | pre-authorised (SK-P3-9) | that is the app itself |
+| 16b | `/` serves but md5-mismatches | STOP, no auto-rollback | owner | a mismatch is stable, not transient — row 17 |
+| 17 | any `MD5 BAD` | STOP | owner (default recommendation: roll back) | without byte-identity this phase has no evidence at all |
+| 18 | the payload enumeration is not the frozen four paths | STOP | orchestrator | the wrong base, or something else changed under `public/` |
+| 19 | live `sw.js` still contains v18 | STOP | owner | the bump did not ship; nothing further proceeds |
+| 20 | **`/audio/words/index.json` ≠ 200 or md5-mismatched** | STOP | owner (recommend rollback) | every speaker button in the app vanishes, silently, with a green suite |
+| 21 | a trophy webp 404s or is case-wrong | STOP | owner (recommend rollback) | broken image on her shelf; never "fix" via `PRECACHE` |
+| 22 | the negative control returns 200 | STOP | orchestrator | every other 200 is now meaningless |
+| 23 | the comparator self-test is not 8/8, or `result.txt` is not from today | STOP **before** the GET | orchestrator | an unproven comparator produces a false all-clear, which is worse than no check |
+| 24 | read-back: key/trophy/tier **LOST or RESTAMPED** | **STOP — the T8 trigger** | owner, immediately | roll back code; say plainly that code rollback does not restore data |
+| 25 | status change with no activity evidence | STOP | owner | same path as 24 |
+| 26 | a tier appeared with no evidence clause firing | STOP | owner | a trophy over an unchanged profile is the "shows her a lie" risk |
+| 27 | R2's `stamped but NOT earned` non-empty | STOP | **owner only** — never-regress forbids silent retraction | keep, or a one-time correction as new gated work |
+| 28 | she has not used the app in the window | **not a failure** | orchestrator records | close with R2 OPEN; do not fake a session |
+| 29 | owner names a defect at 3.7 | STOP | owner picks rollback vs fix-forward | the fix is a new gated step, never in place |
+| 30 | §VAL-P3 fails at any step | STOP | orchestrator | the tree that would ship is not the tree that was gated |
+
+**The pre-authorised rollbacks are exactly two (rows 15 and 16)** — the cases where waiting for a
+human leaves a child's app broken for longer. Everything else stops and asks.
+
+---
+
+## THE THREE REVIEW QUESTIONS, ANSWERED IN PLACE
+
+1. **Runtime reachability** — SK-P3-6. Traced for all four shipped artifacts plus the one nobody had
+   traced: `/audio/words/index.json`, fetched by the browser at `words-index.js:17`, **absent from
+   `PRECACHE`**, and never probed by any previous deploy's evidence. Criterion 14 closes it.
+2. **Contradictory sources** — SK-P3-7. Five shown values traced to their sources. The one pair that
+   could have disagreed (the speaker button vs the clip URL) is proven to be **one variable, not
+   two**. This phase creates no new pair.
+3. **Ungated composites** — SK-P3-12. Four named; three go to the owner's eyes at 3.7, and the
+   fourth (the chapter-end quiz) is stated as **not visible at the gate** rather than quietly
+   assumed covered.
+
+---
+
+## RISKS
+
+1. **The service worker hands her a broken mix.** Her phone holds the v18 shell. The new worker must
+   install (all 15 URLs), activate, claim, and trigger the one-shot reload at `app.js:62-66`. If
+   `addAll` fails she stays on v18 **silently and indefinitely**. *Noticed by:* criterion 13, the
+   15/15 sweep. *Residual:* a phone that never revisits never updates.
+2. **Rollback restores code, not data.** *Mitigation:* the awarding engine is pure and additive, T8
+   watches for disappearance, and the capture exists for the deploy window — which is when the risk
+   lives. *Residual, stated:* if her profile is damaged, the capture is a photograph, not a spare.
+3. **The audio manifest 404s and every speaker button disappears.** New this phase because T3(a)
+   made the button depend on it. Unprecedented in this project's gates. *Mitigation:* criterion 14.
+   *Residual:* if the manifest is served but stale (a CDN edge case), the buttons would be right for
+   the wrong words; the md5 comparison catches exactly that.
+4. **The bump is applied to only one of the two files.** *Mitigation:* the seam clause in §VAL-P3,
+   which is watched failing during step 3.1 itself. *Residual:* none identified — the two states are
+   enumerated and no third passes.
+5. **A stale artifact from the previous run is read as this phase's evidence.** This is the failure
+   that shipped a vacuous gate last time. *Mitigation:* a separate directory, six path assertions, a
+   freshness check on `selftest/result.txt`, and a comparator that refuses a self-comparison.
+   *Residual:* an executor who edits a frozen path. Covered by the stop-rule, nothing more.
+6. **The owner reads "shipped" as "she can hear the missing words".** *Mitigation:* SK-P3-11, the
+   plain plan, and checklist item 5 all say the opposite in words a non-engineer reads. *Residual:*
+   none mechanical; this is a communication risk and it is handled by repetition.
+
+## BLOCKERS
+
+* **B-P3-1 — the briefing's endings correction is wrong (RESOLVED IN THIS PLAN, but it must be
+  corrected in the record).** `BRIEFING-POLISH-P3.md:81-85` states five files are CRLF; two are LF.
+  A plan that inherited it would have pinned an ending only a corrupted file could satisfy. The plan
+  above pins the measured values. **The orchestrator should correct the briefing before any other
+  agent reads it.**
+* **B-P3-2 — no live measurement was permitted to this planner.** Every production value in this
+  plan is either quoted from the record as a hypothesis to confirm, or written as a thing step 3.2
+  must measure. If the live baseline has moved since 2026-07-31, step 3.2 stops the phase, which is
+  the correct behaviour but should be expected rather than treated as a surprise.
+* **B-P3-3 — the phase cannot complete without her.** R2 needs a real session by the child. If she
+  does not use the app in the window, the phase closes with R2 OPEN. That is planned for, not a
+  failure, but the owner should know the close may be partial.
+
+## RECORD GAPS
+
+1. **`vercel inspect` may print no commit line.** It did not for the outgoing deployment last time
+   (`step-4.4.sh:8-9` records exactly that). The plan therefore freezes `OC=a40cdb2` from a dated
+   measurement rather than depending on inspect, and backs it with the frozen four-path literal.
+2. **The `cache-control` header Vercel serves on `/sw.js` has never been recorded** in any phase of
+   this project. It decides how quickly she gets a new worker. Steps 3.2 and 3.5 record it; **no
+   step gates on it**, because no threshold has ever been agreed and this is not the phase to invent
+   one.
+3. **`.oplan/word-polish/STATUS.md` does not exist** (the previous run had one). Step 3.9 creates it.
+4. **`.oplan/word-polish/backup-receipt.txt` does not exist.** Step 3.3 creates it.
+5. **No owner ruling is on record for phase 3 specifically.** `phase-state.md:16` says "OPEN
+   QUESTIONS: none" as of phase 1. The orchestrator must obtain an explicit GO before step 3.4, and
+   the D27 rider must be re-asked at 3.9 rather than assumed.
+6. **The projection in step 3.3 is less meaningful than it was last run**, because the engine has
+   been live since 2026-07-30 and her `trophies` key is no longer empty. It is kept because it costs
+   nothing and gives R2 an anchor, but the close must not describe it as a prediction of a first
+   award pass.
+
+---
+
+## PLAIN PLAN — for the owner, in plain words
+
+Three fixes are already built and tested on this machine and none of them has reached her phone yet.
+This phase is the delivery: nine steps, one deploy, and two careful readings of her profile to prove
+nothing was lost.
+
+**3.1 — Give the app's stored copy a new name, and move the test that guards it in the same breath.**
+*Why:* her phone keeps its own copy of the app's files and only throws it away when the name
+changes. Without this, all three fixes sit on the server and she keeps seeing the old app forever.
+The test that pins the name moves at the same moment so the two can never drift apart — and we
+deliberately break the tree halfway first, to watch the alarm go off.
+**DONE WHEN:** the app file says `magic-vet-v19`, its test says the same, all 358 tests pass, and
+both files are exactly the same size they were.
+
+**3.2 — Write down what is live right now, and the one command that undoes this.**
+*Why:* if the deploy goes wrong, nobody should be composing a rescue command under pressure. It gets
+written and saved before anything moves.
+**DONE WHEN:** the current live version is confirmed to be the one we think it is, the undo command
+is saved in the record with the real address pasted in, and it is committed.
+
+**3.3 — Take a fresh copy of her profile, minutes before the deploy.**
+*Why:* it is the only photograph of her words, her chapters and her trophies from just before the
+change. It goes to a brand-new filename so nothing can confuse it with an older copy.
+**DONE WHEN:** the copy exists, is readable, passes the app's own validity check, and a receipt
+(size and fingerprint — never the contents) is written into the record.
+
+**3.4 — Deploy. Once.**
+*Why:* this is the moment the three fixes reach the internet. Once, with the output written to a
+file rather than watched on screen — a truncated screen once caused an accidental second deploy.
+**DONE WHEN:** exactly one deployment exists, the live address points at it, and it reports Ready.
+
+**3.5 — Prove that what the internet is now serving is exactly what we tested.**
+*Why:* "it deployed" and "it deployed correctly" are different claims. We compare the four changed
+files byte for byte, check that every file her phone must download actually answers, and — new this
+time — check the little list that tells the app which words have a recording. If that list ever
+went missing, every speaker button in the app would quietly vanish and every test would still pass.
+**DONE WHEN:** all four files match byte for byte, the new name is live and the old one gone, all
+fifteen required files answer, the recordings list and three sample recordings answer, all nine
+trophy pictures answer, and a deliberately fake address still returns "not found".
+
+**3.6 — Read her profile back and prove the deploy cost her nothing.**
+*Why:* this is the promise the whole ritual exists to keep. Before it runs, the comparison tool is
+put through eight rigged tests — five of which it must FAIL — so we know it is capable of raising
+an alarm at all.
+**DONE WHEN:** every word she had is still there, no trophy or date has been changed, and the tool
+proved itself first.
+
+**3.7 — You look at it on your own phone.**
+*Why:* the defect that started this run — the shelf that did not look like a shelf — passed every
+automated check there was. Only a person looking found it. **You may tap a word and press the little
+speaker: I checked the code today and neither of those saves anything.** Please do not press "save",
+answer a quiz question, or make a new chapter — those write to her profile.
+**DONE WHEN:** you say yes, or name what is wrong.
+
+**3.8 — After she next uses the app, read the profile once more.**
+*Why:* to confirm the server side is still healthy after the change — that nothing vanished and that
+every trophy she has is one the app can justify.
+**DONE WHEN:** both comparisons come back clean and the trophy recomputation agrees. **If she has
+not used the app yet, we close the phase saying so, rather than pretending.**
+
+**3.9 — Write it all down and ask you the one standing question.**
+*Why:* the next run starts from this record. And the copies of her profile on this machine are the
+only ones that exist — whether they are deleted is your call, asked fresh each time, never assumed.
+**DONE WHEN:** every check has been re-run, the record names the new version and the undo command,
+and you have answered.
+
+### THE TWO THINGS THIS DOES NOT FIX — please read these
+
+**1. She still cannot hear about seventeen words.** The plan was to record the missing ones before
+this deploy. That did not happen: those words sit outside the vocabulary the recording script works
+from, and the script rewrites the master list every time it runs, so making them naively would
+scramble the list. It was stopped before anything was spent. **What changes after this deploy is
+honesty, not coverage:** for words like `moon`, `deer`, `wings` and `scary` the little speaker
+button will now be **absent** rather than present-and-dead. She will no longer press a button that
+does nothing — but she still cannot hear those words. Recording them is its own separate piece of
+work.
+
+**2. She will not see the change instantly, and that is normal.** Her phone keeps its own copy of
+the app. The next time she opens it, the first thing she sees is still the old version; while she is
+looking at it the phone quietly fetches the new one, and then the app reloads itself once — a brief
+flash — and from that moment she is on the new version. So: **the change arrives on her next visit,
+after one automatic reload, not the second the deploy finishes.** If you open it yourself and it
+looks unchanged, close it completely and open it once more. The one thing that would stop this
+working entirely is if any single required file failed to download — and that is exactly what step
+3.5 checks fifteen times over, because it is the one failure that would leave her stuck on the old
+app indefinitely without anyone noticing.
+
+---
+
+*End of plan. Nine steps: 3.1 bump · 3.2 pre-flight · 3.3 capture · 3.4 deploy · 3.5 proof ·
+3.6 read-back R1 · 3.7 owner's eyes · 3.8 read-back R2 · 3.9 close.*

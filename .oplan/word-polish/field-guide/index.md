@@ -131,3 +131,18 @@
     · TWO APPROVED THINGS MAKE AN UNAPPROVED THIRD. Wherever approved art meets approved CSS, or
       approved code meets approved config, there is a surface nobody signed off — gate it or look
       at it.
+
+16. GREP CANNOT MEASURE LINE ENDINGS IN THIS ENVIRONMENT. COUNT BYTES.
+    Proven 2026-08-01 on lf.txt / crlf.txt fixtures:
+    · `grep -c` with a CR in the pattern returns 0 on a REAL CRLF file — MSYS grep opens in text
+      mode and strips CR before matching. False "it is LF".
+    · If the raw CR is stripped from the command string before bash sees it, the pattern collapses
+      to `$` (the end-of-line anchor), which matches EVERY line of EVERY file. False "it is CRLF".
+    Both failure modes are silent and both look like a measurement. The orchestrator shipped the
+    second one into a planning brief and told a planner the record was wrong; the planner
+    re-measured and was right.
+    THE ONLY TRUSTWORTHY FORM: `tr -dc '\r' < f | wc -c` (CR bytes) vs `tr -dc '\n' < f | wc -c`.
+    CR==0 -> LF. CR==LF -> CRLF. Otherwise MIXED, which is a defect.
+    NEVER put a raw control character inside a shell command here. And: WHEN EVERY INPUT PASSES A
+    CHECK IDENTICALLY, THE CHECK IS THE SUSPECT, not the inputs. Five files all reporting
+    "CRLF-lines == total lines" was the tell, and it was ignored.
