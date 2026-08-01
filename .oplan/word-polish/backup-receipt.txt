@@ -1,1 +1,2 @@
 capture C2 /c/Users/dkreinov/english-app-backups/profile-20260801-171305.json bytes=20900 sha256=400d67d2d96802dc4d84370cfd0be53b79d354ba9352944abcbb8ea28b3670d2
+readback R1 /c/Users/dkreinov/polish-deploy/readback-1.json bytes=20900 sha256=400d67d2d96802dc4d84370cfd0be53b79d354ba9352944abcbb8ea28b3670d2
