@@ -2,3 +2,15 @@ capture C2 /c/Users/dkreinov/english-app-backups/profile-20260801-171305.json by
 readback R1 /c/Users/dkreinov/polish-deploy/readback-1.json bytes=20900 sha256=400d67d2d96802dc4d84370cfd0be53b79d354ba9352944abcbb8ea28b3670d2
 capture C2 /c/Users/dkreinov/english-app-backups/profile-20260801-173427.json bytes=20900 sha256=400d67d2d96802dc4d84370cfd0be53b79d354ba9352944abcbb8ea28b3670d2
 readback R2 /c/Users/dkreinov/polish-deploy/readback-2.json bytes=20900 sha256=400d67d2d96802dc4d84370cfd0be53b79d354ba9352944abcbb8ea28b3670d2
+D27 ANSWERED 2026-08-01: the owner said delete all backups. Deleted:
+  deleted /c/Users/dkreinov/english-app-backups/profile-20260730-114016.json bytes=13295 sha256=4e7fe8bca4ac6d577970b69bc047363603b78c6838efe83c9fce999ed080a597
+  deleted /c/Users/dkreinov/english-app-backups/profile-20260730-201842.json bytes=15133 sha256=f7befc3833cdbfdfb24ce4a785c81fedadf9c72dc493acf94f60c6385557d049
+  deleted /c/Users/dkreinov/english-app-backups/profile-20260801-171305.json bytes=20900 sha256=400d67d2d96802dc4d84370cfd0be53b79d354ba9352944abcbb8ea28b3670d2
+  deleted /c/Users/dkreinov/english-app-backups/profile-20260801-173427.json bytes=20900 sha256=400d67d2d96802dc4d84370cfd0be53b79d354ba9352944abcbb8ea28b3670d2
+  deleted /c/Users/dkreinov/polish-deploy/capture-copy.json bytes=20900 sha256=400d67d2d96802dc4d84370cfd0be53b79d354ba9352944abcbb8ea28b3670d2
+  deleted /c/Users/dkreinov/polish-deploy/readback-1.json bytes=20900 sha256=400d67d2d96802dc4d84370cfd0be53b79d354ba9352944abcbb8ea28b3670d2
+  deleted /c/Users/dkreinov/polish-deploy/readback-2.json bytes=20900 sha256=400d67d2d96802dc4d84370cfd0be53b79d354ba9352944abcbb8ea28b3670d2
+  deleted /c/Users/dkreinov/trophies-deploy/capture-copy.json bytes=15133 sha256=f7befc3833cdbfdfb24ce4a785c81fedadf9c72dc493acf94f60c6385557d049
+  deleted /c/Users/dkreinov/trophies-deploy/readback-1.json bytes=15133 sha256=f7befc3833cdbfdfb24ce4a785c81fedadf9c72dc493acf94f60c6385557d049
+  deleted /c/Users/dkreinov/trophies-deploy/readback-2.json bytes=20900 sha256=400d67d2d96802dc4d84370cfd0be53b79d354ba9352944abcbb8ea28b3670d2
+
