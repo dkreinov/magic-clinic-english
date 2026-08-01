@@ -25,6 +25,9 @@ const VIEW_STYLE = `
     font-size: 1.08rem;
     line-height: 1.9;
     text-align: left;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   .reader-text .w {
@@ -724,6 +727,15 @@ export async function render(container, ctx) {
         draw();
       });
     });
+
+    const storyEl = container.querySelector(".reader-text");
+    if (storyEl) {
+      // A long press used to raise the browser's own "Copy" callout. Refuse it, so the
+      // release still reaches the click handler below and opens her word popup instead.
+      storyEl.addEventListener("contextmenu", (ev) => {
+        ev.preventDefault();
+      });
+    }
 
     container.querySelectorAll(".reader-text .w").forEach((span) => {
       span.addEventListener("click", async (ev) => {

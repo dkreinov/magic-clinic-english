@@ -490,3 +490,22 @@ test('a second chapter in the same sitting is not asked the same four words', as
     'with nothing recorded the identical four come back -- the defect this step fixes'
   );
 });
+
+// --- long press must do the app's own thing, not the OS "Copy" callout -------------
+// She long-pressed a word and got the system copy menu instead of the word popup.
+// Two halves, both required: the text must not be selectable (that is what summons
+// the callout), and the context menu must be refused so the release still fires click.
+test('the story text suppresses the OS selection callout', () => {
+  const src = readFileSync(viewPath, 'utf8');
+  const block = src.slice(src.indexOf('.reader-text {'), src.indexOf('.reader-text .w {'));
+  assert.ok(block.includes('-webkit-touch-callout: none'), 'no -webkit-touch-callout: none on .reader-text');
+  assert.ok(block.includes('-webkit-user-select: none'), 'no -webkit-user-select: none on .reader-text');
+  assert.ok(/[^-]user-select: none/.test(block), 'no unprefixed user-select: none on .reader-text');
+});
+
+test('a long press on the story is answered by the app, not the browser', () => {
+  const src = readFileSync(viewPath, 'utf8');
+  assert.ok(/addEventListener\("contextmenu"/.test(src), 'reader.js binds no contextmenu handler');
+  const at = src.indexOf('addEventListener("contextmenu"');
+  assert.ok(src.slice(at, at + 160).includes('preventDefault'), 'the contextmenu handler does not preventDefault');
+});
