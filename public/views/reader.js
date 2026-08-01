@@ -306,6 +306,52 @@ export function chapterQuizState(quizState, n) {
   return quizState[n];
 }
 
+// T2 (word-polish). The end-of-chapter quiz asks about THIS chapter's words
+// first. Four things are frozen here, because each is a place the quiz can
+// silently do nothing at all:
+//  * the key is `word`, not `lemma` -- a glossary entry is { word, he }.
+//  * a word containing a space ("deep breath") can never be a lemma file.
+//  * a glossary word is DROPPED unless it is already a key in profile.words:
+//    api/profile.js:130 answers a quiz-answer for an unknown word with
+//    400 'unknown word' and public/quiz.js:304 swallows that, so an
+//    unrecordable word buys a question that scores nothing, awards no
+//    quizRight progress and never records lastQuizAt.
+//  * the chapter's words are SHUFFLED with the Fisher-Yates from
+//    quiz-core.js:26-29, so re-opening a chapter does not always ask the
+//    same first four.
+// The global pool is appended, de-duplicated. A lemma already asked earlier in
+// this sitting goes to the TAIL rather than being dropped, so the quiz can
+// always still reach four. Pure: no DOM, no fetch, no clock.
+export function chapterQuizLemmas(chapter, words, pool, asked, rand = Math.random) {
+  const known = words && typeof words === "object" ? words : {};
+  const seen = new Set();
+  const first = [];
+  const glossary = chapter && Array.isArray(chapter.glossary) ? chapter.glossary : [];
+  for (const g of glossary) {
+    if (!g || typeof g.word !== "string") continue;
+    const k = g.word.trim().toLowerCase();
+    if (k === "" || k.includes(" ")) continue;
+    if (!Object.prototype.hasOwnProperty.call(known, k)) continue;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    first.push(k);
+  }
+  for (let i = first.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [first[i], first[j]] = [first[j], first[i]];
+  }
+  const already = asked instanceof Set ? asked : new Set();
+  const fresh = [];
+  const repeat = [];
+  for (const k of Array.isArray(pool) ? pool : []) {
+    if (typeof k !== "string" || seen.has(k)) continue;
+    seen.add(k);
+    if (already.has(k)) repeat.push(k);
+    else fresh.push(k);
+  }
+  return first.concat(fresh, repeat);
+}
+
 function findInGlossary(chapter, dataWord) {
   if (!chapter || !Array.isArray(chapter.glossary)) return null;
   for (const g of chapter.glossary) {
@@ -328,6 +374,16 @@ export async function render(container, ctx) {
   let lemmas = [];
   let knownSet = new Set();
   let candidateSet = new Set();
+  // T2. One quiz list per chapter, computed ONCE and memoised, so the count
+  // afterChapterStage sees and the array startQuiz receives are the SAME array
+  // object and cannot disagree (field guide 15b: bugs live in the seam).
+  // askedThisSitting is what actually fixes D2: `lemmas` below is built once in
+  // boot() and never rebuilt -- runGenerate pushes a chapter without touching it
+  // and the celebrate-from-server helper deliberately reads into a local -- so without this,
+  // every chapter in one sitting is handed the identical order and quiz.js
+  // takes the identical first four.
+  const quizLemmasByChapter = {};
+  const askedThisSitting = new Set();
 
   async function boot() {
     draw();
@@ -369,6 +425,18 @@ export async function render(container, ctx) {
   function latestChapter() {
     const chapters = profile.story.chapters;
     return chapters[chapters.length - 1];
+  }
+
+  function quizLemmasFor(chapter) {
+    if (!quizLemmasByChapter[chapter.n]) {
+      quizLemmasByChapter[chapter.n] = chapterQuizLemmas(
+        chapter,
+        profile && profile.words,
+        lemmas,
+        askedThisSitting
+      );
+    }
+    return quizLemmasByChapter[chapter.n];
   }
 
   async function runGenerate() {
@@ -543,7 +611,7 @@ export async function render(container, ctx) {
     const questionsHtml = chapter.questions.map((q) => renderQuestion(chapter, q)).join("");
     const doneAll = allQuestionsCorrect(chapter);
     const qs = chapterQuizState(quizState, chapter.n);
-    const chapterStage = afterChapterStage({ doneAll, quizDone: qs.done, lemmaCount: lemmas.length });
+    const chapterStage = afterChapterStage({ doneAll, quizDone: qs.done, lemmaCount: quizLemmasFor(chapter).length });
     const quizHtml = chapterStage === "quiz" ? `<div class="reader-quiz-slot"></div>` : "";
     const celebrateHtml = chapterStage === "celebrate"
       ? `<img class="celebrate-image" src="/assets/celebration.webp" alt="" />`
@@ -748,8 +816,8 @@ export async function render(container, ctx) {
       const qs = chapterQuizState(quizState, chapter.n);
       if (!qs.started) {
         qs.started = true;
-        startQuiz(slot, {
-          lemmas,
+        const started = startQuiz(slot, {
+          lemmas: quizLemmasFor(chapter),
           knownSet,
           candidateSet,
           count: 4,
@@ -759,6 +827,16 @@ export async function render(container, ctx) {
             if (total > 0) await celebrateFromServer();
           },
         });
+        // T2. quiz.js -- not this file -- decides which four of the list it
+        // could actually load, and session.questions is where it says so. That
+        // knowledge exists nowhere else, so it is recorded here, at the start,
+        // not in onDone: the next chapter's list is built before onDone fires.
+        started.then(
+          (session) => {
+            for (const q of session.questions) askedThisSitting.add(q.lemma);
+          },
+          () => {}
+        );
       }
     }
   }

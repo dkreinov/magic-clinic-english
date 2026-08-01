@@ -1257,11 +1257,11 @@ MEMO="$(grep -c 'quizLemmasByChapter\[chapter.n\]' public/views/reader.js)"
 case "$MEMO" in 3) ;; *) fail "the per-chapter memo must be read/written exactly 3 times, got '$MEMO'";; esac
 NOSTATE="$(grep -c 'started: false, done: false' public/views/reader.js)"
 case "$NOSTATE" in 1) ;; *) fail "chapterQuizState must stay exactly { started, done } -- its deepStrictEqual pin is tests/reader-ui.test.js:189-201";; esac
-EXPECT=' M public/styles.css
- M public/views/reader.js
- M public/views/trophies.js
- M tests/reader-ui.test.js
- M tests/trophies-ui.test.js'
+# P1-AMENDMENT #1 applied to step 1.3 as well (orchestrator, 2026-08-01, pre-emptively -- the
+# worker hit the identical stale block in 1.2). Steps 1.1 and 1.2 are COMMITTED by the time 1.3
+# runs, so their files are clean. Step 1.3's own file list is exactly these two.
+EXPECT=' M public/views/reader.js
+ M tests/reader-ui.test.js'
 case "$PORC" in "$EXPECT") ;; *) fail "write set wrong. got:
 $PORC";; esac
 exit $RC

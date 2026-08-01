@@ -124,3 +124,50 @@ to its pin.
 
 ORCHESTRATOR AUDIT: write set exactly the two files; reader.js CRLF=767 preserved; ledger 349/354;
 contrast 58; quiz.js and quiz-core.js md5s frozen; manifest md5 back to its pin. ACCEPTED.
+
+STEP 1.3 T2: the chapter's own words first, and never the same four twice — WORKER
+reader.js CRLF 767 -> 845 (+81/-3, four inserts EXTRACTED from plan.md by script, three 1-for-1
+replacements, every anchor asserted unique before writing); tests/reader-ui.test.js LF 349 -> 492,
+append-only proven by byte-comparing the first 14351 bytes. Ledger 349 -> 353 flat / 358 reported.
+Contrast 58. quiz.js and quiz-core.js md5s frozen. pgate-1.3.sh exit 0.
+
+TWO BLOCKERS, BOTH ESCALATED CORRECTLY, BOTH RULED.
+P1-AMENDMENT #2 -- Insert B's own COMMENT spelled the identifier `celebrateFromServer`, taking the
+raw-substring count in tests/trophies-ui.test.js:659 from 3 to 4 and breaking a frozen QZ-adjacent
+pin. There was no way to apply Insert B as written without breaking it, and the file was not in the
+step's write set. RULED: reword the COMMENT ("the celebrate-from-server helper"), never the pin --
+weakening an exact-shape assertion to accommodate a comment is exactly backwards. Count back to 3
+at the three legitimate sites; test 296 green.
+P1-AMENDMENT #3 -- the DELS pin required 4 while measuring `git diff --numstat HEAD`, but step
+1.2's one deletion is inside HEAD, so the measurement can only ever see 3. IDENTICAL staleness
+class to P1-AMENDMENT #1, which I had fixed for EXPECT and failed to carry to its sibling. RULED:
+pin 3, HEAD-relative, with the reason on the line; the phase total of 5 is unchanged and still
+checked at the close. My omission, caught by the worker.
+
+*** THE FINDING OF THIS PHASE (M1.3d), and it is lesson 15 reproducing itself ***
+The mutation meant to prove the repeat-fix is WIRED deleted `askedThisSitting.add(q.lemma)` -- and
+NOTHING failed. All 358 tests green, and no needle in the gate either. Cause: the plan specifies
+test 4 to feed the asked-set "exactly as Insert D does", i.e. the test RE-IMPLEMENTS the wiring
+instead of executing it, because Insert D lives inside render() which needs a DOM. So the one line
+that fixes the child's actual complaint could be deleted at any future date with a fully green
+suite, and D2 would silently return. That is field-guide lesson 15(a) -- an assertion that names a
+property it does not observe -- occurring INSIDE a step whose own comments cite lesson 15. The
+worker reported it as an observed NON-failure and refused to invent a fix.
+RULED: add ONE assertion (not a new test, so the ledger is unmoved) inside the existing ordering
+test, pinning that the wiring line appears exactly once, labelled in-code as a GUARD not a gate.
+PROVEN: re-running M1.3d now fails with "the already-asked wiring must be present exactly once in
+render(), or the repeat bug returns silently  0 !== 1". A guard nobody has seen fail is not
+evidence; this one has been seen to fail.
+HONEST LIMIT, recorded by the worker: the guard is a source needle and fails OPEN against a
+rewrite. It catches deletion, not re-implementation. The only real proof that the wiring RUNS is
+step 1.4's sandbox pass -- two chapters finished in one sitting must ask different words.
+
+WORKER-VERIFIED, unasked: the no-questions path cannot break. quiz.js is byte-frozen so
+onDone({right:0,total:0}) and `return createQuizSession([])` are untouched; Insert D iterates an
+EMPTY array there and cannot throw; and chapterQuizLemmas never DROPS from the pool (already-asked
+move to the tail), so quizLemmasFor(chapter).length >= lemmas.length always -- the quiz can never
+be suppressed where it previously ran. A child cannot be left stuck on a dead quiz by this change.
+
+ORCHESTRATOR AUDIT: celebrateFromServer 3; wiring line present once and guarded once; quiz.js and
+quiz-core.js md5s frozen; reader.js CRLF=845 LF=0; tests LF=492; ledger 353/358; contrast 58.
+ACCEPTED.

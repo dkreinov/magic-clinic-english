@@ -347,3 +347,146 @@ test('the browser and the server read the SAME word list, and the button plays t
     assert.ok(!src.includes(forbidden), `the button must not be drawn from "${forbidden}"`);
   }
 });
+
+test('chapterQuizLemmas puts the chapter glossary first and drops what the server could not record', async () => {
+  const { chapterQuizLemmas } = await import('../public/views/reader.js');
+  const chapter = {
+    n: 1,
+    glossary: [
+      { word: 'shadow' },
+      { word: 'deep breath' },
+      { word: 'Moon' },
+      { word: 'nowhere' },
+      { word: 'shadow' },
+    ],
+  };
+  // 'deep breath' IS a key in words on purpose: the SPACE, not the profile, is
+  // what must drop it. 'nowhere' is the opposite control -- no space, dropped
+  // only because api/profile.js:130 would answer its quiz-answer with
+  // 400 'unknown word' and public/quiz.js:304 would swallow that in silence.
+  const words = { shadow: {}, moon: {}, 'deep breath': {}, zoo: {} };
+  const got = chapterQuizLemmas(chapter, words, ['zoo', 'dark'], new Set(), () => 0.999);
+  assert.deepStrictEqual(
+    got,
+    ['shadow', 'moon', 'zoo', 'dark'],
+    "the chapter's own recordable words come first, lower-cased and de-duplicated, then the pool"
+  );
+});
+
+test('chapterQuizLemmas varies the order of the chapter words but never loses one', async () => {
+  const { chapterQuizLemmas } = await import('../public/views/reader.js');
+  const chapter = { n: 2, glossary: [{ word: 'a' }, { word: 'b' }, { word: 'c' }] };
+  const words = { a: {}, b: {}, c: {} };
+
+  // Both derived by hand off the Fisher-Yates copied from quiz-core.js:26-29.
+  assert.deepStrictEqual(
+    chapterQuizLemmas(chapter, words, [], new Set(), () => 0),
+    ['b', 'c', 'a'],
+    'rand()=0 swaps the last element to the front, twice'
+  );
+  assert.deepStrictEqual(
+    chapterQuizLemmas(chapter, words, [], new Set(), () => 0.999),
+    ['a', 'b', 'c'],
+    'rand()=0.999 swaps every element with itself, so the order is untouched'
+  );
+
+  const orders = new Set();
+  for (let i = 0; i < 200; i++) {
+    const got = chapterQuizLemmas(chapter, words, [], new Set());
+    assert.deepStrictEqual(
+      [...got].sort(),
+      ['a', 'b', 'c'],
+      'a shuffle may reorder the chapter words but may never drop or duplicate one'
+    );
+    orders.add(got.join(','));
+  }
+  assert.ok(
+    orders.size > 1,
+    `re-opening a chapter must not always ask the same first four, saw ${orders.size} order(s)`
+  );
+
+  // GUARD, not a gate (field-guide lesson 15a): Insert D lives inside render(),
+  // which needs a DOM, so no node test can execute the wiring. This asserts the
+  // wiring LINE exists. It fails open against a rewrite, but it does catch the
+  // deletion -- which is the specific regression that would silently bring back
+  // the repeated-questions bug the learner reported.
+  const readerSrc = readFileSync(viewPath, 'utf8');
+  assert.strictEqual(
+    readerSrc.split('askedThisSitting.add(q.lemma)').length - 1,
+    1,
+    'the already-asked wiring must be present exactly once in render(), or the repeat bug returns silently'
+  );
+});
+
+test('a lemma already asked in this sitting goes to the tail, and the list still reaches four', async () => {
+  const { chapterQuizLemmas } = await import('../public/views/reader.js');
+  const got = chapterQuizLemmas(
+    { n: 3, glossary: [] },
+    {},
+    ['a', 'b', 'c', 'd', 'e', 'f'],
+    new Set(['a', 'b']),
+    () => 0.999
+  );
+  assert.deepStrictEqual(
+    got,
+    ['c', 'd', 'e', 'f', 'a', 'b'],
+    'an already-asked lemma moves to the TAIL; nothing is ever dropped'
+  );
+  assert.ok(got.length >= 4, 'a sitting must always still be able to fill four questions');
+});
+
+test('a second chapter in the same sitting is not asked the same four words', async () => {
+  const { chapterQuizLemmas } = await import('../public/views/reader.js');
+  const { startQuiz } = await import('../public/quiz.js');
+
+  const withItem = new Set(['w1', 'w2', 'w3', 'w4', 'w5', 'w6', 'w7', 'w8']);
+  const pool = ['w1', 'x1', 'w2', 'w3', 'w4', 'x2', 'w5', 'w6', 'w7', 'w8'];
+  const load = async (lemma) =>
+    withItem.has(lemma)
+      ? {
+          sense: 'a sense',
+          sentence: 'the ___ is here',
+          answer: lemma,
+          distractors: ['d1', 'd2', 'd3', 'd4', 'd5'],
+        }
+      : null;
+  const opts = (lemmas) => ({
+    lemmas,
+    knownSet: new Set(),
+    count: 4,
+    load,
+    post: async () => ({ words: {} }),
+    rand: () => 0,
+  });
+  const container = () => ({ innerHTML: '', querySelector: () => null, querySelectorAll: () => [] });
+  const listFor = (n, asked) => chapterQuizLemmas({ n, glossary: [] }, {}, pool, asked, () => 0);
+
+  // quiz.js, not reader.js, decides which of the list actually loaded, so the
+  // asked set is fed from session.questions exactly as Insert D does: at start,
+  // not in onDone.
+  const asked = new Set();
+  const s1 = await startQuiz(container(), opts(listFor(1, asked)));
+  for (const q of s1.questions) asked.add(q.lemma);
+  const s2 = await startQuiz(container(), opts(listFor(2, asked)));
+  const first = s1.questions.map((q) => q.lemma);
+  const second = s2.questions.map((q) => q.lemma);
+  assert.strictEqual(first.length, 4, 'chapter 1 must still be asked four questions');
+  assert.strictEqual(second.length, 4, 'chapter 2 must still be asked four questions');
+  assert.deepStrictEqual(
+    second.filter((l) => first.includes(l)),
+    [],
+    'the second chapter of one sitting must not re-ask a word from the first'
+  );
+
+  // The negative control: nothing remembers what was asked. That is the app as
+  // it shipped, and it is defect D2. Without this a green test cannot tell
+  // 'fixed' from 'never broken'.
+  const never = new Set();
+  const c1 = await startQuiz(container(), opts(listFor(1, never)));
+  const c2 = await startQuiz(container(), opts(listFor(2, never)));
+  assert.deepStrictEqual(
+    c2.questions.map((q) => q.lemma),
+    c1.questions.map((q) => q.lemma),
+    'with nothing recorded the identical four come back -- the defect this step fixes'
+  );
+});
