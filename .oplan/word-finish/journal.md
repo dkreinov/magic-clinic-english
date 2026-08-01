@@ -31,3 +31,40 @@ E her real vocabulary sitting in the dev sandbox (found today).
 - **B's real risk, measured:** isUsableItem validates SHAPE only. It cannot tell that a distractor
   is also a correct answer. A shape check is not a correctness check; the correctness pass is part
   of the work.
+
+## 2026-08-01 — R4 discovery: she is right, and C and R4 are ONE defect
+
+DISCOVERY AGENT (opus, read-only) verdict: PARTLY TRUE, and the true part is a real defect.
+Report: C:/Users/dkreinov/trophies-art/DISCOVERY-R4.md
+
+- Her answers ARE persisted. reader.js:715 -> api/profile.js:104 -> lib/profile.js:422 writes
+  story.checkLog durably on every FIRST answer. Generation plays no part in the save.
+- NOTHING EVER READS IT BACK. reader.js:546 `const checkState = {};` is declared inside render()
+  and seeded from hardcoded literals at :549-555. docs/growth.md:87-88 already documented this:
+  "Nothing in the codebase still reads story.checkLog back out." boot() (:397) fetches the whole
+  profile and ignores the field.
+- app.js:40 `app.innerHTML = ""` + re-render on every hashchange, with a permanent 4-tab nav
+  (index.html:25-90). One tab tap = new empty checkState. allQuestionsCorrect (:557) is derived
+  purely from it, so doneAll goes false and the chapter looks untouched. quizState (:547) resets too.
+- There is NO submit/finish control. The only end-of-chapter button is reader.js:623
+  `המשך הסיפור`, wired to runGenerate() (:690-695). renderGenerating() (:523-533) replaces the
+  whole view with a spinner, so her work vanishes from screen during generation.
+
+**ORCHESTRATOR CORRECTION, logged because I told the owner the opposite.** I assessed R4 as NOT
+mergeable with phase 1's item C. That was wrong. C (the story reloads) and R4 (the answers come
+back blank) are TWO SYMPTOMS OF ONE MISSING MECHANISM: leaving the view destroys all state and
+nothing restores it. Phase 1's planner is designing that restore right now, so R4 belongs in
+phase 1, not in a phase of its own. Decision deferred until the planner's draft lands: either
+amend phase 1 or add 1b, whichever its mechanism actually accommodates.
+
+TWO TRAPS ANY FIX MUST HANDLE (from the discovery, not invented):
+- checkLog records only her FIRST attempt (reader.js:712). A naive restore strands a
+  wrong-then-right question as permanently incomplete AND unreachable.
+- checkLog can already contain duplicates from prior re-entries.
+
+SECOND LATENT DEFECT FOUND, not part of R4: the log POST swallows all failures silently
+(reader.js:722-724) and sets st.logged = true BEFORE the await -- so a failed save is never
+retried and never surfaced. Recorded; not scheduled.
+
+NEEDS A REAL SESSION, could not be verified statically: generation wall-clock (no maxDuration in
+vercel.json), and whether her live checkLog holds duplicates.
