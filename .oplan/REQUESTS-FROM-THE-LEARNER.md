@@ -108,3 +108,68 @@ as fast as she finishes quizzes.** To a child that is "the same exact questions"
 
 **Not a regression from the trophies run** — this behaviour predates it entirely; nothing in
 phases 1-4 touched quiz selection. Recorded here rather than hot-fixed.
+
+---
+
+## R4 — let her SUBMIT her answers without generating a new story — LIKELY DEFECT (data loss)
+**Raised:** 2026-08-01, via the owner. **Status:** recorded, NOT yet verified in code.
+
+**Her words, relayed:** at the end of a story she answers the questions, but if she does not
+generate a new story the answers are not saved — and she is asked the same questions again.
+Generating a new story takes time, so she often does not want to do it.
+
+**Two separate things, and they must not be confused:**
+- **(a) the save.** If answering and leaving really loses her answers, that is a DEFECT, not a
+  feature request — she did work and the app threw it away. **Must be verified against the code
+  before it is designed**; `reader.js` already posts `action: "log-check"` on a first answer, so
+  either the claim is about something else (the *done* state? the celebration? the trophy count?)
+  or there is a path where the post does not happen. Find out which before promising anything.
+- **(b) the coupling.** "Submit my answers" and "make me a new story" are currently the same
+  button. They should be two things. She should be able to finish, submit, and stop.
+
+**Her own design idea, which is a good one:** if she has submitted, generate the next story **in
+the background** — while the app is closed or she is in another window — so she never waits for it.
+
+**Open questions:** what does she see when the background generation has not finished yet? What if
+it fails? Does a background job survive the app being closed on a phone (a service worker can, a
+page cannot — this is the hard part and it must not be hand-waved)?
+
+---
+
+## R5 — quizzes where she WRITES the word, not only recognises it
+**Raised:** 2026-08-01, via the owner. **Status:** recorded, needs design.
+
+**What she asked for, concretely:**
+1. **Typing questions.** She wants to have to write the word, not only pick it.
+2. **Turn off the keyboard's autocomplete/autocorrect** for those fields — "like a password" — or
+   the phone writes the answer for her and she learns nothing. (This is `autocomplete`,
+   `autocorrect`, `autocapitalize`, `spellcheck` on the input.)
+3. **Hebrew → English direction.** Show the Hebrew, she picks the English one **or hears it**, and
+   then she has to write it. Her stated reason: this teaches the word AND reading comprehension.
+4. **Listening to words all the time gets annoying** — so audio should be one option among
+   several, not the only way a question is asked.
+5. **Later: writing sentences.** Recorded, not scheduled.
+
+---
+
+## R6 — take the best ideas from Duolingo and similar apps, cheapest first
+**Raised:** 2026-08-01, by the owner. **Status:** recorded; a discovery pass is the right first step.
+
+Explicitly: **start from the lowest-hanging fruit.** Do not rebuild Duolingo. Find the small number
+of mechanics that carry most of the teaching value and fit what this app already has.
+
+---
+
+## R7 — do NOT try to cover every word; degrade honestly and fill in later
+**Raised:** 2026-08-01, by the owner. **Status:** recorded — **this AMENDS the word-finish design.**
+
+The rule he wants:
+- **Translation:** if she adds a word we do not have, translate it **in real time**. He is right
+  that this is the easy case — `/api/translate` already exists and the reader already calls it.
+- **Audio:** do not silently hide it. Show a short honest line — *"coming soon"* / *"not yet
+  available"* — so she knows the word exists and the sound does not, yet.
+- **Then fill it in asynchronously**, out of her way.
+
+**This changes what word-finish just shipped.** `canSay` currently makes the speaker button
+**absent** when there is no clip. He is asking for **visible but honest** instead of invisible.
+That is a better answer than either the dead button or the missing one, and it is a small change.
