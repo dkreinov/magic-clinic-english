@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "shadow",
+    "sense": "the dark shape made when something stops the light",
+    "sentence": "My ___ was gone because the sun went behind a cloud.",
+    "answer": "shadow",
+    "distractors": ["hat", "coat", "ball", "book", "hand", "face", "foot", "dog"]
+  }
+]

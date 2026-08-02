@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "afraid",
+    "sense": "feeling that something bad may happen to you",
+    "sentence": "My brother is ___ of the dark, so he sleeps with a light on.",
+    "answer": "afraid",
+    "distractors": ["angry", "happy", "sad", "hungry", "thirsty", "sorry", "proud", "glad"]
+  }
+]

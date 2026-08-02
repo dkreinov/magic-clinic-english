@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "bright",
+    "sense": "giving out a lot of strong light",
+    "sentence": "The sun was so ___ that I had to close my eyes.",
+    "answer": "bright",
+    "distractors": ["dark", "cold", "heavy", "round", "wide", "far", "yellow", "red"]
+  },
+  {
+    "lemma": "bright",
+    "sense": "clever and quick at learning new things",
+    "sentence": "She is so ___ that she finished the hard test first.",
+    "answer": "bright",
+    "distractors": ["kind", "funny", "quiet", "shy", "polite", "careful", "lazy", "brave"]
+  }
+]

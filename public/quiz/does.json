@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "does",
+    "sense": "the word we use with he, she or it in the present",
+    "sentence": "My sister ___ her homework every evening before dinner.",
+    "answer": "does",
+    "distractors": ["do", "was", "were", "have", "went", "gone", "ate", "thought"]
+  }
+]

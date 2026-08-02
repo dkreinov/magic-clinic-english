@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "forest",
+    "sense": "a big place where many trees grow close together",
+    "sentence": "So many tall trees grow in that ___ that no sun gets in.",
+    "answer": "forest",
+    "distractors": ["field", "beach", "desert", "lake", "river", "sea", "cave", "road"]
+  }
+]

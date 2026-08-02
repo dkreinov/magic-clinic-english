@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "creature",
+    "sense": "any animal or living thing, big or small",
+    "sentence": "A fish is a ___ that lives under the water.",
+    "answer": "creature",
+    "distractors": ["plant", "stone", "flower", "machine", "toy", "cloud", "tree", "rock"]
+  }
+]

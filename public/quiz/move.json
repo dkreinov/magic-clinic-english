@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "move",
+    "sense": "to change the place where you are",
+    "sentence": "The cat was so still that it did not ___ at all.",
+    "answer": "move",
+    "distractors": ["sleep", "read", "count", "cook", "draw", "write", "fly", "paint"]
+  }
+]

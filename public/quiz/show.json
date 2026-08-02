@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "show",
+    "sense": "to let someone see something",
+    "sentence": "Open your mouth and ___ me where it hurts.",
+    "answer": "show",
+    "distractors": ["give", "send", "sell", "throw", "buy", "wash", "read", "count"]
+  },
+  {
+    "lemma": "show",
+    "sense": "something funny or nice that you watch on television",
+    "sentence": "We watched a funny ___ on television after dinner last night.",
+    "answer": "show",
+    "distractors": ["book", "letter", "page", "word", "map", "sign", "note", "poem"]
+  }
+]

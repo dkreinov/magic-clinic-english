@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "noise",
+    "sense": "a loud sound that is not nice to hear",
+    "sentence": "The ___ from the street was so loud that I shut the window.",
+    "answer": "noise",
+    "distractors": ["smell", "light", "heat", "cold", "dust", "fog", "dirt", "snow"]
+  }
+]

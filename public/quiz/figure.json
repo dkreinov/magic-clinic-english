@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "figure",
+    "sense": "a number that shows how much something costs",
+    "sentence": "The ___ on the price tag was so big that we walked away.",
+    "answer": "figure",
+    "distractors": ["word", "letter", "name", "picture", "color", "line", "sign", "note"]
+  }
+]

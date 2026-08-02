@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "voice",
+    "sense": "the sound you make when you speak or sing",
+    "sentence": "I could not see her, but her ___ made me think she was sad.",
+    "answer": "voice",
+    "distractors": ["face", "eye", "smile", "hand", "hair", "dress", "tear", "head"]
+  }
+]

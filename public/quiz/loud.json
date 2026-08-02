@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "loud",
+    "sense": "making a big sound that is easy to hear",
+    "sentence": "The music was so ___ that we could not hear the phone.",
+    "answer": "loud",
+    "distractors": ["quiet", "soft", "slow", "fast", "sweet", "sad", "new", "old"]
+  }
+]

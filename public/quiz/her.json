@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "her",
+    "sense": "belonging to a girl or a woman",
+    "sentence": "The little girl looked at ___ own face in the mirror.",
+    "answer": "her",
+    "distractors": ["his", "its", "him", "he", "she", "hers", "mine", "theirs"]
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "lemma": "feel",
+    "sense": "to touch something and know how it is",
+    "sentence": "Put your hand in the water to ___ how warm it is.",
+    "answer": "feel",
+    "distractors": ["hear", "smell", "taste", "listen", "watch", "count", "hold", "carry"]
+  },
+  {
+    "lemma": "feel",
+    "sense": "to be well or ill in your body",
+    "sentence": "I do not ___ well today, so I will stay in bed.",
+    "answer": "feel",
+    "distractors": ["swim", "run", "dance", "sing", "draw", "write", "cook", "count"]
+  }
+]

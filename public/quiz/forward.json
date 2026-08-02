@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "forward",
+    "sense": "toward the front, in the way you are looking",
+    "sentence": "She was far from the board, so she moved ___ to see it.",
+    "answer": "forward",
+    "distractors": ["back", "down", "away", "out", "outside", "inside", "upstairs", "downstairs"]
+  }
+]

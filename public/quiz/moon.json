@@ -1,0 +1,9 @@
+[
+  {
+    "lemma": "moon",
+    "sense": "the big round light we see in the sky at night",
+    "sentence": "Only the ___ gave us light after the sun went down.",
+    "answer": "moon",
+    "distractors": ["cloud", "rain", "wind", "sea", "hill", "road", "grass", "tree"]
+  }
+]
