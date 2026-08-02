@@ -144,6 +144,48 @@ export function nextThreshold(trophy, tier) {
   return trophy.bronze;
 }
 
+// D (word-finish). THE ONE TIER A CARD IS DRAWN FROM.
+//
+// Until this function existed, cardHtml read the ring from STORED profile.trophies
+// and the number from the LIVE metric, so the two could disagree -- and did.
+// Measured on the shipped module before the fix: a profile with twelve known words
+// and an empty trophies map rendered the 'known' card with trophy-card--locked
+// while its progress line read "12 <the progress word> 5". That is the seam
+// between two correct parts (field guide 15b), and it is the defect the owner
+// reported.
+//
+// The fix is NOT to clamp the number. It is to give the card ONE tier and derive
+// both the ring and the line from it, so the contradiction is not representable.
+//
+// displayTier is the HIGHER of:
+//   * the tier the server has already stamped -- never-regress, because a stored
+//     tier is never lowered even when the metric falls (days and streak are not
+//     monotonic), and
+//   * the tier the live metric currently justifies.
+//
+// Because it absorbs every threshold the metric has passed, the invariant
+//     metric < nextThreshold(trophy, displayTier(trophy, profile, entry))
+// holds for every trophy, every metric and every stored shape, so a card can
+// never show a target it has already reached. That is asserted by sweep, not by
+// argument: tests/trophies-ui.test.js drives all eight trophies over every metric
+// from 0 to gold+3 against eleven stored shapes.
+//
+// AWARDING IS NOT TOUCHED. This is a display decision only; lib/profile.js
+// the awarding pass in it remains the only thing that ever writes a tier, and the
+// celebration still reads STORED trophies alone, so nothing is ever celebrated
+// that the server has not stamped.
+export function displayTier(trophy, profile, entry) {
+  const stored = tierOf(entry);
+  const metric = trophy.metric(profile);
+  let live = null;
+  for (const tier of TROPHY_TIERS_VIEW) {
+    if (metric >= trophy[tier]) live = tier;
+  }
+  if (stored === null) return live;
+  if (live === null) return stored;
+  return TROPHY_TIERS_VIEW.indexOf(live) > TROPHY_TIERS_VIEW.indexOf(stored) ? live : stored;
+}
+
 // SK3-4, frozen. Locked: metric against the bronze threshold. Bronze/silver:
 // metric against the next threshold. Gold: nothing at all -- there is no next
 // tier, and the gold ring is what says "finished".
@@ -162,7 +204,7 @@ export function progressLine(trophy, profile, tier) {
 // The artwork src is the SAME for every state (T4: no separate locked asset).
 export function cardHtml(trophy, profile, trophies) {
   const earned = isPlainObject(trophies) ? trophies[trophy.id] : undefined;
-  const tier = tierOf(earned);
+  const tier = displayTier(trophy, profile, earned);
   const layer = tier === null ? "trophy-card--locked" : `trophy-card--${tier}`;
   const line = progressLine(trophy, profile, tier);
   const progress = line === "" ? "" : `

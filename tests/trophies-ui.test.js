@@ -1065,3 +1065,183 @@ test('the trophies screen uses .shelf-banner, emits no style tag of its own, and
     'field guide 14: this view may emit no style tag -- its CSS must stay in the globally-linked sheet, the only place it can reach an element written into container.innerHTML',
   );
 });
+
+// ===== step 1.2 (word-polish) D: one tier per card, so "greyed" and "target
+// reached" cannot both be true. Until displayTier existed, cardHtml read the
+// ring from STORED profile.trophies and the number from the LIVE metric, so
+// the two could disagree -- a profile with twelve known words and an empty
+// trophies map rendered the 'known' card locked while its line read "12 out
+// of 5". The fix gives the card ONE tier and derives both the ring and the
+// line from it, so the contradiction is not representable (field guide 15b).
+
+const D_STORED_SHAPES = [
+  undefined,
+  null,
+  {},
+  { bronze: T32_ISO },
+  { bronze: T32_ISO, silver: T32_ISO },
+  { bronze: T32_ISO, silver: T32_ISO, gold: T32_ISO },
+  { gold: T32_ISO },
+  { silver: T32_ISO },
+  { silver: T32_ISO, gold: T32_ISO },
+  'notanobject',
+  42,
+];
+
+// One synthesiser per trophy id, each producing a profile whose OWN metric is
+// exactly m -- independent of the production metric functions, which is what
+// lets this sweep catch a metric bug too, not just a displayTier bug.
+function dSynthesizeProfile(id, m) {
+  switch (id) {
+    case 'chapters':
+      return t32Profile({}, new Array(m).fill({}));
+    case 'days': {
+      const chapters = [];
+      for (let i = 0; i < m; i += 1) {
+        const at = Date.parse('2026-01-01T00:00:00.000Z') + i * 2 * 86400000;
+        chapters.push({ generatedAt: new Date(at).toISOString() });
+      }
+      return t32Profile({}, chapters);
+    }
+    case 'streak': {
+      const chapters = [];
+      for (let i = 0; i < m; i += 1) {
+        const at = Date.parse('2026-01-01T00:00:00.000Z') + i * 86400000;
+        chapters.push({ generatedAt: new Date(at).toISOString() });
+      }
+      return t32Profile({}, chapters);
+    }
+    case 'known':
+      return t32Profile(t32KnownWords(m), []);
+    case 'quizRight':
+      return t32Profile({ w0: { quizRight: m } }, []);
+    case 'quizzer':
+      return t32Profile({ w0: { quizRight: m, quizWrong: 0 } }, []);
+    case 'curious':
+      return t32Profile({ w0: { taps: m } }, []);
+    case 'proven': {
+      const words = {};
+      for (let i = 0; i < m; i += 1) words['p' + i] = { status: 'known', nominations: 1 };
+      return t32Profile(words, []);
+    }
+    default:
+      throw new Error('no D synthesiser for trophy id ' + id);
+  }
+}
+
+// The tier a metric justifies, computed independently of displayTier's own
+// loop -- so a broken displayTier cannot pass by agreeing with itself.
+function dLiveTier(trophy, metric) {
+  let live = null;
+  for (const tier of ['bronze', 'silver', 'gold']) {
+    if (metric >= trophy[tier]) live = tier;
+  }
+  return live;
+}
+
+function dTierRank(tier) {
+  return tier === null ? -1 : ['bronze', 'silver', 'gold'].indexOf(tier);
+}
+
+test('no trophy card can ever show a metric that has reached its displayed target', async () => {
+  const { TROPHY_VIEW, displayTier, nextThreshold, tierOf } = await import('../public/views/trophies.js');
+
+  let checked = 0;
+  for (const trophy of TROPHY_VIEW) {
+    for (let m = 0; m <= trophy.gold + 3; m += 1) {
+      const profile = dSynthesizeProfile(trophy.id, m);
+      const metric = trophy.metric(profile);
+      const live = dLiveTier(trophy, metric);
+
+      for (const entry of D_STORED_SHAPES) {
+        checked += 1;
+        const stored = tierOf(entry);
+        const tier = displayTier(trophy, profile, entry);
+        const next = nextThreshold(trophy, tier);
+
+        // (a) the D invariant: a card can never show a target already reached.
+        assert.ok(
+          next === null || metric < next,
+          `${trophy.id} metric=${metric} entry=${JSON.stringify(entry)}: displayTier=${tier}, next=${next}`,
+        );
+
+        // (b) never-regress: never below the stored tier.
+        assert.ok(
+          dTierRank(tier) >= dTierRank(stored),
+          `${trophy.id} metric=${metric} entry=${JSON.stringify(entry)}: displayTier=${tier} is below stored=${stored}`,
+        );
+
+        // (c) the defect itself: never below what the live metric justifies.
+        assert.ok(
+          dTierRank(tier) >= dTierRank(live),
+          `${trophy.id} metric=${metric} entry=${JSON.stringify(entry)}: displayTier=${tier} is below live=${live}`,
+        );
+      }
+    }
+  }
+
+  // a synthesiser that silently stops producing cases cannot make this test vacuous.
+  assert.strictEqual(checked, 6644, `expected exactly 6644 combinations, got ${checked}`);
+});
+
+test('cardHtml draws the ring and the progress line from the same single tier', async () => {
+  const { TROPHY_VIEW, cardHtml } = await import('../public/views/trophies.js');
+  const MITOCH = '\u05de\u05ea\u05d5\u05da';
+
+  // the profile that reproduces the defect: five known words, trophies: {}.
+  const profile = t32Profile(t32KnownWords(5), []);
+
+  const progressOf = (card) => {
+    const m = card.match(new RegExp('<p class="trophy-progress">(\\d+) ' + MITOCH + ' (\\d+)</p>'));
+    return m ? { metric: Number(m[1]), target: Number(m[2]) } : null;
+  };
+
+  let sawBroken = false;
+  let brokenId = null;
+  for (const trophy of TROPHY_VIEW) {
+    const card = cardHtml(trophy, profile, profile.trophies);
+    const locked = card.includes('trophy-card--locked');
+    const tiered = /trophy-card--(bronze|silver|gold)/.test(card);
+    const progress = progressOf(card);
+
+    if (locked) {
+      assert.ok(progress, `${trophy.id}: a locked card must carry a progress line`);
+      assert.ok(progress.metric < progress.target,
+        `${trophy.id}: locked but metric ${progress.metric} has reached target ${progress.target}`);
+    }
+    if (tiered) {
+      assert.ok(progress === null || progress.metric < progress.target,
+        `${trophy.id}: ringed but metric ${progress && progress.metric} has reached target ${progress && progress.target}`);
+    }
+
+    if (locked && progress && progress.metric >= progress.target) {
+      sawBroken = true;
+      brokenId = trophy.id;
+    }
+  }
+
+  // the one-line form of the whole defect: no card is both locked and at/past its target.
+  assert.ok(!sawBroken, `card '${brokenId}' is both locked and at or past its target`);
+});
+
+test('the fix is display-only: awarding, the celebration and the catalogue are untouched', async () => {
+  const src = readFileSync(trophiesViewPath, 'utf8');
+
+  assert.ok(src.includes('export function tierOf(entry) {'), 'tierOf must survive byte-unchanged');
+  assert.ok(src.includes('export function nextThreshold(trophy, tier) {'), 'nextThreshold must survive byte-unchanged');
+  assert.ok(src.includes('export function progressLine(trophy, profile, tier) {'), 'progressLine must survive byte-unchanged');
+
+  const collectAt = src.indexOf('function collectUncelebrated(profile, read) {');
+  assert.ok(collectAt >= 0, 'collectUncelebrated must still exist');
+  const collectBody = src.slice(collectAt, src.indexOf('\n}', collectAt));
+  assert.ok(collectBody.includes('profile.trophies'), 'collectUncelebrated must still read profile.trophies');
+  assert.ok(!collectBody.includes('displayTier'), 'collectUncelebrated must not learn about displayTier');
+
+  assert.ok(!src.includes('awardTrophies'), 'the view must contain no awardTrophies -- awarding stays server-side only');
+
+  const { uncelebrated } = await import('../public/views/trophies.js');
+  // metric past the bronze threshold (ten known words, bronze is five), but no
+  // stored tier at all -- passing a threshold must not, by itself, celebrate anything.
+  const profileWithMetricPastBronzeButNoStoredTier = t32Profile(t32KnownWords(10), []);
+  assert.deepStrictEqual(uncelebrated(profileWithMetricPastBronzeButNoStoredTier), []);
+});

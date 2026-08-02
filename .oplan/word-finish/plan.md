@@ -2196,3 +2196,46 @@ a cheap action removes an ambiguity entirely, take it instead of measuring the a
   legitimate survivors.
 - That sweep is the real gate: it is the only check that would have caught the five copies the first
   deletion missed, and it is now written down so it cannot be forgotten again.
+
+---
+
+# P1-AMENDMENT #2 (orchestrator, 2026-08-02) — step 1.2's comment vs its own CLIENTAWARD pin
+
+**The executor STOPPED with a question rather than guessing. That was correct, and the escalation
+rule is what produced it.** The contradiction was real and was inside the spec:
+
+- EDIT 1's comment is mandated **verbatim** (`plan.md:1341-1344`) and contains the literal token
+  `awardTrophies`.
+- §VAL-F1's **CLIENTAWARD** gate (`plan.md:898-899`) requires `grep -rl 'awardTrophies' public/`
+  to return **0**.
+- Step 1.2's own **test 3** is specified verbatim as "the file contains no `awardTrophies`".
+
+No file could satisfy all three. The executor transcribed both sides exactly and stopped.
+
+**RULING: reword the comment. Do NOT relax the pin.** This project has already met this exact shape
+— `word-polish` P1-AMENDMENT #2, where a comment spelling `celebrateFromServer` pushed a raw
+substring pin from 3 to 4 — and ruled the same way then. The reasoning is unchanged and is the
+easy-and-robust one: the pin is a dumb, cheap guard against the real danger (awarding logic reaching
+the client). Redefining it to mean "a call site rather than the bare word" would make it clever,
+parser-shaped, and defeatable — for the sake of one sentence of prose. Prose is free to move; a
+guard that has to reason about syntax is not.
+
+**The reworded line, frozen:**
+```
+// the awarding pass in it remains the only thing that ever writes a tier, and the
+```
+replacing
+```
+// awardTrophies remains the only thing that ever writes a tier, and the
+```
+The sentence still reads as one clause with `lib/profile.js` on the line above, and the meaning is
+identical: the server is the only writer of a tier.
+
+**Pins moved by this amendment** (the planner's precomputed values assumed the original wording):
+`public/views/trophies.js` is now **CR=0, LF=410, 18479 bytes** (was 18469),
+md5 `715fd1b6123b379880360429bb0ce3e1`. Line count is UNCHANGED at 410, so every line-number anchor
+in step 1.2 and in later steps still holds.
+
+**Generalised, because this is now twice:** a mandated verbatim comment must never contain an
+identifier that any raw-substring gate forbids. When writing a step that quotes prose, grep the
+prose against every substring pin in force before freezing it.
