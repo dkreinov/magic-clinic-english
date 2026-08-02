@@ -35,7 +35,7 @@ BASE (phase 1): e44cffa · BASE (phase 2): 81fb743 · BASE (phase 3): <the 2.7 c
 ACCEPTED (phase 2): 2.1 3a2b2b3 · 2.2 f6eb81b · 2.3 a6fbd61 · 2.4 e352cfb ·
   2.5 visual gate self-served, PASSED (no repo bytes) · 2.6 45ac2de · 2.7 this commit
 
-STATE OF THE TREE: 399 reported / 394 flat / 0 fail · contrast 58 PASS · quiz bank 78 files/103 items
+STATE OF THE TREE: 405 reported / 400 flat / 0 fail · contrast 58 PASS · quiz bank 78 files/103 items
   · manifest 2266 == clips on disk 2266 (0 dead entries, 0 orphans)  [F2-1 added ellie+sparkle]
   · public/audio/words/index.json md5 8b211ed1524bb272f2474692fba0b7f0, 20037 bytes, LF
   · public/sw.js CACHE magic-vet-v22 (F1-1 spent at v21; v22 is the follow-on's own bump,
@@ -162,10 +162,36 @@ CARRIED OBLIGATIONS:
         and unbumped; phase 2 adds public/styles.css, public/views/reader.js and
         public/views/words.js. FOUR distinct precached files are now changed and unbumped.
         See F2-3: this is no longer theoretical.
-  F1-2  R4(ii) NOT DONE — nothing reads story.checkLog back, so her answers still do not survive a
-        page reload. OWNER HAS RULED (design §10): wrong-then-right counts as FINISHED; a question
-        is done if ANY logged attempt is correct; de-dup by questionId. Still needs a step.
-  F1-3  latent: the log-check POST swallows failures and sets st.logged=true BEFORE the await.
+  F1-2  *** CLOSED 2026-08-02 evening, commit a2bcf09, LIVE at dpl_59SVYjFaALJsAgM3VcLMbBCY9y77. ***
+        Her answers now survive a full page RELOAD. reader.js gained restoredCheckState() and
+        mergeRestoredChecks(); the read-back runs in boot() after the fresh profile lands and
+        before decideStage(), so the FIRST paint already shows what she finished.
+        THREE LOAD-BEARING DECISIONS, each measured before it was written:
+        (1) correctness is RECOMPUTED against the question on screen, never read from the log
+            entry's own `correct` flag -- that flag comes from a correctIndex the BROWSER supplied
+            and is never re-checked, so trusting it is the "two sources for one card" seam again;
+        (2) the option at correctIndex can NEVER be restored as tried-wrong -- swept over all 128
+            combinations, 0 violations -- so she can never be stranded on a question;
+        (3) `logged` is FALSE unless already correct. checkLog holds only her FIRST attempt, so a
+            wrong-then-right question leaves only the WRONG entry. Marking it logged would stop
+            her retry ever being posted and the question would come back unfinished after EVERY
+            reload, forever -- the fix re-creating the defect. False makes the log self-healing.
+        5 new flat tests, and TWO MUTATIONS PROVED THEY FIRE: forcing logged=true broke the
+        wrong-then-right test; trusting entry.correct broke the 128-combination seam sweep.
+        The frozen pin "reader.js must not mention checkLog -- R4(ii) is a later obligation" named
+        a SCHEDULE, not a property. RE-EXPRESSED (field guide 22), after being seen to fail, into
+        the real invariant: reader.js may READ the durable log and POST to it, but must NEVER
+        mutate it in place.
+  F1-3  *** CLOSED 2026-08-02 evening, same commit, under ruling R-F6-3. ***
+        `st.logged = true` moved to AFTER the await resolves. A failed save now leaves the
+        question unlogged so her next answer retries it, and the owner's de-duplication ruling
+        makes the second entry harmless. NOTHING is shown to her: she is eleven, an error about a
+        network write is noise she cannot act on, and D14 says the correction loop must never wait
+        on a human. A console warning is the whole of the surfacing.
+        *** ITS CHECK IS A GUARD, NOT A GATE, AND IS LABELLED SO IN THE TEST. *** The defect is an
+        ORDERING inside an async click handler; the check reads the ORDER IN THE SOURCE and
+        therefore fails OPEN. No harness here can stub the imported postJson inside that handler.
+        The mutation control was still run: restoring the old ordering fires it.
   F1-4  *** DISCHARGED 2026-08-02. *** The machine-wide sweep ran at the close: OBSERVED 301233
         files, 21 profile-shaped, NONE hers. The tool is now IN THE REPO at
         .oplan/word-finish/identity-sweep.mjs (it prints paths and counts, never a word), with
