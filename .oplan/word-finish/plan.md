@@ -2276,3 +2276,49 @@ pins raised by exactly 1 before it is run. Nothing else in those steps changes.
 amendment. Re-running it now fails on the ledger pins (363/358), on the deletion budget and on the
 write set — all three because the step is COMMITTED and the ledger deliberately moved afterwards.
 That is expected and is not a regression.
+
+## P1-AMENDMENT #4 — step 1.3's two frozen-packet errors
+
+**The executor STOPPED with a question rather than resolving either. Correct, and the second time
+this run that the escalation rule has paid for itself.** Both findings were real; neither was
+fixable inside the write set.
+
+### (a) The deletion budget was wrong for the plan's OWN quoted code
+The tail pinned `DELS=29`. The measured value is **15**, and the executor confirmed it is identical
+under all four diff algorithms (myers, minimal, patience, histogram). The file's final content
+matches the plan's simulation **byte-for-byte** — 910 lines, 30573 bytes, CRLF-only — so the CONTENT
+is right and the derived number was wrong: git counts textually identical replaced lines (`draw();`,
+`decideStage();`, a closing brace) as unchanged context.
+
+**RULING: the byte/line/md5 pins are authoritative; the deletion count is a derived heuristic and it
+was mis-derived. Budget corrected to 15.** A deletion count is only ever a cheap proxy for "did the
+executor delete more than it should"; when it disagrees with an exact content pin, the content pin
+wins. Where the two can disagree, prefer the pin that names the artifact, not the pin that names the
+diff.
+
+### (b) A frozen out-of-scope test pinned a SPELLING, not the invariant it named
+`tests/trophies-ui.test.js` (SK3-2) asserted the literal `profile = await getJson("/api/profile")`
+appears exactly once. EDIT 3 necessarily splits that line — the new boot() must compare the profile
+signature BEFORE adopting the answer — so the substring count went to 0 and a frozen test failed on
+a change that **strengthened** the very invariant it exists to protect.
+
+Measured after EDIT 3: the only GET-derived adoption is `profile = fresh;` at `reader.js:447`,
+**inside boot()**; `celebrateFromServer` still reads into a local; the other `profile =` is the
+pre-existing POST save path at `:722`. The invariant holds.
+
+**RULING: re-express the pin to assert the INVARIANT, not the spelling. Do not delete it, do not
+weaken it.** This is the opposite call from P1-AMENDMENT #2 and the difference is the point: there,
+a comment could move and the guard was correct, so the prose moved. Here the CODE had to change and
+the guard was pinning an implementation detail, so the guard moved. **The test that decides which
+way: does the pin still describe a property we care about, or only a way of writing it?**
+
+The re-expressed pin asserts: exactly two server reads; exactly one `profile = fresh;`; and that the
+adoption sits inside `boot()` and before `celebrateFromServer`.
+
+**SEEN TO FAIL, twice:**
+- adopting the profile a second time inside `celebrateFromServer` -> `not ok 301`
+- moving the adoption out of `boot()` -> `not ok 301` **plus** the two new behavioural tests
+  (`not ok 253`, `not ok 254`), so the invariant is now guarded more thoroughly than before.
+
+**Write set for 1.3 therefore grows by one file**, `tests/trophies-ui.test.js`, for this pin only.
+The tail's `EXPECT` is corrected to match. Ledger: **367 reported / 362 flat / 0 fail**, gate exit 0.

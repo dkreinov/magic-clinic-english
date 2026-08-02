@@ -7,6 +7,46 @@ import { maybeCelebrateTrophy } from "./trophies.js";
 
 const CHAPTER_BANNERS = { 0: "chapter-night", 1: "chapter-clinic", 2: "chapter-forest" };
 
+// C (word-finish). ONE SITTING'S READER STATE. The router (public/app.js:37-52)
+// does app.innerHTML = "" and calls the view again on every hashchange, so leaving
+// for the dictionary and coming back built a brand-new closure, refetched the
+// profile, and painted a loading screen while she waited. Measured before the fix:
+// on a re-entry the FIRST paint contained no story at all.
+//
+// The profile is STILL refetched on every entry -- this caches the PAINT, not the
+// FETCH. The refetch simply happens behind a screen she can already read.
+let sitting = null;
+
+// Only the mounted view may paint. renderRoute hands the SAME #app element to every
+// view, so an in-flight callback from a view she has already left can otherwise
+// overwrite whatever is on screen now.
+let mountSeq = 0;
+
+// The invalidation signal is the WHOLE serialised profile, never a list of fields.
+// A hand-maintained field list silently stops covering a field the day someone
+// renders a new one, and THAT failure direction shows a child a stale story.
+// Comparing everything cannot under-invalidate; at worst it over-invalidates, which
+// costs one local redraw and no network. A throw returns null, treated as changed.
+export function profileSignature(profile) {
+  try {
+    return JSON.stringify(profile);
+  } catch (err) {
+    return null;
+  }
+}
+
+// On a re-entry the quiz must be able to run again. bindEvents only calls startQuiz
+// when `started` is false, so a kept quizState with started:true would render an
+// empty quiz slot and never fill it -- no quiz, no continue button, green suite.
+export function restartQuizzes(quizState) {
+  if (!quizState || typeof quizState !== "object") return quizState;
+  for (const key of Object.keys(quizState)) {
+    const entry = quizState[key];
+    if (entry && typeof entry === "object") entry.started = false;
+  }
+  return quizState;
+}
+
 const VIEW_STYLE = `
   .reader-card-title {
     font-size: 1.15rem;
@@ -368,15 +408,17 @@ function findInGlossary(chapter, dataWord) {
 }
 
 export async function render(container, ctx) {
-  let profile = null;
+  const kept = sitting;
+  const myMount = ++mountSeq;
+  let profile = kept ? kept.profile : null;
   let stage = "loading";
   let generating = false;
   let genError = false;
   let activePopup = null; // { lemma, surface, he, saved, canSay }
   let allowedWords = new Set();
-  let lemmas = [];
-  let knownSet = new Set();
-  let candidateSet = new Set();
+  let lemmas = kept ? kept.lemmas : [];
+  let knownSet = kept ? kept.knownSet : new Set();
+  let candidateSet = kept ? kept.candidateSet : new Set();
   // T2. One quiz list per chapter, computed ONCE and memoised, so the count
   // afterChapterStage sees and the array startQuiz receives are the SAME array
   // object and cannot disagree (field guide 15b: bugs live in the seam).
@@ -385,28 +427,38 @@ export async function render(container, ctx) {
   // and the celebrate-from-server helper deliberately reads into a local -- so without this,
   // every chapter in one sitting is handed the identical order and quiz.js
   // takes the identical first four.
-  const quizLemmasByChapter = {};
-  const askedThisSitting = new Set();
+  const quizLemmasByChapter = kept ? kept.quizLemmasByChapter : {};
+  const askedThisSitting = kept ? kept.askedThisSitting : new Set();
 
   async function boot() {
+    const resuming = kept !== null && kept.profile !== null;
+    if (resuming) restartQuizzes(quizState);
+    if (resuming) decideStage();
     draw();
+    let signature = resuming ? kept.signature : null;
     try {
       allowedWords = await getAllowedSet();
-      profile = await getJson("/api/profile");
-      // B3 (docs/growth.md section 8): at most ONE candidate per sitting, merged
-      // ahead of the known pool HERE, at the call site, so QZ-17's comparator is
-      // untouched. The slot is RESERVED, not leftover: a candidate that is never
-      // reached can never become known. A candidate with no bank item is skipped
-      // in silence (D23), so an empty slot costs nothing.
+      const fresh = await getJson("/api/profile");
+      if (myMount !== mountSeq) return;
+      const sig = profileSignature(fresh);
+      const changed = !resuming || sig === null || signature === null || sig !== signature;
+      signature = sig;
+      if (!changed) { remember(signature); return; }
+      profile = fresh;
       const candidateLemmas = pickCandidateWords(profile, 1);
       candidateSet = new Set(candidateLemmas);
       lemmas = candidateLemmas.concat(pickQuizWords(profile, 20));
       knownSet = knownSetFromProfile(profile);
       decideStage();
     } catch (err) {
-      stage = "error";
+      if (!resuming) stage = "error";
     }
     draw();
+    remember(signature);
+  }
+
+  function remember(signature) {
+    sitting = { profile, signature, lemmas, knownSet, candidateSet, quizLemmasByChapter, askedThisSitting, checkState, quizState };
   }
 
   function decideStage() {
@@ -543,8 +595,8 @@ export async function render(container, ctx) {
     `;
   }
 
-  const checkState = {};
-  const quizState = {};
+  const checkState = kept ? kept.checkState : {};
+  const quizState = kept ? kept.quizState : {};
 
   function questionState(q) {
     const key = q.id;
@@ -641,6 +693,7 @@ export async function render(container, ctx) {
   }
 
   function draw() {
+    if (myMount !== mountSeq) return;
     let html;
     if (stage === "loading") html = renderLoading();
     else if (stage === "needs-placement") html = renderNeedsPlacement();

@@ -509,3 +509,268 @@ test('a long press on the story is answered by the app, not the browser', () => 
   const at = src.indexOf('addEventListener("contextmenu"');
   assert.ok(src.slice(at, at + 160).includes('preventDefault'), 'the contextmenu handler does not preventDefault');
 });
+
+// ===== step 1.3 (C, word-finish): coming back from the dictionary repaints
+// the chapter she left, once, from kept state -- while the profile is still
+// refetched every time (public/views/reader.js:9-20).
+function t13Container() {
+  const paints = [];
+  let html = '';
+  const container = {
+    get innerHTML() { return html; },
+    set innerHTML(v) { html = v; paints.push(v); },
+    querySelector: () => null,
+    querySelectorAll: () => [],
+  };
+  return { container, paints };
+}
+
+function t13Chapter(n, title, text) {
+  return { n, title, text, glossary: [], questions: [] };
+}
+
+function t13Profile(chapters) {
+  return {
+    version: 1,
+    placement: { completed: true },
+    learner: { heroineName: 'Mia', petName: 'Fox' },
+    words: {},
+    story: { chapters },
+    trophies: {},
+  };
+}
+
+// Stubs the two endpoints render() touches. words-index.js caches the audio
+// manifest ONCE for the life of this process, so it is fetched at most once
+// across this whole file; /api/profile calls are counted so a test can prove
+// the refetch still happens on every entry.
+function t13StubFetch(getProfile) {
+  let profileCalls = 0;
+  const stub = async (url) => {
+    const u = String(url);
+    if (u.includes('/audio/words/index.json')) return { ok: true, json: async () => [] };
+    if (u === '/api/profile') {
+      profileCalls += 1;
+      return { status: 200, json: async () => ({ ok: true, data: getProfile() }) };
+    }
+    throw new Error('t13StubFetch: unexpected url ' + u);
+  };
+  return { stub, calls: () => profileCalls };
+}
+
+test('coming back to the reader paints the story once, from kept state, and still refetches the profile', async () => {
+  const { render } = await import('../public/views/reader.js');
+  const { container, paints } = t13Container();
+  let profile = t13Profile([t13Chapter(1, 'Chapter One', 'The cat sat still.')]);
+  const { stub, calls } = t13StubFetch(() => profile);
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = stub;
+
+  try {
+    // FIRST ENTRY: nothing kept yet -- a loading paint, then the story.
+    await render(container, {});
+    assert.strictEqual(paints.length, 2, 'first entry must paint exactly twice: loading, then the story');
+    assert.ok(!paints[0].includes('class="reader-text"'), 'the first paint must not contain the story');
+    assert.ok(paints[1].includes('class="reader-text"'), 'the second paint must contain the story');
+    const callsAfterFirst = calls();
+
+    // RE-ENTRY, same profile: the fix. One paint, already the story, and the
+    // profile is still refetched exactly once more.
+    paints.length = 0;
+    await render(container, {});
+    assert.strictEqual(paints.length, 1, 'a re-entry with an unchanged profile must paint exactly once');
+    assert.ok(paints[0].includes('class="reader-text"'), 'the one paint must already show the kept story');
+    assert.strictEqual(calls() - callsAfterFirst, 1, 'the profile must still be refetched exactly once on re-entry');
+
+    // RE-ENTRY, changed profile: no blank screen, and the new chapter lands.
+    profile = t13Profile([
+      t13Chapter(1, 'Chapter One', 'The cat sat still.'),
+      t13Chapter(2, 'Chapter Two', 'A fox ran fast.'),
+    ]);
+    paints.length = 0;
+    await render(container, {});
+    assert.strictEqual(paints.length, 2, 're-entry after a real change must paint twice: kept, then fresh');
+    assert.ok(paints[0].includes('class="reader-text"'), 'the first paint on a changed re-entry must already show the kept story, never a blank screen');
+    assert.ok(paints[1].includes('Chapter Two'), 'the final paint must show the new chapter');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+
+  // Stale-mount guard: a render that is still in flight when a newer one
+  // takes over the SAME container must never paint after losing the mount.
+  {
+    const { container: staleContainer, paints: staleP } = t13Container();
+    let fetchCalls = 0;
+    let rejectStale;
+    const staleGate = new Promise((_, reject) => { rejectStale = reject; });
+    const staleProfile = t13Profile([t13Chapter(1, 'Chapter One', 'The cat sat still.')]);
+    const originalFetch2 = globalThis.fetch;
+    globalThis.fetch = async (url) => {
+      const u = String(url);
+      if (u.includes('/audio/words/index.json')) return { ok: true, json: async () => [] };
+      fetchCalls += 1;
+      if (fetchCalls === 1) await staleGate; // the first caller never gets an answer until told to fail
+      return { status: 200, json: async () => ({ ok: true, data: staleProfile }) };
+    };
+    try {
+      const stalePromise = render(staleContainer, {}); // started, never awaited
+      await render(staleContainer, {}); // takes over the same container, completes fully
+      const paintsAfterTakeover = staleP.length;
+      rejectStale(new Error('network down'));
+      await stalePromise; // let the stale render unwind through its own catch
+      assert.strictEqual(
+        staleP.length,
+        paintsAfterTakeover,
+        'a stale mount must not paint after losing the mount to a newer render'
+      );
+    } finally {
+      globalThis.fetch = originalFetch2;
+    }
+  }
+});
+
+test('the invalidation signal is total, and a failed refetch never blanks a story she is reading', async () => {
+  const { profileSignature, render } = await import('../public/views/reader.js');
+
+  const base = {
+    version: 1,
+    placement: { completed: true },
+    learner: { heroineName: 'Mia', petName: 'Fox' },
+    words: { cat: { status: 'known', taps: 1 } },
+    story: {
+      chapters: [
+        {
+          n: 1,
+          title: 'Chapter One',
+          text: 'The cat sat.',
+          glossary: [{ word: 'cat', he: 'placeholder' }],
+          questions: [{ id: 'q1', prompt: 'p', options: ['a', 'b'], correctIndex: 0 }],
+        },
+      ],
+    },
+    trophies: { known: { bronze: '2026-01-01T00:00:00.000Z' } },
+  };
+  const identical = JSON.parse(JSON.stringify(base));
+  assert.strictEqual(
+    profileSignature(base),
+    profileSignature(identical),
+    'two structurally identical profiles must sign the same'
+  );
+
+  const baseSig = profileSignature(base);
+  const mutations = [
+    (p) => { p.version = 2; },
+    (p) => { p.learner.heroineName = 'Zoe'; },
+    (p) => { p.words.cat.status = 'learning'; },
+    (p) => { p.words.dog = { status: 'known' }; },
+    (p) => { p.story.chapters[0].text = 'The cat ran.'; },
+    (p) => { p.story.chapters[0].glossary[0].he = 'changed'; },
+    (p) => { p.trophies.known.bronze = '2026-02-02T00:00:00.000Z'; },
+  ];
+  assert.ok(mutations.length >= 6, 'need at least six mutations at different depths');
+  for (const mutate of mutations) {
+    const mutated = JSON.parse(JSON.stringify(base));
+    mutate(mutated);
+    assert.notStrictEqual(
+      profileSignature(mutated),
+      baseSig,
+      'a nested mutation must change the signature: ' + mutate.toString()
+    );
+  }
+
+  const cyclic = {};
+  cyclic.self = cyclic;
+  assert.strictEqual(profileSignature(cyclic), null, 'a cyclic object must return null rather than throw');
+
+  // A failed refetch on a re-entry must never blank a story she is already reading.
+  const { container, paints } = t13Container();
+  const profile = t13Profile([t13Chapter(1, 'Chapter One', 'The cat sat still.')]);
+  const { stub } = t13StubFetch(() => profile);
+  const originalFetch = globalThis.fetch;
+
+  globalThis.fetch = stub;
+  try {
+    await render(container, {}); // populate `sitting`
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+
+  paints.length = 0;
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    if (u.includes('/audio/words/index.json')) return { ok: true, json: async () => [] };
+    if (u === '/api/profile') throw new Error('network down');
+    throw new Error('unexpected url ' + u);
+  };
+  try {
+    await render(container, {});
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+
+  assert.ok(
+    paints[0].includes('class="reader-text"'),
+    'a re-entry must still show the kept story even if the refetch fails'
+  );
+  const ERROR_CARD = '\u05de\u05e9\u05d4\u05d5 \u05d4\u05e9\u05ea\u05d1\u05e9';
+  for (const p of paints) {
+    assert.ok(!p.includes(ERROR_CARD), 'a failed refetch on a re-entry must never show the error card');
+  }
+});
+
+test('a re-entry restarts the quiz and keeps what she already did, and C does not touch checkLog', async () => {
+  const { restartQuizzes } = await import('../public/views/reader.js');
+
+  const quizState = {
+    1: { started: true, done: false },
+    2: { started: false, done: true },
+    3: { started: true, done: true },
+  };
+  const got = restartQuizzes(quizState);
+  assert.strictEqual(got, quizState, 'restartQuizzes must return the SAME object it was given');
+  assert.deepStrictEqual(
+    quizState,
+    {
+      1: { started: false, done: false },
+      2: { started: false, done: true },
+      3: { started: false, done: true },
+    },
+    'every started flag must be reset to false; done must be left exactly alone'
+  );
+
+  assert.strictEqual(restartQuizzes(null), null, 'null must be tolerated');
+  assert.strictEqual(restartQuizzes(undefined), undefined, 'undefined must be tolerated');
+  assert.strictEqual(restartQuizzes('nope'), 'nope', 'a non-object must be tolerated');
+  const withBadEntry = { 1: { started: true, done: false }, 2: 'not-an-object', 3: null };
+  assert.deepStrictEqual(
+    restartQuizzes(withBadEntry),
+    { 1: { started: false, done: false }, 2: 'not-an-object', 3: null },
+    'an entry that is not an object must be left alone rather than throwing'
+  );
+
+  const src = readFileSync(viewPath, 'utf8');
+  const bootAt = src.indexOf('async function boot() {');
+  assert.ok(bootAt >= 0, 'reader.js must declare boot()');
+  const bootClose = src.indexOf('\n  }', bootAt);
+  assert.ok(bootClose > bootAt, 'boot() must close');
+  const bootBody = src.slice(bootAt, bootClose);
+  assert.ok(
+    bootBody.includes('restartQuizzes(quizState)'),
+    'boot() must call restartQuizzes(quizState) on a resumed re-entry'
+  );
+
+  assert.ok(
+    src.includes('const checkState = kept ? kept.checkState : {};'),
+    'checkState must be bound from kept'
+  );
+  assert.ok(
+    src.includes('const quizState = kept ? kept.quizState : {};'),
+    'quizState must be bound from kept'
+  );
+
+  assert.strictEqual(
+    src.split('checkLog').length - 1,
+    0,
+    'reader.js must not mention checkLog -- R4(ii) is a later, carried obligation'
+  );
+});

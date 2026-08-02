@@ -662,12 +662,20 @@ test('the celebration is hooked at exactly the three designed moments, guarded o
   assert.ok(celebrateAt > helperAt, 'the single celebration call must live inside celebrateFromServer');
   assert.ok(reader.slice(helperAt, celebrateAt).includes('let fresh;'),
     'celebrateFromServer must read the fresh profile into a LOCAL (SK3-2)');
-  assert.strictEqual(t34Count(reader, 'profile = await getJson("/api/profile")'), 1,
-    'only boot() may reassign the module-scope profile');
+  // SK3-2, RE-EXPRESSED by word-finish P1-AMENDMENT #4. The invariant is unchanged:
+  // the reader asks the server ONCE in boot(), into a LOCAL, and only boot() may ever
+  // adopt that answer into the module-scope profile. Step 1.3 had to split the fetch
+  // from the adoption (it must compare the signature BEFORE adopting), so the old
+  // single-line spelling `profile = await getJson(...)` no longer exists. Pinning the
+  // spelling made this test fail on a change that STRENGTHENED the invariant.
+  assert.strictEqual(t34Count(reader, 'await getJson("/api/profile")'), 2,
+    'exactly two server reads: boot() and celebrateFromServer');
+  assert.strictEqual(t34Count(reader, 'profile = fresh;'), 1,
+    'the module-scope profile is adopted in exactly one place');
+  const adoptAt = reader.indexOf('profile = fresh;');
   const bootAt = reader.indexOf('async function boot() {');
-  const assignAt = reader.indexOf('profile = await getJson("/api/profile")');
-  assert.ok(bootAt >= 0 && assignAt > bootAt && assignAt < helperAt,
-    'the one profile reassignment must sit inside boot(), never in celebrateFromServer');
+  assert.ok(bootAt >= 0 && adoptAt > bootAt && adoptAt < helperAt,
+    'the one adoption must sit inside boot(), never in celebrateFromServer');
 
   // the no-questions path (quiz.js:247-250) fires onDone with NO done screen,
   // so both hooks are guarded on total > 0.
