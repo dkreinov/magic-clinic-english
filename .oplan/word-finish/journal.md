@@ -112,3 +112,29 @@ BLOCKERS ANSWERED BY THE ORCHESTRATOR:
 RECORD GAPS PATCHED: design.md's "last copy" claim and its D line numbers (both above).
 STILL STALE, patched next: word-polish/plan.md quotes reader.js 845 (now 857), reader-ui.test.js
 492 (now 511) and an old sw.js md5; word-finish/phase-state.md still says BASE 0c0f32a.
+
+## 2026-08-02 — STEP 1.1 ACCEPTED (E: her vocabulary leaves both sandboxes)
+
+  tier: ORCHESTRATOR (the generator was frozen in the plan and extracted, not authored here)
+  did: ran the plan's frozen generator on english-app-sandbox/profile.json (12 words -> the 6-word
+       synthetic candle/feather/garden/mirror/river/window, md5 91eff5da59674d7463f462fad659534e,
+       validateProfile OK, overlap 0, before-keys absent from the after-JSON as a string);
+       then copied its own pristine output onto trophies-val/sandbox/profile.json (15 words),
+       byte-identical, so the frozen artifact was NOT modified to serve a second path.
+  repo write set: EMPTY (0 files outside .oplan), as specified.
+  surprises: MY SWEEP GATE WAS WRONG ON ITS FIRST RUN. P1-AMENDMENT #1 specified "no profile with
+       more than 2 word keys anywhere" -- but the plan's own synthetic fixture has SIX words, so
+       the gate flagged its own output. A FALSE FAILURE, not a false pass, so it failed safe; but
+       it was still a defective gate, and I wrote it. Corrected to pin IDENTITY, not size: a file
+       passes iff its md5 equals the frozen synthetic md5 OR it has <=2 words (comparator fixture).
+       Re-run: 19 files accounted for -- 3 frozen synthetic, 16 comparator. NONE IS HERS.
+  deviations: none beyond the gate correction above.
+  validation_first_try: no (the gate, not the work)
+  retries: 0 on the work itself
+
+  THE PATTERN IN TODAY'S FOUR ORCHESTRATOR ERRORS, promoted to a field-guide candidate:
+  collapsed grep / wrong trophy line numbers / "covers both" narrated but not made / this sweep
+  criterion. Every one is the same move: I ASSERTED WHAT THE ANSWER SHOULD LOOK LIKE instead of
+  deriving it from what the step actually produces, and then read my own assertion back as evidence.
+  The counter-habit is mechanical: after writing any gate, ask "what does the CORRECT tree look
+  like to this check?" and confirm the check passes on it -- not only that it fails on a broken one.
