@@ -241,13 +241,13 @@ const manifestPath = path.join(clipsDir, 'index.json');
 test('every word in the audio manifest has a clip on disk, and every clip is in the manifest', () => {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
   assert.ok(Array.isArray(manifest), 'the audio manifest must be a JSON array');
-  assert.strictEqual(manifest.length, 2254, 'the manifest must list exactly 2254 words');
+  assert.strictEqual(manifest.length, 2264, 'the manifest must list exactly 2264 words');
 
   const files = readdirSync(clipsDir);
-  assert.strictEqual(files.length, 2255, 'public/audio/words holds 2254 clips plus index.json');
+  assert.strictEqual(files.length, 2265, 'public/audio/words holds 2264 clips plus index.json');
 
   const clips = new Set(files.filter((f) => f.endsWith('.aac')).map((f) => f.slice(0, -4)));
-  assert.strictEqual(clips.size, 2254, 'there must be exactly 2254 .aac clips on disk');
+  assert.strictEqual(clips.size, 2264, 'there must be exactly 2264 .aac clips on disk');
 
   // Name the offenders. This is the invariant phase 2 is about to stress, so a
   // failure has to say WHICH word broke it, not merely that something did.
@@ -267,26 +267,59 @@ test('resolveLemma only ever returns a word that has a clip, so a speaker button
   );
 
   // Every manifest entry, plus an inflection sweep of the forms the story
-  // generator is allowed to print, plus words the chapter can contain that we
-  // deliberately have nothing for.
+  // generator is allowed to print, plus words we still have nothing for.
+  //
+  // RE-EXPRESSED in step 2.6. Nine of the words this list used to call
+  // "deliberately nothing for" -- growls, glows, nervous, scary, harm, deer,
+  // feet, moon, tightly -- are exactly what this phase generated, so the old
+  // comment became false the moment the clips landed. They moved to a POSITIVE
+  // control below. What stays here is what is still, and permanently, silent:
+  // "deepbreath" (a space can never be a lemma file) and nonsense. Three more
+  // nonsense inputs were added so the nulls>0 cry-wolf guard still has
+  // something to count.
   const inputs = [];
   for (const word of manifest) {
     inputs.push(word, `${word}s`, `${word}ed`, `${word}ing`, `${word}es`);
   }
-  inputs.push(
-    'deepbreath',
-    'growls',
-    'glows',
-    'nervous',
-    'scary',
-    'harm',
-    'deer',
-    'feet',
-    'moon',
-    'tightly',
-    'zzzz',
-    ''
-  );
+  inputs.push('deepbreath', 'zzzz', 'zzqq', 'xyzzy', 'qqqq', '');
+
+  // THE POSITIVE CONTROL, new in step 2.6. Every story word this phase paid for
+  // must now reach a clip -- through the de-inflector where that is the point:
+  // we generated the BASE LEMMA only (ruling B2 / FC-6), so "growls" must fold
+  // to "growl" rather than have a clip of its own. A clip of its own would
+  // split a word she already holds. This asserts the fold, not just the file.
+  const nowSpeaks = {
+    after: 'after', deer: 'deer', feet: 'feet', harm: 'harm', moon: 'moon',
+    nervous: 'nervous', scary: 'scary',
+    glow: 'glow', glowing: 'glow', glows: 'glow',
+    growl: 'growl', growls: 'growl',
+    tight: 'tight', tightly: 'tight',
+  };
+  let checked = 0;
+  for (const [surface, expected] of Object.entries(nowSpeaks)) {
+    checked += 1;
+    assert.strictEqual(
+      resolveLemma(normalizeWord(surface), allowed),
+      expected,
+      `"${surface}" must now speak "${expected}"`
+    );
+    assert.ok(clips.has(expected), `"${expected}" has no clip on disk`);
+  }
+  assert.strictEqual(checked, 14, `the positive control must check 14 forms, checked ${checked}`);
+
+  // FC-6, at the surface she actually sees: these four already spoke BEFORE this
+  // phase by folding into a base form she may already have collected. If any of
+  // them ever gets a clip of its own, migrateWordKeys stops folding it and her
+  // dictionary splits. Generating them was ruled out (design section 12).
+  for (const [surface, mustFoldTo] of Object.entries({
+    closer: 'close', softly: 'soft', suddenly: 'sudden', wings: 'wing',
+  })) {
+    assert.strictEqual(
+      resolveLemma(normalizeWord(surface), allowed),
+      mustFoldTo,
+      `FC-6: "${surface}" must still fold to "${mustFoldTo}" -- a clip of its own splits her dictionary`
+    );
+  }
 
   let nulls = 0;
   for (const input of inputs) {
@@ -301,7 +334,7 @@ test('resolveLemma only ever returns a word that has a clip, so a speaker button
     );
   }
 
-  assert.ok(inputs.length > 2254, `the sweep must drive more than 2254 inputs, drove ${inputs.length}`);
+  assert.ok(inputs.length > 2264, `the sweep must drive more than 2264 inputs, drove ${inputs.length}`);
   assert.ok(nulls > 0, 'negative control: a sweep where nothing ever resolves to null passes vacuously');
 });
 
@@ -324,7 +357,7 @@ test('the browser and the server read the SAME word list, and the button plays t
   assert.ok(existsSync(browserFile), 'the shared manifest file must exist');
   const browserWords = JSON.parse(readFileSync(browserFile, 'utf8'));
   const serverWords = JSON.parse(readFileSync(serverFile, 'utf8'));
-  assert.strictEqual(browserWords.length, 2254, 'the shared list is 2254 words long');
+  assert.strictEqual(browserWords.length, 2264, 'the shared list is 2264 words long');
   assert.deepStrictEqual(
     serverWords,
     browserWords,

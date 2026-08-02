@@ -53,9 +53,9 @@ test('dry run reports the derived word count without a network call', () => {
   });
   assert.strictEqual(result.status, 0, `expected exit 0, got stderr: ${result.stderr}`);
   const out = result.stdout.toString();
-  assert.ok(out.includes('words: 2254'), `words line wrong: ${out}`);
-  assert.ok(out.includes('extras: 0'), `extras line wrong: ${out}`);
-  assert.ok(out.includes('clips: 2254'), `clips line wrong: ${out}`);
+  assert.ok(out.includes('words: 2264'), `words line wrong: ${out}`);
+  assert.ok(out.includes('extras: 10'), `extras line wrong: ${out}`);
+  assert.ok(out.includes('clips: 2264'), `clips line wrong: ${out}`);
 });
 
 // NEW in phase 2 -- THE HONESTY INVARIANT, and the whole point of the
