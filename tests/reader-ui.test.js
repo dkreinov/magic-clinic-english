@@ -760,7 +760,7 @@ test('the invalidation signal is total, and a failed refetch never blanks a stor
   }
 });
 
-test('a re-entry restarts the quiz and keeps what she already did, and C does not touch checkLog', async () => {
+test('a re-entry restarts the quiz and keeps what she already did, and reader.js never MUTATES checkLog', async () => {
   const { restartQuizzes } = await import('../public/views/reader.js');
 
   const quizState = {
@@ -810,10 +810,27 @@ test('a re-entry restarts the quiz and keeps what she already did, and C does no
     'quizState must be bound from kept'
   );
 
-  assert.strictEqual(
-    src.split('checkLog').length - 1,
-    0,
-    'reader.js must not mention checkLog -- R4(ii) is a later, carried obligation'
+  // RE-EXPRESSED, F1-2 (field guide 22). This pin used to read "reader.js must not
+  // mention checkLog -- R4(ii) is a later, carried obligation". That named a SCHEDULE,
+  // not a property, and R4(ii) is now DONE: reader.js reads the log back so her answers
+  // survive a reload. Deleting the pin would have thrown away the real invariant hiding
+  // underneath it, so the invariant is stated instead, and it was watched failing first.
+  //
+  // THE INVARIANT: the durable log belongs to the SERVER. The client may READ it and may
+  // POST an attempt to it, but must never edit it in place -- a local mutation would make
+  // the screen disagree with the record that survives the reload, which is the whole
+  // defect this work exists to remove.
+  for (const forbidden of ['checkLog =', 'checkLog=', 'checkLog.push', 'checkLog.splice', 'checkLog.pop', 'checkLog.shift']) {
+    assert.strictEqual(
+      src.split(forbidden).length - 1,
+      0,
+      `reader.js must never mutate the durable log in place, found: ${forbidden}`
+    );
+  }
+  // ...and the read-back really is present, so this test cannot pass by the feature vanishing.
+  assert.ok(
+    src.split('checkLog').length - 1 >= 2,
+    'reader.js must READ checkLog -- F1-2 is done, and a pin that passes when the feature is gone is not a pin'
   );
 });
 
@@ -904,4 +921,145 @@ test('both views render byte-identical say slots, so the duplicated markup canno
   );
   assert.ok(!reader.saySlot(false, 'x').includes('data-say'), 'the marker must never carry data-say');
   assert.ok(reader.saySlot(true, 'cat').includes('data-say="cat"'), 'the live button must carry data-say');
+});
+
+// ---------------------------------------------------------------------------
+// F1-2 / R4(ii) — HER ANSWERS MUST SURVIVE A PAGE RELOAD.
+//
+// Her answers were already saved durably and NOTHING read them back, so a reload
+// showed every answered question as unanswered. Phase 1 kept state across a TAB
+// SWITCH only; a reload builds a new module and `sitting` is null.
+//
+// These drive the SHIPPED restoredCheckState/mergeRestoredChecks, not a copy.
+// ---------------------------------------------------------------------------
+
+const F12_CHAPTER = {
+  n: 1,
+  questions: [
+    { id: 'q1', prompt: 'a', options: ['w', 'x', 'y', 'z'], correctIndex: 2 },
+    { id: 'q2', prompt: 'b', options: ['w', 'x', 'y', 'z'], correctIndex: 0 },
+  ],
+};
+
+test('F1-2: a question she got right survives a reload as answered and done', async () => {
+  const { restoredCheckState } = await import('../public/views/reader.js');
+  const restored = restoredCheckState(F12_CHAPTER, [
+    { chapter: 1, questionId: 'q1', chosenIndex: 2, correctIndex: 2, correct: true },
+  ]);
+  assert.strictEqual(restored.q1.correct, true, 'a correct attempt must come back correct');
+  assert.strictEqual(restored.q1.chosen, 2, 'the chosen option must be the correct one');
+  assert.strictEqual(restored.q1.logged, true, 'an already-correct question needs no re-post');
+  assert.ok(!restored.q1.triedWrong.has(2), 'the right answer can never be marked tried-wrong');
+  assert.ok(!('q2' in restored), 'a question she never answered must stay untouched');
+});
+
+test('F1-2 TRAP 1: wrong-then-right is NOT stranded -- the log holds only the wrong attempt', async () => {
+  const { restoredCheckState } = await import('../public/views/reader.js');
+  // checkLog records only her FIRST attempt, so a wrong-then-right question leaves
+  // ONLY the wrong entry behind. If the restore marked it logged, her retry would
+  // never be posted and the question could never become done -- forever.
+  const restored = restoredCheckState(F12_CHAPTER, [
+    { chapter: 1, questionId: 'q1', chosenIndex: 0, correctIndex: 2, correct: false },
+  ]);
+  assert.strictEqual(restored.q1.correct, false, 'she has not got it right yet');
+  assert.ok(restored.q1.triedWrong.has(0), 'her wrong attempt must be remembered');
+  assert.strictEqual(restored.q1.logged, false,
+    'logged MUST be false, or her retry is never posted and the question can never clear');
+  assert.ok(!restored.q1.triedWrong.has(2),
+    'the option that can still clear the question must remain live');
+});
+
+test("F1-2: the owner's ruling -- ANY correct attempt finishes the question, de-duped by questionId", async () => {
+  const { restoredCheckState } = await import('../public/views/reader.js');
+  // design.md section 10: "a question counts as ANSWERED AND DONE if any logged
+  // attempt was correct, not only the first ... the question is done if ANY of them
+  // is correct." Duplicates for one questionId are the NORMAL product of the defect.
+  const restored = restoredCheckState(F12_CHAPTER, [
+    { chapter: 1, questionId: 'q1', chosenIndex: 1, correctIndex: 2, correct: false },
+    { chapter: 1, questionId: 'q1', chosenIndex: 2, correctIndex: 2, correct: true },
+    { chapter: 1, questionId: 'q1', chosenIndex: 3, correctIndex: 2, correct: false },
+  ]);
+  assert.strictEqual(restored.q1.correct, true, 'ANY correct attempt finishes it (owner ruling)');
+  assert.ok(!restored.q1.triedWrong.has(2), 'the right answer is never disabled');
+  assert.ok(restored.q1.triedWrong.has(1) && restored.q1.triedWrong.has(3),
+    'her wrong attempts are still remembered');
+});
+
+test('F1-2 THE SEAM: the right answer can NEVER be restored as tried-wrong, swept', async () => {
+  const { restoredCheckState } = await import('../public/views/reader.js');
+  // "restored as tried-wrong" and "is the right answer" must not be simultaneously
+  // representable -- the same shape as the trophy card that read "target reached"
+  // while greyed out (field guide 15b). Correctness is recomputed against the
+  // question ON SCREEN, never read from the entry's own `correct` flag, which is
+  // derived from a correctIndex the BROWSER supplied and never re-checked.
+  let observed = 0;
+  const violations = [];
+  for (let correctIndex = 0; correctIndex < 4; correctIndex++) {
+    const chapter = { n: 1, questions: [{ id: 'q1', options: ['w', 'x', 'y', 'z'], correctIndex }] };
+    for (let chosen = 0; chosen < 4; chosen++) {
+      // every combination of what the LOG claims vs what the CHAPTER says
+      for (const claimedCorrect of [true, false]) {
+        for (const staleIndex of [0, 1, 2, 3]) {
+          observed++;
+          const r = restoredCheckState(chapter, [
+            { chapter: 1, questionId: 'q1', chosenIndex: chosen, correctIndex: staleIndex, correct: claimedCorrect },
+          ]);
+          const st = r.q1;
+          if (!st) continue;
+          if (st.triedWrong.has(correctIndex)) {
+            violations.push(`correctIndex=${correctIndex} chosen=${chosen} stale=${staleIndex}: the right answer was disabled`);
+          }
+          if (st.correct && st.chosen !== correctIndex) {
+            violations.push(`correctIndex=${correctIndex} chosen=${chosen}: marked correct but chosen=${st.chosen}`);
+          }
+        }
+      }
+    }
+  }
+  assert.strictEqual(observed, 128, `sweep observed ${observed} combinations, expected 128`);
+  assert.deepStrictEqual(violations, [], `the restore can strand her:\n${violations.slice(0, 5).join('\n')}`);
+});
+
+test('F1-2: the merge FILLS IN and never downgrades work she just did', async () => {
+  const { mergeRestoredChecks } = await import('../public/views/reader.js');
+  // A tab switch refetches the profile and re-runs the restore over a checkState
+  // that already holds this sitting's answers. F1-3 means a POST may have been
+  // silently swallowed, so an overwrite would UN-answer, on screen, a question she
+  // had just answered. The merge may only move a question towards done.
+  const live = {
+    q1: { correct: true, chosen: 2, logged: true, triedWrong: new Set([1]) },
+    q2: { correct: false, chosen: 3, logged: false, triedWrong: new Set([3]) },
+  };
+  mergeRestoredChecks(live, {
+    q1: { correct: false, chosen: 0, logged: false, triedWrong: new Set([0]) },
+    q2: { correct: true, chosen: 0, logged: true, triedWrong: new Set() },
+  });
+  assert.strictEqual(live.q1.correct, true, 'a correct answer must never be downgraded');
+  assert.strictEqual(live.q1.chosen, 2, 'her correct choice must not be overwritten');
+  assert.ok(live.q1.triedWrong.has(0) && live.q1.triedWrong.has(1), 'tried-wrong is a union');
+  assert.strictEqual(live.q2.correct, true, 'the durable record may UPGRADE an unfinished question');
+  assert.strictEqual(live.q2.logged, true, 'an upgraded question needs no re-post');
+});
+
+// F1-3 GUARD (labelled a GUARD, not a gate -- field guide 2 and 15). The defect is an
+// ORDERING inside an async click handler, and this checks the ORDER IN THE SOURCE. A
+// source-needle check fails OPEN, so it is honestly named: it can prove the bad shape
+// is gone, it cannot prove the good shape works at runtime. The runtime behaviour was
+// verified by hand against a failing postJson; no harness in this repo can stub the
+// imported postJson inside that handler.
+test('F1-3 GUARD: the answer is marked saved only AFTER the server confirms', async () => {
+  const src = readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public', 'views', 'reader.js'), 'utf8');
+  const handler = src.slice(src.indexOf('const isFirstAnswer'));
+  const end = handler.indexOf('draw();');
+  const body = handler.slice(0, end);
+
+  const setAt = body.indexOf('st.logged = true;');
+  const awaitAt = body.indexOf('await postJson(');
+  assert.ok(setAt > 0 && awaitAt > 0, 'expected both the await and the logged assignment in the handler');
+  assert.ok(setAt > awaitAt,
+    'st.logged must be set AFTER the await resolves -- setting it before is F1-3: a failed save is never retried and her answer is silently lost');
+  assert.ok(!/catch \(err\) \{\s*\/\/ ignore network errors on logging\s*\}/.test(body),
+    'the silent swallow must be gone');
+  // and she must never be shown an error about it (ruling R-F6-3)
+  assert.ok(!/genError\s*=\s*true/.test(body), 'a failed save must not surface to an 11-year-old');
 });

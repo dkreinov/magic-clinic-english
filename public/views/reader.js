@@ -47,6 +47,89 @@ export function restartQuizzes(quizState) {
   return quizState;
 }
 
+// F1-2 / R4(ii). THE READ-BACK. Her answers were already saved durably
+// (api/profile.js:104 -> lib/profile.js:418) and NOTHING read them, so a page
+// reload showed every answered question as unanswered. Phase 1 kept state across
+// a TAB SWITCH only; a reload builds a new module instance and `sitting` is null.
+//
+// design.md section 10, the OWNER'S RULING, quoted so no later step re-opens it:
+//   "a question counts as ANSWERED AND DONE if any logged attempt was correct,
+//    not only the first ... where checkLog holds several entries for the same
+//    questionId (possible from prior re-entries), the question is done if ANY of
+//    them is correct."
+//
+// THREE THINGS ARE LOAD-BEARING, and each was measured before it was written:
+//
+// 1. CORRECTNESS IS RECOMPUTED AGAINST THE QUESTION ON SCREEN, never read from
+//    the entry's own `correct` flag. That flag is derived server-side from a
+//    correctIndex the BROWSER supplied (api/profile.js:95-109 validates its type
+//    and nothing else), so it is a claim about a question that may no longer be
+//    the one being rendered. Two sources for one card is exactly the seam that
+//    put "target reached" on a greyed trophy (field guide 15b). Here there is one.
+//
+// 2. THE OPTION AT q.correctIndex CAN NEVER BE DISABLED. `correct` and
+//    `triedWrong` are filled from the SAME comparison, in opposite branches, so
+//    "restored as wrong" and "is the right answer" are not simultaneously
+//    representable. Without this, a chapter whose correctIndex moved would grey
+//    out the only option that can clear the question and strand her on it.
+//
+// 3. logged IS FALSE UNLESS SHE IS ALREADY CORRECT. checkLog records only the
+//    FIRST attempt (reader.js's own isFirstAnswer guard), so a wrong-then-right
+//    question leaves ONLY the wrong entry behind -- MEASURED, not assumed. If the
+//    restore also set logged=true, her next correct answer would never be posted,
+//    the log could never learn she got it right, and the question would come back
+//    unfinished after EVERY reload, forever. logged=false makes the log
+//    self-healing: the correct attempt is appended, and the de-duplication rule
+//    above is precisely what makes that second entry safe.
+export function restoredCheckState(chapter, checkLog) {
+  const out = {};
+  const questions = chapter && Array.isArray(chapter.questions) ? chapter.questions : [];
+  const log = Array.isArray(checkLog) ? checkLog : [];
+  for (const q of questions) {
+    if (!q || typeof q.id !== "string") continue;
+    let correct = false;
+    let chosen = null;
+    const triedWrong = new Set();
+    for (const entry of log) {
+      if (!entry || entry.questionId !== q.id) continue;
+      if (typeof entry.chosenIndex !== "number") continue;
+      if (entry.chosenIndex === q.correctIndex) {
+        correct = true;
+      } else {
+        triedWrong.add(entry.chosenIndex);
+        chosen = entry.chosenIndex;
+      }
+    }
+    if (!correct && triedWrong.size === 0) continue;
+    out[q.id] = { correct, chosen: correct ? q.correctIndex : chosen, logged: correct, triedWrong };
+  }
+  return out;
+}
+
+// The restore FILLS IN; it never downgrades. A re-entry refetches the profile
+// (phase 1 kept the paint, not the fetch), so this runs again on every tab
+// switch -- and F1-3 means a POST she made in this sitting may have been
+// swallowed. Overwriting would then UNDO on screen work the server never heard
+// about. Merging can only ever move a question from unanswered towards done.
+export function mergeRestoredChecks(checkState, restored) {
+  for (const [id, r] of Object.entries(restored)) {
+    const cur = checkState[id];
+    if (!cur) {
+      checkState[id] = r;
+      continue;
+    }
+    if (r.correct && !cur.correct) {
+      cur.correct = true;
+      cur.chosen = r.chosen;
+      cur.logged = true;
+    }
+    if (cur.triedWrong instanceof Set) {
+      for (const i of r.triedWrong) cur.triedWrong.add(i);
+    }
+  }
+  return checkState;
+}
+
 // C (word-finish), the other half of "it takes time": she also loses her place.
 // app.innerHTML = "" collapses the document height to nothing, so the browser
 // drops her to the top before the new view has any content.
@@ -493,6 +576,16 @@ export async function render(container, ctx) {
       candidateSet = new Set(candidateLemmas);
       lemmas = candidateLemmas.concat(pickQuizWords(profile, 20));
       knownSet = knownSetFromProfile(profile);
+      // F1-2 / R4(ii). The read-back sits HERE and nowhere else: after the fresh
+      // profile has replaced the kept one and before decideStage()/draw(), so the
+      // first paint of a reload already shows what she finished. The unchanged-
+      // profile early return above is deliberately NOT a restore point -- on that
+      // path `sitting` already holds the very checkState this would rebuild.
+      const chs = profile.story && Array.isArray(profile.story.chapters) ? profile.story.chapters : [];
+      mergeRestoredChecks(
+        checkState,
+        restoredCheckState(chs[chs.length - 1] || null, profile.story && profile.story.checkLog)
+      );
       decideStage();
     } catch (err) {
       if (!resuming) stage = "error";
@@ -812,7 +905,20 @@ export async function render(container, ctx) {
         }
 
         if (isFirstAnswer) {
-          st.logged = true;
+          // F1-3. `st.logged = true` USED TO SIT HERE, BEFORE the await, and the catch
+          // swallowed every failure -- so a save that never reached the server was never
+          // retried and never surfaced, and her answer was simply lost. Phase 1 made that
+          // WORSE, not better: keeping checkState alive for a whole sitting hides the loss
+          // until she reloads. With the read-back above, this is the ONLY remaining path
+          // by which her work can disappear.
+          //
+          // Setting it only AFTER the await resolves makes the log self-healing: a failed
+          // save leaves the question unlogged, so her next answer on it posts again, and
+          // the owner's de-duplication ruling makes that second entry harmless.
+          //
+          // NOTHING IS RENDERED TO HER ABOUT IT (ruling R-F6-3). She is eleven and learning
+          // to read English; a message about a failed network write is noise she cannot act
+          // on, and D14 already says the correction loop must never wait on a human.
           try {
             await postJson("/api/profile", {
               action: "log-check",
@@ -821,8 +927,12 @@ export async function render(container, ctx) {
               chosenIndex: choice,
               correctIndex: q.correctIndex,
             });
+            st.logged = true;
           } catch (err) {
-            // ignore network errors on logging
+            // left unlogged ON PURPOSE so the next attempt retries it.
+            if (typeof console !== "undefined" && console.warn) {
+              console.warn("log-check failed; will retry on her next answer", err);
+            }
           }
         }
 
