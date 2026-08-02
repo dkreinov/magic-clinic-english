@@ -36,8 +36,8 @@ ACCEPTED (phase 2): 2.1 3a2b2b3 · 2.2 f6eb81b · 2.3 a6fbd61 · 2.4 e352cfb ·
   2.5 visual gate self-served, PASSED (no repo bytes) · 2.6 45ac2de · 2.7 this commit
 
 STATE OF THE TREE: 399 reported / 394 flat / 0 fail · contrast 58 PASS · quiz bank 78 files/103 items
-  · manifest 2264 == clips on disk 2264 (0 dead entries, 0 orphans)
-  · public/audio/words/index.json md5 6a885982b75e82ef1f00dc6768796ecf, 20019 bytes, LF
+  · manifest 2266 == clips on disk 2266 (0 dead entries, 0 orphans)  [F2-1 added ellie+sparkle]
+  · public/audio/words/index.json md5 8b211ed1524bb272f2474692fba0b7f0, 20037 bytes, LF
   · public/sw.js CACHE magic-vet-v22 (F1-1 spent at v21; v22 is the follow-on's own bump,
     required because public/styles.css and public/views/trophies.js are both PRECACHED) · public/quiz/light.json md5
     f00b091b7f4208ec8783f06a0f6ff320
@@ -57,15 +57,26 @@ FROZEN CONTRACTS IN FORCE:
         (gpt-4o-mini-tts / nova / the existing instructions string). 2264 clips now came from
         those. The ONLY edit to synthesizeWord this phase was the word `export`.
   FC-3  the .oplan awk filter is  awk '$NF !~ /^\.oplan\//'  — TWO backslash bytes.
-  FC-4  CACHE magic-vet-v20 -> v21 happens EXACTLY ONCE, in phase 4 (F1-1). public/sw.js md5
-        78fc3b0ac1d10de8a5baccb753eca33c.
+  FC-4  *** SUPERSEDED AND RE-STATED 2026-08-02 evening. *** The ONE-BUMP rule was about F1-1's
+        DEFERRED debt across phases 1-3, and that debt is paid (v20 -> v21, commit cb799b6).
+        THE STANDING RULE FROM HERE IS THE ORDINARY ONE (field guide 7 / QZ-22): ANY change to a
+        PRECACHED file ships a CACHE bump IN THE SAME COMMIT, with the pin in tests/shell.test.js
+        moved in that same commit and the half-applied bump SEEN TO FAIL first.
+        NOW: CACHE magic-vet-v22, public/sw.js md5 eb979b08e104049ffe919263200af9e2.
+        The precached list is in public/sw.js PRECACHE. Nothing under public/audio/ or
+        public/quiz/ is precached, so clips and quiz items never owe a bump (verified, not assumed).
   FC-5  the no-recording marker (design §8, owner-frozen): `btn-say na` + the English caption
         `coming soon`. The CSS lives in design.md's two ```css blocks, is EXTRACTED BY SCRIPT and
         never retyped, md5 6e43cb5e463520f5d277d7d02c5ff26c, and a test asserts it is present in
         public/styles.css byte-for-byte. A tidy-up of the owner's rules fails the suite.
-  FC-6  BASE LEMMAS ONLY in data/story-words.json (design §12). Gated by an executed 20286-form
-        sweep in tests/word-audio.test.js AND by a surface guard in tests/reader-ui.test.js.
-  FC-7  no new Hebrew string anywhere. reader.js non-ASCII 754, words.js 465, styles.css 0.
+  FC-6  BASE LEMMAS ONLY in data/story-words.json (design §12). Gated by an executed sweep in
+        tests/word-audio.test.js AND by a surface guard in tests/reader-ui.test.js. THE SWEEP SIZE
+        IS DERIVED FROM THE MANIFEST AND MOVES WITH IT -- do not pin a form count; pin the
+        PROPERTY (0 inflected entries, 0 key splits) and let the sweep report what it observed.
+  FC-7  no new Hebrew string anywhere. Counts are RAW NON-ASCII BYTES, not characters and not
+        grep hits -- reader.js 754 BYTES, words.js 465 BYTES, styles.css 0. (A grep returns 376
+        for reader.js because it counts matching LINES; the unit was missing and it misled.)
+        Measure with: node -e 'const b=require("fs").readFileSync(f);let n=0;for(const x of b)if(x>127)n++'
         Hebrew is MOVED by byte-slicing, never retyped (field guide 8).
   ENDINGS RE-MEASURED THIS PHASE, by counting bytes only (field guide 16), NEVER with grep:
         public/styles.css CRLF=758 · public/views/reader.js CRLF=959 · public/views/words.js
@@ -111,6 +122,31 @@ STANDING RULINGS (recorded the day they were made -- field guide 24):
         run outputs and WORDS.txt live OUTSIDE the repo (/c/Users/dkreinov/f3-stage/), the .oplan
         record carries COUNTS ONLY (backup-receipt.txt), and every step tail parses the outside
         copies. A plan may not re-commit a leak it just identified.
+  R-F6-1  2026-08-02, ORCHESTRATOR. THE BASE FOR THE READ-BACK WORK IS **52257c9**, tree clean,
+        ledger 399 reported / 394 flat, manifest 2266, CACHE magic-vet-v22.
+        *** AND THE BLOCKER WAS MY FAULT, RECORDED AS A PROCESS RULE. *** I told a planner the
+        tree was clean at a base and then committed twice underneath it while it worked (e49a0a3,
+        52257c9). It saw a red suite and reasonably suspected a flake. NEW RULE: WHILE A PLANNER
+        IS RUNNING, THE ORCHESTRATOR DOES NOT COMMIT TO THAT PLANNER'S SUBJECT AREA -- or tells it
+        the base moved, in writing, the moment it does. A plan is written against a photograph;
+        moving the subject mid-exposure is not the planner's error.
+  R-F6-2  2026-08-02, ORCHESTRATOR. SPENT VISUAL-GATE ORIGINS, kept here because every remedy
+        that names an origin expires the moment it is used (field guide 27):
+        SPENT -- localhost:3000, 127.0.0.1:3000, localhost:3100, localhost:3200.
+        NEXT FREE -- 3300. Any visual gate takes the next unused port and ADDS IT TO THIS LINE
+        in the same step. A service worker is registered per ORIGIN, and this run has now burned
+        four of them.
+  R-F6-3  2026-08-02, ORCHESTRATOR. F1-3 IS FIXED IN THE SAME PHASE, AS ITS OWN STEP, AND THE
+        FAILURE IS NEVER SHOWN TO THE CHILD.
+        The planner is right that it becomes the ONLY remaining loss path once the read-back
+        lands, and right that it belongs in the same deploy.
+        THE SHAPE, ruled so no step re-opens it: (a) `st.logged` is set to true ONLY AFTER the
+        await RESOLVES SUCCESSFULLY -- today it is set before, so a failed save is never retried;
+        (b) a failure leaves the question UNLOGGED so the next action retries it, which is
+        self-healing and invisible; (c) NOTHING is rendered to her about it. She is eleven and
+        learning to read English; an error message about a network write is noise she cannot act
+        on, and design decision D14 already says the correction loop must never wait on a human.
+        A console warning is the whole of the surfacing.
   B-F3-1  2026-08-02, ORCHESTRATOR, under R-CAPTURE. Phase 3 derives its target word set from a
         live capture, not from a repo-derivable substitute. The alternative was measured once
         already and failed: word-quiz's 50-word pilot bank overlapped her 12 known words in
