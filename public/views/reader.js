@@ -331,6 +331,19 @@ export function normalizeWord(raw) {
   return raw.toLowerCase().replace(/[^a-z]/g, "");
 }
 
+// word-finish phase 2 (design section 8, FROZEN). canSay gates the button's STATE, no
+// longer its EXISTENCE. A word we cannot speak still shows the speaker, crossed out
+// by CSS, with the ASCII caption "coming soon" under it -- so she can tell "no sound
+// for THIS word yet" from "this app has no sound". The pressable branch still implies
+// a clip exists: it is the only branch that carries data-say, and the [data-say]
+// handler is the only thing that can play anything.
+export function saySlot(canSay, lemma) {
+  if (canSay) {
+    return `<button class="btn-say" type="button" data-say="${escapeHtml(lemma)}" aria-label="הקשיבי למילה">🔊</button>`;
+  }
+  return `<span class="say-soon-wrap"><button class="btn-say na" type="button" disabled aria-hidden="true">🔊</button><span class="btn-say-soon">coming soon</span></span>`;
+}
+
 function renderWords(text) {
   const tokens = text.split(/(\s+)/);
   return tokens
@@ -688,7 +701,7 @@ export async function render(container, ctx) {
       <div class="reader-overlay" data-action="popup-close">
         <div class="reader-popup" data-action="popup-stop">
           <p class="reader-popup-word">${escapeHtml(activePopup.lemma)}</p>
-          ${activePopup.canSay ? `<button class="btn-say" type="button" data-say="${escapeHtml(activePopup.lemma)}" aria-label="הקשיבי למילה">🔊</button>` : ""}
+          ${saySlot(activePopup.canSay, activePopup.lemma)}
           <p class="reader-popup-he">${escapeHtml(activePopup.he || "—")}</p>
           ${savedHtml}
         </div>

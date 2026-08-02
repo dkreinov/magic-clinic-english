@@ -131,7 +131,10 @@ test('reader.js resolves the printed word against the manifest', () => {
   const src = readFileSync(viewPath, 'utf8');
   assert.ok(src.includes('resolveLemma'), 'reader must resolve the tapped word');
   assert.ok(src.includes('getAllowedSet'), 'reader must load the manifest');
-  assert.ok(src.includes('activePopup.canSay'), 'the button is conditional on having a clip');
+  // Re-worded 2026-08-02: design section 8 makes canSay gate the button's STATE,
+  // not its existence, so "conditional on having a clip" became false. The needle
+  // itself still holds and is still only a GUARD -- it fails open.
+  assert.ok(src.includes('activePopup.canSay'), 'the popup consults canSay');
 });
 
 // Step 4.4. The after-chapter check of 4 words.
@@ -336,7 +339,13 @@ test('the browser and the server read the SAME word list, and the button plays t
   for (const needle of [
     'canSay: lemma !== null,',
     'lemma: lemma || dataWord,',
-    'data-say="${escapeHtml(activePopup.lemma)}"',
+    // RE-EXPRESSED 2026-08-02 (field guide 22). This read
+    //   data-say="${escapeHtml(activePopup.lemma)}"
+    // and named a real property -- THE BUTTON PLAYS THE VALUE IT WAS DRAWN FROM --
+    // in a spelling design section 8 necessarily changes: the attribute moved into
+    // saySlot(). The property is now PROVED by the executed popup test at the end of
+    // this file rather than spelled here; this needle only pins the call site.
+    'saySlot(activePopup.canSay, activePopup.lemma)',
   ]) {
     assert.ok(src.includes(needle), `reader.js missing "${needle}"`);
   }
@@ -845,4 +854,21 @@ test('restoring the scroll is attempted on a re-entry and never on a first entry
     if (originalWindow === undefined) delete globalThis.window;
     else globalThis.window = originalWindow;
   }
+});
+
+test('both views render byte-identical say slots, so the duplicated markup cannot drift', async () => {
+  const reader = await import('../public/views/reader.js');
+  const words = await import('../public/views/words.js');
+  assert.strictEqual(
+    reader.saySlot(false, 'x'),
+    words.saySlot(false, 'x'),
+    'the coming-soon marker must be the same bytes in the reader and in the words list'
+  );
+  assert.strictEqual(
+    reader.saySlot(true, 'cat'),
+    words.saySlot(true, 'cat'),
+    'the pressable button must be the same bytes in the reader and in the words list'
+  );
+  assert.ok(!reader.saySlot(false, 'x').includes('data-say'), 'the marker must never carry data-say');
+  assert.ok(reader.saySlot(true, 'cat').includes('data-say="cat"'), 'the live button must carry data-say');
 });
