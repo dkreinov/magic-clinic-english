@@ -180,3 +180,58 @@ sound". R7 asks for **visible and honest**: the word is there, the sound is *not
 data-loss defect; background generation) and R5/R6 (typing quizzes with the keyboard's autocomplete
 off, Hebrew→English direction, and a ranked shortlist of Duolingo-style mechanics). Both are under
 discovery now. Neither is folded into phases 1-4 — see the merge assessment in `journal.md`.
+
+---
+
+## 8. AMENDMENT #2 — the "no recording yet" marker, FROZEN by the owner 2026-08-02
+
+The owner chose **option A** from a live visual comparison, and ruled: **the label is English —
+"coming soon" — with no Hebrew translation.** (His words: *"just say comming soon no need to
+translate to hebrew"*, and for the icon *"the sign not exist you know the circle with line
+crossing"*.)
+
+**FROZEN, quoted not named. Nothing here may be re-invented by an executor:**
+
+- The button still renders when a word resolves to a lemma but has **no clip**. It is
+  **not pressable** and carries the class `btn-say na` in addition to `btn-say`.
+- The glyph stays the existing speaker `&#128266;` (🔊). The "does not exist" mark is drawn as a
+  **diagonal line across the circle** by CSS, not by swapping in a different emoji — so it inherits
+  the button's real size and border and cannot drift from `.btn-say`.
+- The caption is the ASCII string **`coming soon`**, lower-case, English, directly under the button.
+- Exact rules, as shown to and approved by the owner:
+
+```css
+.btn-say.na {
+  opacity: 0.55;
+  cursor: default;
+  position: relative;
+}
+.btn-say.na::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: linear-gradient(to bottom right,
+    transparent calc(50% - 1.5px),
+    var(--color-muted) calc(50% - 1.5px),
+    var(--color-muted) calc(50% + 1.5px),
+    transparent calc(50% + 1.5px));
+}
+```
+```css
+.btn-say-soon { font-size: 0.8rem; color: var(--color-muted); margin-top: 7px; letter-spacing: 0.02em; }
+```
+
+**Why A and not the bare 🚫 he first described:** shown all three side by side, the prohibition sign
+reads to a child as *"you are not allowed"*, and a muted speaker reads as *"you switched it off"*.
+The crossed-out speaker reads as *"sound, not yet"* — which is the true statement. The owner agreed.
+
+**Consequences the planner must carry:**
+- `canSay` currently gates the button's EXISTENCE. It must now gate its **state** instead: the
+  button renders either way; only `na` differs. The honesty property word-polish proved must
+  survive — a pressable button still implies a clip exists.
+- The Hebrew and the save line must not move. Verified in the mock: nothing else on the popup shifts.
+- `.btn-say.na` is non-interactive, so it is **not** subject to the 3:1 contrast gate for controls;
+  the `coming soon` caption IS text and must pass `scripts/check-contrast.mjs` against
+  `--color-card`. **The planner must add that pair to the contrast script, or state why not.**
+- This lands in **phase 2**, with the audio work, because it is the same surface.
