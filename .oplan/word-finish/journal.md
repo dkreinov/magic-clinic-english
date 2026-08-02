@@ -87,7 +87,12 @@ ORCHESTRATOR ERRORS IT CAUGHT — all three were mine:
    catalogue literal, pinned by a deepStrictEqual; the real seam is cardHtml:163-167. An executor
    sent to my address would have broken a pin and fixed nothing. design.md corrected in place.
 3. **E is TWO files, not one** — trophies-val/sandbox/profile.json (15 words) was missed entirely.
-   Step 1.1's scope grows to cover both.
+   *** CORRECTION 2026-08-02: the sentence that stood here, "Step 1.1's scope grows to cover both",
+   was FALSE OF THE PLAN. I asserted the scope change in this journal but never made it in plan.md,
+   where step 1.1 named one file and FINDING 1 explicitly excluded the other. The plan reviewer
+   caught it as its only HIGH finding. Actually fixed by P1-AMENDMENT #1 at the end of plan.md.
+   THE LESSON: writing that something is fixed is not fixing it; the journal must be written FROM
+   the plan, never the other way round. ***
 
 PLANNER FOUND A DEFECT IN ITS OWN GATE BY RUNNING IT: §VAL-F1 printed 4 FAIL: lines and EXITED 0,
 because the preamble carries no `exit $RC` — run alone it is a REPORT, not a gate. Verified correct

@@ -2159,3 +2159,40 @@ you and is its own piece of work.
 *End of plan. Six steps: 1.1 sandbox · 1.2 the trophy card · 1.3 the returning story ·
 1.4 the scroll · 1.5 a human looks · 1.6 close. Ledger 355 → 363 flat, 360 → 368 reported.
 No deploy, no API, no money, no `CACHE` bump.*
+
+---
+
+# P1-AMENDMENT #1 (orchestrator, 2026-08-02) — step 1.1 covers BOTH sandbox fixtures
+
+**Raised by the plan reviewer as its only HIGH finding, and it is an ORCHESTRATOR error.**
+`journal.md` states "Step 1.1 now covers BOTH sandbox files". That was **false of the plan document
+actually delivered**: step 1.1's `FILES:` list (`plan.md:1078-1083`) names only
+`english-app-sandbox/profile.json`; FINDING 1 (`:112-116`) explicitly classifies
+`trophies-val/sandbox/profile.json` as out of scope; and Acceptance Criterion 15 (`:366-370`) pins
+one md5. I asserted a scope change in the record without making it in the plan.
+
+**RULING: step 1.1 replaces BOTH files with synthetic data.**
+
+The planner excluded the second file because it measured **0 overlap** with her vocabulary. That
+reasoning is not wrong, but it is **not sufficient, and the plan must not rest on it**: the only
+surviving reference is the 12-word sandbox copy, and her live profile holds ~40 words. Zero overlap
+against 12 of 40 proves nothing about the other 28. Re-measured today: the fixture holds 15 word
+keys, overlap 0 against the 12 — the same number the planner got, and it carries the same weakness.
+
+**Why replace rather than investigate:** proving the fixture is not hers would mean reconstructing
+her full vocabulary from the live service — a fresh authenticated read, for a question whose answer
+changes nothing. Replacing both is a few seconds and makes the question moot. Easy and robust: when
+a cheap action removes an ambiguity entirely, take it instead of measuring the ambiguity.
+
+**Concretely, step 1.1 as amended:**
+- FILES: `C:/Users/dkreinov/english-app-sandbox/profile.json` **and**
+  `C:/Users/dkreinov/trophies-val/sandbox/profile.json`. Both outside the repo; the repo write set
+  stays EMPTY, exactly as planned.
+- The step's frozen generator is run **twice**, once per path, producing the same synthetic profile.
+- Acceptance Criterion 15 extends: **both** files must equal the frozen synthetic md5, and a
+  machine-wide sweep must report **zero** files anywhere under `C:/Users/dkreinov` (excluding
+  `node_modules`, `.git`, `AppData`) that parse as a profile with `learner` defined and **more than
+  2 word keys**. The 2-word comparator fixtures (`cat`, `dog`) are synthetic and are the only
+  legitimate survivors.
+- That sweep is the real gate: it is the only check that would have caught the five copies the first
+  deletion missed, and it is now written down so it cannot be forgotten again.
