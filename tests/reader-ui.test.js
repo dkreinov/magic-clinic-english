@@ -774,3 +774,75 @@ test('a re-entry restarts the quiz and keeps what she already did, and C does no
     'reader.js must not mention checkLog -- R4(ii) is a later, carried obligation'
   );
 });
+
+test('the reader records its scroll position only while the reader route is mounted', async () => {
+  const { shouldRecordScroll } = await import('../public/views/reader.js');
+  assert.strictEqual(shouldRecordScroll('#/reader'), true, '#/reader must be recorded');
+  const notReader = ['#/words', '#/home', '#/trophies', '#/placement', '#/parent', '', '#/reader?x'];
+  for (const hash of notReader) {
+    assert.strictEqual(shouldRecordScroll(hash), false, `${JSON.stringify(hash)} must not be recorded`);
+  }
+
+  const src = readFileSync(viewPath, 'utf8');
+  const guardStr = 'if (typeof window !== "undefined" && typeof window.addEventListener === "function") {';
+  assert.strictEqual(
+    src.split(guardStr).length - 1,
+    1,
+    'the listener registration must be guarded exactly once'
+  );
+  const guardAt = src.indexOf(guardStr);
+  assert.strictEqual(
+    src.split('window.addEventListener(').length - 1,
+    1,
+    'the scroll listener must be registered exactly once'
+  );
+  const addAt = src.indexOf('window.addEventListener(', guardAt);
+  assert.ok(addAt > guardAt, 'the listener must be registered inside the guard');
+  const closeAt = src.indexOf(');', addAt);
+  const block = src.slice(guardAt, closeAt + 2);
+  assert.ok(block.includes('"scroll"'), 'must listen for the scroll event');
+  assert.ok(block.includes('{ passive: true }'), 'the listener must be passive');
+
+  const originalWindow = globalThis.window;
+  delete globalThis.window;
+  try {
+    const freshUrl = new URL('../public/views/reader.js', import.meta.url).href + '?scrollGuardProbe';
+    await assert.doesNotReject(
+      import(freshUrl),
+      'reader.js must import cleanly in node with no window defined'
+    );
+  } finally {
+    if (originalWindow === undefined) delete globalThis.window;
+    else globalThis.window = originalWindow;
+  }
+});
+
+test('restoring the scroll is attempted on a re-entry and never on a first entry', async () => {
+  const originalWindow = globalThis.window;
+  const originalFetch = globalThis.fetch;
+  const scrollCalls = [];
+  globalThis.window = {
+    location: { hash: '#/reader' },
+    scrollTo: (...args) => { scrollCalls.push(args); },
+    addEventListener: () => {},
+  };
+  try {
+    const freshUrl = new URL('../public/views/reader.js', import.meta.url).href + '?scrollRestoreProbe';
+    const { render } = await import(freshUrl);
+    const { container } = t13Container();
+    const profile = t13Profile([t13Chapter(1, 'Chapter One', 'The cat sat still.')]);
+    const { stub } = t13StubFetch(() => profile);
+    globalThis.fetch = stub;
+
+    await render(container, {}); // first entry: nothing kept yet
+    assert.strictEqual(scrollCalls.length, 0, 'scrollTo must never be called on a first entry');
+
+    await render(container, {}); // re-entry: kept state exists now
+    assert.ok(scrollCalls.length >= 1, 'scrollTo must be called at least once on a re-entry');
+    assert.strictEqual(scrollCalls[0][0], 0, 'the x argument to scrollTo must be 0');
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalWindow === undefined) delete globalThis.window;
+    else globalThis.window = originalWindow;
+  }
+});

@@ -47,6 +47,36 @@ export function restartQuizzes(quizState) {
   return quizState;
 }
 
+// C (word-finish), the other half of "it takes time": she also loses her place.
+// app.innerHTML = "" collapses the document height to nothing, so the browser
+// drops her to the top before the new view has any content.
+//
+// There is no unmount hook, so the position is recorded CONTINUOUSLY rather than
+// at the moment of leaving. The hash guard is the same source of truth the router
+// itself uses (app.js:20), so scrolling the dictionary can never overwrite the
+// reader's saved position -- and by the time the router runs, the hash has already
+// changed, so the collapse-to-zero scroll event is ignored.
+//
+// A hashchange listener would fire earlier and be exact, but only because
+// reader.js's module body runs before app.js's. Depending on ESM evaluation order
+// would fail SILENTLY -- restoring her to 0 with nothing to show for it -- the day
+// someone reorders an import. This does not depend on it.
+let readerScrollY = 0;
+
+export function shouldRecordScroll(hash) {
+  return hash === "#/reader";
+}
+
+if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (shouldRecordScroll(window.location.hash)) readerScrollY = window.scrollY;
+    },
+    { passive: true }
+  );
+}
+
 const VIEW_STYLE = `
   .reader-card-title {
     font-size: 1.15rem;
@@ -435,6 +465,7 @@ export async function render(container, ctx) {
     if (resuming) restartQuizzes(quizState);
     if (resuming) decideStage();
     draw();
+    if (resuming) restoreScroll();
     let signature = resuming ? kept.signature : null;
     try {
       allowedWords = await getAllowedSet();
@@ -454,6 +485,7 @@ export async function render(container, ctx) {
       if (!resuming) stage = "error";
     }
     draw();
+    if (resuming) restoreScroll();
     remember(signature);
   }
 
@@ -461,6 +493,10 @@ export async function render(container, ctx) {
     sitting = { profile, signature, lemmas, knownSet, candidateSet, quizLemmasByChapter, askedThisSitting, checkState, quizState };
   }
 
+  function restoreScroll() {
+    if (typeof window === "undefined" || typeof window.scrollTo !== "function") return;
+    window.scrollTo(0, readerScrollY);
+  }
   function decideStage() {
     if (!profile.placement || !profile.placement.completed) {
       stage = "needs-placement";
