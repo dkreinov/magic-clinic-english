@@ -139,6 +139,19 @@ export function renderQuizLauncher(count) {
   return `<div class="words-quiz-launch"><button class="btn btn-primary" type="button" data-action="start-quiz">בואי נתרגל מילים</button></div>`;
 }
 
+// word-finish phase 2 (design section 8, FROZEN). canSay gates the button's STATE, no
+// longer its EXISTENCE. A word we cannot speak still shows the speaker, crossed out
+// by CSS, with the ASCII caption "coming soon" under it -- so she can tell "no sound
+// for THIS word yet" from "this app has no sound". The pressable branch still implies
+// a clip exists: it is the only branch that carries data-say, and the [data-say]
+// handler is the only thing that can play anything.
+export function saySlot(canSay, lemma) {
+  if (canSay) {
+    return `<button class="btn-say" type="button" data-say="${escapeHtml(lemma)}" aria-label="הקשיבי למילה">🔊</button>`;
+  }
+  return `<span class="say-soon-wrap"><button class="btn-say na" type="button" disabled aria-hidden="true">🔊</button><span class="btn-say-soon">coming soon</span></span>`;
+}
+
 export function renderList(words, allowedWords = null, launcherHtml = "") {
   const entries = Object.entries(words).sort((a, b) => {
     const aTime = Date.parse(a[1].lastSeen) || 0;
@@ -157,9 +170,7 @@ export function renderList(words, allowedWords = null, launcherHtml = "") {
       // not loaded we fall back to assuming the key is sayable -- it is a lemma
       // by then, so that is the right guess.
       const sayLemma = allowedWords ? resolveLemma(lemma, allowedWords) : lemma;
-      const sayHtml = sayLemma
-        ? `<button class="btn-say" type="button" data-say="${escapeHtml(sayLemma)}" aria-label="הקשיבי למילה">🔊</button>`
-        : "";
+      const sayHtml = saySlot(Boolean(sayLemma), sayLemma || lemma);
       const knowHtml =
         entry.status === "learning" || entry.status === "candidate"
           ? `<button class="btn-know" type="button" data-action="know" data-lemma="${escapeHtml(lemma)}">יודעת את זה</button>`
