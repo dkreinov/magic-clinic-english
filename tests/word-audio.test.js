@@ -53,9 +53,15 @@ test('dry run reports the derived word count without a network call', () => {
   });
   assert.strictEqual(result.status, 0, `expected exit 0, got stderr: ${result.stderr}`);
   const out = result.stdout.toString();
-  assert.ok(out.includes('words: 2264'), `words line wrong: ${out}`);
-  assert.ok(out.includes('extras: 10'), `extras line wrong: ${out}`);
-  assert.ok(out.includes('clips: 2264'), `clips line wrong: ${out}`);
+  // 2264 -> 2266: F2-1 closed. `ellie` and `sparkle` -- her heroine's and pet's names --
+  // come from profile.learner, so no band-derived top-up could ever reach them and she was
+  // told "coming soon" on her own characters indefinitely. Adding them was measured safe
+  // first: 18122 surface forms swept, 10 gains, 0 regressions, 0 key splits, and
+  // migrateWordKeys leaves her keys and taps identical. `sparkling` still resolves to
+  // itself, because resolveLemma tries an exact match before de-inflecting.
+  assert.ok(out.includes('words: 2266'), `words line wrong: ${out}`);
+  assert.ok(out.includes('extras: 12'), `extras line wrong: ${out}`);
+  assert.ok(out.includes('clips: 2266'), `clips line wrong: ${out}`);
 });
 
 // NEW in phase 2 -- THE HONESTY INVARIANT, and the whole point of the
