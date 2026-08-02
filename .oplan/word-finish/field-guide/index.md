@@ -146,3 +146,20 @@
     NEVER put a raw control character inside a shell command here. And: WHEN EVERY INPUT PASSES A
     CHECK IDENTICALLY, THE CHECK IS THE SUSPECT, not the inputs. Five files all reporting
     "CRLF-lines == total lines" was the tell, and it was ignored.
+
+17. A PREAMBLE IS NOT A GATE; ONLY PREAMBLE+TAIL IS.
+    §VAL-F1 printed four FAIL: lines and EXITED 0 — the preamble carries no `exit $RC` by design.
+    Run alone it is a REPORT. Every step's tail must end `exit $RC`, in the SAME file.
+
+18. NEVER BUILD A PATTERN OUT OF THE CONTENT YOU ARE SEARCHING FOR.
+    A sweep meant to prove a trophy card cannot contradict itself used a regex containing the
+    Hebrew word מתוך. It matched NOTHING on all 3020 cards and reported zero violations — a green
+    test that had inspected nothing. Extract structurally (`>([^<]*)<`), then pull `\d+` out of the
+    result. And ALWAYS instrument a new sweep once: print how many items it actually observed.
+    If "observed" is 0 or equals "skipped", the test is decoration.
+
+19. WRITING CODE THROUGH SHELL QUOTING EATS BACKSLASHES. USE A FILE.
+    `node -e` inside single quotes inside a heredoc turned `<\/p>` into `</p>` and `\d+` into `d+`,
+    breaking a whole test file — 364 passing tests became 337. Write the block to a file with a
+    QUOTED heredoc (<<'X'), then splice it in with node. And read the test COUNT back, not just
+    "tests pass": a file that fails to parse silently removes all of its tests from the total.

@@ -1245,3 +1245,52 @@ test('the fix is display-only: awarding, the celebration and the catalogue are u
   const profileWithMetricPastBronzeButNoStoredTier = t32Profile(t32KnownWords(10), []);
   assert.deepStrictEqual(uncelebrated(profileWithMetricPastBronzeButNoStoredTier), []);
 });
+
+// P1-AMENDMENT #3 (word-finish). THE RENDER-LEVEL SWEEP.
+//
+// The auditor found the gap this closes. Test 1 sweeps displayTier in ISOLATION, so a
+// regression that re-splits cardHtml's two sources while leaving displayTier correct
+// would not be caught. The cardHtml test above DOES call the real render path, but with
+// one profile in which only 'known' has a non-zero metric -- the other seven trophies sit
+// at 0, so the same bug in any of them slips past both.
+//
+// This drives EVERY trophy over EVERY interesting metric value against EVERY stored shape,
+// through the real cardHtml. The metric is substituted rather than the profile constructed,
+// because the eight metrics read eight different profile fields and the thing under test is
+// the CARD, not the arithmetic.
+test('no trophy card can render greyed-out while its number has reached the target', async () => {
+  const { TROPHY_VIEW, cardHtml } = await import('../public/views/trophies.js');
+  const MITOCH = '\u05de\u05ea\u05d5\u05da';
+  const profile = { words: {}, story: { chapters: [] }, meta: {} };
+
+  // Extract the two numbers WITHOUT depending on the Hebrew word between them.
+  // The first version of this helper used a regex containing MITOCH and matched
+  // NOTHING on all 3020 cards, so the sweep silently checked zero of them.
+  const progressOf = (card) => {
+    const m = card.match(/<p class="trophy-progress">([^<]*)<\/p>/);
+    if (!m) return null;
+    const nums = m[1].match(/\d+/g);
+    return nums && nums.length === 2 ? { metric: Number(nums[0]), target: Number(nums[1]) } : null;
+  };
+
+  let combos = 0;
+  const violations = [];
+  for (const trophy of TROPHY_VIEW) {
+    for (const stored of [undefined, {}, { bronze: 'x' }, { bronze: 'x', silver: 'x' },
+                          { bronze: 'x', silver: 'x', gold: 'x' }]) {
+      for (let v = 0; v <= trophy.gold + 3; v++) {
+        const faked = { ...trophy, metric: () => v };
+        const card = cardHtml(faked, profile, { [trophy.id]: stored });
+        const locked = card.includes('trophy-card--locked');
+        const p = progressOf(card);
+        combos += 1;
+        if (locked && p && p.metric >= p.target) {
+          violations.push(`${trophy.id} v=${v} stored=${JSON.stringify(stored)} -> locked but ${p.metric}/${p.target}`);
+        }
+      }
+    }
+  }
+  assert.ok(combos > 1500, `sweep too small to mean anything: ${combos} combinations`);
+  assert.deepStrictEqual(violations, [],
+    `a card rendered greyed-out while at or past its target:\n${violations.slice(0, 5).join('\n')}`);
+});
