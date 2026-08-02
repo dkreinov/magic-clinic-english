@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { resolveLemma } from '../public/lemma.js';
-import { deriveWordList } from '../scripts/build-word-audio.js';
+import { clipsOnDisk } from '../scripts/build-word-audio.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
@@ -76,8 +76,15 @@ test('the manifest matches the clips on disk and the derived word list', () => {
   assert.deepEqual(manifest, [...manifest].sort(), 'manifest must be sorted');
   assert.deepEqual(new Set(manifest).size, manifest.length, 'no duplicates');
 
-  const derived = deriveWordList();
-  assert.deepEqual(manifest, derived, 'manifest must equal deriveWordList()');
+  // RE-EXPRESSED in phase 2 (field guide 22). This pin used to assert that the
+  // manifest equalled the CURRICULUM-derived word list. Design section 3 A
+  // deliberately overturned that: the manifest is now a statement about WHAT IS
+  // ON DISK, so a manifest entry can never be a dead play button. The pin named
+  // a real property -- the manifest agrees with the thing that produces it -- in
+  // a spelling that named the wrong producer. The property survives; the
+  // producer moved.
+  const derived = clipsOnDisk();
+  assert.deepEqual(manifest, derived, 'manifest must equal clipsOnDisk()');
 
   const missing = manifest.filter((w) => !clipSet.has(w));
   const extra = [...clipSet].filter((w) => !manifest.includes(w));

@@ -1,6 +1,7 @@
 // One-time (resumable) generator for per-word audio clips.
-// Derives the word list from the same allowed-vocabulary builder the story
-// generator uses (lib/story.js + data/band1.json + data/band2.json), then
+// Derives WHAT TO GENERATE from the same allowed-vocabulary builder the story
+// generator uses (lib/story.js + data/band1.json + data/band2.json) UNION the
+// explicit story-word extras in data/story-words.json, then
 // calls the OpenAI TTS API to synthesize each word and writes the resulting
 // aac bytes to public/audio/words/<lemma>.aac.
 //
@@ -14,7 +15,7 @@
 // dependencies (uses global fetch). Node ESM. Resumable: re-running skips
 // any word whose .aac file already exists.
 
-import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -27,6 +28,7 @@ const BAND1_PATH = path.join(REPO_ROOT, 'data', 'band1.json');
 const BAND2_PATH = path.join(REPO_ROOT, 'data', 'band2.json');
 const WORDS_DIR = path.join(REPO_ROOT, 'public', 'audio', 'words');
 const MANIFEST_PATH = path.join(WORDS_DIR, 'index.json');
+const STORY_WORDS_PATH = path.join(REPO_ROOT, 'data', 'story-words.json');
 
 const MODEL = 'gpt-4o-mini-tts';
 const VOICE = 'nova';
@@ -37,7 +39,38 @@ const WORD_RE = /^[a-z]+(?:'[a-z]+)?$/;
 const MAX_ATTEMPTS = 4;
 const RETRY_BASE_MS = 1500;
 
-export function deriveWordList() {
+// TWO CONCEPTS, TWO NAMES. One function used to mean both at once, and that
+// ambiguity is exactly what let the manifest drift away from the disk.
+//
+//   wordsToGenerate()  = WHAT WE INTEND TO HAVE. The curriculum bands, plus the
+//                        explicit story-word extras. Drives the generation loop.
+//   clipsOnDisk()      = WHAT EXISTS. The .aac files, and nothing else.
+//
+// THE MANIFEST IS clipsOnDisk(), ALWAYS. A manifest entry with no file is a dead
+// speaker button in a child's story; deriving it from the disk makes that state
+// structurally unreachable rather than merely unlikely.
+//
+// The extras are a DATA FILE, never a literal in this script: a hardcoded word
+// list here is what tests/word-audio.test.js has forbidden since the first run.
+// BASE LEMMAS ONLY. See .oplan/word-polish/journal.md ruling B2: an inflected
+// surface form in the manifest stops migrateWordKeys (lib/profile.js) folding it
+// into its lemma, which SPLITS a word she has already collected into two entries.
+export function readStoryWords() {
+  if (!existsSync(STORY_WORDS_PATH)) return [];
+  const raw = JSON.parse(readFileSync(STORY_WORDS_PATH, 'utf8'));
+  if (!Array.isArray(raw)) throw new Error('data/story-words.json must be a JSON array');
+  const seen = new Set();
+  for (const w of raw) {
+    if (typeof w !== 'string' || !WORD_RE.test(w)) {
+      throw new Error(`data/story-words.json holds ${JSON.stringify(w)}, which can never be a lemma file`);
+    }
+    if (seen.has(w)) throw new Error(`data/story-words.json lists "${w}" twice`);
+    seen.add(w);
+  }
+  return [...seen];
+}
+
+export function bandWords() {
   const band1 = JSON.parse(readFileSync(BAND1_PATH, 'utf8'));
   const band2 = JSON.parse(readFileSync(BAND2_PATH, 'utf8'));
   const profile = { skills: { receptiveVocab: { band: 'A2' } }, words: {}, learner: {} };
@@ -45,11 +78,23 @@ export function deriveWordList() {
   return [...allowed].filter((w) => WORD_RE.test(w)).sort();
 }
 
+export function wordsToGenerate() {
+  return [...new Set([...bandWords(), ...readStoryWords()])].sort();
+}
+
+export function clipsOnDisk() {
+  if (!existsSync(WORDS_DIR)) return [];
+  return readdirSync(WORDS_DIR)
+    .filter((f) => f.endsWith('.aac'))
+    .map((f) => f.slice(0, -'.aac'.length))
+    .sort();
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function synthesizeWord(apiKey, lemma) {
+export async function synthesizeWord(apiKey, lemma) {
   const res = await fetch('https://api.openai.com/v1/audio/speech', {
     method: 'POST',
     headers: {
@@ -90,24 +135,25 @@ async function synthesizeWithRetry(apiKey, lemma) {
   throw lastErr;
 }
 
-// The manifest the browser resolves against. Written from the SAME derived list
-// the clips come from, so it cannot drift from what is actually on disk.
-export function writeManifest(words) {
+// The manifest the browser AND api/profile.js resolve against. It is written
+// from the DISK, so "listed" and "exists" cannot come apart. It takes no
+// argument on purpose: there is no caller-supplied list that could be wrong.
+export function writeManifestFromDisk() {
   mkdirSync(WORDS_DIR, { recursive: true });
+  const words = clipsOnDisk();
   writeFileSync(MANIFEST_PATH, JSON.stringify(words) + '\n');
-  return MANIFEST_PATH;
+  return { path: MANIFEST_PATH, count: words.length };
 }
 
 async function main() {
-  const words = deriveWordList();
+  const words = wordsToGenerate();
 
   if (process.env.WORD_AUDIO_DRY_RUN === '1') {
     console.log(`words: ${words.length}`);
+    console.log(`extras: ${readStoryWords().length}`);
+    console.log(`clips: ${clipsOnDisk().length}`);
     return;
   }
-
-  writeManifest(words);
-  console.log(`manifest: ${words.length} words -> ${MANIFEST_PATH}`);
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -123,18 +169,27 @@ async function main() {
   let wrote = 0;
   let skipped = 0;
 
-  for (const lemma of words) {
-    const outPath = path.join(WORDS_DIR, `${lemma}.aac`);
-    if (existsSync(outPath)) {
-      console.log(`skip ${lemma} (already exists)`);
-      skipped++;
-      continue;
-    }
+  try {
+    for (const lemma of words) {
+      const outPath = path.join(WORDS_DIR, `${lemma}.aac`);
+      if (existsSync(outPath)) {
+        console.log(`skip ${lemma} (already exists)`);
+        skipped++;
+        continue;
+      }
 
-    const bytes = await synthesizeWithRetry(apiKey, lemma);
-    writeFileSync(outPath, bytes);
-    console.log(`wrote ${lemma} (${bytes.length} bytes)`);
-    wrote++;
+      const bytes = await synthesizeWithRetry(apiKey, lemma);
+      writeFileSync(outPath, bytes);
+      console.log(`wrote ${lemma} (${bytes.length} bytes)`);
+      wrote++;
+    }
+  } finally {
+    // ALWAYS, even on a half-finished run: the manifest is a statement about
+    // the disk, and it must be true of the disk we actually have. A run that
+    // dies after 6 of 10 leaves 6 clips and a manifest that lists 6 -- honest,
+    // just incomplete, and completed by re-running (this script is resumable).
+    const m = writeManifestFromDisk();
+    console.log(`manifest: ${m.count} words -> ${m.path}`);
   }
 
   console.log(`wrote ${wrote}, skipped ${skipped}`);
