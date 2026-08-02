@@ -55,8 +55,17 @@ test('every .js file under public/ passes node --check', () => {
 
 test('sw.js has the expected cache name and precache list resolving to real files', () => {
   const sw = readFileSync(path.join(publicDir, 'sw.js'), 'utf8');
-  assert.ok(sw.includes('magic-vet-v20'));
-  assert.ok(!sw.includes('magic-vet-v19'), 'the old cache name must be gone, not merely joined');
+  // F1-1, word-finish phase 4: the single v20 -> v21 bump, spent exactly once, covering
+  // FOUR precached files changed across phases 1-2 (styles.css, views/reader.js,
+  // views/words.js, views/trophies.js). THE SEAM: the version is named ONCE here and
+  // read back out of sw.js, so a bump applied to only one of the two files fails loudly
+  // rather than leaving her browser serving yesterday's code from a cache with no reason
+  // to refetch -- which is exactly what F2-3 caught happening on a dev origin.
+  const EXPECTED_CACHE = 'magic-vet-v21';
+  const cacheMatch = sw.match(/const CACHE = "([^"]+)";/);
+  assert.ok(cacheMatch, 'expected to find the CACHE constant in sw.js');
+  assert.strictEqual(cacheMatch[1], EXPECTED_CACHE, 'sw.js CACHE and this pin must agree');
+  assert.ok(!sw.includes('magic-vet-v20'), 'the old cache name must be gone, not merely joined');
 
   const match = sw.match(/PRECACHE\s*=\s*(\[[\s\S]*?\])/);
   assert.ok(match, 'expected to find PRECACHE array literal in sw.js');

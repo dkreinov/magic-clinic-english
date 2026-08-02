@@ -1,4 +1,4 @@
-const CACHE = "magic-vet-v20";
+const CACHE = "magic-vet-v21";
 const PRECACHE = [
   "/",
   "/styles.css",
