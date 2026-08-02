@@ -841,6 +841,11 @@ test('the celebration is styled from the globally-linked stylesheet, not from a 
     '.trophy-art', '.trophy-name', '.trophy-celebrate-name', '.trophy-celebrate-rays',
     '.trophy-card--locked',
     '.trophy-card--bronze .trophy-art', '.trophy-card--silver .trophy-art', '.trophy-card--gold .trophy-art',
+    // word-trophy-tiers: the pips live in the GLOBAL sheet for the same reason every
+    // rule above does -- a view-scoped block only exists while that view is mounted
+    // (field guide 14), and the celebration card carries these classes too.
+    '.trophy-pips', '.trophy-pip',
+    '.trophy-card--bronze .trophy-pip--on', '.trophy-card--silver .trophy-pip--on', '.trophy-card--gold .trophy-pip--on',
   ]) {
     assert.ok(ownRule(selector),
       'public/styles.css must carry a rule of its OWN for ' + selector + ' -- the overlay fires on routes where the trophies view is not mounted');
@@ -1301,4 +1306,97 @@ test('no trophy card can render greyed-out while its number has reached the targ
   assert.ok(combos > 1500, `sweep too small to mean anything: ${combos} combinations`);
   assert.deepStrictEqual(violations, [],
     `a card rendered greyed-out while at or past its target:\n${violations.slice(0, 5).join('\n')}`);
+});
+
+// ---------------------------------------------------------------------------
+// word-trophy-tiers: THE LEVEL SHE IS AT MUST BE VISIBLE ON THE CARD.
+//
+// The learner's own report, 2026-08-02: "the trophies are all colored now, so
+// she doesn't feel like she's achieving something ... maybe we should have some
+// additional ranking, like the bronze, silver, gold".
+//
+// The ranking ALREADY EXISTED -- eight trophies x three tiers, thresholds
+// owner-signed and pinned by the catalogue test above. What did not exist was
+// any way for her to SEE which of the three she was on: the only difference
+// between bronze and gold on the shelf was a 3px ring colour on a 96px circle,
+// while LOCKED -> BRONZE flipped the whole card from greyscale/45% to full
+// colour. So crossing the FIRST threshold looked like finishing.
+//
+// The pips are the fix, and they carry NO WORDS: three dots, filled to the tier.
+// No new Hebrew is authored (the module's Hebrew inventory does not move), and
+// nothing is translated. They are aria-hidden because the progress line already
+// states the same fact in text.
+//
+// THE SEAM (field guide 15b): the pip count and the ring class must come from
+// the SAME tier. This is the identical failure shape as the "12 out of 5" defect
+// -- two correct parts disagreeing -- so it is asserted directly rather than
+// hoped for, over every trophy and every tier.
+// ---------------------------------------------------------------------------
+test('cardHtml shows which of the three levels she is on, and the pips can never disagree with the ring', async () => {
+  const { TROPHY_VIEW, cardHtml, TROPHY_TIERS_VIEW } = await import('../public/views/trophies.js');
+
+  const pipsOf = (card) => {
+    const block = card.match(/<p class="trophy-pips"[^>]*>([\s\S]*?)<\/p>/);
+    if (!block) return null;
+    const all = block[1].match(/<span class="trophy-pip[^"]*"><\/span>/g) || [];
+    const on = block[1].match(/<span class="trophy-pip trophy-pip--on"><\/span>/g) || [];
+    return { total: all.length, on: on.length };
+  };
+
+  let observed = 0;
+  const violations = [];
+
+  for (const trophy of TROPHY_VIEW) {
+    // every tier, driven through the REAL render path by moving the METRIC, so
+    // the tier is derived exactly as it is in production rather than injected.
+    const cases = [
+      { metric: 0, expectTier: null, expectOn: 0 },
+      { metric: trophy.bronze, expectTier: 'bronze', expectOn: 1 },
+      { metric: trophy.silver, expectTier: 'silver', expectOn: 2 },
+      { metric: trophy.gold, expectTier: 'gold', expectOn: 3 },
+      { metric: trophy.gold + 7, expectTier: 'gold', expectOn: 3 },
+    ];
+    for (const c of cases) {
+      observed++;
+      const faked = { ...trophy, metric: () => c.metric };
+      const card = cardHtml(faked, { words: {} }, {});
+      const pips = pipsOf(card);
+
+      if (pips === null) { violations.push(`${trophy.id}@${c.metric}: no pip block at all`); continue; }
+      if (pips.total !== 3) violations.push(`${trophy.id}@${c.metric}: ${pips.total} pips, expected 3`);
+      if (pips.on !== c.expectOn) violations.push(`${trophy.id}@${c.metric}: ${pips.on} filled, expected ${c.expectOn}`);
+
+      // THE SEAM: the ring class and the pip count must name the same tier.
+      const ring = card.match(/trophy-card--(locked|bronze|silver|gold)/);
+      const ringTier = ring && ring[1] === 'locked' ? null : ring && ring[1];
+      const pipTier = pips.on === 0 ? null : TROPHY_TIERS_VIEW[pips.on - 1];
+      if (ringTier !== pipTier) {
+        violations.push(`${trophy.id}@${c.metric}: ring says ${ringTier} but pips say ${pipTier} -- the "12 out of 5" seam, again`);
+      }
+      if (ringTier !== c.expectTier) {
+        violations.push(`${trophy.id}@${c.metric}: ring says ${ringTier}, expected ${c.expectTier}`);
+      }
+    }
+  }
+
+  assert.ok(observed === TROPHY_VIEW.length * 5,
+    `sweep observed ${observed} cards, expected ${TROPHY_VIEW.length * 5} -- an uninstrumented sweep is decoration`);
+  assert.deepStrictEqual(violations, [],
+    `the level she is on is not legible, or contradicts the ring:\n${violations.slice(0, 6).join('\n')}`);
+});
+
+// The pips must be DECORATIVE ONLY. The progress line is the accessible statement
+// of the same fact, so a screen reader must not hear "bullet bullet bullet".
+test('the pips are aria-hidden, carry no text, and author no new Hebrew', async () => {
+  const { TROPHY_VIEW, cardHtml } = await import('../public/views/trophies.js');
+  const card = cardHtml(TROPHY_VIEW[0], { words: {} }, {});
+  const block = card.match(/<p class="trophy-pips"([^>]*)>([\s\S]*?)<\/p>/);
+  assert.ok(block, 'expected a trophy-pips block');
+  assert.ok(block[1].includes('aria-hidden="true"'),
+    'the pips duplicate the progress line, so they must be aria-hidden');
+  const inner = block[2].replace(/<span class="trophy-pip[^"]*"><\/span>/g, '').trim();
+  assert.strictEqual(inner, '', `the pip block must hold only pip spans, found: ${JSON.stringify(inner)}`);
+  let nonAscii = 0;
+  for (const ch of Buffer.from(block[0], 'utf8')) if (ch > 127) nonAscii++;
+  assert.strictEqual(nonAscii, 0, 'the pip block must be pure ASCII -- no new Hebrew is authored for this feature');
 });

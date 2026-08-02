@@ -200,6 +200,29 @@ export function progressLine(trophy, profile, tier) {
   return `${trophy.metric(profile)} ${MITOCH} ${next}`;
 }
 
+// word-trophy-tiers: WHICH OF THE THREE LEVELS SHE IS ON, as three dots.
+//
+// The learner reported the shelf reads as finished: crossing the FIRST threshold
+// flipped a card from greyscale/45% to full colour, and from there bronze and gold
+// differed only by a 3px ring colour. The three tiers were already there and she
+// could not see them.
+//
+// NO WORD IS AUTHORED HERE. The pips carry no text at all, so no new Hebrew enters
+// the app and nothing needs translating; the progress line already states the same
+// fact in words, which is why the block is aria-hidden rather than labelled.
+//
+// It takes the SAME tier cardHtml draws the ring from -- not a second derivation --
+// so the pips and the ring cannot disagree. That is the "12 out of 5" seam
+// (field guide 15b) closed by construction rather than by care.
+export function tierPips(tier) {
+  const filled = tier === null ? 0 : TROPHY_TIERS_VIEW.indexOf(tier) + 1;
+  let out = "";
+  for (let i = 0; i < TROPHY_TIERS_VIEW.length; i++) {
+    out += `<span class="trophy-pip${i < filled ? " trophy-pip--on" : ""}"></span>`;
+  }
+  return `<p class="trophy-pips" aria-hidden="true">${out}</p>`;
+}
+
 // One card: artwork, name, the tier ring, and the plain-text progress line.
 // The artwork src is the SAME for every state (T4: no separate locked asset).
 export function cardHtml(trophy, profile, trophies) {
@@ -213,7 +236,8 @@ export function cardHtml(trophy, profile, trophies) {
       <article class="trophy-card">
         <div class="${layer}">
           <img class="trophy-art" src="/assets/trophies/${trophy.id}.webp" alt="" />
-          <p class="trophy-name">${trophy.name}</p>${progress}
+          <p class="trophy-name">${trophy.name}</p>
+          ${tierPips(tier)}${progress}
         </div>
       </article>`;
 }

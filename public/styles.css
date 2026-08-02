@@ -477,14 +477,17 @@ a {
    never blended, because a blended colour fabricates a contrast pass. */
 .trophy-card--bronze .trophy-art {
   border-color: var(--color-bronze);
+  border-width: 3px;
 }
 
 .trophy-card--silver .trophy-art {
   border-color: var(--color-silver);
+  border-width: 5px;
 }
 
 .trophy-card--gold .trophy-art {
   border-color: var(--color-gold);
+  border-width: 7px;
 }
 
 /* A1: per-tier ring WEIGHT, on the medallion only -- gold reads heavier. The
@@ -503,6 +506,41 @@ a {
 .trophy-card--locked .trophy-art {
   filter: grayscale(1);
   opacity: 0.45;
+}
+
+/* word-trophy-tiers: three dots, filled to the tier she has reached. The learner
+   could not tell bronze from gold -- the ring colour alone was not legible at 96px,
+   while locked-to-bronze flipped the whole card, so level 1 of 3 read as finished.
+   No text, no new Hebrew: the progress line already says it in words. A locked card
+   shows three empty pips, which reads as none-of-three rather than as nothing. */
+.trophy-pips {
+  display: flex;
+  gap: 6px;
+  margin: 2px 0 0;
+}
+
+.trophy-pip {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+}
+
+/* The fill arrives from the SAME tier token the ring uses, never a blend: a blended
+   colour fabricates a contrast pass (T7). */
+.trophy-card--bronze .trophy-pip--on {
+  background: var(--color-bronze);
+  border-color: var(--color-bronze);
+}
+
+.trophy-card--silver .trophy-pip--on {
+  background: var(--color-silver);
+  border-color: var(--color-silver);
+}
+
+.trophy-card--gold .trophy-pip--on {
+  background: var(--color-gold);
+  border-color: var(--color-gold);
 }
 
 .trophy-name {
