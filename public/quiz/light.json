@@ -11,6 +11,6 @@
     "sense": "a lamp that helps you to see when a room is dark",
     "sentence": "Please turn on the ___ so that I can see my book.",
     "answer": "light",
-    "distractors": ["radio", "television", "oven", "fan", "camera", "computer", "machine", "motor"]
+    "distractors": ["radio", "iron", "oven", "fan", "camera", "clock", "machine", "motor"]
   }
 ]

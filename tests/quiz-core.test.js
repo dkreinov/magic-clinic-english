@@ -91,7 +91,12 @@ test('selectOptions really shuffles and is deterministic under a stub rand, on p
   const stub = () => 0;
   const opts1 = selectOptions(item, new Set(), stub);
   const opts2 = selectOptions(item, new Set(), stub);
-  assert.deepStrictEqual(opts1, ['radio', 'television', 'oven', 'fan', 'camera', 'light']);
+  // RE-EXPRESSED, word-finish 3.3 (field guide 22): this pin names a PROPERTY --
+  // selectOptions is deterministic under a stub rand -- not a particular option list.
+  // `television` and `computer` left light.json[1] because both are answers a child
+  // could defend for "turn on the ___ so that I can see my book", and the item then
+  // marks her wrong for being right. The pin was SEEN TO FAIL (not ok 5) before it moved.
+  assert.deepStrictEqual(opts1, ['radio', 'iron', 'oven', 'fan', 'camera', 'light']);
   assert.deepStrictEqual(opts2, opts1);
 });
 
