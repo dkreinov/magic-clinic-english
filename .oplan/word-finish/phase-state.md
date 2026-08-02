@@ -72,6 +72,14 @@ STANDING RULINGS (recorded the day they were made -- field guide 24):
         N<=25 gate can never stall. Frozen ordering: most-recent-chapter glossary first, then taps
         desc, then lastSeen desc, then LC_ALL=C asc. The remainder is DEFERRED AND REPORTED
         (WORDS-DEFERRED.txt + the owner's page + F3-2), never silently truncated (field guide 18).
+  R-F3-5  2026-08-02, ORCHESTRATOR, DURING EXECUTION OF 3.1. HER WORD LIST DOES NOT ENTER THE
+        REPOSITORY. plan-phase3 step 3.1 specified topup-3-run1.txt / topup-3-run2.txt under
+        .oplan/word-finish/ -- which would write NEED <word> lines, i.e. her vocabulary, into the
+        repo. That is the very practice the plan's own section 2.2 flags as a surviving leak
+        (.oplan/word-quiz/topup-1-words.txt) and record gap 9 (design.md:17). AMENDED: the two
+        run outputs and WORDS.txt live OUTSIDE the repo (/c/Users/dkreinov/f3-stage/), the .oplan
+        record carries COUNTS ONLY (backup-receipt.txt), and every step tail parses the outside
+        copies. A plan may not re-commit a leak it just identified.
   B-F3-1  2026-08-02, ORCHESTRATOR, under R-CAPTURE. Phase 3 derives its target word set from a
         live capture, not from a repo-derivable substitute. The alternative was measured once
         already and failed: word-quiz's 50-word pilot bank overlapped her 12 known words in

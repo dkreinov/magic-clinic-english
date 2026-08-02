@@ -1,0 +1,8 @@
+# word-finish phase 3 -- capture receipt. COUNTS AND HASHES ONLY, NEVER CONTENTS.
+# The capture and its projection live OUTSIDE the repository and are deleted at step 3.8.
+capture /c/Users/dkreinov/english-app-backups/profile-20260802-163625.json bytes=24659 sha256=3d2a22fcc2c1e7384b491de1f6ae1bcc31164e9ec0c2070d33ea9d9e22905e68 ts=2026-08-02T16:36:25 http=200
+capture-shape words=42 known=15 candidate=8 learning=19 chapters=8 glossaryEntries=61 distinctGlossaryWords=39 glossaryInProfile=10
+projected /c/Users/dkreinov/english-app-backups/profile-20260802-163625-projected.json sha256=fe69952410265319fb56e41f071e01b26a8f90018e12b8561b83d2aea7f18a44 projected=9
+topup TOPUP-RUN-1 known=15 candidate=8 pool=23 dropped=0 covered=12 missing=11
+topup TOPUP-RUN-2 known=24 candidate=5 pool=29 dropped=0 covered=13 missing=16
+target N=16 inManifest=16 alreadyBanked=0 qz8Excluded=0 rule8Exempt=2 deferred=0 (N<=25, R-F3-4's cap did not bite)
