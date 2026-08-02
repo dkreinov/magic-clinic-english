@@ -2239,3 +2239,40 @@ in step 1.2 and in later steps still holds.
 **Generalised, because this is now twice:** a mandated verbatim comment must never contain an
 identifier that any raw-substring gate forbids. When writing a step that quotes prose, grep the
 prose against every substring pin in force before freezing it.
+
+## P1-AMENDMENT #3 — the render-level sweep, and the LEDGER SHIFT it causes
+
+**Why it exists.** The step-1.2 auditor returned `match / high` but named a real gap: test 1 sweeps
+`displayTier` in ISOLATION, so a regression that re-splits `cardHtml`'s two sources while leaving
+`displayTier` correct would not be caught; and the one test that does call `cardHtml` uses a single
+profile in which only `known` has a non-zero metric, so the same bug in any of the other seven
+trophies slips past both. The design demands the contradiction be UNREPRESENTABLE, not absent today.
+
+**What was added.** A fourth test in `tests/trophies-ui.test.js`, driving the REAL `cardHtml` over
+8 trophies x 5 stored shapes x every metric from 0 to gold+3 = **3020 combinations**, substituting
+`trophy.metric` rather than constructing profiles (the eight metrics read eight different fields;
+the thing under test is the CARD, not the arithmetic).
+
+**SEEN TO FAIL.** With `cardHtml`'s tier line mutated back to `tierOf(earned)`, `npm test` reports
+`not ok 309 - no trophy card can render greyed-out while its number has reached the target`
+alongside the pre-existing `not ok 307`. Restored: 364 pass / 0 fail, `trophies.js` md5 back to
+`715fd1b6123b379880360429bb0ce3e1`.
+
+**THREE FAILURES ON THE WAY THERE, recorded because they are the phase's real lesson:**
+1. The sweep's first regex embedded the Hebrew word `מתוך` and matched **nothing** — `progressOf`
+   returned null on all 3020 cards, so it checked ZERO of them and passed. Fixed by extracting
+   structurally (`>([^<]*)<`) and pulling `\d+` from the result. -> field guide 18.
+2. The fix was written through `node -e` inside shell quoting, which ate the backslashes: `<\/p>`
+   became `</p>` and `\d+` became `d+`, breaking the whole test file. `npm test` fell from 364 to
+   **337 passing** — visible only by reading the COUNT, not the word "pass". -> field guide 19.
+3. Only the third attempt, written to a file with a quoted heredoc and spliced in with node, worked.
+
+**LEDGER SHIFT — every later step in this phase inherits +1.**
+Steps 1.3, 1.4 and 1.6 were planned against `358 flat / 363 reported`. The correct post-1.2 baseline
+is now **`359 flat / 364 reported`**, and each later step's frozen tail must have its two ledger
+pins raised by exactly 1 before it is run. Nothing else in those steps changes.
+
+**The step-1.2 gate is CLOSED, not stale.** It exited 0 at the moment of acceptance, before this
+amendment. Re-running it now fails on the ledger pins (363/358), on the deletion budget and on the
+write set — all three because the step is COMMITTED and the ledger deliberately moved afterwards.
+That is expected and is not a regression.
