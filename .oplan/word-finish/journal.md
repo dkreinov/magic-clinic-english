@@ -138,3 +138,43 @@ STILL STALE, patched next: word-polish/plan.md quotes reader.js 845 (now 857), r
   deriving it from what the step actually produces, and then read my own assertion back as evidence.
   The counter-habit is mechanical: after writing any gate, ask "what does the CORRECT tree look
   like to this check?" and confirm the check passes on it -- not only that it fails on a broken one.
+
+## 2026-08-02 — PHASE 1 CLOSED. Gate PHASE-1-CLOSE-OK, exit 0.
+
+STEPS 1.1-1.6 all accepted. Ledger 369 reported / 364 flat / 0 fail; contrast 58; quiz bank 62/84.
+Write set for the whole phase, against base e44cffa, is exactly four files:
+  public/views/reader.js  public/views/trophies.js  tests/reader-ui.test.js  tests/trophies-ui.test.js
+Zero repository deletions. QZ-18 md5s unmoved. CACHE deliberately still v20.
+
+1.5 VISUAL GATE, self-served (owner directive), findings:
+  - trophies: ZERO cards locked at or past target. `known` and `proven` -- the exact two the fixture
+    was built to reproduce the defect on -- now render earned/full-colour at 5/15 and 1/5. Six cards
+    stay legitimately locked below target. Shelf banner reads as a shelf (the word-polish fix holds).
+  - reader: left to the word list and came back -> NO loading screen, NO spinner, story present on
+    the first paint, and the two screenshots before/after are PIXEL-IDENTICAL, so scroll landed
+    exactly where she left it. The answered question was still answered.
+  - NEAR-MISS WORTH RECORDING: the first read of the trophy screen showed the DEFECT (5 מתוך 5).
+    curl proved the server was serving the FIXED module. A stale localhost service worker was
+    serving yesterday's code. Switching to 127.0.0.1:3000 showed the truth. I had skipped the
+    plan's own step 3 ("hard-reload past any stale localhost service worker") and nearly reported a
+    false regression. -> field guide 23.
+  - The dev server DID write to the sandbox (md5 changed); restored from the pristine copy and
+    SB=FIXTURE confirmed before closing. The plan's warning was real, not theoretical.
+
+CARRIED OBLIGATIONS INTO LATER PHASES:
+  F1-1  phase 4 bumps CACHE magic-vet-v20 -> v21 in public/sw.js:1 AND moves the pin in
+        tests/shell.test.js IN THE SAME STEP, with a seam assertion so a half-applied bump fails
+        loudly. Two precached files moved in this phase and are unbumped.
+  F1-2  R4(ii) IS NOT DONE. Her answers still do not survive a page RELOAD, because nothing reads
+        story.checkLog back. Phase 1 fixed only R4(i), the tab-switch case. Needs an owner ruling on
+        first-attempt vs best-attempt plus a de-duplication rule. OWNER RULING STILL OUTSTANDING;
+        the orchestrator's standing recommendation is "wrong-then-right counts as finished".
+  F1-3  UNSCHEDULED LATENT DEFECT: the log-check POST swallows failures and sets st.logged = true
+        BEFORE the await, so a failed save is never retried or surfaced. NOTE THE INTERACTION --
+        keeping checkState alive for a whole sitting (step 1.3) makes that failure LESS visible,
+        not more.
+  F1-4  E removed her data from both sandboxes, but NO REPOSITORY GATE CAN EVER SEE THOSE FILES.
+        The SBSTATE clause is machine-local. The machine-wide identity sweep (P1-AMENDMENT #1) is
+        the only real check and must be re-run at phase 4.
+  B-F1-1 CLOSED: the other copies were found and deleted (15 files in two passes). Receipts in
+        .oplan/word-polish/backup-receipt.txt.

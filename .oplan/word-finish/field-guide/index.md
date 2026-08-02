@@ -163,3 +163,30 @@
     breaking a whole test file — 364 passing tests became 337. Write the block to a file with a
     QUOTED heredoc (<<'X'), then splice it in with node. And read the test COUNT back, not just
     "tests pass": a file that fails to parse silently removes all of its tests from the total.
+
+20. LOOK FOR THE HARNESS BEFORE WRITING THE PLAN.
+    reader.js had NO behavioural test for two whole runs, and was only ever source-needle tested.
+    The fake-container idiom needed to actually execute it had existed at quiz-ui.test.js:67 the
+    entire time. Nobody had looked. Before writing "this cannot be tested mechanically", grep the
+    test folder for a harness that already does it.
+
+21. SIMULATE THE EDIT BEFORE SPECIFYING ITS NUMBERS; AND PREFER THE PIN THAT NAMES THE ARTIFACT.
+    Every line/byte pin in this phase was measured on a simulated post-edit tree; a hand-count was
+    wrong by 4. And when step 1.3's DELETION budget (29) disagreed with its byte/line pin, the byte
+    pin was right and the diff-shaped pin was wrong: git counts textually identical replaced lines
+    as context. A deletion count is a proxy; a content digest is the thing.
+
+22. WHEN A FROZEN PIN AND A MANDATED EDIT COLLIDE, ASK WHICH ONE NAMES A PROPERTY.
+    Twice in one phase. (a) A verbatim comment contained `awardTrophies`, which a raw-substring gate
+    forbids under public/ -> the PROSE moved, because the gate guarded something real and cheap.
+    (b) A frozen test pinned the literal `profile = await getJson(...)`, which the fix necessarily
+    splits -> the PIN moved, because it described a spelling, not the invariant it named. The test:
+    does the pin still describe a property we care about, or only a way of writing it? Never delete
+    such a pin -- re-express it, and see it fail.
+
+23. THE LOCALHOST SERVICE WORKER WILL SERVE YOU YESTERDAY'S CODE.
+    A visual gate read the trophy screen as still broken while curl proved the server was sending
+    the FIXED file. A stale SW on localhost:3000 was serving cached modules. Switching origin to
+    127.0.0.1:3000 (no worker registered there) showed the truth immediately. Do this FIRST, before
+    reporting any visual regression. And after any sandbox session, RESTORE the fixture: the dev
+    server writes to DATA_DIR and its md5 had changed.
