@@ -82,8 +82,17 @@ behaviour somewhere nobody is looking. **Check both call sites and say so explic
 (`gpt-4o-mini-tts`, `nova`) — 2254 existing clips came from that voice and a different engine would
 put a stranger's voice in the middle of her story. `deep breath` is excluded: it contains a space
 and cannot be a lemma file. **PAID API — already authorised by the owner on 2026-08-01
-("Both — honest button + generate the 21 clips"), cost a fraction of a cent. He must hear a sample
-before the batch is accepted.**
+("Both — honest button + generate the 21 clips"), cost a fraction of a cent.** ~~He must hear a
+sample before the batch is accepted.~~ **SUPERSEDED BY §11 (2026-08-02): the owner WAIVED the
+listening gate. §11 is later and wins; the four mechanical checks are the only gate.**
+
+**CORRECTED 2026-08-02 — THE COUNT IN THIS SECTION IS WRONG AND HAS BEEN WRONG SINCE IT WAS
+WRITTEN. It is not 21, not 17 and not 16. IT IS TEN. See §12 (AMENDMENT #5).** The 17-word list this
+design inherited is a list of **surface forms**; four of them (`closer`, `softly`, `suddenly`,
+`wings`) **already speak today**, because `resolveLemma` de-inflects into the manifest. Generating
+them would put the inflected form into the manifest, stop the folding, and **split a word she has
+already collected into two dictionary entries on the server**. A standing ruling already said so
+(`.oplan/word-polish/journal.md:41`, RULING B2, 2026-08-01) and this design lost it.
 
 ### B — quiz items for the words she actually has
 Format is fixed and simple (`public/quiz/<lemma>.json`, an array of
@@ -238,7 +247,17 @@ The crossed-out speaker reads as *"sound, not yet"* — which is the true statem
 
 ---
 
-## 9. RISK A RESOLVED (orchestrator, 2026-08-02) — the manifest has no second meaning
+## 9. RISK A ~~RESOLVED~~ — PARTLY FALSE AS WRITTEN. CORRECTED 2026-08-02, SEE §12.
+
+> **⚠ THIS SECTION ASKED THE RIGHT QUESTION OF THE WRONG FUNCTION.** Everything below about
+> `getAllowedSet()` is TRUE and was independently reproduced. But the manifest has a **THIRD
+> consumer that never calls `getAllowedSet()` at all**: `api/profile.js:6` imports
+> `public/audio/words/index.json` **directly** and uses it as `ALLOWED_WORDS` — the word-key
+> normalisation table `migrateWordKeys` (`lib/profile.js:294`) runs over her durable dictionary on
+> **every profile POST**, plus `resolveLemma` at `:62` and `:78`. **That IS a vocabulary gate.**
+> The conclusion "the disk-derived manifest is safe" still holds, but **only because the generation
+> set is base lemmas only** — which is now frozen as a contract in §12, not left to luck.
+> **THE LESSON: grep the ARTIFACT, not the accessor.**
 
 §3 A flagged the one real risk in phase 2: `getAllowedSet()` has TWO consumers and redefining the
 manifest to mean "what is on disk" would be dangerous if either treated it as a *vocabulary* gate.
@@ -316,3 +335,73 @@ instructions are unchanged, so the risk of a stranger's voice is near zero. The 
 **ACCEPTED RESIDUAL RISK, stated so nobody is surprised later:** a clip may say the wrong thing, or
 say the right thing wrongly, and ship. The blast radius is one word, she hears it, and it is fixed
 by regenerating one file. That is the trade the owner made knowingly.
+
+---
+
+## 12. AMENDMENT #5 — THE GENERATION SET IS **TEN**, AND WHY. Orchestrator, 2026-08-02.
+
+**RULING (B-F2-1): generate exactly these ten base lemmas, and no surface forms.**
+
+```
+after  deer  feet  glow  growl  harm  moon  nervous  scary  tight
+```
+
+This **reaffirms** RULING B2, made on 2026-08-01 at `.oplan/word-polish/journal.md:41` and approved
+by the owner the same day as B3 ("APPROVED generating the ten clips with `scripts/build-word-audio.js`
+UNCHANGED"). **This design, `phase-state.md` and the phase-2 planning brief had all lost it**, and
+each of them said 21, ~17 or 16. The phase-2 planner found it and re-derived it independently; the
+orchestrator then verified both the ruling's existence and its reasoning before accepting.
+
+**WHY TEN AND NOT SIXTEEN — measured, not argued.** `public/lemma.js:58` `resolveLemma` tries an
+**exact match first**, so a word present in the manifest wins over its own base form.
+
+| word | today | if we generate the ten | if we generate the sixteen |
+|---|---|---|---|
+| `closer` | speaks `close` | speaks `close` | speaks `closer` — **SPLIT** |
+| `softly` | speaks `soft` | speaks `soft` | speaks `softly` — **SPLIT** |
+| `suddenly` | speaks `sudden` | speaks `sudden` | speaks `suddenly` — **SPLIT** |
+| `wings` | speaks `wing` | speaks `wing` | speaks `wings` — **SPLIT** |
+| `glowing`/`glows` | silent | speak `glow` | speak themselves |
+| `growls` | silent | speaks `growl` | speaks itself |
+| `tightly` | silent | speaks `tight` | speaks itself |
+
+Two sweeps, both instrumented and both run against the **shipped** code:
+
+* `resolveLemma` over **20 270** surface forms: the ten cause **79 gains, 0 regressions, 0 key
+  splits**. The sixteen cause 122 gains and **4 key splits**.
+* the shipped `migrateWordKeys` on a profile holding `soft`+`softly`: under the ten the keys stay
+  `["soft","sudden","wing"]` with `soft.taps=6`; under the sixteen they become
+  `["soft","softly","sudden","wing"]` with `soft.taps=5`. **Her dictionary gains a duplicate entry
+  and loses a tap, durably, on the server, invisibly.** Not data loss — `migrateWordKeys` never
+  drops a key and stays idempotent — but a silent regression in the one thing she is collecting.
+
+**Every one of the 16 non-space glossary words that is silent today is covered by these ten**
+(`glow` covers glow/glowing/glows, `growl` covers growls, `tight` covers tightly). Verified by
+execution, not by argument. `deep breath` stays silent forever: it contains a space and `WORD_RE`
+can never accept it.
+
+### FROZEN CONTRACT FC-6 — BASE LEMMAS ONLY, FOREVER
+
+**`data/story-words.json` may contain base lemmas only. An inflected surface form in the manifest
+stops `migrateWordKeys` folding it into its lemma and splits a word she has already collected.**
+This is load-bearing for §9's safety claim, and it is gated by an executed sweep in
+`tests/word-audio.test.js`, not by prose. Any future top-up honours it.
+
+### CARRIED FORWARD, NOT DECIDED HERE
+
+* **F2-1 — `coming soon` is a promise we cannot keep for her own names.** `Ellie` and `Sparkle`
+  come from `profile.learner`, and the audio manifest is derived from a profile with `learner: {}`,
+  so a child's own heroine and pet can never enter a band-derived manifest. After §8 she will tap
+  her heroine's name and be told "coming soon" indefinitely. **A real, small dishonesty, accepted
+  knowingly rather than designed away.** Two clips at the next top-up close it; it needs her live
+  profile, so it is phase 4 or later.
+* **F2-2 — `lib/quiz-item.js` resolves tokens through `resolveLemma` against a set its callers
+  supply.** After this phase the bands and the manifest are **no longer the same list**. Phase 3
+  must state which one it means.
+
+### THE RECORD LESSON, promoted to the field guide
+
+**A LATER RUN'S BRIEF CAN LOSE AN EARLIER RUN'S RULING.** B2 was ruled and owner-approved on
+2026-08-01 and was absent from this design, from `phase-state.md` and from the phase-2 brief on
+2026-08-02 — one day later. **A ruling that lives only in a journal is a ruling that will be re-made
+wrongly.** Rulings belong in `phase-state.md`'s FROZEN CONTRACTS the day they are made.
