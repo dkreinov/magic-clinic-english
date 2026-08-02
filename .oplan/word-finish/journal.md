@@ -312,3 +312,121 @@ FIELD-GUIDE CANDIDATES EARNED THIS PHASE (lessons 24-27, added to the guide):
   26  ABSENCE FROM A LIST IS NOT ABSENCE OF THE BEHAVIOUR.
   27  A TEST VERIFIED IN ISOLATION IS NOT VERIFIED IN ITS FILE (module caches are process-wide),
       and its companion: THE SERVICE WORKER NOW LIVES ON 127.0.0.1 TOO — use a fresh PORT.
+
+## 2026-08-02 — PHASE 3 CLOSED, PHASE 4 DEPLOYED. The run is finished.
+
+397 reported / 392 flat / 0 fail; contrast 58; quiz bank **62/84 -> 78/103**; manifest 2264.
+LIVE: dpl_6piLnUX5zj8zEVzUucLeHqt5aRqG, magic-vet-v21, aliased, READY. ONE deploy.
+
+**PLANNING.** A fresh planner (opus, read-only, spent nothing, never touched production) wrote
+plan-phase3.md, 2362 lines, verifying by EXECUTION throughout — and it caught the phase's premise
+being wrong. My review added P3-AMENDMENT #1 and re-derived six of its load-bearing claims
+independently before reading its conclusions; all six reproduced.
+
+**THE MEASUREMENT THAT SAVED THE PHASE (plan section 2.5).** The documented "reuse rather than
+re-implement" route is `scripts/quiz-topup.mjs`. Its pool is `known UNION candidate`. But a word she
+TAPS IN HER STORY enters as `learning` (lib/profile.js:263), and `chapterQuizLemmas`
+(reader.js:420) admits ANY status via hasOwnProperty. **So the lister is structurally blind to
+exactly the words the chapter-first quiz asks FIRST.** Watched live on a fixture before her data was
+involved: raw run `missing=0` — nothing to do — projected run `missing=10`. On her real capture:
+`M1=11, M2=16`. Taking the documented route on a day when she had claimed nothing new would have
+generated ZERO items, closed green, and changed nothing she would ever see — word-polish FINDING 2
+shipped a second time. Resolved by PROJECTION, reusing the shipped filters unmodified, which is
+public/quiz-core.js:81-98's own idiom applied one level up.
+
+**FIVE RECORD ERRORS, ALL MINE OR THE DESIGN'S, ALL CORRECTED IN PLACE.**
+1. **"only 1 of her ~40 words has a quiz item"** (design.md:14, phase-state.md:81, STATUS.md:35)
+   garbled a measurement about her ~36 GLOSSARY words. Her PROFILE words were separately measured
+   as fully covered. The difference IS the phase.
+2. **"distractors[>=5]"** — the contract is EXACTLY 8. `>=5` is isUsableItem's runtime tolerance.
+3. **"PAID API, gpt-4.1-mini, per scripts/build-item-bank.js"** — that script builds the PLACEMENT
+   bank and has never written into public/quiz/. Owner decision D7 FORBIDS a paid API for this
+   bank. **FIELD GUIDE 24 FOR THE SECOND TIME IN THIS RUN, and my brief carried it.** R-F3-1.
+   Phase 3 spent ZERO money.
+4. **F2-2 named both callers of lib/quiz-item.js wrongly** — the only importers are
+   check-quiz-bank.mjs:30 and tests/quiz-item.test.js:7.
+5. **QZ-2, quoted verbatim into every generation packet, still tells workers `after` and `feet` are
+   ABSENT from the manifest.** Phase 2 added them. Handled by a RIDER, re-expressed not deleted.
+
+**AND A SIXTH, PREVIOUSLY UNRECORDED: rule 8 is OFF for every phase-2 word.** Measured: 73 of 2264
+manifest words have no band entry, and ALL TEN of phase 2's lemmas are among them, as are 2 of the
+16 targets. For those the pos-intersection check does not fire at all and the gate accepts any word
+class. The generation packet says so explicitly.
+
+**A LIVE DEFECT FOUND IN THE SHIPPED BANK.** `public/quiz/light.json[1]` — "Please turn on the ___
+so that I can see my book." offering `computer` and `television` as WRONG answers. The project's own
+content auditor called it "the single CERTAIN leak" and "the single failure this entire phase existed
+to prevent" on 2026-07-27; the later two-pass QZ-24 sweep DID NOT FLAG IT; it shipped byte-unchanged
+from 24c67dc until today. And `light` is the ONE bank word word-polish measured as reachable from her
+glossary. Fixed in step 3.3; the frozen pin in tests/quiz-core.test.js was SEEN TO FAIL (`not ok 5`)
+and then re-expressed, because it named a PROPERTY (determinism under a stub rand), not a word list.
+
+**THE CORRECTNESS PASS, AND THE CONTROL THIS PROJECT HAS NEVER HAD.** Mechanical detection was
+measured at precision ~0 / recall 0 on 9 known leaks and is excluded, reproducing the run's own
+REFUTED hypothesis. What works is adversarial RECOGNITION. Two blind passes, neither having authored
+the items, neither seeing the other, the gloss, or the answer key — and three deliberately poisoned
+items shuffled in, with the answer key moved OUT of the directory they read. Both passes: reviewed
+24/24, verdicts 24/24, **poisonRecall 3/3, naming the planted traps specifically**, agreement 100%,
+and ZERO flags on the 19 real items. A pass below 3/3 would have been discarded and re-run — the
+instrument is gated before its verdicts are believed.
+
+**"APPROVED" IS MECHANICAL FOR THE FIRST TIME.** The promoter refuses without APPROVED.txt, and
+refuses when its BATCH-DIGEST no longer recomputes — so a batch edited after approval, or a file
+added after it, structurally cannot reach public/quiz/. BOTH refusals were watched firing before the
+real approval was written. The owner's words, verbatim: "all good deploy".
+
+**THE Q10 GATE — does the work reach her screen?** Driven on the SHIPPED selector and the SHIPPED
+bank, before vs after:
+
+[REDACTED: her vocabulary -- D27/R-F3-5, counts only]
+    AFTER  bankFiles=78 -> the four questions she gets = [bright, creature, does, feel] (4 of 4 hers)
+
+**HER DATA.** Two captures (identical sha256, so her profile did not change across the whole phase),
+a projection, staging, the review page and both verdict files: ALL DELETED, receipts in
+backup-receipt.txt, counts and hashes only. **R-F3-5 caught the plan re-committing a leak it had
+itself identified**: step 3.1 as written would have put her word list into .oplan/. It did not.
+design.md:17 named six of her real words in prose since 2026-08-01 — D27 deleted profile FILES and
+never covered the RECORD. Now redacted. The machine-wide sweep at the close: 301233 files observed,
+21 profile-shaped, none hers.
+
+**INSTRUMENTATION CAUGHT ME TWICE MORE.** The identity sweep first ran with no roots and reported
+`OBSERVED files=0` — a sweep that observed nothing, caught only because it prints what it observed
+(field guide 18). And a `grep -c` returning 0 exits 1, which silently short-circuited an `&&` chain
+and made a pin that DOES exist look absent. Both were my commands, and both looked like measurements.
+
+STEP SUMMARIES:
+
+    3.1  tier: ORCHESTRATOR (it holds a key and touches production). did: the frozen subshell
+         capture (200, no leak; the leak assertion watched firing first against a bogus URL), the
+         projection, N=16. repo write set: .oplan only. surprises: the 2.5 trap, on her real data.
+    3.2  tier: WORKER. did: scripts/check-item-batch.mjs + tests/item-batch.test.js (17 flat tests,
+         every one killed by a targeted mutation), the poison frozen and md5-pinned. Its most
+         important test is INVERTED: the poison must PASS the shape gate. repo write set: 2 files.
+    3.3  tier: ORCHESTRATOR. did: light.json[1]; the pin seen to fail, then re-expressed.
+         repo write set: 2 files.
+    3.4  tier: WORKER. did: 16 files / 19 items, two sequential batches, both gate-green, staged
+         OUTSIDE the repo. repo write set: EMPTY. It REFUSED three senses rather than ship them
+         leaky (her/object, move/motion, figure/person-shape) and reported ~60 distractors it
+         rejected by hand as near-synonyms — the rule that was load-bearing and never written down
+         until this phase put it in the packet.
+    3.5  tier: WORKER x2 blind + ORCHESTRATOR adjudication. did: 3/3 poison recall both passes,
+         100% agreement, 0 real flags. Two near-misses raised without flags (forward/`down`,
+         forest/`field`) were adjudicated KEEP and put on the owner's page anyway.
+    3.6  tier: ORCHESTRATOR + OWNER. did: the HTML review page, every item enumerated, never
+         --sample; Hebrew byte-sliced from public/quiz.js:188. APPROVED.
+    3.7  tier: ORCHESTRATOR. did: promotion + the Q10 proof. repo write set: 16 files.
+    4.1  tier: ORCHESTRATOR. did: F1-1, the bump spent once, seam asserted, half-applied bump seen
+         to fail. repo write set: 2 files.
+    4.2  tier: ORCHESTRATOR. did: inspect, capture #2, ONE deploy, live verification, F1-4, close.
+
+FIELD-GUIDE CANDIDATES EARNED THIS PHASE (28-30):
+
+    28  THE OBVIOUS REUSE CAN ANSWER A DIFFERENT QUESTION THAN THE ONE YOU ASKED. quiz-topup.mjs is
+        correct and documented and reports `missing=0` on a profile where nothing works. Reuse the
+        FILTERS, not the POOL — and prove the difference on a fixture before trusting it on real
+        data. The obvious route is dangerous precisely because it is documented.
+    29  GATE THE INSTRUMENT, NOT ONLY THE OUTPUT. Plant known defects and require the reviewer to
+        find them BEFORE believing its verdicts. Two blind passes once cleared a bank while walking
+        past a leak a prior audit had already named in writing.
+    30  AN APPROVAL THAT IS NOT BOUND TO BYTES IS NOT AN APPROVAL. Digest the batch, name the digest
+        in the approval record, and make the promoter recompute it before it copies anything.

@@ -6,3 +6,9 @@ projected /c/Users/dkreinov/english-app-backups/profile-20260802-163625-projecte
 topup TOPUP-RUN-1 known=15 candidate=8 pool=23 dropped=0 covered=12 missing=11
 topup TOPUP-RUN-2 known=24 candidate=5 pool=29 dropped=0 covered=13 missing=16
 target N=16 inManifest=16 alreadyBanked=0 qz8Excluded=0 rule8Exempt=2 deferred=0 (N<=25, R-F3-4's cap did not bite)
+deleted /c/Users/dkreinov/english-app-backups/profile-20260802-163625.json sha256=3d2a22fcc2c1e7384b491de1f6ae1bcc31164e9ec0c2070d33ea9d9e22905e68 2026-08-02T17:30Z
+deleted /c/Users/dkreinov/english-app-backups/profile-20260802-163625-projected.json (the projection) 2026-08-02T17:30Z
+deleted /c/Users/dkreinov/english-app-backups/profile-20260802-171208-predeploy.json (pre-deploy capture #2) sha256=3d2a22fc... IDENTICAL to capture #1 -- her profile unchanged across the phase
+deleted C:/Users/dkreinov/f3-stage (WORDS.txt, the staged batches, APPROVED.txt md5=0b7705c31a477c1d98569def9c390961)
+deleted C:/Users/dkreinov/{f3-review,f3-review-stage,f3-pass-a,f3-pass-b,f3-val} -- every file naming her words
+KEPT C:/Users/dkreinov/f3-poison -- 3 synthetic control items, NO data of hers, and the frozen instrument phase 5's re-sweep (F3-2) needs. tests/item-batch.test.js carries the same bytes inline, so the suite does not depend on it.

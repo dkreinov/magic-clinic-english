@@ -232,3 +232,12 @@
     THE REMEDY THAT STILL WORKS IS A FRESH ORIGIN: run the dev server on a different PORT
     (`PORT=3100 DATA_DIR=... node scripts/dev-server.js`). No worker is registered there. Any
     remedy that names a specific origin expires the moment you use it.
+    28  THE OBVIOUS REUSE CAN ANSWER A DIFFERENT QUESTION THAN THE ONE YOU ASKED. quiz-topup.mjs is
+        correct and documented and reports `missing=0` on a profile where nothing works. Reuse the
+        FILTERS, not the POOL — and prove the difference on a fixture before trusting it on real
+        data. The obvious route is dangerous precisely because it is documented.
+    29  GATE THE INSTRUMENT, NOT ONLY THE OUTPUT. Plant known defects and require the reviewer to
+        find them BEFORE believing its verdicts. Two blind passes once cleared a bank while walking
+        past a leak a prior audit had already named in writing.
+    30  AN APPROVAL THAT IS NOT BOUND TO BYTES IS NOT AN APPROVAL. Digest the batch, name the digest
+        in the approval record, and make the promoter recompute it before it copies anything.

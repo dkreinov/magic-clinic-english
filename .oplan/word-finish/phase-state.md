@@ -1,5 +1,8 @@
-CURRENT: phase 3 "quiz items" — PLANNED AND ACCEPTED (plan-phase3.md, 2465 lines incl.
-  P3-AMENDMENT #1, the orchestrator review). Executing from step 3.1.
+CURRENT: PHASES 1-4 ALL CLOSED. **DEPLOYED 2026-08-02.** The run is finished.
+  LIVE: dpl_6piLnUX5zj8zEVzUucLeHqt5aRqG / english-3iewsk4vv-dkreinovs-projects.vercel.app,
+  aliased to english-app-three-tan.vercel.app, magic-vet-v21, READY.
+  Predecessor (rollback target): dpl_6pFjJ8LrcyaFodRELCa46BzATUXy, magic-vet-v20 -- CONFIRMED live
+  by `vercel inspect` at the phase-4 pre-flight, which discharges phase 2's recorded hypothesis.
 PLAN (phase 3): .oplan/word-finish/plan-phase3.md · BRIEF: brief-phase3.md
 PLAN (phase 2): .oplan/word-finish/plan-phase2.md · BRIEF: brief-phase2.md
 PLAN (phase 1): .oplan/word-finish/plan.md
@@ -8,10 +11,13 @@ BASE (phase 1): e44cffa · BASE (phase 2): 81fb743 · BASE (phase 3): <the 2.7 c
 ACCEPTED (phase 2): 2.1 3a2b2b3 · 2.2 f6eb81b · 2.3 a6fbd61 · 2.4 e352cfb ·
   2.5 visual gate self-served, PASSED (no repo bytes) · 2.6 45ac2de · 2.7 this commit
 
-STATE OF THE TREE: 380 reported / 375 flat / 0 fail · contrast 58 PASS · quiz bank 62 files/84 items
-  · manifest 2264 == clips on disk 2264 (0 dead entries, 0 orphans) · public/ 2382 files
+STATE OF THE TREE: 397 reported / 392 flat / 0 fail · contrast 58 PASS · quiz bank 78 files/103 items
+  · manifest 2264 == clips on disk 2264 (0 dead entries, 0 orphans)
   · public/audio/words/index.json md5 6a885982b75e82ef1f00dc6768796ecf, 20019 bytes, LF
-  · LIVE magic-vet-v20 at dpl_6pFjJ8LrcyaFodRELCa46BzATUXy (a hypothesis phase 4 confirms)
+  · public/sw.js CACHE magic-vet-v21 (F1-1 SPENT, once) · public/quiz/light.json md5
+    f00b091b7f4208ec8783f06a0f6ff320
+  · VERIFIED LIVE, md5 worktree==live: sw.js, styles.css, views/{reader,words,trophies}.js,
+    quiz/light.json, audio/words/index.json (the manifest-URL probe, kept per design section 9)
 
 PHASE 2 WRITE SET against 81fb743, .oplan excluded: 22 paths, 0 deletions.
   data/story-words.json · public/audio/words/index.json · the ten new .aac ·
@@ -86,8 +92,11 @@ STANDING RULINGS (recorded the day they were made -- field guide 24):
         ZERO places (.oplan/word-quiz/journal.md, step 6.3), i.e. it would have shipped inert.
 
 CARRIED OBLIGATIONS:
-  F1-1  phase 4 bumps CACHE magic-vet-v20 -> v21 in public/sw.js:1 AND moves the pin in
-        tests/shell.test.js IN THE SAME STEP, with a seam assertion.
+  F1-1  *** DISCHARGED 2026-08-02, commit cb799b6. *** CACHE magic-vet-v20 -> v21 in public/sw.js:1
+        AND the pin moved in tests/shell.test.js IN THE SAME COMMIT. The half-applied bump was SEEN
+        TO FAIL first (`not ok 4`). The pin was strengthened into a real seam: the version is named
+        ONCE and read back out of sw.js, so the two can never drift silently. Verified live: the
+        served sw.js md5 equals the worktree's. ORIGINAL TEXT, for the record:
         *** ENLARGED, AND PHASE 2 SAW WHAT IT COSTS ***  Phase 1 left 2 precached files changed
         and unbumped; phase 2 adds public/styles.css, public/views/reader.js and
         public/views/words.js. FOUR distinct precached files are now changed and unbumped.
@@ -96,8 +105,14 @@ CARRIED OBLIGATIONS:
         page reload. OWNER HAS RULED (design §10): wrong-then-right counts as FINISHED; a question
         is done if ANY logged attempt is correct; de-dup by questionId. Still needs a step.
   F1-3  latent: the log-check POST swallows failures and sets st.logged=true BEFORE the await.
-  F1-4  the sandbox de-identification is machine-local; re-run the machine-wide identity sweep at
-        phase 4 (a file outside the repo can never be gated by a repo check).
+  F1-4  *** DISCHARGED 2026-08-02. *** The machine-wide sweep ran at the close: OBSERVED 301233
+        files, 21 profile-shaped, NONE hers. The tool is now IN THE REPO at
+        .oplan/word-finish/identity-sweep.mjs (it prints paths and counts, never a word), with
+        .oplan/word-finish/synthetic-check.mjs beside it. *** THE CRITERION WAS WRONG AND IS FIXED:
+        phase 1 used "md5 == the frozen synthetic OR <=2 words", which raises a FALSE ALARM on
+        finish-art/served-profile.json -- a dev-server rewrite with identical WORD KEYS and
+        different bytes. The criterion is now word-key IDENTITY. Identity is the property; md5 was
+        a proxy for it. All 5 six-word files pass; 16 are 2-word comparator fixtures. ***
   F2-1  `Ellie` and `Sparkle` — her heroine's and pet's names — say `coming soon` and no
         band-derived top-up can ever fix them, because the audio manifest is derived from a profile
         with learner: {}. CONFIRMED IN A BROWSER this phase. Two clips at the next top-up close it;
@@ -114,6 +129,23 @@ CARRIED OBLIGATIONS:
         THE WORKING REMEDY, used this phase: run the dev server on a DIFFERENT PORT
         (PORT=3100 is supported), which is a different origin and therefore has no worker.
         Phase 4 must either bump CACHE first or use a fresh port for every visual check.
+
+CARRIED INTO A FUTURE RUN (nothing blocks today's deploy):
+  F3-1  CLOSED SAME DAY. "Phase 3 ships nothing; the items reach her only at phase 4" -- phase 4 ran
+        the same day and they are live. Recorded because "the work was done and she never saw it" is
+        this project's documented failure mode and a phase boundary is where it hides.
+  F3-2  THE OTHER 83 SHIPPED ITEMS ARE NOT RE-SWEPT (ruling R-F3-2). They were cleared on
+        2026-07-27 by a two-pass sweep now MEASURED to have missed a named CERTAIN leak
+        (light.json[1]/computer, which shipped byte-unchanged from 24c67dc until today). Phase 5
+        should re-sweep them with the poison-controlled instrument built this phase. The frozen
+        control lives at C:/Users/dkreinov/f3-poison (3 synthetic items, no data of hers) and the
+        same bytes are inline in tests/item-batch.test.js, so the suite does not depend on it.
+        THE OWNER WAS TOLD, in plain words, on the review page. He approved anyway.
+  F3-3  THE SUITE HAS A MACHINE-LOCAL DEPENDENCY. tests/item-batch.test.js reads
+        C:/Users/dkreinov/f3-poison and, when it is absent, prints a `note:` and SKIPS that half --
+        a fail-open. The substance is safe (the poison text and its md5s are embedded in the test
+        file, so the real assertions run anywhere), but the skip should become a hard failure or
+        the path should move into the repo.
 
 BLOCKED: no.
 
