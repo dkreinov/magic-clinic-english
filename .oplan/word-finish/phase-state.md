@@ -138,10 +138,22 @@ CARRIED OBLIGATIONS:
         finish-art/served-profile.json -- a dev-server rewrite with identical WORD KEYS and
         different bytes. The criterion is now word-key IDENTITY. Identity is the property; md5 was
         a proxy for it. All 5 six-word files pass; 16 are 2-word comparator fixtures. ***
-  F2-1  `Ellie` and `Sparkle` — her heroine's and pet's names — say `coming soon` and no
-        band-derived top-up can ever fix them, because the audio manifest is derived from a profile
-        with learner: {}. CONFIRMED IN A BROWSER this phase. Two clips at the next top-up close it;
-        needs her live profile, so phase 4 or later. A real, small dishonesty, accepted knowingly.
+  F2-1  *** CLOSED 2026-08-02 evening, commit e49a0a3, LIVE at dpl_9rA4Y7XoBN2F4H9XyRTLPWTtcmix. ***
+        `ellie` and `sparkle` now have clips. Her heroine and her pet stop saying `coming soon`.
+        MEASURED SAFE BEFORE SPENDING ANYTHING, through the shipped code: 18122 surface forms
+        swept -> 10 gains, 0 regressions, 0 KEY SPLITS; migrateWordKeys leaves her keys and taps
+        byte-identical before and after; and `sparkling` (already a band word with a clip) still
+        resolves to ITSELF, because resolveLemma tries an exact match before de-inflecting.
+        Neither name is a band word, so nothing was shadowed. FC-2 honoured -- same model, voice
+        and instructions as the other 2264. FC-6 honoured -- both are base forms, and the executed
+        sweep in tests/word-audio.test.js passed unchanged.
+        Manifest 2264 -> 2266; clips 2264 -> 2266. NO CACHE BUMP was owed: nothing under
+        public/audio/ is precached (verified, not assumed).
+        Pins moved, each after being SEEN TO FAIL: word-audio.test.js words/clips/extras,
+        reader-ui.test.js five manifest counts.
+        *** THE RESIDUAL, STATED: I cannot hear whether either clip pronounces its name. The
+        owner waived the listening gate knowingly (design section 11). Blast radius is one word;
+        the repair is to delete one file and re-run. ***
   F2-2  lib/quiz-item.js resolves tokens through resolveLemma against a set its CALLERS supply
         (scripts/build-item-bank.js, scripts/quiz-topup.mjs). After phase 2 the bands and the
         manifest are NO LONGER THE SAME LIST (2254 vs 2264). PHASE 3 MUST STATE WHICH ONE IT MEANS.
