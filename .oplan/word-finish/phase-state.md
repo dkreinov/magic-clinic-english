@@ -1,5 +1,6 @@
-CURRENT: phase 2 "audio" CLOSED (gate PHASE-2-CLOSE-OK, exit 0). NEXT: phase 3 "quiz items" —
-  NOT YET PLANNED. A fresh planner must plan it before any step runs.
+CURRENT: phase 3 "quiz items" — PLANNED AND ACCEPTED (plan-phase3.md, 2465 lines incl.
+  P3-AMENDMENT #1, the orchestrator review). Executing from step 3.1.
+PLAN (phase 3): .oplan/word-finish/plan-phase3.md · BRIEF: brief-phase3.md
 PLAN (phase 2): .oplan/word-finish/plan-phase2.md · BRIEF: brief-phase2.md
 PLAN (phase 1): .oplan/word-finish/plan.md
 DESIGN: .oplan/word-finish/design.md · JOURNAL: journal.md · FIELD GUIDE: field-guide/index.md
@@ -41,6 +42,40 @@ FROZEN CONTRACTS IN FORCE:
         quiz-core.js CRLF=99 · all of scripts/ tests/ lib/ and the manifest are LF.
 
 OPEN QUESTIONS: none.
+
+STANDING RULINGS (recorded the day they were made -- field guide 24):
+  R-CAPTURE  2026-08-02, OWNER. The frozen live profile capture
+        (.oplan/word-quiz/plan.md:1573-1586, the subshell that sources .env INSIDE the parens so
+        APP_CODE dies with it) is PRE-AUTHORISED and STANDING. His words: "dont ask me next time
+        just capture". DO NOT ask again -- capture when a phase needs her word list.
+        UNCHANGED BY THIS: it is the ORCHESTRATOR's to run, never a worker's and never a
+        planner's; field guide 3 still forbids every OTHER form of live read; and every capture
+        carries a receipt (path, bytes, sha256, counts -- NEVER contents) and a proved DELETION
+        at the phase close, because D27 is standing policy and F1-4 must be clean at phase 4.
+  R-F3-1  2026-08-02, ORCHESTRATOR. NO PAID API FOR public/quiz/. Items are authored by oplan
+        WORKER AGENTS, zero money. design.md:107 named scripts/build-item-bank.js, which builds the
+        PLACEMENT bank and has never written a byte into public/quiz/. The real precedent is the
+        owner-level D7 (.oplan/word-quiz/design.md:36): "no paid API, no runtime LLM, no second
+        key", restated at word-quiz/plan.md:255-258 and word-g1/plan.md:2949.
+        *** FIELD GUIDE 24, SECOND TIME THIS RUN, AND MINE: my phase-3 brief asserted "PAID API
+        (gpt-4.1-mini)" from memory against a standing ruling. A brief must QUOTE a ruling or ASK
+        for it, never recall it. ***
+  R-F3-2  2026-08-02, ORCHESTRATOR. The other 83 shipped items are NOT re-swept in phase 3 ->
+        carried obligation F3-2, phase 5. They were cleared by a two-pass sweep now MEASURED to
+        have missed a named CERTAIN leak (light.json[1]/computer, still shipped, byte-unchanged
+        since 24c67dc). Knowingly accepted, and stated on the owner's review page, not hidden.
+  R-F3-3  2026-08-02, ORCHESTRATOR. light.json's replacement wording (television->iron,
+        computer->clock) is PROVISIONAL, pinned from a simulated tree; light.json goes through the
+        3.5 adversarial passes and the 3.6 owner gate like any other item. Pins are re-derived on a
+        simulated tree if one word changes -- never hand-edited.
+  R-F3-4  2026-08-02, ORCHESTRATOR. WORDS.txt is CAPPED AT 25 BY CONSTRUCTION, so plan 3.0's hard
+        N<=25 gate can never stall. Frozen ordering: most-recent-chapter glossary first, then taps
+        desc, then lastSeen desc, then LC_ALL=C asc. The remainder is DEFERRED AND REPORTED
+        (WORDS-DEFERRED.txt + the owner's page + F3-2), never silently truncated (field guide 18).
+  B-F3-1  2026-08-02, ORCHESTRATOR, under R-CAPTURE. Phase 3 derives its target word set from a
+        live capture, not from a repo-derivable substitute. The alternative was measured once
+        already and failed: word-quiz's 50-word pilot bank overlapped her 12 known words in
+        ZERO places (.oplan/word-quiz/journal.md, step 6.3), i.e. it would have shipped inert.
 
 CARRIED OBLIGATIONS:
   F1-1  phase 4 bumps CACHE magic-vet-v20 -> v21 in public/sw.js:1 AND moves the pin in
