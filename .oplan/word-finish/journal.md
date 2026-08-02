@@ -178,3 +178,137 @@ CARRIED OBLIGATIONS INTO LATER PHASES:
         the only real check and must be re-run at phase 4.
   B-F1-1 CLOSED: the other copies were found and deleted (15 files in two passes). Receipts in
         .oplan/word-polish/backup-receipt.txt.
+
+## 2026-08-02 — PHASE 2 CLOSED. Gate PHASE-2-CLOSE-OK, exit 0.
+
+380 reported / 375 flat / 0 fail; contrast 58; quiz bank 62/84; manifest 2264 == disk 2264.
+Write set against 81fb743, .oplan excluded: **22 paths, 0 deletions**. QZ-18 md5s unmoved.
+CACHE deliberately still v20.
+
+**PLANNING.** A fresh planner (opus, read-only, spent nothing) wrote plan-phase2.md, 2999 lines,
+7 steps, verifying by EXECUTION throughout: it parsed all 2254 shipped clips as ADTS, ran the
+shipped resolveLemma over 20270 surface forms, executed migrateWordKeys on three fixtures,
+simulated every source edit on a byte-exact mirror outside the repo, and extracted and RAN its own
+VAL-F2 preamble — reproducing field guide 17 live (five FAIL: lines, exit 0).
+
+**IT CAUGHT THREE ORCHESTRATOR ERRORS. The first is the one that mattered.**
+
+1. **THE GENERATION SET IS TEN, NOT SIXTEEN — and it had already been ruled, one day earlier.**
+   RULING B2 (.oplan/word-polish/journal.md:41, 2026-08-01, owner-approved the same day as B3) says
+   base lemmas only, and names the ten. design.md section 3 A, phase-state.md AND my phase-2 brief
+   had all lost it; my brief confidently told the planner "the honest number is 16". Four of those
+   sixteen ALREADY SPEAK today by de-inflection; generating them puts the inflected form in the
+   manifest, stops the fold, and splits a word she already holds — measured on the shipped
+   migrateWordKeys: keys ["soft","sudden","wing"] become ["soft","softly","sudden","wing"] and
+   soft.taps drops 6 to 5, durably, on the server, invisibly. I verified the ruling's existence and
+   its reasoning myself before accepting. Now frozen as FC-6 and written into design.md section 12.
+2. **design section 9 "RISK A RESOLVED" asked the right question of the wrong function.** Both
+   getAllowedSet() consumers ARE audio-only — reproduced. But api/profile.js:6 imports the manifest
+   JSON DIRECTLY as the word-key normalisation table for her durable dictionary. The conclusion
+   survives ONLY because of FC-6. **Grep the ARTIFACT, not the accessor.**
+3. **No ffprobe or ffmpeg on this machine.** Durations are counted by walking ADTS frames in pure
+   node — validated against all 2254 shipped clips, 0 parse errors. And design section 11(3)'s
+   "plausible duration FOR THE WORD'S LENGTH" is NOT implementable: length barely predicts duration
+   (a 3-letter clip reaches 3.115s; "telecommunications" is 2.133s). The gate is the global measured
+   envelope and says so. A gate that fires on correct input is worse than no gate.
+
+**AND I FOUND FOUR THINGS THE PLAN GOT WRONG, all by running it rather than reading it.**
+
+  a. **tests/lemma.test.js also imported deriveWordList** and pinned "manifest must equal
+     deriveWordList()". The plan's step-2.1 write set named only word-audio.test.js. Node failed
+     loudly, as the planner had verified it would. Field guide 22: the pin names a real property in
+     a spelling that named the WRONG PRODUCER. Re-expressed to clipsOnDisk(), never deleted.
+  b. **THE PLAN'S STRONGEST GATE COULD NOT PASS WHERE THE PLAN PUT IT.** The executed popup test
+     was appended to tests/reader-ui.test.js. public/words-index.js caches the manifest in a
+     module-level variable FOR THE PROCESS, and t13StubFetch (:560) stubs it as [] in tests that run
+     earlier in the same file — and an empty Set is truthy, so the cache never refills. The popup
+     test's own stub was ignored; every word resolved to null. The planner had verified it IN
+     ISOLATION and shipped it into a different context — field guide 15's shape, one layer up: the
+     assertion was sound, its NEIGHBOURS were not. node --test isolates per FILE, so it moved to
+     tests/reader-popup.test.js, which explains why in its own header. Only then did it become a
+     real gate, seen to fail on the shipped tree for the right reason.
+  c. **styles.css is CRLF=758, not the plan's 748** (729 + 19 for the frozen block, forgetting the
+     10-line wrapper). The md5 — the authoritative pin — matched exactly, so the FILE was right and
+     the COUNT was wrong. Field guide 21: a digest is the thing; a line count is a proxy.
+  d. **Field guide 22(a), for the FOURTH time in this project.** My wrapper comment said
+     "AMENDMENT #2", and tests/entry-code.test.js:35 forbids the hash character anywhere after the
+     entry-gate marker — the guard against raw hex colours, invisible to the contrast gate. Neither
+     the plan nor I saw it; THE SUITE did. The guard names a real, cheap property, so the prose moved.
+
+**A PROCESS FAILURE OF MY OWN, recorded because it is the silent kind.** My first attempt to add a
+clause to gate 2.3 silently did nothing — the replacement string never matched, so a clause I
+believed I had added was never there, and the gate passed anyway. I rebuilt the tail from a heredoc
+and COUNTED the clauses before running. **An edit that is not verified to have landed is not an
+edit**, and a gate you believe in is not a gate you have.
+
+**THE MONEY.** 11 API calls. The drift control ran FIRST, through the SHIPPED synthesizeWord(), to a
+path outside the repo, reading the shipped clip back afterwards to prove it untouched:
+ratios duration 0.818 / bytes 0.855 / voiced 0.844, band 0.5..2, same 24000Hz mono AAC-LC.
+NOT DETECTABLY DRIFTED. A second free signal: the ten new clips' median duration is 1.408s against a
+2254-clip population median of 1.365s. The manifest came out at md5 6a885982b75e82ef1f00dc6768796ecf
+— **the value the plan predicted before a single clip existed**, because it is derived from the disk.
+
+**2.5 VISUAL GATE, self-served, and it earned its place.**
+  - The reader popup for an unspeakable word shows the dimmed speaker with a clean diagonal across
+    the circle and the caption `coming soon` under it. It reads as *"sound, not yet"* — not "you are
+    not allowed" (no red, no prohibition sign) and not "you switched it off" (the glyph is not a
+    muted variant). The icon alone could read as muted; the words alone could read as a feature
+    announcement; TOGETHER they say the true thing. That pairing is why the owner chose option A.
+  - Design section 8's layout requirement VERIFIED by measuring both popups at 414x896 on one
+    origin: the Hebrew line sits at y~799 and the save button at y~851 in BOTH. The sheet is
+    bottom-anchored, so the caption grows it upward and nothing below the marker moves.
+  - The words list shows one marked row among six live ones; the caption sits under its button
+    (.say-soon-wrap is the only thing making that true — no test can see it). The row is taller than
+    a plain neighbour, but it also carries a 3-line context sentence, and nothing clips or overlaps.
+  - **THE NEAR-MISS, and it is F2-3.** The first reading showed NO MARKER AT ALL on a tree where 375
+    tests passed. A service worker registered on 127.0.0.1:3000 by PHASE 1'S OWN VISUAL GATE was
+    serving the precached magic-vet-v20 reader.js — and because F1-1 defers the CACHE bump, it had
+    no reason to refetch. curl proved the server was sending the new file while the browser ran the
+    old one. **Field guide 23's remedy ("switch to 127.0.0.1") is SPENT: using it registered a
+    worker there.** The working remedy is a DIFFERENT PORT — a different origin has no worker.
+    PORT=3100 is supported by scripts/dev-server.js.
+  - The dev server wrote to the sandbox (md5 changed, as the plan warned); restored from the
+    pristine copy and SB=FIXTURE confirmed before recording.
+
+**INSTRUMENTATION CAUGHT ME TWICE, which is the point of it.** My positive control asserted it
+checked 15 forms; it checks 14. And a `grep -c` for written clips in the plan expects 10 but returns
+11, because the summary line "wrote 10, skipped 2254" matches the same pattern — a flaw in the
+check, not the batch.
+
+**WHAT NOBODY CHECKED, stated plainly:** whether any of the ten clips PRONOUNCES ITS WORD. The agent
+cannot hear and the owner waived the listening gate knowingly (design section 11). Blast radius is
+one word; the repair is to delete one file and re-run. That is the trade he made.
+
+STEP SUMMARIES (house shape):
+
+  2.1  tier: WORKER-equivalent (frozen apply script, run by the orchestrator)
+       did: split deriveWordList into wordsToGenerate/clipsOnDisk/bandWords/readStoryWords,
+            deleted writeManifest(words) for writeManifestFromDisk(), moved the manifest write
+            into a finally, exported synthesizeWord, created data/story-words.json empty.
+       repo write set: 4 files (the plan said 3 — see (a) above).
+       surprises: tests/lemma.test.js; field guide 22(a) on my own comment.
+       validation_first_try: no (the plan's write set, not the work). retries: 0.
+  2.2  tier: WORKER. did: scripts/check-word-audio.mjs + 4 tests. Every clause seen to fire on
+       8 fabricated broken fixtures, reproducing the planner's transcript byte-for-byte.
+       repo write set: 2 files. validation_first_try: yes. retries: 0.
+  2.3  tier: WORKER. did: the frozen section-8 CSS extracted from design.md by script into
+       public/styles.css, saySlot() in words.js, the :181 pin re-expressed, +3 tests.
+       repo write set: 3 files. surprises: (c) and (d) above.
+       validation_first_try: no. retries: 1.
+  2.4  tier: WORKER. did: saySlot() in reader.js, two collisions ruled, +2 tests, the executed
+       popup harness moved to its own file. repo write set: 3 files. surprises: (b) above.
+       validation_first_try: no. retries: 1.
+  2.5  tier: ORCHESTRATOR. did: the self-served visual gate. repo write set: EMPTY.
+       surprises: F2-3, the service worker. validation_first_try: yes (after the origin change).
+  2.6  tier: ORCHESTRATOR (it holds a key and spends money). did: the drift control, the ten
+       clips, the manifest at 2264, the count pins, the re-expressed control list.
+       repo write set: 14 files. surprises: my own 15-vs-14 hand-count.
+       validation_first_try: no. retries: 1.
+  2.7  tier: ORCHESTRATOR. did: this close.
+
+FIELD-GUIDE CANDIDATES EARNED THIS PHASE (lessons 24-27, added to the guide):
+  24  A LATER RUN'S BRIEF CAN LOSE AN EARLIER RUN'S RULING.
+  25  ASK THE QUESTION OF THE ARTIFACT, NOT OF THE ACCESSOR.
+  26  ABSENCE FROM A LIST IS NOT ABSENCE OF THE BEHAVIOUR.
+  27  A TEST VERIFIED IN ISOLATION IS NOT VERIFIED IN ITS FILE (module caches are process-wide),
+      and its companion: THE SERVICE WORKER NOW LIVES ON 127.0.0.1 TOO — use a fresh PORT.

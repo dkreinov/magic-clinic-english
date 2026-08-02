@@ -1,46 +1,45 @@
-# STATUS — word-finish (photograph of now, 2026-08-02)
+# STATUS — word-finish (photograph of now, 2026-08-02, after phase 2)
 
-**Phase 1 is finished and proved. Nothing is deployed yet.** Her app on the phone is still
-`magic-vet-v20`, exactly as it was last night — all of phase 1 is waiting on this machine.
+**Phases 1 and 2 are finished and proved. Nothing is deployed yet.** Her app on the phone is still
+`magic-vet-v20`, exactly as it was last night. Everything is waiting on this machine.
 
-## What phase 1 actually fixed
+## What phase 2 actually did
 
 | what | state |
 |---|---|
-| her real vocabulary sitting in two dev sandboxes | **gone** — replaced with invented words; a machine-wide sweep proves all 19 profile-shaped files here are fake |
-| a trophy card showing "target reached" while greyed out | **fixed** — one source of truth per card, proved over 3,020 combinations and proved to fail when the bug is put back |
-| the story reloading when she returns from her word list | **fixed** — the chapter she left is repainted, and the app still asks the server for her profile every time |
-| losing her place on the page | **fixed** — before/after screenshots are pixel-identical |
+| the recording script could never make her story words | **fixed** — the master list is now a statement about which sound files exist on disk, so it can never drift from reality again |
+| ~17 story words with no sound | **done, and it was ten, not seventeen** — four of the seventeen already spoke, and recording them would have split words she has already collected into two |
+| she could not tell "no sound for this word" from "this app has no sound" | **fixed** — the speaker is still there, crossed out, with **coming soon** under it, exactly as you chose |
 
-I looked at both screens in a real browser. Zero cards contradict themselves; the two that used
-to (`אוצרת מילים`, `באמת יודעת`) now show earned. Coming back from the word list shows no loading
-screen, no spinner, the same scroll position, and the answered question still answered.
+I looked at both screens in a real browser. The crossed-out speaker reads as *"sound, not yet"* —
+not as *"you are not allowed"* and not as *"you muted it"*. The Hebrew line and the save button do
+not move a single pixel when the marker appears.
 
 ## Proof
 
-- **369 tests pass, 0 fail.** Contrast 58 pairs. Quiz bank 62 files / 84 items.
-- Exactly **four** files changed all phase; **zero** deleted; the frozen quiz engine is untouched.
-- Every behaviour was **seen to fail** before it was fixed.
+- **380 tests pass, 0 fail.** Contrast 58 pairs. 2264 sound files, and the master list matches them
+  exactly — no dead buttons, no orphans.
+- **22 files changed all phase; zero deleted.** The frozen quiz engine is untouched.
+- Every new check was **seen to fail** before it was trusted, including on eight deliberately
+  broken sound files.
+- Before recording anything I regenerated one word you already have and compared it to the shipped
+  version. **The voice has not changed.**
+
+## The one thing nobody checked, and you decided that
+
+**Whether each new clip says the right word.** I cannot hear. You waived that check knowing the
+cost. If one is wrong, she hears it, and it is one file to redo.
 
 ## What is NOT done
 
-1. **She still cannot hear ~17 story words.** That is phase 2, and it needs your ears.
-2. **Only 1 of her ~40 words has a quiz question.** That is phase 3, and it needs your eyes.
-3. **Her answers still do not survive a full page reload.** Phase 1 fixed only the tab-switch case.
-   Reading them back needs your ruling: *if she answers wrong and then right, is that question
-   finished?* My recommendation is **yes**.
-4. **A latent defect, found and recorded, not scheduled:** the app marks an answer saved *before*
-   the server confirms, and swallows failures silently. Keeping her answers alive during a sitting
-   makes that failure **less** visible, not more.
+1. **Only 1 of her ~40 words has a quiz question.** That is phase 3.
+2. **Her answers still do not survive a full page reload.** Your ruling is recorded; it needs a step.
+3. **Her heroine's and pet's names will say "coming soon" forever** unless we add them — they come
+   from her own profile, so no automatic top-up can ever reach them. Two clips fixes it.
+4. **A latent defect, recorded, not scheduled:** the app marks an answer saved *before* the server
+   confirms, and swallows failures silently.
 
 ## Next
 
-Phase 2 — audio. The recording script currently rebuilds its master list from the curriculum, which
-is why it can never make her story words and why the earlier attempt was stopped. Phase 2 fixes that
-first, then records the missing words, then shows you a sample. Her speaker button will change from
-*invisible* to a crossed-out speaker with **coming soon**, which you chose and I froze.
-
-## Open question for you
-
-**Wrong-then-right — finished or not?** Nothing is blocked on it today; it blocks the second half
-of R4 whenever we pick that up.
+Phase 3 — quiz questions for her own words. Then phase 4 ships everything at once, with the one
+cache bump this whole run has been saving up.

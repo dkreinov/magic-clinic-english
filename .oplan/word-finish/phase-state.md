@@ -1,74 +1,84 @@
-CURRENT: phase 2 "audio" PLANNED and RULED. NEXT: execute steps 2.1 -> 2.7.
-PLAN (phase 2): .oplan/word-finish/plan-phase2.md (2999 lines, 7 steps, planned by a fresh planner
-  2026-08-02 and reviewed by the orchestrator; every gate in it was seen to fail before it was used)
+CURRENT: phase 2 "audio" CLOSED (gate PHASE-2-CLOSE-OK, exit 0). NEXT: phase 3 "quiz items" —
+  NOT YET PLANNED. A fresh planner must plan it before any step runs.
+PLAN (phase 2): .oplan/word-finish/plan-phase2.md · BRIEF: brief-phase2.md
 PLAN (phase 1): .oplan/word-finish/plan.md
 DESIGN: .oplan/word-finish/design.md · JOURNAL: journal.md · FIELD GUIDE: field-guide/index.md
-  (192 lines, 23 lessons. 15 governs review, 16 measurement, 22 pin-vs-property.)
-BASE (phase 1): e44cffa   ·   BASE (phase 2): 81fb743
-  (phase-state previously said dcf66a3; MEASURED — the diff dcf66a3..81fb743 outside .oplan is
-   EMPTY, so both are valid, but 81fb743 is the one every number in plan-phase2.md was taken at.)
-ACCEPTED (phase 1): 1.1 544814b · 1.2 376a2d9 (+amendment 1bd2ca5) · 1.3 43a3811 · 1.4 870e9c7 ·
-  1.5 visual gate self-served, PASSED · 1.6 close dcf66a3
-STATE OF THE TREE: 369 reported / 364 flat / 0 fail · contrast 58 PASS · quiz bank 62 files/84 items
-  · manifest 2254 == clips on disk 2254 · public/ 2372 files
+BASE (phase 1): e44cffa · BASE (phase 2): 81fb743 · BASE (phase 3): <the 2.7 close commit>
+ACCEPTED (phase 2): 2.1 3a2b2b3 · 2.2 f6eb81b · 2.3 a6fbd61 · 2.4 e352cfb ·
+  2.5 visual gate self-served, PASSED (no repo bytes) · 2.6 45ac2de · 2.7 this commit
+
+STATE OF THE TREE: 380 reported / 375 flat / 0 fail · contrast 58 PASS · quiz bank 62 files/84 items
+  · manifest 2264 == clips on disk 2264 (0 dead entries, 0 orphans) · public/ 2382 files
+  · public/audio/words/index.json md5 6a885982b75e82ef1f00dc6768796ecf, 20019 bytes, LF
   · LIVE magic-vet-v20 at dpl_6pFjJ8LrcyaFodRELCa46BzATUXy (a hypothesis phase 4 confirms)
+
+PHASE 2 WRITE SET against 81fb743, .oplan excluded: 22 paths, 0 deletions.
+  data/story-words.json · public/audio/words/index.json · the ten new .aac ·
+  public/styles.css · public/views/reader.js · public/views/words.js ·
+  scripts/build-word-audio.js · scripts/check-word-audio.mjs ·
+  tests/{lemma,reader-popup,reader-ui,word-audio,words-ui}.test.js
 
 FROZEN CONTRACTS IN FORCE:
   FC-1  public/quiz.js md5 69b6d71117cf776715374abc6f0abb02 and public/quiz-core.js md5
         9a2131be8b9d1b77c219f1e8c3482a71 (QZ-18 — NEVER touched, not even whitespace).
   FC-2  the audio VOICE, MODEL and INSTRUCTIONS in scripts/build-word-audio.js
-        (gpt-4o-mini-tts / nova / the existing instructions string) — 2254 clips came from those.
-  FC-3  the .oplan awk filter is  awk '$NF !~ /^\.oplan\//'  — TWO backslash bytes. A collapsed
-        copy is a bash syntax error, which makes the whole gate exit 0 and pass everything.
+        (gpt-4o-mini-tts / nova / the existing instructions string). 2264 clips now came from
+        those. The ONLY edit to synthesizeWord this phase was the word `export`.
+  FC-3  the .oplan awk filter is  awk '$NF !~ /^\.oplan\//'  — TWO backslash bytes.
   FC-4  CACHE magic-vet-v20 -> v21 happens EXACTLY ONCE, in phase 4 (F1-1). public/sw.js md5
         78fc3b0ac1d10de8a5baccb753eca33c.
-  FC-5  the no-recording marker, FROZEN BY THE OWNER 2026-08-02 (design §8): `btn-say na` — a
-        diagonal line drawn in CSS across the EXISTING speaker glyph — plus the English caption
-        `coming soon`. Not a swapped emoji, not Hebrew. canSay gates the button's STATE, no longer
-        its EXISTENCE. The exact CSS lives in design.md's two ```css blocks and is EXTRACTED BY
-        SCRIPT, never retyped; md5 of that extraction is 6e43cb5e463520f5d277d7d02c5ff26c.
-  FC-6  *** NEW 2026-08-02, LOAD-BEARING (design §12) *** BASE LEMMAS ONLY in
-        data/story-words.json. An inflected surface form in the manifest stops migrateWordKeys
-        (lib/profile.js:294, run on EVERY profile POST via api/profile.js:52) folding it into its
-        lemma, which SPLITS a word she has already collected into two dictionary entries. This is
-        what makes the disk-derived manifest safe; it is not luck.
-  FC-7  no new Hebrew string anywhere, ever, without the owner's sign-off. Hebrew is MOVED by
-        byte-slicing, never retyped (field guide 8).
-  ENDINGS ARE RE-MEASURED PER PHASE, never quoted from an older document (field guide 16), and
-  ONLY by counting bytes (tr -dc '\r' vs '\n'). NEVER with grep.
+  FC-5  the no-recording marker (design §8, owner-frozen): `btn-say na` + the English caption
+        `coming soon`. The CSS lives in design.md's two ```css blocks, is EXTRACTED BY SCRIPT and
+        never retyped, md5 6e43cb5e463520f5d277d7d02c5ff26c, and a test asserts it is present in
+        public/styles.css byte-for-byte. A tidy-up of the owner's rules fails the suite.
+  FC-6  BASE LEMMAS ONLY in data/story-words.json (design §12). Gated by an executed 20286-form
+        sweep in tests/word-audio.test.js AND by a surface guard in tests/reader-ui.test.js.
+  FC-7  no new Hebrew string anywhere. reader.js non-ASCII 754, words.js 465, styles.css 0.
+        Hebrew is MOVED by byte-slicing, never retyped (field guide 8).
+  ENDINGS RE-MEASURED THIS PHASE, by counting bytes only (field guide 16), NEVER with grep:
+        public/styles.css CRLF=758 · public/views/reader.js CRLF=959 · public/views/words.js
+        CRLF=300 · public/sw.js CRLF=51 · public/index.html CRLF=90 · quiz.js CRLF=346 ·
+        quiz-core.js CRLF=99 · all of scripts/ tests/ lib/ and the manifest are LF.
 
-OPEN QUESTIONS: none. R4(ii) was ruled (design §10). B-F2-1 was ruled (design §12).
+OPEN QUESTIONS: none.
 
-PHASE 2 RULINGS MADE 2026-08-02, BEFORE EXECUTION:
-  · B-F2-1 RULED: THE GENERATION SET IS **TEN**, not 21/17/16 —
-      after  deer  feet  glow  growl  harm  moon  nervous  scary  tight
-    This REAFFIRMS ruling B2 (.oplan/word-polish/journal.md:41, owner-approved same day as B3).
-    design.md §3 A, this file and the phase-2 brief had ALL lost it. Full reasoning and the two
-    sweeps that prove it: design.md §12.
-  · B-F2-2 DONE: design.md §3 A and §9 corrected in place; §9's "risk A resolved" was PARTLY FALSE
-    — the manifest has a THIRD consumer (api/profile.js:6, a direct JSON import) that never calls
-    getAllowedSet(). Grep the ARTIFACT, not the accessor.
-  · design §3 A's listening gate is marked SUPERSEDED by §11. Two clauses of one document had
-    disagreed since 2026-08-02.
-
-CARRIED OBLIGATIONS (a later phase MUST honour these):
+CARRIED OBLIGATIONS:
   F1-1  phase 4 bumps CACHE magic-vet-v20 -> v21 in public/sw.js:1 AND moves the pin in
-        tests/shell.test.js IN THE SAME STEP, with a seam assertion. ENLARGED BY PHASE 2:
-        phase 1 left 2 precached files changed and unbumped; phase 2 adds styles.css,
-        views/reader.js and views/words.js, so phase 4 owes the bump for FOUR distinct files.
-        Safe ONLY because neither phase deploys.
+        tests/shell.test.js IN THE SAME STEP, with a seam assertion.
+        *** ENLARGED, AND PHASE 2 SAW WHAT IT COSTS ***  Phase 1 left 2 precached files changed
+        and unbumped; phase 2 adds public/styles.css, public/views/reader.js and
+        public/views/words.js. FOUR distinct precached files are now changed and unbumped.
+        See F2-3: this is no longer theoretical.
   F1-2  R4(ii) NOT DONE — nothing reads story.checkLog back, so her answers still do not survive a
-        page reload. THE OWNER HAS RULED (design §10): wrong-then-right counts as FINISHED; a
-        question is done if ANY logged attempt is correct; de-dup by questionId. Still needs a step.
+        page reload. OWNER HAS RULED (design §10): wrong-then-right counts as FINISHED; a question
+        is done if ANY logged attempt is correct; de-dup by questionId. Still needs a step.
   F1-3  latent: the log-check POST swallows failures and sets st.logged=true BEFORE the await.
   F1-4  the sandbox de-identification is machine-local; re-run the machine-wide identity sweep at
         phase 4 (a file outside the repo can never be gated by a repo check).
-  F2-1  *** NEW *** `Ellie` and `Sparkle` — her heroine's and pet's names — will say `coming soon`
-        indefinitely. They come from profile.learner and the audio manifest is derived from a
-        profile with learner: {}, so no band-derived top-up can ever reach them. Two clips close it.
-        Needs her live profile, so phase 4 or later. A real, small dishonesty, accepted knowingly.
-  F2-2  *** NEW *** lib/quiz-item.js resolves tokens through resolveLemma against a set its CALLERS
-        supply (scripts/build-item-bank.js, scripts/quiz-topup.mjs). After phase 2 the bands and the
-        manifest are NO LONGER THE SAME LIST. Phase 3 must state which one it means.
+  F2-1  `Ellie` and `Sparkle` — her heroine's and pet's names — say `coming soon` and no
+        band-derived top-up can ever fix them, because the audio manifest is derived from a profile
+        with learner: {}. CONFIRMED IN A BROWSER this phase. Two clips at the next top-up close it;
+        needs her live profile, so phase 4 or later. A real, small dishonesty, accepted knowingly.
+  F2-2  lib/quiz-item.js resolves tokens through resolveLemma against a set its CALLERS supply
+        (scripts/build-item-bank.js, scripts/quiz-topup.mjs). After phase 2 the bands and the
+        manifest are NO LONGER THE SAME LIST (2254 vs 2264). PHASE 3 MUST STATE WHICH ONE IT MEANS.
+  F2-3  *** NEW, AND IT WILL BITE PHASE 4'S VERIFICATION *** A SERVICE WORKER IS REGISTERED ON
+        127.0.0.1:3000 from phase 1's visual gate, and it serves the precached magic-vet-v20 copies
+        of /styles.css, /views/reader.js and /views/words.js. Because F1-1 defers the CACHE bump,
+        it has NO REASON TO REFETCH. Phase 2's visual gate looked at YESTERDAY'S CODE and saw the
+        marker missing, on a tree where 375 tests passed. Field guide 23 said "switch to
+        127.0.0.1"; that advice is now SPENT, because using it registered a worker there.
+        THE WORKING REMEDY, used this phase: run the dev server on a DIFFERENT PORT
+        (PORT=3100 is supported), which is a different origin and therefore has no worker.
+        Phase 4 must either bump CACHE first or use a fresh port for every visual check.
 
 BLOCKED: no.
+
+PHASE 3 MUST START FROM:
+  · design.md §3 B (the quiz-item risk: isUsableItem validates SHAPE only and cannot tell that a
+    distractor is ALSO a correct answer — a shape check is not a correctness check).
+  · F2-2 above: decide bands vs manifest for lib/quiz-item.js's allowed set, and say so.
+  · the quiz bank is 62 files / 84 items and only ONE of her ~40 words has an item.
+  · PAID API (gpt-4.1-mini). The owner must approve the batch and see samples before any item
+    reaches her — that gate is NOT waived; §11 waived only the AUDIO listening gate.
+  · no change to public/quiz.js or public/quiz-core.js (QZ-18 / FC-1).

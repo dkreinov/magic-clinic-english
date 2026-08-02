@@ -1,4 +1,4 @@
-# Field guide — word-g1 (amended: word-trophies phase-1 close widened lessons 4 and 8; phase-2 close added lesson 13; phase-3 close corrected lesson 4 and added lesson 14; phase-4 close added lesson 15) (budget: 40 lines; at 133 because these are commands+mechanisms that do not compress — justification in word-trophies journal)
+# Field guide — word-g1 (amended: word-trophies phase-1 close widened lessons 4 and 8; phase-2 close added lesson 13; phase-3 close corrected lesson 4 and added lesson 14; phase-4 close added lesson 15) (word-finish phase 2 added lessons 24-27 and SPENT lesson 23s remedy) (budget: 40 lines; at 133 because these are commands+mechanisms that do not compress — justification in word-trophies journal)
 
 1. A FORMAT GATE IS NOT A CONTENT GATE — bitten three times. Gate what the CHILD experiences
    (phase 3 gated `knownLemmaSet`, not `status`). If no gate can see the failure, add a human one.
@@ -190,3 +190,45 @@
     127.0.0.1:3000 (no worker registered there) showed the truth immediately. Do this FIRST, before
     reporting any visual regression. And after any sandbox session, RESTORE the fixture: the dev
     server writes to DATA_DIR and its md5 had changed.
+
+24. A LATER RUN'S BRIEF CAN LOSE AN EARLIER RUN'S RULING. RULINGS GO IN phase-state.md THE DAY
+    THEY ARE MADE.
+    Ruling B2 ("generate BASE LEMMAS only; the list is TEN") was made AND owner-approved on
+    2026-08-01 and lived only in word-polish/journal.md. One day later it was absent from
+    design.md, absent from phase-state.md, and absent from the phase-2 planning brief, which
+    confidently told a fresh planner "the honest number is 16". Generating those sixteen would
+    have split her live dictionary on the server. Only the planner re-deriving it from scratch
+    caught it. A ruling that lives in a journal is a ruling that will be re-made wrongly; the
+    journal is the NARRATIVE, phase-state.md's FROZEN CONTRACTS is the CONTRACT.
+
+25. ASK THE QUESTION OF THE ARTIFACT, NOT OF THE ACCESSOR.
+    design section 9 asked "who calls getAllowedSet()?", got a TRUE answer (both callers are
+    audio-only), and concluded the manifest had no second meaning. It has one: api/profile.js:6
+    imports public/audio/words/index.json DIRECTLY -- never touching getAllowedSet -- and feeds it
+    to migrateWordKeys, which rewrites the keys of her durable dictionary on every POST. The right
+    question was of the FILE, not the function. Grep the artifact's PATH, then every accessor of
+    every result.
+
+26. ABSENCE FROM A LIST IS NOT ABSENCE OF THE BEHAVIOUR.
+    "These 16 words are not in the manifest" was true. "These 16 words are silent" was FALSE:
+    resolveLemma de-inflects INTO the manifest, so `softly` already spoke as `soft`. A transform
+    sat between the list and the behaviour. This is lesson 2's "anything reaching its subject
+    through a transform fails OPEN" in its positive form -- measure THROUGH the transform
+    (resolveLemma, tokenize, normalizeWord), never at the list.
+
+27. A TEST VERIFIED IN ISOLATION IS NOT VERIFIED IN ITS FILE -- MODULE CACHES ARE PROCESS-WIDE.
+    An executed popup test passed alone and could NEVER pass where it was appended:
+    public/words-index.js caches the manifest in a module-level variable for the life of the
+    PROCESS, and an earlier test in the same file stubbed that fetch as []. An empty Set is
+    TRUTHY, so the cache never refilled and the new test silently measured the OLD test's stub.
+    `node --test` isolates per FILE, not per test -- so a test that needs its own module state
+    needs its own FILE, with a header saying why. Field guide 15's shape one layer up: the
+    assertion was sound, its NEIGHBOURS were not. Before appending any test that stubs a module
+    already stubbed earlier in that file, ask what the module remembers.
+    COMPANION, and it invalidates lesson 23's remedy: THE SERVICE WORKER NOW LIVES ON 127.0.0.1
+    TOO, because lesson 23 told us to go there and going there REGISTERED ONE. Phase 2's visual
+    gate read the marker as missing while curl proved the server was sending the fixed file --
+    a precached magic-vet-v20 reader.js, which the deferred CACHE bump gives no reason to refetch.
+    THE REMEDY THAT STILL WORKS IS A FRESH ORIGIN: run the dev server on a different PORT
+    (`PORT=3100 DATA_DIR=... node scripts/dev-server.js`). No worker is registered there. Any
+    remedy that names a specific origin expires the moment you use it.
