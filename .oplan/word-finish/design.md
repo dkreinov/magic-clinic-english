@@ -235,3 +235,32 @@ The crossed-out speaker reads as *"sound, not yet"* — which is the true statem
   the `coming soon` caption IS text and must pass `scripts/check-contrast.mjs` against
   `--color-card`. **The planner must add that pair to the contrast script, or state why not.**
 - This lands in **phase 2**, with the audio work, because it is the same surface.
+
+---
+
+## 9. RISK A RESOLVED (orchestrator, 2026-08-02) — the manifest has no second meaning
+
+§3 A flagged the one real risk in phase 2: `getAllowedSet()` has TWO consumers and redefining the
+manifest to mean "what is on disk" would be dangerous if either treated it as a *vocabulary* gate.
+**Measured today. It does not. Both consumers use it for audio existence only:**
+
+- `public/views/words.js:159` — `const sayLemma = allowedWords ? resolveLemma(lemma, allowedWords) : lemma;`
+  The variable is literally named `sayLemma`, and it feeds the play button. When `allowedWords` is
+  null it falls back to the raw lemma, so a missing manifest degrades the BUTTON, never the list.
+- `public/views/reader.js:803` — `const lemma = resolveLemma(dataWord, allowedWords);` which feeds
+  `canSay`. Nothing else in either file reads `allowedWords`.
+- `public/words-index.js` already documents the intended failure mode in its own header: on any
+  error it returns an EMPTY set, "the views simply do not render a play button. A dictionary that
+  loads without audio beats one that does not load."
+
+**Therefore the phase-2 decision stands and is safe:** the manifest becomes a statement about which
+`.aac` files exist. Nothing gates her vocabulary on it, so no word can disappear from her list, her
+story or her quiz because of a manifest change. The only thing a manifest change can alter is
+whether a speaker button is live — which, after design §8, is exactly the state `btn-say na` exists
+to express.
+
+**One consequence for phase 2's planner, so it is not rediscovered:** because `getAllowedSet()`
+swallows every failure into an empty Set, a manifest that 404s is INDISTINGUISHABLE at runtime from
+a manifest that legitimately lists nothing. Phase 4's proof already probes the manifest URL directly
+(word-polish step 3.5 added it, and it was the first deploy in this project's history to do so).
+That probe must stay.
