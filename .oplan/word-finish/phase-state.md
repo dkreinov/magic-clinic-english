@@ -1,6 +1,30 @@
-CURRENT: PHASES 1-4 ALL CLOSED. **DEPLOYED 2026-08-02.** The run is finished.
-  LIVE: dpl_6piLnUX5zj8zEVzUucLeHqt5aRqG / english-3iewsk4vv-dkreinovs-projects.vercel.app,
-  aliased to english-app-three-tan.vercel.app, magic-vet-v21, READY.
+CURRENT: PHASES 1-4 CLOSED, plus a FOLLOW-ON shipped the same evening (trophy tiers).
+  LIVE: dpl_BvYkmV8kygG1X69JcFdBJaahf5jw / english-gbvv15qta-dkreinovs-projects.vercel.app,
+  aliased to english-app-three-tan.vercel.app, **magic-vet-v22**, READY.
+  Previous: dpl_6piLnUX5zj8zEVzUucLeHqt5aRqG (v21, the phase 1-3 payload) ->
+  before that dpl_6pFjJ8LrcyaFodRELCa46BzATUXy (v20).
+
+FOLLOW-ON, 2026-08-02 evening -- TROPHY TIERS MADE VISIBLE (the learner's own report).
+  HER WORDS: "the trophies are all colored now, so she doesn't feel like she's achieving
+  something ... maybe we should have additional trophies or ... additional ranking, like the
+  bronze, silver, gold".
+  THE DIAGNOSIS, measured, not guessed: bronze/silver/gold ALREADY EXISTED (8 trophies x 3
+  tiers, thresholds owner-signed and catalogue-pinned). The only visual difference between
+  bronze and gold on the shelf was a 3px ring COLOUR on a 96px circle, while locked -> bronze
+  flipped the whole card from greyscale/45% to full colour. So crossing the FIRST threshold
+  looked like finishing. She had earned three levels the screen never showed her.
+  THE FIX: three pips per card, filled to the tier, plus ring WEIGHT climbing 3px/5px/7px.
+  NO WORDS, so NO NEW HEBREW -- the pips are aria-hidden because the progress line already
+  states the same fact in text. The pips take the SAME tier the ring is drawn from, so they
+  cannot disagree (the "12 out of 5" seam, closed by construction).
+  GATED: 2 new flat tests, both SEEN TO FAIL first; the seam asserted over all 8 trophies x 5
+  metric points; the new CSS selectors added to the globally-linked-sheet pin and that pin
+  seen to fire when one rule was deleted. Ledger 397/392 -> 399/394. Contrast 58.
+  VISUAL GATE self-served at 414x1500 on PORT 3200 -- a FRESH origin, because 3000, 127.0.0.1
+  and 3100 all carry service workers from earlier phases (F2-3, field guide 27).
+  *** AND THE SANDBOX WAS NEVER TOUCHED: DATA_DIR pointed at a throwaway directory, so the
+  restore-the-fixture dance of phases 1 and 2 was designed out rather than performed. md5
+  confirmed still 91eff5da59674d7463f462fad659534e. ***
   Predecessor (rollback target): dpl_6pFjJ8LrcyaFodRELCa46BzATUXy, magic-vet-v20 -- CONFIRMED live
   by `vercel inspect` at the phase-4 pre-flight, which discharges phase 2's recorded hypothesis.
 PLAN (phase 3): .oplan/word-finish/plan-phase3.md · BRIEF: brief-phase3.md
@@ -11,10 +35,11 @@ BASE (phase 1): e44cffa · BASE (phase 2): 81fb743 · BASE (phase 3): <the 2.7 c
 ACCEPTED (phase 2): 2.1 3a2b2b3 · 2.2 f6eb81b · 2.3 a6fbd61 · 2.4 e352cfb ·
   2.5 visual gate self-served, PASSED (no repo bytes) · 2.6 45ac2de · 2.7 this commit
 
-STATE OF THE TREE: 397 reported / 392 flat / 0 fail · contrast 58 PASS · quiz bank 78 files/103 items
+STATE OF THE TREE: 399 reported / 394 flat / 0 fail · contrast 58 PASS · quiz bank 78 files/103 items
   · manifest 2264 == clips on disk 2264 (0 dead entries, 0 orphans)
   · public/audio/words/index.json md5 6a885982b75e82ef1f00dc6768796ecf, 20019 bytes, LF
-  · public/sw.js CACHE magic-vet-v21 (F1-1 SPENT, once) · public/quiz/light.json md5
+  · public/sw.js CACHE magic-vet-v22 (F1-1 spent at v21; v22 is the follow-on's own bump,
+    required because public/styles.css and public/views/trophies.js are both PRECACHED) · public/quiz/light.json md5
     f00b091b7f4208ec8783f06a0f6ff320
   · VERIFIED LIVE, md5 worktree==live: sw.js, styles.css, views/{reader,words,trophies}.js,
     quiz/light.json, audio/words/index.json (the manifest-URL probe, kept per design section 9)
