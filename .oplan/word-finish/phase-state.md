@@ -29,7 +29,8 @@ CARRIED OBLIGATIONS (a later phase MUST honour these — see journal 2026-08-02 
         tests/shell.test.js IN THE SAME STEP, with a seam assertion. Two precached files are
         already changed and unbumped.
   F1-2  R4(ii) NOT DONE — nothing reads story.checkLog back, so her answers still do not survive a
-        page reload. Needs the owner's ruling (first-attempt vs best-attempt) + a de-dup rule.
+        page reload. THE OWNER HAS NOW RULED (design §10): wrong-then-right counts as FINISHED; a
+        question is done if ANY logged attempt is correct; de-dup by questionId. Still needs a step.
   F1-3  latent: the log-check POST swallows failures and sets st.logged=true BEFORE the await.
   F1-4  the sandbox de-identification is machine-local; re-run the machine-wide identity sweep at
         phase 4 (a file outside the repo can never be gated by a repo check).
@@ -40,5 +41,8 @@ PHASE 2 MUST START FROM (all measured, do not re-derive):
     consumers are audio-only, so the disk-derived manifest is safe).
   · scripts/build-word-audio.js:102 deriveWordList() + :95 writeManifest() overwrite the manifest
     from the BANDS. 17 story words are outside the bands; 0 of them have clips today.
-  · PAID API, owner-authorised 2026-08-01. Owner MUST hear a sample before the batch is accepted.
+  · PAID API, owner-authorised 2026-08-01. THE LISTENING GATE IS WAIVED (design §11, 2026-08-02):
+    phase 2 does NOT stop for the owner's ears. The mechanical checks in §11 are therefore the ONLY
+    gate and are mandatory -- voice-drift control against an existing clip, non-silence, plausible
+    duration, manifest/file correspondence.
   · canSay moves from gating the button's EXISTENCE to gating its STATE.

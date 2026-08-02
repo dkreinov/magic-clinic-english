@@ -287,3 +287,32 @@ can never clear — the app only ever recorded attempt one, so a wrong first ans
 unfinished forever. That is worse than generous marking, for a child learning to read.
 
 This unblocks carried obligation F1-2. It does NOT schedule it — R4(ii) still needs its own step.
+
+---
+
+## 11. AMENDMENT #4 — the owner WAIVES the listening gate, 2026-08-02
+
+Design §3 A and word-polish both required: *"He must hear a sample before the batch is accepted."*
+**The owner has waived it** ("no, its ok no need to stop"), after being told plainly what the waiver
+costs. **Phase 2 does NOT stop for his ears.**
+
+**What he was told before deciding, so the record shows this was informed:** the voice, model and
+instructions are unchanged, so the risk of a stranger's voice is near zero. The real exposure is
+(a) TTS mispronouncing unusual or inflected story words — `growls`, `glowing`, `deer`, `tightly`,
+`softly`, `wings` — which no test in this project can detect because **the agent cannot hear**, and
+(b) silent model drift behind a fixed model name.
+
+**THE MECHANICAL CHECKS ARE NOT WAIVED — they are now the ONLY gate, so they are mandatory:**
+1. **Voice-drift control.** Regenerate ONE word that already has a clip, to a scratch path outside
+   `public/`, and compare duration and byte size against the shipped clip. A large divergence means
+   the model moved behind its name; STOP and report. **The existing clip is never overwritten.**
+2. **Non-silence.** Every new `.aac` must be non-trivial in size and must decode; a silent or
+   zero-length clip is a failure, not a clip.
+3. **Plausible duration** for the word's length, so a clip that says nothing, or says far too much,
+   is caught.
+4. Every generated word must appear in the manifest, and every manifest entry must have a file —
+   which the disk-derived manifest (§3 A) makes structural rather than checked.
+
+**ACCEPTED RESIDUAL RISK, stated so nobody is surprised later:** a clip may say the wrong thing, or
+say the right thing wrongly, and ship. The blast radius is one word, she hears it, and it is fixed
+by regenerating one file. That is the trade the owner made knowingly.
