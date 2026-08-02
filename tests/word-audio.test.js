@@ -1,12 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import { wordsToGenerate, bandWords, clipsOnDisk, readStoryWords } from '../scripts/build-word-audio.js';
 import { resolveLemma } from '../public/lemma.js';
+import { probeAac, checkClip } from '../scripts/check-word-audio.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
@@ -130,5 +132,121 @@ test('FC-6: no story-word extra re-routes a word she may already hold', () => {
 
   for (const w of readStoryWords()) {
     assert.ok(!before.has(w), `data/story-words.json lists "${w}", which the bands already cover`);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// STEP 2.2 -- the four mechanical checks design.md section 11 makes the ONLY
+// gate on the audio batch, now that the owner has waived the listening gate.
+// Every test below EXECUTES the shipped module; none is a source needle.
+// ---------------------------------------------------------------------------
+
+test('probeAac reads a real shipped clip correctly', () => {
+  const p = probeAac(readFileSync(path.join(wordsDir, 'cat.aac')));
+  assert.strictEqual(p.error, null, `cat.aac should decode cleanly, got: ${p.error}`);
+  assert.strictEqual(p.sampleRate, 24000);
+  assert.strictEqual(p.channels, 1);
+  assert.strictEqual(p.frames, 33);
+  assert.strictEqual(p.bytes, 12140);
+  assert.ok(Math.abs(p.seconds - 1.408) < 0.001, `expected 1.408s, got ${p.seconds}`);
+  assert.ok(p.voicedSeconds > 1.3 && p.voicedSeconds <= p.seconds, `voiced ${p.voicedSeconds}`);
+});
+
+// There is no ffprobe and no ffmpeg on this machine, so "must decode" is a frame
+// walk. These are the four ways a TTS call actually goes wrong: nothing came
+// back, an HTML error page came back, the transfer was cut, or the model spoke
+// silence. A byte-size proxy sees only the first three.
+test('probeAac names each way a clip can be broken', () => {
+  const real = readFileSync(path.join(wordsDir, 'cat.aac'));
+
+  const silentFrames = [];
+  for (let i = 0; i < 40; i++) {
+    const len = 11;
+    const h = Buffer.alloc(len);
+    h[0] = 0xff;
+    h[1] = 0xf1;
+    h[2] = (1 << 6) | (6 << 2) | 0;
+    h[3] = (1 << 6) | ((len >> 11) & 0x03);
+    h[4] = (len >> 3) & 0xff;
+    h[5] = ((len & 0x07) << 5) | 0x1f;
+    h[6] = 0xfc;
+    silentFrames.push(h);
+  }
+
+  const inputs = [
+    { name: 'empty', buf: Buffer.alloc(0) },
+    { name: 'html', buf: Buffer.from('<html><title>502 Bad Gateway</title></html>', 'utf8') },
+    { name: 'truncated', buf: real.subarray(0, real.length - 200) },
+    { name: 'silent', buf: Buffer.concat(silentFrames) },
+  ];
+
+  let observed = 0;
+  const seen = {};
+  for (const input of inputs) {
+    observed++;
+    seen[input.name] = probeAac(input.buf);
+  }
+  assert.strictEqual(observed, 4, 'this test must drive exactly 4 inputs');
+
+  assert.match(seen.empty.error, /no ADTS frames at all/, `empty: ${seen.empty.error}`);
+  assert.match(seen.html.error, /lost ADTS sync at byte 0/, `html: ${seen.html.error}`);
+  assert.match(seen.truncated.error, /TRUNCATED/, `truncated: ${seen.truncated.error}`);
+  // the silent stream is the important one: it DECODES PERFECTLY and says nothing
+  assert.strictEqual(seen.silent.error, null, 'the silent stream must decode -- that is the point');
+  assert.strictEqual(seen.silent.voicedSeconds, 0, `silent voicedSeconds ${seen.silent.voicedSeconds}`);
+  assert.ok(seen.silent.frames > 0, 'the silent stream must have real frames');
+});
+
+test('checkClip passes a real clip and fails a silent one', () => {
+  const real = readFileSync(path.join(wordsDir, 'cat.aac'));
+  const good = checkClip('cat', real);
+  assert.deepStrictEqual(good.failures, [], `a shipped clip must pass: ${good.failures.join(' | ')}`);
+
+  const silentFrames = [];
+  for (let i = 0; i < 40; i++) {
+    const len = 11;
+    const h = Buffer.alloc(len);
+    h[0] = 0xff;
+    h[1] = 0xf1;
+    h[2] = (1 << 6) | (6 << 2) | 0;
+    h[3] = (1 << 6) | ((len >> 11) & 0x03);
+    h[4] = (len >> 3) & 0xff;
+    h[5] = ((len & 0x07) << 5) | 0x1f;
+    h[6] = 0xfc;
+    silentFrames.push(h);
+  }
+  const bad = checkClip('silent', Buffer.concat(silentFrames));
+  assert.ok(bad.failures.length > 0, 'a silent clip must not pass');
+  assert.ok(
+    bad.failures.some((f) => f.includes('SILENT')),
+    `the silent clip must be named SILENT, got: ${bad.failures.join(' | ')}`
+  );
+});
+
+// THE CRY-WOLF CONTROL FOR THE WHOLE GATE. Step 2.6 acts on nothing but this
+// script's EXIT CODE, so the exit code itself is proved here, in both
+// directions, four steps before any money exists. The temp tree lives in
+// os.tmpdir() and NEVER inside the repository (field guide 4).
+test('check-word-audio.mjs exits 0 on the real tree and 1 on a broken one', () => {
+  const checker = path.join(root, 'scripts', 'check-word-audio.mjs');
+
+  const ok = spawnSync(process.execPath, [checker], { cwd: root });
+  assert.strictEqual(ok.status, 0, `the real tree must pass: ${ok.stdout}${ok.stderr}`);
+  assert.ok(ok.stdout.toString().includes('OBSERVED:'), 'the gate must print what it observed');
+
+  const tmp = mkdtempSync(path.join(tmpdir(), 'word-audio-'));
+  try {
+    writeFileSync(path.join(tmp, 'healthy.aac'), readFileSync(path.join(wordsDir, 'cat.aac')));
+    const manifest = path.join(tmp, 'index.json');
+    writeFileSync(manifest, JSON.stringify(['healthy', 'nosuchword']) + '\n');
+
+    const bad = spawnSync(process.execPath, [checker, '--dir', tmp, '--manifest', manifest], { cwd: root });
+    assert.strictEqual(bad.status, 1, 'a manifest entry with no clip must exit 1');
+    assert.ok(
+      bad.stdout.toString().includes('nosuchword'),
+      `the failing run must NAME the offender, got: ${bad.stdout}`
+    );
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
   }
 });
