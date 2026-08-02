@@ -264,3 +264,26 @@ swallows every failure into an empty Set, a manifest that 404s is INDISTINGUISHA
 a manifest that legitimately lists nothing. Phase 4's proof already probes the manifest URL directly
 (word-polish step 3.5 added it, and it was the first deploy in this project's history to do so).
 That probe must stay.
+
+---
+
+## 10. AMENDMENT #3 — R4(ii) OWNER RULING, 2026-08-02
+
+**Question:** if she answers a comprehension question **wrong and then right**, is that question
+finished?
+
+**OWNER'S RULING: YES — finished.** (His words: "1.yes")
+
+**Consequence, frozen, so no later step re-opens it:** when `story.checkLog` is read back to restore
+her answered state, a question counts as ANSWERED AND DONE if **any** logged attempt was correct,
+not only the first. `checkLog` records only the FIRST attempt today (`reader.js:712`), so the
+read-back must treat a question as finished when the log shows a correct attempt, and must NOT
+strand a question as permanently incomplete because her first try was wrong. De-duplication rule:
+where `checkLog` holds several entries for the same `questionId` (possible from prior re-entries),
+the question is done if ANY of them is correct.
+
+**Why this and not the strict reading:** the strict alternative leaves her looking at a question she
+can never clear — the app only ever recorded attempt one, so a wrong first answer would mark it
+unfinished forever. That is worse than generous marking, for a child learning to read.
+
+This unblocks carried obligation F1-2. It does NOT schedule it — R4(ii) still needs its own step.
