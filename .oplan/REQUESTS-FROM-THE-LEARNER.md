@@ -277,3 +277,42 @@ use for any future web-service generation** (see also the ChatGPT-images precede
 
 **Standing constraint on the track itself:** INSTRUMENTAL ONLY. A vocal track would put English
 lyrics under a child reading English, which works directly against the app's purpose.
+
+---
+
+## PRIVACY INCIDENT — 2026-08-03, the push that nearly published her vocabulary
+
+**Found when the owner said "lets push."** The GitHub repo `dkreinov/magic-clinic-english` is
+**PUBLIC** (unauthenticated API returns 200), and 332 unpushed commits contained her word list.
+Pushing would have published an eleven-year-old's vocabulary and her per-word quiz scores.
+
+**What was actually leaked, measured rather than assumed:**
+- `.oplan/word-quiz/topup-1-words.txt` — the file **is** her 12-word list. Named as a surviving
+  leak by this project's own ruling **R-F3-5** and never acted on.
+- `.oplan/word-g1/plan.md`, `.oplan/word-quiz/journal.md`, `.oplan/word-polish/plan.md` — lines
+  naming her words as hers.
+- `.oplan/word-quiz/night/parent-view-DESIGN.md` — **her per-word scores** (hardest/easiest, 0/3,
+  2/2). Worse than the words alone.
+
+**THE TRAP THAT MAKES THE OBVIOUS FIX WRONG.** All 12 of her words are ordinary English that also
+exist as *shipped content* — every one has an audio clip and a quiz item. A word-level
+`--replace-text` purge would have corrupted the app's own data everywhere and still not fixed the
+real problem. **The leak is not the words; it is documents asserting these are HERS.** The purge
+was therefore scoped to 35 exact offending LINES plus one whole file.
+
+**A DISCRIMINATOR'S BLIND SPOT, recorded because it nearly hid the worst file.** "Does a line hold
+3+ of her words?" reports `topup-1-words.txt` as CLEAN — it is one word per line, so no line ever
+clusters. A bare list defeats a cluster test. Both shapes must be checked.
+
+**What was NOT leaked:** the already-public `.oplan` files (`placement-fix-and-art/plan.md`,
+`first-build/journal.md`) matched many of her words but only SCATTERED, never clustered — ordinary
+bank discussion. Nothing of hers was public before this, and `.env` was never committed.
+
+**The fix:** `git filter-repo` over `origin/master..HEAD` only. Because every leak was unpushed,
+already-public history was untouched and the push stayed a **clean fast-forward — no force-push**.
+Verified after rewriting: 0 clustered lines, 0 list-shaped files, and the leak file 404s on
+`raw.githubusercontent.com`. Every staged copy of her vocabulary was deleted with a receipt.
+
+**THE STANDING RULE THIS EARNS: `.oplan` IS PUBLISHED. Treat every word written there as public.**
+D27 covered profile *files* and never covered the *record* — that gap has now produced two
+incidents (design.md on 2026-08-02, this one). Counts only, always.
