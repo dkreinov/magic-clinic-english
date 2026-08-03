@@ -132,8 +132,12 @@ STANDING RULINGS (recorded the day they were made -- field guide 24):
         moving the subject mid-exposure is not the planner's error.
   R-F6-2  2026-08-02, ORCHESTRATOR. SPENT VISUAL-GATE ORIGINS, kept here because every remedy
         that names an origin expires the moment it is used (field guide 27):
-        SPENT -- localhost:3000, 127.0.0.1:3000, localhost:3100, localhost:3200.
-        NEXT FREE -- 3300. Any visual gate takes the next unused port and ADDS IT TO THIS LINE
+        SPENT -- localhost:3000, 127.0.0.1:3000, localhost:3100, localhost:3200,
+        localhost:3300 and localhost:3400 (both burned 2026-08-03 by the R8 music gate:
+        3300 for the reader-only control, then 3400 was REQUIRED because moving the
+        control into the shell changed index.html/app.js/styles.css, all precached, and
+        3300's worker had no reason to refetch them -- F2-3 exactly).
+        NEXT FREE -- 3500. Any visual gate takes the next unused port and ADDS IT TO THIS LINE
         in the same step. A service worker is registered per ORIGIN, and this run has now burned
         four of them.
   R-F6-3  2026-08-02, ORCHESTRATOR. F1-3 IS FIXED IN THE SAME PHASE, AS ITS OWN STEP, AND THE

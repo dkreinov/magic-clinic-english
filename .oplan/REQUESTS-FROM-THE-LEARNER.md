@@ -225,7 +225,31 @@ That is a better answer than either the dead button or the missing one, and it i
 ---
 
 ## R8 — background music behind the story
-**Raised:** 2026-08-02 evening, by the owner. **Status: HALF-BUILT, IN FLIGHT 2026-08-03.**
+**Raised:** 2026-08-02 evening, by the owner.
+**Status: SHIPPED AND LIVE 2026-08-03** — commit `3b6bf24`, `magic-vet-v24`,
+`dpl_AMd2BqqD3UeYVrBrbqfnXCg31LWd`. Every changed file verified md5-identical live vs the
+tested tree. The record below is kept as written because it is the reasoning, not the status.
+
+**What she gets:** a 3:04 instrumental bed, **default OFF**, with a control in the app shell
+reachable from *every* screen, that **ducks to near-silence under every spoken word**.
+
+**DELIVERY, owner-chosen:** stream the first time, then keep it. `prime()` adopts a copy already
+on her phone and never downloads; `fill()` runs only after she switches music on. `sw.js` spares
+`MUSIC_CACHE` in the activate sweep so the track outlives version bumps. Precaching was rejected:
+4 MB on *every* deploy for a feature that is default OFF.
+
+**THE DEFECT THIS NEARLY SHIPPED, kept as the lesson:** `music.js` was imported by `reader.js`
+and `words.js` — both precached — while not being precached itself. **Offline, that import fails
+and the whole reader dies**: a music file taking down the story, the one thing this module's
+property 1 forbids. **414 passing tests did not see it.** There is now a seam test for the general
+property — every module a precached file imports must itself be precached.
+
+**AND THE MUTATION HARNESS LIED ONCE.** A control reported "0 failures", which reads exactly like
+a test that cannot fail. It was a no-op: the file is CRLF and the patch used `\n`. **Every mutation
+must now assert that it actually applied.** Sibling to field guide 16 (grep cannot measure line
+endings).
+
+**ORIGINAL RECORD, from when this was half-built:**
 
 **His words:** "see if we can add some music. you can generate it in gemini or suno".
 
