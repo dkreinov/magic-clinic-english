@@ -143,3 +143,19 @@ export function gradeTyped(typed, answer, { isRetry = false } = {}) {
   if (isNearMiss(typed, answer)) return 'near-miss';
   return 'wrong';
 }
+
+// STEP 1.2: reorder the ranked pool so the same word is not question #1 every time.
+// WK-5: the ranked list is REORDERED, never TRUNCATED -- pickQuizWords itself is untouched.
+// Fisher-Yates over the FIRST min(8, length) entries only, using the exact loop idiom at
+// lines 26-29 above. The tail (index slice..end) is left in ranked order. ranked is never
+// mutated: we shuffle a copy. D7 / R-W-6: pure function, no DOM, no fetch, no network.
+export function sampleRanked(ranked, count, rand = Math.random) {
+  if (!Array.isArray(ranked) || ranked.length === 0) return [];
+  const arr = ranked.slice();
+  const slice = Math.min(8, arr.length);
+  for (let i = slice - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}

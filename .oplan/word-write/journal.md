@@ -51,3 +51,56 @@ PLAN REVIEW (fresh CHECKER, read-only) -- VERDICT fix-first, 3 findings, ALL FIX
   logic, and that W1-1 (the deferred CACHE bump) is safe because nothing deploys between phases.
 
 STATUS: phase 1 planned in full, phases 2-3 skeletons. Awaiting the owner's go-ahead.
+
+## PHASE 1 — execution
+
+STEP 1.1 grade a typed answer
+  tier: WORKER (Sonnet)
+  did: normalizeTyped / isNearMiss / gradeTyped appended to public/quiz-core.js; new
+       tests/typed-answer.test.js, 27 flat tests.
+  surprises: the frozen validation's last line could never pass on this machine (see I-1).
+  deviations: three fail-first controls, each seen to fail and named -- removing the
+       transposition branch broke the lgiht/light test; ignoring isRetry broke the 4-case retry
+       sweep; accepting distance 2 broke the distance-2 test.
+  validation_first_try: no (my command was broken, not the work)
+  retries: 0 · escalations: 0 · interventions: 1 (I-1, bad-spec, MINE)
+  append-only PROVED byte-for-byte: baseline 4197 bytes identical, 1484 appended, 46 CR = 46 LF.
+  ledger 433 -> 460 · quiz.js md5 unchanged 69b6d711...
+  audit: MATCH, high confidence. The auditor verified the transposition branch by READING the
+       algorithm and independently computed that plain-Levenshtein('lgiht','light') is 2, so the
+       test is a genuine non-circular check. One narrowing noted: the "empty is never a
+       near-miss for ANY answer" claim is exercised against a single answer value; the code's
+       `a === ''` short-circuit makes it general, so accepted with the narrowing recorded.
+  commit: 2c7eb0e
+
+INTERVENTION I-1 (bad-spec, MINE). `node --test tests/` fails MODULE_NOT_FOUND on Node v22 --
+  directory-argument discovery was dropped after v20. It could never have passed, on any tree,
+  for ANY of the four steps. Contract GC-1 of the first-build run already recorded this and
+  package.json's own script is the bare form. Amended in all four steps and in acceptance
+  criterion 1. Verified on a TRULY pristine tree (my first check was contaminated: `git stash`
+  does not stash UNTRACKED files, so the new test file stayed behind and failed against the
+  reverted implementation, giving a misleading 434/433/fail-1).
+  *** THIS IS THE THIRD DEFECT IN MY OWN FROZEN VALIDATIONS THIS RUN *** -- the CR==99 pin that
+  would have failed every appending step, the shell-quoting replacement that silently matched
+  nothing, and this. And the plan reviewer COULD NOT have caught this one: it is read-only and
+  cannot execute, so an unrunnable command is invisible to it. A plan review that cannot run a
+  command cannot validate a command.
+
+STEP 1.2 reorder the ranked pool (R3a)
+  tier: WORKER (Sonnet)
+  did: sampleRanked appended to public/quiz-core.js; new tests/quiz-sampling.test.js, 8 flat
+       tests with a seeded LCG (no Math.random in assertions).
+  surprises: none
+  deviations: fail-first control seen to fail -- replacing the body with `return ranked` broke
+       "rank #1 appears among first 4 sometimes and not always".
+  validation_first_try: yes · retries: 0 · escalations: 0
+  git numstat 16 added / 0 deleted · ledger 460 -> 468 · quiz.js md5 unchanged
+  audit: MATCH, high confidence. Confirmed the two properties that matter: output length always
+       equals input length (`count` is unused in the body -- it REORDERS, never TRUNCATES), and
+       membership is proved by SORTED COMPARISON, not by length alone (a shuffle that duplicated
+       one entry and dropped another would survive a length check).
+  *** AND THE AUDITOR FOUND A REAL DEFECT IN MY OWN CONTROL. *** OBSERVED_SEEDS printed a
+       HARDCODED 500 while the loop broke early. Measured honest count: EIGHT. My gate --
+       written precisely so that "a sweep which inspected nothing cannot pass silently" -- was
+       passing on a number 62x larger than the work actually done. Field guide 18, in the
+       instrument rather than the subject. See I-2.
