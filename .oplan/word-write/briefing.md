@@ -154,3 +154,45 @@ this machine — nothing has been sent to her phone yet.**
 
 **WHAT HAPPENS NEXT.** Phase 3 puts it on her phone and checks that what is live is exactly what
 was tested. That is the only step left.
+
+---
+
+## 2026-08-03 — Phase 3 closed: it is on her phone
+
+**WHAT WE SET OUT TO DO.** Put it live and prove that what is running is exactly what was tested.
+
+**WHAT WE ACTUALLY DID.** One deploy. Then checked all six changed files one by one against what
+the server is actually sending — all six identical. The app's version number went from v24 to v25,
+which is the thing that makes her phone bother to download the new code at all; I checked that
+those two numbers really differ before deploying, because if they had matched she would have kept
+seeing the old app forever and everything would have looked fine from here.
+
+**WHAT SHE GETS, the moment she next opens it.**
+- Four kinds of question instead of one, and she gets one of each in every round of four.
+- Two of them make her **write** the word — one from the Hebrew, one from hearing it.
+- The keyboard's autocomplete, autocorrect, auto-capitals and spellcheck are all switched off for
+  those boxes, so the phone cannot answer for her.
+- If she is **one letter off**, she gets one free second try and her typing stays in the box. Get
+  it right and it counts as right.
+- Hearing a word read aloud is now only one question in four, not every question — she said that
+  got annoying.
+- And the word she once got wrong is no longer the first question every single time.
+
+**WHAT WE FOUND OUT.** The new file the app now needs was genuinely missing from the server before
+this deploy and is genuinely there now. I checked, rather than assuming, because this project has
+shipped a version where a file the app imports was not delivered — and offline, that killed the
+whole story screen while every test passed.
+
+**WHAT WENT WRONG.** Nothing in this phase.
+
+**WHERE WE ARE NOW.** Live, verified, with the previous version recorded so we can go back in one
+command if anything is wrong.
+
+**WHAT HAPPENS NEXT — and this is the one thing I need from you.** I could not test her actual
+phone keyboard from this machine. Everything is set correctly and I checked it at phone size in a
+desktop browser, but whether *her* phone really stops suggesting words is something only she can
+tell us. **Please ask her: when she types the answer, does the phone still try to finish the word
+for her?** If it does, that is a small fix and I would want to know.
+
+Also worth asking her, since it is the whole point: does having to write the word feel better or
+worse than tapping one?

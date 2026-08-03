@@ -1,0 +1,24 @@
+PRE-FLIGHT BASELINE -- word-write phase 3, 2026-08-03
+
+ROLLBACK TARGET (the deployment currently live, recorded EXACTLY as inspect reported it):
+  id  dpl_BgsVu1EtEb3poYS2qrQeJSD1Bq9G
+  url https://english-4bmumj60r-dkreinovs-projects.vercel.app
+  created Mon Aug 03 2026 16:15:05 GMT+0300 · status Ready · target production
+  aliased to english-app-three-tan.vercel.app
+
+LIVE CACHE VERSION (the R-W-7 gate: it MUST differ from ours, or her phone never refetches):
+  live : const CACHE = "magic-vet-v24";
+  ours : const CACHE = "magic-vet-v25";
+
+LIVE quiz-strings.js (must be 404 before this deploy -- it is a new file):
+  HTTP 404
+
+LOCAL STATE: suite 551 pass / 0 fail · tree 0 modified paths
+
+WORKTREE md5 OF EVERY FILE THIS DEPLOY CHANGES (compared against live AFTER the deploy):
+  e9bf81c7a2ad63d392cce093062082cd *public/sw.js
+  a5df4cfdb031b68a6aceaf8b8c2d9fe4 *public/quiz.js
+  04b61a2e7602e5cd8dc0dad3c7ad1e4a *public/quiz-core.js
+  e50c944fa8ccb59c4894c7bcb8b63829 *public/quiz-strings.js
+  cda033cd74e967e1f7a1510beb48b139 *public/views/reader.js
+  e0da6baf684720d6c21c86b4866b491a *public/views/words.js

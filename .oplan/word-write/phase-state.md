@@ -338,3 +338,46 @@ PHASE 2 VISUAL GATE -- self-served by the orchestrator, 2026-08-03
     answer resolves. FIXED in step 2.7 (`retry && !resolved`), with a test WRITTEN FIRST and
     SEEN TO FAIL against the unfixed code ("1 !== 0"), so it cannot come back.
     RE-CHECKED ON THE FRESH ORIGIN: the "almost" line is gone, only the praise remains.
+
+================================================================================
+PHASE 3 -- SHIPPED. 2026-08-03.
+================================================================================
+  LIVE NOW:  dpl_4qvNyyBb5E2691PBXA3XZX82EFRF
+             https://english-2o3e159jr-dkreinovs-projects.vercel.app
+             aliased to english-app-three-tan.vercel.app · status Ready
+             created Mon Aug 03 2026 21:13:48 GMT+0300
+             CACHE magic-vet-v25
+  ROLLBACK TARGET (what was live before):
+             dpl_BgsVu1EtEb3poYS2qrQeJSD1Bq9G
+             https://english-4bmumj60r-dkreinovs-projects.vercel.app · CACHE magic-vet-v24
+
+  PRE-FLIGHT, in the order field guide 10 requires: `vercel inspect` FIRST, id AND url recorded
+  exactly as inspect reported them; ONE deploy, with output to a FILE (a truncated terminal once
+  caused a double deploy here).
+
+  THE R-W-7 GATE, discharged: live CACHE was magic-vet-v24 and ours is magic-vet-v25. They
+  DIFFER, which is the whole reason her phone will refetch the precached quiz files at all. This
+  check was promised at the phase-1 close, when the bump was deliberately deferred, precisely so
+  a deferred bump could not be forgotten at the boundary -- which is how F2-3 happened.
+
+  VERIFIED LIVE, md5 WORKTREE vs SERVED, all six changed files:
+    public/sw.js · public/quiz.js · public/quiz-core.js · public/quiz-strings.js ·
+    public/views/reader.js · public/views/words.js
+    6 matched, 0 differed. Compared against the WORKTREE, never a git blob (a git-mediated copy
+    re-applies autocrlf and would make the comparison meaningless).
+  ALSO CONFIRMED LIVE:
+    /quiz-strings.js was HTTP 404 before this deploy and is HTTP 200 after -- the new module is
+      really there, so a precached quiz.js importing it cannot die offline.
+    /api/profile still answers 401 without her code. The privacy gate is intact.
+    Suite at the deployed commit: 551 pass / 0 fail.
+
+  WHAT SHE WILL SEE, on her next visit once the new service worker takes over:
+    four kinds of question instead of one, each exactly once per sitting of four;
+    two of them ask her to WRITE the word, with autocomplete/autocorrect/autocapitalise and
+    spellcheck all off; a one-letter slip gives her one free retry with her text kept;
+    and the word she once got wrong is no longer question #1 every single time.
+
+  THE ONE THING STILL UNPROVED, and it is stated on the owner's page rather than buried (W1-2):
+    I cannot drive her actual phone keyboard from this machine. All nine input attributes are
+    set and were verified in a phone-width browser, but "her phone really stops suggesting the
+    answer" is verifiable only by her. If it still autocompletes, that is the thing to report.
