@@ -1,6 +1,11 @@
 // Pure quiz core: no imports, no fetch, no DOM. QZ-17.
 // Date.now() is used only inside newSessionId.
 
+// STEP 2.2: the one new import in this file. resolveLemma de-inflects a word INTO the audio
+// manifest (field guide 26) -- measuring listen-type availability at the raw Set with .has()
+// would report "no audio" for a word like "softly" that already speaks fine as "soft".
+import { resolveLemma } from './lemma.js';
+
 export function newSessionId() {
   return 'q-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
 }
@@ -223,5 +228,36 @@ export function chooseKind(position, avail) {
     if (avail && avail[flagName]) return kind;
   }
   return null;
+}
+
+// STEP 2.2: measure what is actually buildable for this word, then assemble the question.
+// WK-1: a kind is never faked and a prompt is never blank. cloze-pick deliberately returns
+// options: null -- the existing caller's own selectOptions(item, knownSet, rand) line must
+// stay byte-identical, because today's tapped question must not change at all.
+export function buildQuestion(position, lemma, { item, entry, audioSet, words } = {}, rand = Math.random) {
+  const clozePick = item !== null && item !== undefined && isUsableItem(item);
+
+  const entryHe = entry && typeof entry === 'object' && typeof entry.he === 'string' ? entry.he.trim() : '';
+  const heType = entryHe !== '';
+
+  const heOptions = heType ? selectHeOptions(lemma, words, rand, 6) : null;
+  const hePick = heType && heOptions !== null;
+
+  const resolvedLemma = resolveLemma(lemma, audioSet);
+  const listenType = resolvedLemma !== null;
+
+  const kind = chooseKind(position, { clozePick, hePick, heType, listenType });
+  if (kind === null) return null;
+
+  if (kind === 'cloze-pick') {
+    return { kind, lemma, item, options: null, answer: item.answer, promptHe: null, sayLemma: null };
+  }
+  if (kind === 'he-pick') {
+    return { kind, lemma, item, options: heOptions, answer: lemma, promptHe: entry.he, sayLemma: null };
+  }
+  if (kind === 'he-type') {
+    return { kind, lemma, item, options: null, answer: lemma, promptHe: entry.he, sayLemma: null };
+  }
+  return { kind, lemma, item, options: null, answer: lemma, promptHe: null, sayLemma: resolvedLemma };
 }
 
