@@ -295,3 +295,46 @@ CHANGED:
         intact. Never do that: it buys a green needle with a worse program.
         tests/words-ui.test.js is added to step 2.5's write set and to validate-2.5.sh's expected
         changed-paths list.
+
+================================================================================
+PHASE 2 VISUAL GATE -- self-served by the orchestrator, 2026-08-03
+================================================================================
+  ORIGINS: ports 3500 AND 3600 both spent. R-F6-2's spent list is now
+    localhost:3000, 127.0.0.1:3000, 3100, 3200, 3300, 3400, 3500, 3600.
+    NEXT FREE: 3700.
+    WHY TWO: I ran the gate on 3500, found a defect, fixed it -- and 3500 then served the
+    PRE-FIX code, because visiting it had REGISTERED A SERVICE WORKER there. Field guide 27
+    exactly: "any remedy that names a specific origin expires the moment you use it." Moved to
+    3600 to see the fix. A visual gate that finds a defect ALWAYS costs two origins, not one.
+  FIXTURE: a throwaway DATA_DIR outside the repo, holding a SYNTHETIC profile -- learner "Nova",
+    pet "Pip", and 10 words chosen ONLY because they carry both a quiz item and an audio clip
+    (ability, about, abroad, add, afraid, back, bear, behind, beyond, body -- all BANK words).
+    Hebrew values are invented nonsense written as escapes. NOTHING OF HERS WAS TOUCHED, so the
+    restore-the-fixture dance was designed out rather than performed (the word-finish precedent).
+  VIEWPORT: 390 x 844, iPhone-class portrait.
+
+  WHAT WAS SEEN, all four kinds in ONE sitting of four, each exactly once:
+    Q1 cloze-pick  -- today's card, unchanged: sentence, hint button, six options with speakers.
+    Q2 he-pick     -- Hebrew prompt right-aligned and legible, six English options reading LTR,
+                      NO sentence, NO hint button. No overlap, no horizontal scroll at 390px.
+    Q3 he-type     -- Hebrew prompt, an EMPTY input whose text enters LEFT-TO-RIGHT and
+                      left-aligned on an RTL page (the composite that could have silently gone
+                      wrong), the check button large and tappable. NO speaker (R-W-11).
+    Q4 listen-type -- prompt, speaker button, input, check. NO ENGLISH TEXT ANYWHERE, so she
+                      must actually listen. Exactly the design.
+    THE RETRY, driven for real: typed "behnid" for behind -> "almost! look again", her text
+    STILL IN THE BOX, no next button, and the correct word NOWHERE on screen. Corrected it ->
+    scored right.
+    R3(a) VISIBLE: a second sitting opened with a DIFFERENT first question than the first
+    sitting. sampleRanked working where she can see it.
+
+  *** THE GATE EARNED ITS KEEP: IT FOUND A DEFECT 550 GREEN TESTS COULD NOT SEE. ***
+    After she corrected the typo, the card showed BOTH lines at once:
+        "almost! look again"   and   "well done!"
+    She would be told she nearly got it AND that she got it, in the same breath. Every part was
+    individually correct; the whole was incoherent. Field guide 15(c), and the reason the owner
+    directive says a human must LOOK.
+    CAUSE: the near-miss line was gated on `retry` alone, and `retryUsed` stays true after the
+    answer resolves. FIXED in step 2.7 (`retry && !resolved`), with a test WRITTEN FIRST and
+    SEEN TO FAIL against the unfixed code ("1 !== 0"), so it cannot come back.
+    RE-CHECKED ON THE FRESH ORIGIN: the "almost" line is gone, only the praise remains.

@@ -199,7 +199,7 @@ function renderTypedSurface({ inputName, typed, chosen, retry }) {
   const checkHtml = resolved
     ? ''
     : `<button type="button" class="btn btn-primary" data-action="quiz-check">${QUIZ_STRINGS.check_button}</button>`;
-  const nearMissHtml = retry ? `<p class="quiz-nearmiss">${QUIZ_STRINGS.near_miss}</p>` : '';
+  const nearMissHtml = retry && !resolved ? `<p class="quiz-nearmiss">${QUIZ_STRINGS.near_miss}</p>` : '';
   return `${nearMissHtml}<div class="quiz-typed">${inputHtml}${checkHtml}</div>`;
 }
 

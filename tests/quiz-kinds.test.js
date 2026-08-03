@@ -330,3 +330,18 @@ test('he-type check button contains the check-button string', () => {
   const html = renderQuizCard(heTypeState());
   assert.ok(html.includes(QUIZ_STRINGS.check_button), 'he-type card must have check button with check_button string');
 });
+
+// 18. STEP 2.7: A resolved retry card (chosen set, correct: true) must NOT render
+//     the near-miss message. An unresolved retry card (chosen: null) MUST still render
+//     the near-miss message. Both must be tested with he-type kind.
+test('resolved retry card hides near-miss; unresolved retry card shows it', () => {
+  // Part 1: resolved correct answer with retry flag set should NOT show near-miss
+  const resolvedHtml = renderQuizCard(heTypeState({ retry: true, typed: 'light', chosen: 'light', correct: true }));
+  const nearMissCount = (resolvedHtml.match(new RegExp(QUIZ_STRINGS.near_miss, 'g')) || []).length;
+  assert.strictEqual(nearMissCount, 0, 'resolved correct answer must not contain near_miss');
+  assert.ok(resolvedHtml.includes('class="quiz-feedback"'), 'resolved correct answer must contain feedback');
+
+  // Part 2: unresolved retry card (chosen: null) MUST still show near-miss
+  const unresolveddHtml = renderQuizCard(heTypeState({ retry: true, typed: 'ligth', chosen: null, correct: null }));
+  assert.ok(unresolveddHtml.includes(QUIZ_STRINGS.near_miss), 'unresolved retry card must contain near_miss');
+});
