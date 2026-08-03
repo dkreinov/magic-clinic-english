@@ -30,6 +30,46 @@ export function selectOptions(item, knownSet, rand = Math.random) {
   return arr;
 }
 
+// STEP 1.3: options for a Hebrew-prompt question. WK-2: distractors are drawn from HER OWN
+// other words, excluding any whose stored `he` equals the answer's `he` after trim() -- two
+// different English words can share one Hebrew word, and this app already shipped that defect
+// once. No normalisation beyond trim(): Hebrew has no case, and anything cleverer is an invented
+// rule nobody signed off. Fisher-Yates using the exact loop idiom at lines 26-29 above.
+// words is never mutated -- only Object.keys and property reads happen here.
+export function selectHeOptions(answerLemma, words, rand = Math.random, count = 4) {
+  if (!words || typeof words !== 'object') return null;
+  const answerEntry = words[answerLemma];
+  if (!answerEntry || typeof answerEntry !== 'object') return null;
+  const answerHe = typeof answerEntry.he === 'string' ? answerEntry.he.trim() : '';
+  if (answerHe === '') return null;
+
+  const candidates = [];
+  for (const k of Object.keys(words)) {
+    if (k === answerLemma) continue;
+    const entry = words[k];
+    if (!entry || typeof entry !== 'object') continue;
+    const he = typeof entry.he === 'string' ? entry.he.trim() : '';
+    if (he === '') continue;
+    if (he === answerHe) continue;
+    candidates.push(k);
+  }
+
+  if (candidates.length < count - 1) return null;
+
+  const pool = candidates.slice();
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+
+  const arr = [answerLemma, ...pool.slice(0, count - 1)];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 export function isUsableItem(x) {
   if (typeof x !== 'object' || x === null || Array.isArray(x)) return false;
   if (typeof x.sense !== 'string' || x.sense.trim() === '') return false;
