@@ -175,7 +175,29 @@ page cannot — this is the hard part and it must not be hand-waved)?
 ---
 
 ## R5 — quizzes where she WRITES the word, not only recognises it
-**Raised:** 2026-08-01, via the owner. **Status:** recorded, needs design.
+**Raised:** 2026-08-01, via the owner.
+**Status: SHIPPED AND LIVE 2026-08-03** — the **word-write** run, all three phases.
+`dpl_4qvNyyBb5E2691PBXA3XZX82EFRF` / `magic-vet-v25`. All six changed files verified md5-identical
+worktree vs live. Design at `.oplan/word-write/design.md`.
+
+- **(1) typing questions — SHIPPED.** Two of the four question kinds make her write the word.
+- **(2) autocomplete off — SHIPPED, WITH A STATED RESIDUAL.** All nine attributes are set
+  (`autocomplete`, `autocorrect`, `autocapitalize`, `spellcheck`, plus a per-question random
+  `name`, which is the part that actually defeats mobile Safari — it re-offers previous values for
+  any field name it recognises). The precedent at `reader.js:699` sets only five and omits
+  `autocapitalize`. **NOT PROVED ON HER PHONE** — that is verifiable only by her, and it is the
+  one open question of this run. Ask her whether the phone still finishes the word for her.
+- **(3) Hebrew → English — SHIPPED, both ways she asked for.** `he-pick` (tap the English) and
+  `he-type` (write it). Options are drawn from her own words and can never include a word that
+  means the same Hebrew word as the answer — the `light`/`computer` defect, designed out by
+  construction rather than reviewed for.
+- **(4) audio as one option among several — SHIPPED BY CONSTRUCTION.** A fixed rotation makes
+  listening exactly one question in four, always, rather than on average.
+- **(5) writing sentences — NOT SHIPPED.** Still recorded, still unscheduled. Untouched by this run.
+
+**Folded in and also shipped: R3(a).** `sampleRanked` reorders the top 8 of the ranked pool, so a
+word she once got wrong is no longer question #1 in every sitting. Measured: rank-1 now lands in
+the first four 50% of the time instead of 100%.
 
 **What she asked for, concretely:**
 1. **Typing questions.** She wants to have to write the word, not only pick it.
