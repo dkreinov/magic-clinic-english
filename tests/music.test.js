@@ -152,3 +152,113 @@ test('muting stops what is already playing, not just what starts next', () => {
   assert.strictEqual(isMuted(), true);
   assert.strictEqual(start(), false, 'after muting, start() must refuse');
 });
+
+// ---------------------------------------------------------------------------
+// R8 delivery: "stream once, then keep it". These are the seams, not the
+// mechanism -- each one is a thing that can silently be wrong while every other
+// test stays green, which is how the missing-precache defect below got shipped
+// past 414 passing tests and was caught by hand.
+// ---------------------------------------------------------------------------
+
+test('SEAM: every module a PRECACHED file imports is itself PRECACHED', () => {
+  // THE DEFECT THIS EXISTS FOR, RECORDED: music.js was imported by reader.js and
+  // words.js -- both precached -- while not being precached itself. Offline, the
+  // import fails and the WHOLE READER dies. A music file taking down the story is
+  // exactly what music.js property 1 forbids, and the suite did not notice.
+  const sw = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
+  const precache = new Set([...sw.matchAll(/"(\/[^"]*)"/g)].map((m) => m[1]));
+  const missing = [];
+  for (const entry of [...precache].filter((p) => p.endsWith('.js'))) {
+    const src = readFileSync(new URL('../public' + entry, import.meta.url), 'utf8');
+    const dir = entry.slice(0, entry.lastIndexOf('/'));
+    for (const m of src.matchAll(/from\s+"(\.[^"]+)"/g)) {
+      const parts = (dir + '/' + m[1]).split('/');
+      const out = [];
+      for (const part of parts) {
+        if (part === '.' || part === '') continue;
+        if (part === '..') out.pop();
+        else out.push(part);
+      }
+      const resolved = '/' + out.join('/');
+      if (!precache.has(resolved)) missing.push(resolved + ' <- ' + entry);
+    }
+  }
+  assert.deepStrictEqual(missing, [],
+    'a precached module importing a non-precached one breaks the app OFFLINE');
+});
+
+test('SEAM: the music cache name in music.js and sw.js cannot drift', () => {
+  // If these two ever disagree, sw.js deletes the cache music.js just filled and
+  // she re-downloads 4 MB on every single deploy -- silently, and only on a real
+  // phone. Neither file can notice this alone, so it is asserted across both.
+  const sw = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
+  const swName = /const MUSIC_CACHE = "([^"]+)"/.exec(sw);
+  assert.ok(swName, 'sw.js must declare MUSIC_CACHE');
+  assert.strictEqual(MUSIC_LEVELS.MUSIC_CACHE, swName[1]);
+});
+
+test('SEAM: the music cache SURVIVES the activate sweep that deletes old versions', () => {
+  const sw = readFileSync(new URL('../public/sw.js', import.meta.url), 'utf8');
+  assert.ok(/key !== CACHE && key !== MUSIC_CACHE/.test(sw),
+    'activate must spare MUSIC_CACHE, or every deploy throws the track away');
+});
+
+test('the music control is PURE ASCII -- FC-7 counts emoji as non-Hebrew-but-non-ASCII too', () => {
+  const app = readFileSync(new URL('../public/app.js', import.meta.url), 'utf8');
+  const icons = /const MUSIC_ICON_ON =[\s\S]*?const MUSIC_ICON_OFF =[\s\S]*?;/.exec(app);
+  assert.ok(icons, 'app.js must define both music icons');
+  const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
+  const btn = /<button id="music-toggle"[\s\S]*?<\/button>/.exec(html);
+  assert.ok(btn, 'index.html must carry the shell music button');
+  for (const [what, text] of [['app.js icons', icons[0]], ['index.html button', btn[0]]]) {
+    let nonAscii = 0;
+    for (const b of Buffer.from(text, 'utf8')) if (b > 127) nonAscii++;
+    assert.strictEqual(nonAscii, 0, `${what}: no new Hebrew and no emoji for the music control`);
+  }
+});
+
+test('SEAM: the control sits OUTSIDE <main id="app">, so the router cannot wipe it', () => {
+  // renderRoute() does app.innerHTML = "" on every hashchange. A control rendered
+  // inside a view survives only until she navigates; this is the property that
+  // makes it reachable on her word list and trophies, which is the whole point.
+  const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
+  const mainEnd = html.indexOf('</main>');
+  const btnAt = html.indexOf('id="music-toggle"');
+  assert.ok(mainEnd > -1 && btnAt > -1, 'both the app main and the button must exist');
+  assert.ok(btnAt > mainEnd,
+    'the music button must live outside #app or the router will delete it on every route change');
+});
+
+test('SEAM: no view renders a SECOND music control', () => {
+  // The reader briefly had its own copy. Two controls can disagree about state,
+  // which is the "two sources for one card" seam this project keeps re-learning.
+  for (const view of ['reader', 'words', 'home', 'trophies', 'placement']) {
+    const src = readFileSync(new URL(`../public/views/${view}.js`, import.meta.url), 'utf8');
+    assert.ok(!/music-toggle|musicSlot/.test(src),
+      `views/${view}.js must not render its own music control`);
+  }
+});
+
+test('reader.js non-ASCII byte count is UNCHANGED by the music feature (FC-7 pin)', () => {
+  const buf = readFileSync(new URL('../public/views/reader.js', import.meta.url));
+  let n = 0;
+  for (const b of buf) if (b > 127) n++;
+  assert.strictEqual(n, 754, 'FC-7: reader.js non-ASCII bytes must stay at 754');
+});
+
+test('start() does NOT await the download -- Safari only allows first play inside the gesture', () => {
+  const src = readFileSync(new URL('../public/music.js', import.meta.url), 'utf8');
+  const fn = /export function start\(\)[\s\S]*?\n\}/.exec(src);
+  assert.ok(fn, 'start() must exist and must stay synchronous');
+  assert.ok(!/^export async function start/m.test(src),
+    'start() must not be async: awaiting the fetch loses the gesture and music never starts on iPhone');
+  assert.ok(/fill\(\)/.test(fn[0]), 'start() must kick off the one-time download');
+});
+
+test('prime() never downloads -- it only adopts a copy already on her phone', () => {
+  const src = readFileSync(new URL('../public/music.js', import.meta.url), 'utf8');
+  const fn = /export async function prime\(\)[\s\S]*?\n\}/.exec(src);
+  assert.ok(fn, 'prime() must exist');
+  assert.ok(!/cache\.add|fetch\(/.test(fn[0]),
+    'prime() must not fetch: a child who never turns music on must never pay for the track');
+});

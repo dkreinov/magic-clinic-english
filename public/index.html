@@ -85,6 +85,16 @@
       </a>
     </nav>
 
+    <!-- R8. The music control lives in the SHELL, not in a view, for one reason:
+         the <audio> element is module state and keeps playing across routes, so a
+         control that only existed on the story screen left her with music running
+         and no way to stop it on her word list or trophies. Sitting outside
+         <main id="app"> means the router's app.innerHTML = "" cannot wipe it.
+         Pure ASCII (FC-7): an inline SVG, not an emoji glyph. app.js fills it. -->
+    <button id="music-toggle" class="music-toggle" type="button" aria-pressed="false" aria-label="Background music">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"></svg>
+    </button>
+
     <script type="module" src="/app.js"></script>
   </body>
 </html>

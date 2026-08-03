@@ -4,6 +4,7 @@ import { getAllowedSet } from "../words-index.js";
 import { startQuiz } from "../quiz.js";
 import { pickQuizWords, knownSetFromProfile, pickCandidateWords } from "../quiz-core.js";
 import { maybeCelebrateTrophy } from "./trophies.js";
+import { playOverMusic } from "../music.js";
 
 const CHAPTER_BANNERS = { 0: "chapter-night", 1: "chapter-clinic", 2: "chapter-forest" };
 
@@ -389,6 +390,10 @@ const VIEW_STYLE = `
   }
 `;
 
+// R8. The music control MOVED to the app shell (public/index.html + app.js) so it
+// exists on every screen: the <audio> element is module state and keeps playing
+// across routes, so a reader-only button left her with music running and no way
+// to stop it on her word list or trophies. The header is back to what it was.
 function header(subtitle, title) {
   return `
     <header class="app-header">
@@ -1011,6 +1016,10 @@ export async function render(container, ctx) {
         if (!lemma) return;
         try {
           const audio = new Audio(`/audio/words/${encodeURIComponent(lemma)}.aac`);
+          // R8. SPEECH ALWAYS WINS: this is what actually makes the music duck.
+          // The bed drops to near-silence for exactly as long as the clip runs,
+          // so the one sound she is trying to learn is never competed with.
+          playOverMusic(audio);
           const p = audio.play();
           if (p && typeof p.catch === "function") p.catch(() => {});
         } catch (err) {

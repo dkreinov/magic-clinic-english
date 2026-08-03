@@ -1,4 +1,10 @@
-const CACHE = "magic-vet-v23";
+const CACHE = "magic-vet-v24";
+// The background music is stored ONCE and must OUTLIVE every version bump, so it
+// is deliberately NOT part of CACHE and is spared by the activate sweep below.
+// Precaching it instead would spend 4 MB on EVERY deploy, for a feature that is
+// default OFF and that she may never switch on. The name is duplicated in
+// public/music.js (MUSIC_CACHE) and a test asserts the two cannot drift.
+const MUSIC_CACHE = "magic-vet-music-v1";
 const PRECACHE = [
   "/",
   "/styles.css",
@@ -6,6 +12,7 @@ const PRECACHE = [
   "/api.js",
   "/lemma.js",
   "/words-index.js",
+  "/music.js",
   "/quiz-core.js",
   "/quiz.js",
   "/views/home.js",
@@ -31,7 +38,11 @@ self.addEventListener("activate", (event) => {
     caches
       .keys()
       .then((keys) =>
-        Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)))
+        Promise.all(
+          keys
+            .filter((key) => key !== CACHE && key !== MUSIC_CACHE)
+            .map((key) => caches.delete(key))
+        )
       )
       .then(() => self.clients.claim())
   );

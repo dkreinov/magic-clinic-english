@@ -4,6 +4,7 @@ import { getAllowedSet } from "../words-index.js";
 import { startQuiz } from "../quiz.js";
 import { pickQuizWords, knownSetFromProfile, pickCandidateWords } from "../quiz-core.js";
 import { maybeCelebrateTrophy } from "./trophies.js";
+import { playOverMusic } from "../music.js";
 
 const VIEW_STYLE = `
   .words-count {
@@ -227,6 +228,10 @@ export async function render(container, ctx) {
         if (!lemma) return;
         try {
           const audio = new Audio(`/audio/words/${encodeURIComponent(lemma)}.aac`);
+          // R8. The dictionary ducks too. The music element is module state, so
+          // it keeps playing when she leaves the story for her word list -- if
+          // only the reader ducked, the bed would sit on top of every word here.
+          playOverMusic(audio);
           const p = audio.play();
           if (p && typeof p.catch === "function") p.catch(() => {});
         } catch (err) {

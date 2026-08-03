@@ -3,6 +3,60 @@ import { render as renderPlacement } from "./views/placement.js";
 import { render as renderReader } from "./views/reader.js";
 import { render as renderTrophies } from "./views/trophies.js";
 import { render as renderWords } from "./views/words.js";
+import { isMuted, setMuted, start as musicStart, prime as musicPrime } from "./music.js";
+
+// R8. Both icons are PURE ASCII inline SVG. FC-7 measures "no new Hebrew" as raw
+// non-ASCII bytes, which counts emoji too, so a music-note glyph is not available
+// to us -- and an icon is clearer to an eleven-year-old than a letter anyway.
+const MUSIC_ICON_ON =
+  '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8a5 5 0 0 1 0 8" fill="none" stroke="currentColor" stroke-width="2"/>';
+const MUSIC_ICON_OFF =
+  '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="2"/>';
+
+function paintMusic(btn) {
+  const on = !isMuted();
+  btn.classList.toggle("on", on);
+  btn.setAttribute("aria-pressed", on ? "true" : "false");
+  const svg = btn.querySelector("svg");
+  if (svg) svg.innerHTML = on ? MUSIC_ICON_ON : MUSIC_ICON_OFF;
+}
+
+function setUpMusic() {
+  const btn = document.getElementById("music-toggle");
+  if (!btn) return;
+  paintMusic(btn);
+
+  btn.addEventListener("click", () => {
+    // She is turning it ON exactly when it was muted a moment ago. start() is
+    // called from inside this click, because Safari only permits the FIRST play
+    // inside the gesture handler itself.
+    const turningOn = isMuted();
+    setMuted(!turningOn);
+    if (turningOn) musicStart();
+    paintMusic(btn);
+  });
+
+  // prime() only ADOPTS a copy already stored from a previous session; it never
+  // downloads. That is what makes every session after the first cost nothing and
+  // work with no signal at all.
+  try {
+    const primed = musicPrime();
+    if (primed && typeof primed.catch === "function") primed.catch(() => {});
+  } catch (err) {
+    /* music must never affect the app */
+  }
+
+  // Property 2: browsers block audio without a gesture. If she left music on, it
+  // resumes at her FIRST touch anywhere -- never on load. Guarded so the very tap
+  // that turns music on cannot double-start it.
+  document.addEventListener(
+    "pointerdown",
+    () => {
+      if (!isMuted()) musicStart();
+    },
+    { once: true }
+  );
+}
 
 const ROUTES = {
   "/home": renderHome,
@@ -53,6 +107,7 @@ function renderRoute() {
 
 window.addEventListener("hashchange", renderRoute);
 renderRoute();
+setUpMusic();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

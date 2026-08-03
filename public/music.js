@@ -30,9 +30,18 @@ const FULL = 0.14;                  // deliberately low: it sits UNDER a reading
 const DUCKED = 0.02;
 const FADE_MS = 220;
 
+// SHE PAYS FOR THIS TRACK ONCE, EVER. The name is duplicated in public/sw.js,
+// which SPARES it when it deletes the old version caches on activate -- without
+// that, every deploy would throw the 4 MB away and re-download it, and this
+// project bumps CACHE on most deploys. The two names must not drift; a test
+// asserts they are equal.
+const MUSIC_CACHE = 'magic-vet-music-v1';
+
 let el = null;
 let fadeTimer = null;
 let ducks = 0;                      // reference count: two clips can overlap
+let cachedUrl = null;               // blob URL, once the track lives on her phone
+let filling = false;                // one download attempt at a time
 
 function storage() {
   try {
@@ -67,11 +76,57 @@ export function setMuted(muted) {
   return muted;
 }
 
+function cacheApi() {
+  try {
+    return typeof caches === 'undefined' ? null : caches;
+  } catch {
+    return null;                    // some embedded webviews throw on access
+  }
+}
+
+// PRIME is what makes the second session free. Called on boot: if the track is
+// already stored from a previous session it becomes a blob URL, and element()
+// then needs NO NETWORK AT ALL -- so the music works on a train, on a dead wifi,
+// and costs her nothing again. It NEVER downloads; a miss is simply a miss.
+export async function prime() {
+  const c = cacheApi();
+  if (!c || cachedUrl) return false;
+  try {
+    const cache = await c.open(MUSIC_CACHE);
+    const hit = await cache.match(SRC);
+    if (!hit) return false;
+    if (typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') return false;
+    cachedUrl = URL.createObjectURL(await hit.blob());
+    return true;
+  } catch {
+    return false;                   // a misbehaving cache must never break the story
+  }
+}
+
+// FILL runs only AFTER she has turned music on, so a child who never wants music
+// never spends a byte on it. It is fire-and-forget: the track she is hearing
+// right now is streaming, and this is about every session after this one.
+async function fill() {
+  const c = cacheApi();
+  if (!c || filling || cachedUrl) return false;
+  filling = true;
+  try {
+    const cache = await c.open(MUSIC_CACHE);
+    if (await cache.match(SRC)) return true;
+    await cache.add(SRC);
+    return true;
+  } catch {
+    return false;                   // quota, offline, anything -- she still has music
+  } finally {
+    filling = false;
+  }
+}
+
 function element() {
   if (el) return el;
   if (typeof Audio === 'undefined') return null;
   try {
-    el = new Audio(SRC);
+    el = new Audio(cachedUrl || SRC);
     el.loop = true;
     el.volume = FULL;
     el.preload = 'none';            // never fetched until she asks for it
@@ -82,6 +137,18 @@ function element() {
 }
 
 // Called ONLY from a user gesture (property 2).
+//
+// THIS FUNCTION STAYS SYNCHRONOUS ON PURPOSE, and the download is deliberately
+// NOT awaited here. Safari only allows the FIRST play() if it happens inside the
+// gesture handler itself; awaiting a 4 MB fetch first would lose that and the
+// music would simply never start on an iPhone. So the very first time she turns
+// music on it STREAMS (instant, no waiting), and fill() stores a copy behind her
+// for every session afterwards.
+//
+// THE COST, STATED RATHER THAN HIDDEN: that first switch-on can fetch the track
+// twice -- once streaming, once for the cache. It happens at most once ever, only
+// if she chooses music, and the second fetch usually revalidates to a 304 against
+// the copy the stream just put in the browser's own cache.
 export function start() {
   if (isMuted()) return false;
   const a = element();
@@ -91,6 +158,12 @@ export function start() {
     if (p && typeof p.catch === 'function') p.catch(() => {});
   } catch {
     return false;
+  }
+  try {
+    const f = fill();
+    if (f && typeof f.catch === 'function') f.catch(() => {});
+  } catch {
+    /* the download is a bonus; never let it affect playback */
   }
   return true;
 }
@@ -164,4 +237,4 @@ export function playOverMusic(audio) {
 }
 
 // Exported for the test only: the values are the contract, not the mechanism.
-export const MUSIC_LEVELS = { FULL, DUCKED, SRC, KEY };
+export const MUSIC_LEVELS = { FULL, DUCKED, SRC, KEY, MUSIC_CACHE };
