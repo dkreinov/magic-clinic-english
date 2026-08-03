@@ -316,3 +316,25 @@ Verified after rewriting: 0 clustered lines, 0 list-shaped files, and the leak f
 **THE STANDING RULE THIS EARNS: `.oplan` IS PUBLISHED. Treat every word written there as public.**
 D27 covered profile *files* and never covered the *record* — that gap has now produced two
 incidents (design.md on 2026-08-02, this one). Counts only, always.
+
+**THE CONTROL THAT NOW ENFORCES THIS (added 2026-08-03, same day).** `scripts/hooks/pre-push`
+calls `scripts/check-record-privacy.mjs` over the exact range being published
+(`<remote>..<local>`), because the incident lived in COMMITTED BLOBS while the working tree was
+already clean — a checker reading files on disk would have waved it through. Installed with
+`git config core.hooksPath scripts/hooks`, so it is version-controlled rather than living in
+`.git/hooks` where it would quietly disappear.
+
+**WHAT IT CANNOT DO, so nobody trusts it too far:** it does NOT know her words. It cannot — D27
+requires the captured profile to be DELETED, and the only local profile is the SYNTHETIC 6-word
+fixture (md5 `91eff5da…`). Matching against that fixture was tried and produced pure false
+positives, flagging generated story prose, because her words are common English that also ship as
+clips and quiz items. So it matches the SHAPE OF A DISCLOSURE: a sentence claiming words are hers
+*and listing them*, a bare word list added to the record, a per-word score table. **A tripwire,
+not a proof.** `LEARNER_PROFILE=<real capture>` adds an exact-word pass when one is available.
+
+**GATED LIKE THE REST:** 5 poison controls modelled on the real leaked lines (invented words —
+this file is published), 4 false-positive controls including **the whole real record**, and an
+install check. The first version was rewritten after it flagged a legitimate 37-word exclusions
+list and seven planning docs: *a hook that cries wolf gets switched off, and then it protects
+nothing.* Proved by EXECUTION, not by reading: a planted list was committed and a real
+`git push` was **refused**, exit 1.
