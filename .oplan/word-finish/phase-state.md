@@ -237,7 +237,32 @@ CARRIED INTO A FUTURE RUN (nothing blocks today's deploy):
   F3-1  CLOSED SAME DAY. "Phase 3 ships nothing; the items reach her only at phase 4" -- phase 4 ran
         the same day and they are live. Recorded because "the work was done and she never saw it" is
         this project's documented failure mode and a phase boundary is where it hides.
-  F3-2  THE OTHER 83 SHIPPED ITEMS ARE NOT RE-SWEPT (ruling R-F3-2). They were cleared on
+  F3-2  *** SWEPT 2026-08-03. NOT DISCHARGED -- the residual is stated and is real. ***
+        All 84 pre-phase-3 items read against the one criterion the shape gate is blind to:
+        does any DISTRACTOR also correctly complete the sentence? Mechanical gate green
+        throughout (78 files / 103 items). RESULT: no defect of the light.json[1] severity.
+        ONE ITEM CHANGED -- ability.json: "enough ___ to play the piano without any lessons"
+        admitted `energy`, `strength`, `health` and `sleep`, because the frame "enough X to
+        VERB" accepts any CAPACITY noun. Fixing the SENTENCE was tried first and abandoned
+        after the gate refused `taught` (only base forms resolve) and after `hope to play`
+        proved to fit grammatically too -- the frame was the fault, so the four capacity nouns
+        were replaced by silence/truth/beauty/danger. Owner reviewed the other four soft spots
+        (mom, dad, camp, zoo) and accepted them.
+        *** THE RESIDUAL: ONE NON-BLIND REVIEWER, WHERE PHASE 3 HAD TWO BLIND ONES. *** The
+        criterion was validated against the three frozen poison items and catches every planted
+        trap -- but the poison had ALREADY BEEN READ, so it tested the CRITERION, not the
+        reviewer's vigilance. This lowers the risk on the 83; it does not clear them to the
+        standard they were promised. A blind second pass is still owed.
+        TWO STRUCTURAL FINDINGS, worth more than the items themselves:
+          (i)  SHE ANSWERS WITHOUT THE SENSE. quiz.js:186 hides `sense` behind the רמז hint
+               button; it appears only after she asks or answers. So THE SENTENCE ALONE MUST
+               DISAMBIGUATE -- a precise sense cannot rescue a loose sentence, and nothing in
+               the record told the authors this.
+          (ii) THE DISTRACTORS SHE SEES ARE BIASED TOWARD WORDS SHE KNOWS. selectOptions
+               (quiz-core.js:24) does known.concat(rest).slice(0,5). So an ambiguous distractor
+               is MOST likely to be shown exactly when it is already her word. This multiplies
+               the cost of (i) and should shape how any future item is authored.
+        ORIGINAL TEXT: They were cleared on
         2026-07-27 by a two-pass sweep now MEASURED to have missed a named CERTAIN leak
         (light.json[1]/computer, which shipped byte-unchanged from 24c67dc until today). Phase 5
         should re-sweep them with the poison-controlled instrument built this phase. The frozen
