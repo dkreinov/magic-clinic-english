@@ -17,6 +17,14 @@ const MIME_TYPES = {
   '.png': 'image/png',
   '.webp': 'image/webp',
   '.mp3': 'audio/mpeg',
+  // EVERY word clip in this app is .aac (2266 of them). Without this entry the
+  // fallback is application/octet-stream, and browsers REFUSE to play audio
+  // served as that -- new Audio() fails with MEDIA_ERR_SRC_NOT_SUPPORTED. So the
+  // dictionary and the quiz were SILENT on the dev server while working perfectly
+  // in production, which serves audio/x-aac. Found 2026-08-03 when the owner
+  // pressed a speaker on a local gate and heard nothing; '.mp3' had been added for
+  // the music feature and '.aac' was simply never noticed as missing.
+  '.aac': 'audio/aac',
 };
 
 async function serveFile(res, filePath) {
