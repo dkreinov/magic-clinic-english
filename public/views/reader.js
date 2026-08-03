@@ -1054,6 +1054,8 @@ export async function render(container, ctx) {
           knownSet,
           candidateSet,
           count: 4,
+          words: (profile && profile.words) || {},
+          audioSet: allowedWords,
           onDone: async ({ total }) => {
             qs.done = true;
             draw();

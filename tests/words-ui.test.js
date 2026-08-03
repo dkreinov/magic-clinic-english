@@ -267,7 +267,8 @@ test('words.js reserves one candidate slot: the frozen merge, candidateSet, and 
     'pickCandidateWords',
     'const candidateLemmas = pickCandidateWords(profile, 1);',
     'candidateSet = new Set(candidateLemmas);',
-    'lemmas = candidateLemmas.concat(pickQuizWords(profile, 20));',
+    'lemmas = candidateLemmas.concat(sampleRanked(pickQuizWords(profile, 20), 4));',
+    'sampleRanked(',
     'candidateSet,',
     'startQuiz',
     'knownSetFromProfile',
@@ -280,6 +281,15 @@ test('words.js reserves one candidate slot: the frozen merge, candidateSet, and 
   assert.ok(
     !/^\s*lemmas = pickQuizWords\(profile, 20\);\s*$/m.test(src),
     'the OLD unmerged pick must be gone, replaced by the frozen merge'
+  );
+
+  // The reserved candidate slot must stay at the head of the list: the
+  // concat wraps the sampled pool, never the other way around.
+  const concatIdx = src.indexOf('candidateLemmas.concat(');
+  const sampleIdx = src.indexOf('sampleRanked(');
+  assert.ok(
+    concatIdx >= 0 && sampleIdx >= 0 && concatIdx < sampleIdx,
+    'the reserved candidate slot must stay at the head of the list'
   );
 });
 

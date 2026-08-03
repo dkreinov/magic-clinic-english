@@ -271,3 +271,27 @@ CHANGED:
   · G-7 -- he-pick shows 6 options, not 4.
   · Scratch files move OUT of the repo (field guide 4 forbids scratch in the repo; the plan used
     ./.old-quiz.tmp). Absolute scratch paths are frozen into each packet.
+
+  R-W-14 2026-08-03, ORCHESTRATOR, DURING EXECUTION OF 2.5. A FROZEN PIN AND A MANDATED EDIT
+        COLLIDED, AND THE PIN MOVED.
+        tests/words-ui.test.js pinned the literal source needle
+          lemmas = candidateLemmas.concat(pickQuizWords(profile, 20));
+        which step 2.5 must necessarily wrap in sampleRanked(...). The executor STOPPED and asked
+        rather than editing a frozen test on its own authority -- correct, and the second time in
+        this run the stop-rule has paid for itself.
+        THE TEST'S OWN NAME SAYS WHAT IT PROTECTS: "words.js reserves one candidate slot: the
+        frozen merge, candidateSet, and the pre-existing quiz wiring". The property is (a) the
+        candidate slot is reserved and merged IN FRONT of the ranked pool, and (b) the old
+        unmerged pick is gone. Wrapping the pool preserves BOTH. The needle described a SPELLING.
+        So the pin MOVES, re-expressed, and is SEEN TO FAIL (field guide 22, and the exact
+        precedent of word-finish F1-2, where a pin on `profile = await getJson(...)` moved for
+        the same reason).
+        RE-EXPRESSED INTO THE REAL INVARIANT: the concat must WRAP the sampled pool, never the
+        reverse -- sampling the whole list would shuffle the reserved candidate slot away from the
+        head, which is the actual defect the old needle only gestured at. Proved by a control:
+        sampling the merged list instead must fail the new assertion.
+        *** I REJECTED THE EXECUTOR'S ALTERNATIVE *** of preserving the old literal by assigning
+        to a temp and reordering separately. That shapes production code to keep a test's spelling
+        intact. Never do that: it buys a green needle with a worse program.
+        tests/words-ui.test.js is added to step 2.5's write set and to validate-2.5.sh's expected
+        changed-paths list.

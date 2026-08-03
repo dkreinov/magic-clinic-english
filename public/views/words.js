@@ -2,7 +2,7 @@ import { getJson, postJson } from "../api.js";
 import { resolveLemma } from "../lemma.js";
 import { getAllowedSet } from "../words-index.js";
 import { startQuiz } from "../quiz.js";
-import { pickQuizWords, knownSetFromProfile, pickCandidateWords } from "../quiz-core.js";
+import { pickQuizWords, knownSetFromProfile, pickCandidateWords, sampleRanked } from "../quiz-core.js";
 import { maybeCelebrateTrophy } from "./trophies.js";
 import { playOverMusic } from "../music.js";
 
@@ -263,6 +263,8 @@ export async function render(container, ctx) {
           knownSet: knownSetFromProfile(profile),
           candidateSet,
           count: 4,
+          words,
+          audioSet: allowedWords,
           // T5. boot() already re-reads /api/profile, so the post-award profile is
           // in hand -- no extra request. total > 0 skips the no-questions path
           // (quiz.js:247-250 fires onDone with NO done screen), and the
@@ -297,7 +299,7 @@ export async function render(container, ctx) {
     // in silence (D23), so an empty slot costs nothing.
     const candidateLemmas = pickCandidateWords(profile, 1);
     candidateSet = new Set(candidateLemmas);
-    lemmas = candidateLemmas.concat(pickQuizWords(profile, 20));
+    lemmas = candidateLemmas.concat(sampleRanked(pickQuizWords(profile, 20), 4));
     draw();
   }
 
