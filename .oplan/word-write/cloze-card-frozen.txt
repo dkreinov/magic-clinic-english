@@ -1,0 +1,205 @@
+=== unanswered ===
+
+    <p class="quiz-progress">שאלה 1 מתוך 4</p>
+    <p class="quiz-prompt">איזו מילה מתאימה?</p>
+    <p class="quiz-sentence" dir="ltr">The huge box was so ___ that the little girl could lift it easily.</p>
+    <button class="quiz-hint-btn" type="button" data-action="quiz-hint">רמז</button>
+    <div class="quiz-options">
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="light">light</button>
+          <button type="button" class="btn-say" data-say="light" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="big">big</button>
+          <button type="button" class="btn-say" data-say="big" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="small">small</button>
+          <button type="button" class="btn-say" data-say="small" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="wide">wide</button>
+          <button type="button" class="btn-say" data-say="wide" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="round">round</button>
+          <button type="button" class="btn-say" data-say="round" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="old">old</button>
+          <button type="button" class="btn-say" data-say="old" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      </div>
+    
+    
+    
+  
+=== hint shown ===
+
+    <p class="quiz-progress">שאלה 2 מתוך 4</p>
+    <p class="quiz-prompt">איזו מילה מתאימה?</p>
+    <p class="quiz-sentence" dir="ltr">The huge box was so ___ that the little girl could lift it easily.</p>
+    <p class="quiz-sense">not heavy and easy to lift</p>
+    <div class="quiz-options">
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="light">light</button>
+          <button type="button" class="btn-say" data-say="light" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="big">big</button>
+          <button type="button" class="btn-say" data-say="big" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="small">small</button>
+          <button type="button" class="btn-say" data-say="small" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="wide">wide</button>
+          <button type="button" class="btn-say" data-say="wide" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="round">round</button>
+          <button type="button" class="btn-say" data-say="round" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="old">old</button>
+          <button type="button" class="btn-say" data-say="old" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      </div>
+    
+    
+    
+  
+=== answered right ===
+
+    <p class="quiz-progress">שאלה 3 מתוך 4</p>
+    <p class="quiz-prompt">איזו מילה מתאימה?</p>
+    <p class="quiz-sentence" dir="ltr">The huge box was so ___ that the little girl could lift it easily.</p>
+    <p class="quiz-sense">not heavy and easy to lift</p>
+    <div class="quiz-options">
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option correct" data-choice="light" disabled>light</button>
+          <button type="button" class="btn-say" data-say="light" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="big" disabled>big</button>
+          <button type="button" class="btn-say" data-say="big" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="small" disabled>small</button>
+          <button type="button" class="btn-say" data-say="small" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="wide" disabled>wide</button>
+          <button type="button" class="btn-say" data-say="wide" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="round" disabled>round</button>
+          <button type="button" class="btn-say" data-say="round" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="old" disabled>old</button>
+          <button type="button" class="btn-say" data-say="old" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      </div>
+    <p class="quiz-feedback">כל הכבוד!</p>
+    
+    <button type="button" class="btn btn-primary" data-action="quiz-next">הלאה</button>
+  
+=== answered wrong ===
+
+    <p class="quiz-progress">שאלה 4 מתוך 4</p>
+    <p class="quiz-prompt">איזו מילה מתאימה?</p>
+    <p class="quiz-sentence" dir="ltr">The huge box was so ___ that the little girl could lift it easily.</p>
+    <p class="quiz-sense">not heavy and easy to lift</p>
+    <div class="quiz-options">
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option correct" data-choice="light" disabled>light</button>
+          <button type="button" class="btn-say" data-say="light" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option wrong" data-choice="big" disabled>big</button>
+          <button type="button" class="btn-say" data-say="big" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="small" disabled>small</button>
+          <button type="button" class="btn-say" data-say="small" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="wide" disabled>wide</button>
+          <button type="button" class="btn-say" data-say="wide" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="round" disabled>round</button>
+          <button type="button" class="btn-say" data-say="round" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="old" disabled>old</button>
+          <button type="button" class="btn-say" data-say="old" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      </div>
+    <p class="quiz-feedback">כמעט! המילה הנכונה היא <strong>light</strong></p>
+    <p class="quiz-demoted">המילה הזאת חוזרת ללמידה, נלמד אותה שוב יחד</p>
+    <button type="button" class="btn btn-primary" data-action="quiz-next">הלאה</button>
+  
+=== wrong candidate ===
+
+    <p class="quiz-progress">שאלה 4 מתוך 4</p>
+    <p class="quiz-prompt">איזו מילה מתאימה?</p>
+    <p class="quiz-sentence" dir="ltr">The huge box was so ___ that the little girl could lift it easily.</p>
+    <p class="quiz-sense">not heavy and easy to lift</p>
+    <div class="quiz-options">
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option correct" data-choice="light" disabled>light</button>
+          <button type="button" class="btn-say" data-say="light" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option wrong" data-choice="big" disabled>big</button>
+          <button type="button" class="btn-say" data-say="big" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="small" disabled>small</button>
+          <button type="button" class="btn-say" data-say="small" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="wide" disabled>wide</button>
+          <button type="button" class="btn-say" data-say="wide" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="round" disabled>round</button>
+          <button type="button" class="btn-say" data-say="round" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      
+        <div class="quiz-option-row">
+          <button type="button" class="quiz-option" data-choice="old" disabled>old</button>
+          <button type="button" class="btn-say" data-say="old" aria-label="הקשיבי למילה">🔊</button>
+        </div>
+      </div>
+    <p class="quiz-feedback">כמעט! המילה הנכונה היא <strong>light</strong></p>
+    <p class="quiz-demoted">עוד לא — נמשיך ללמוד את המילה הזאת</p>
+    <button type="button" class="btn btn-primary" data-action="quiz-next">הלאה</button>
+  
