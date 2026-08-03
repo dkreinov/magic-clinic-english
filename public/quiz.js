@@ -1,6 +1,6 @@
 // The quiz component: the screen, the session, the answer. QZ-18.
 import { postJson } from './api.js';
-import { newSessionId, selectOptions, pickItem } from './quiz-core.js';
+import { newSessionId, selectOptions, pickItem, buildQuestion, gradeTyped, normalizeTyped } from './quiz-core.js';
 import { QUIZ_STRINGS } from './quiz-strings.js';
 
 const VIEW_STYLE = `<style>
@@ -367,20 +367,29 @@ export async function startQuiz(
     load = loadItem,
     post = (body) => postJson('/api/profile', body),
     rand = Math.random,
+    words = {},
+    audioSet = null,
   }
 ) {
   const questions = [];
   for (const lemma of lemmas) {
     if (questions.length === count) break;
     const item = await load(lemma, rand);
-    if (item === null) continue;
-      questions.push({
-        lemma,
-        item,
-        options: selectOptions(item, knownSet, rand),
-        hintShown: false,
-        wasCandidate: candidateSet.has(lemma),
-      });
+    const built = buildQuestion(questions.length, lemma, { item, entry: words[lemma], audioSet, words }, rand);
+    if (built === null) continue;
+    const options = built.kind === 'cloze-pick' ? selectOptions(item, knownSet, rand) : built.options;
+    questions.push({
+      lemma,
+      item,
+      kind: built.kind,
+      answer: built.answer,
+      promptHe: built.promptHe,
+      sayLemma: built.sayLemma,
+      options,
+      hintShown: false,
+      wasCandidate: candidateSet.has(lemma),
+      inputName: 'q-' + randomToken(),
+    });
     if (questions.length === count) break;
   }
 
@@ -393,6 +402,8 @@ export async function startQuiz(
   let chosen = null;
   let correctFlag = null;
   let demoted = false;
+  let typedText = '';
+  let retryUsed = false;
 
   function bind() {
     container.querySelectorAll('[data-choice]').forEach((btn) => {
@@ -411,6 +422,17 @@ export async function startQuiz(
     container.querySelectorAll('[data-action="quiz-hint"]').forEach((btn) => {
       btn.addEventListener('click', () => session.hint());
     });
+    container.querySelectorAll('[data-action="quiz-check"]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const inputEl = container.querySelector('.quiz-input');
+        session.check(inputEl ? inputEl.value : '');
+      });
+    });
+    container.querySelectorAll('.quiz-input').forEach((input) => {
+      input.addEventListener('keydown', (e) => {
+        if (e && e.key === 'Enter') session.check(input.value);
+      });
+    });
   }
 
   function renderCurrent() {
@@ -418,6 +440,11 @@ export async function startQuiz(
     const html = renderQuizCard({
       lemma: q.lemma,
       item: q.item,
+      kind: q.kind,
+      answer: q.answer,
+      promptHe: q.promptHe,
+      sayLemma: q.sayLemma,
+      inputName: q.inputName,
       options: q.options,
       index: session.index,
       total: session.questions.length,
@@ -426,15 +453,26 @@ export async function startQuiz(
       demoted,
       hintShown: q.hintShown,
       wasCandidate: q.wasCandidate,
+      typed: typedText,
+      retry: retryUsed,
     });
     container.innerHTML = VIEW_STYLE + html;
     bind();
+
+    const inputEl = container.querySelector('.quiz-input');
+    if (inputEl && typeof inputEl.focus === 'function' && !inputEl.disabled) {
+      inputEl.focus();
+      if (typeof inputEl.setSelectionRange === 'function') {
+        const len = typeof inputEl.value === 'string' ? inputEl.value.length : 0;
+        inputEl.setSelectionRange(len, len);
+      }
+    }
   }
 
   session.answer = async function answer(option) {
     if (chosen !== null) return;
     const q = session.questions[session.index];
-    const correct = option === q.item.answer;
+    const correct = option === q.answer;
     chosen = option;
     correctFlag = correct;
 
@@ -458,6 +496,20 @@ export async function startQuiz(
     renderCurrent();
   };
 
+  session.check = async function check(value) {
+    if (chosen !== null) return;
+    if (normalizeTyped(value) === '') return;
+    const q = session.questions[session.index];
+    typedText = value;
+    const verdict = gradeTyped(value, q.answer, { isRetry: retryUsed });
+    if (verdict === 'near-miss') {
+      retryUsed = true;
+      renderCurrent();
+      return;
+    }
+    await session.answer(verdict === 'correct' ? q.answer : value);
+  };
+
   session.hint = function hint() {
     if (chosen !== null) return;
     const q = session.questions[session.index];
@@ -470,6 +522,8 @@ export async function startQuiz(
     chosen = null;
     correctFlag = null;
     demoted = false;
+    typedText = '';
+    retryUsed = false;
 
     if (session.index >= session.questions.length) {
       const total = session.questions.length;
