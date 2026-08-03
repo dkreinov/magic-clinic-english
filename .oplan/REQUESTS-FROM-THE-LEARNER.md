@@ -10,6 +10,13 @@ These are FEATURE REQUESTS, not defects, unless marked otherwise.
 
 ## R1 — tapping a word in the story should READ IT ALOUD, not only offer "add to my words"
 **Raised:** 2026-07-30 (during the word-trophies run, phase 3).
+**Status: SHIPPED and LIVE** (verified against the code 2026-08-03, not recalled).
+Taken by the **word-finish** run, phase 2. `saySlot()` (`public/views/reader.js:423`) puts a speaker
+button in the word popup, and the words screen has the same. Both open questions below were
+answered in the shipping design: the tap shows a **button**, not auto-play; and a word with no clip
+shows the button **crossed out with `coming soon`** rather than hidden (that is FC-5, owner-frozen —
+see also R7, which is the rule this came from).
+
 **Her point:** when she taps a word while reading a chapter, the only thing she is offered is
 adding it to her word list. She wants to HEAR the word.
 
@@ -32,6 +39,13 @@ does — `curious` counts `taps`)?
 
 ## R2 — coming back from the dictionary should not reload the story
 **Raised:** 2026-07-30, same conversation.
+**Status: SHIPPED and LIVE** (verified against the code 2026-08-03, not recalled).
+Taken by the **word-finish** run, phase 1, step 1.4 — commit `870e9c7`.
+Both open questions below were answered: the invalidation signal is a **profile signature**
+(`profileSignature(fresh)`; unchanged signature → early return, no rebuild), and **scroll position
+IS restored** (`restoreScroll()`, on re-entry only, one passive listener). She was right that
+"it takes time" also meant "and I lost my place".
+
 **Her point:** she adds a word, goes to look at her word list, comes back to the story — and the
 story reloads and she has to wait. She says there is no reason to reload it if the story has not
 changed.
@@ -62,11 +76,35 @@ usually also means "and I lost my place". Worth asking her.
   this entry gets a line saying which run took it and where the design lives.
 - If she raises something and it is a defect (like R2 probably is), say so plainly rather than
   filing it as a nice-to-have.
+- **A STATUS LINE IN THIS FILE IS ONLY EVER WRITTEN FROM MEASUREMENT, NEVER FROM MEMORY.** This
+  file is an INPUT to future planning, so a stale status propagates into a brief and from there
+  into built code — which is this project's named failure mode (field guide 24). On 2026-08-03 a
+  tidy-up found R1, R2 and R7 still marked unbuilt when they had shipped days earlier, and R3
+  summarised as "fixed" when only half of it was. Each status above now names the file and line,
+  or the commit, that was actually read.
 
 ---
 
 ## R3 — "at the end of each chapter I get the same exact questions" — CONFIRMED DEFECT
-**Raised:** 2026-07-31, via the owner. **Status:** diagnosed, not fixed.
+**Raised:** 2026-07-31, via the owner.
+**Status (re-measured 2026-08-03, and the earlier one-word summary "fixed" was TOO STRONG):
+(b) FIXED AND LIVE · (a) FIXED IN EFFECT, ROOT CAUSE UNTOUCHED.**
+
+- **(b) the chapter-end quiz is now about the chapter.** `chapterQuizLemmas()`
+  (`public/views/reader.js:494`) puts the chapter's **own glossary words first**, shuffled with
+  `rand`, and only then the global pool — with words already asked this sitting pushed to the
+  **back**. Wired in at `quizLemmasFor(chapter)` (`reader.js:627`). A separate word-finish change
+  gave her own words quiz items at all; before it, every chapter fell through to the same four
+[REDACTED: her vocabulary -- D27/R-F3-5, counts only]
+- **(a) selection is still first-N of a fixed order underneath.** `public/quiz.js` and
+  `public/quiz-core.js` are **still byte-frozen at the exact md5s this entry named**
+  (`69b6d711…` / `9a2131be…`, re-checked today), so `pickQuizWords` is unchanged and still fully
+  deterministic. The strike-first pinning described below is therefore **still real** — it is just
+  no longer reachable *first* on a chapter whose glossary words she already knows. On a chapter
+  where it has nothing to put first, the old behaviour returns.
+- **Still open, and this is the honest remainder:** sample from a wider slice inside
+  `pickQuizWords` itself. That needs process, not a quick edit — the two files are QZ-18 frozen
+  and md5-pinned by the phase gates.
 
 **She is right, and it is not the comprehension questions.** Measured against her real profile:
 her four chapters each carry their OWN three questions (four distinct sets, verified by
@@ -161,7 +199,17 @@ of mechanics that carry most of the teaching value and fit what this app already
 ---
 
 ## R7 — do NOT try to cover every word; degrade honestly and fill in later
-**Raised:** 2026-08-01, by the owner. **Status:** recorded — **this AMENDS the word-finish design.**
+**Raised:** 2026-08-01, by the owner.
+**Status (verified against the code 2026-08-03): TWO OF THREE SHIPPED.**
+- **Translation in real time — SHIPPED.** `reader.js:973` posts to `/api/translate` for a word we
+  do not hold.
+- **Honest audio degradation — SHIPPED**, and it became owner-frozen contract **FC-5**: the speaker
+  button is *visible but crossed out* with an English `coming soon` caption. This is exactly the
+  amendment demanded below, and it replaced the `canSay`-makes-it-absent behaviour.
+- **Filling it in asynchronously — NOT SHIPPED.** Top-up is still a **manual** run of
+  `scripts/build-word-audio.js` / `scripts/quiz-topup.mjs` by a human at a terminal. Nothing fills
+  a gap on its own, so "coming soon" stays true only as long as someone remembers to run it.
+  **This is the live remainder of R7.**
 
 The rule he wants:
 - **Translation:** if she adds a word we do not have, translate it **in real time**. He is right
@@ -173,3 +221,35 @@ The rule he wants:
 **This changes what word-finish just shipped.** `canSay` currently makes the speaker button
 **absent** when there is no clip. He is asking for **visible but honest** instead of invisible.
 That is a better answer than either the dead button or the missing one, and it is a small change.
+
+---
+
+## R8 — background music behind the story
+**Raised:** 2026-08-02 evening, by the owner. **Status: HALF-BUILT, IN FLIGHT 2026-08-03.**
+
+**His words:** "see if we can add some music. you can generate it in gemini or suno".
+
+**The objection he was told and overruled, recorded so it is not re-litigated:** she learns by
+tapping words to hear them, and every existing sound in this app is speech. Music under that
+competes with the one thing she is trying to hear. **He chose music behind the story knowing this**,
+so the engineering answer is ducking rather than refusal.
+
+**What is BUILT (commit `c716b3a`, 9 tests, 3 mutation controls):** `public/music.js` — default
+**OFF**, her choice persists in `localStorage`, and the bed **ducks 14% → 2% under every word clip**,
+reference-counted so two overlapping taps cannot un-duck early. Every failure path is a silent
+no-op: a missing or broken track can never break the story.
+
+**What is NOT built, and it is most of what she would notice:**
+1. **No track file.** `public/audio/music/story-loop.mp3` does not exist.
+2. **`music.js` is imported by NOTHING.** No view calls `start()`, and nothing calls `setMuted()`.
+3. **No mute control on screen** — the module exports one, the UI has no button.
+4. Not precached, not deployed. **She currently sees and hears no difference at all.**
+
+**The blocker, and how it was solved:** the first attempt drove the *Playwright* browser, which is
+a blank profile signed out of Suno, Google and ChatGPT. Credentials were not touched. On
+2026-08-03 the **claude-in-chrome extension** was used instead — it attaches to the real signed-in
+Chrome — and Suno generation ran with no login and no credential handling. **That is the route to
+use for any future web-service generation** (see also the ChatGPT-images precedent).
+
+**Standing constraint on the track itself:** INSTRUMENTAL ONLY. A vocal track would put English
+lyrics under a child reading English, which works directly against the app's purpose.
