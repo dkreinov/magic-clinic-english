@@ -97,3 +97,49 @@ export function pickCandidateWords(profile, limit = 1) {
   }
   return pickQuizWords(shadow, limit);
 }
+
+// STEP 1.1: grading a typed answer. Pure functions -- no DOM, no fetch, no network (D7 / R-W-6).
+// isNearMiss uses Damerau-Levenshtein distance restricted to adjacent transpositions (the
+// "optimal string alignment" variant), computed by the unexported osaDistance helper below.
+export function normalizeTyped(s) {
+  return String(s ?? '').trim().toLowerCase();
+}
+
+function osaDistance(a, b) {
+  const al = a.length;
+  const bl = b.length;
+  const d = [];
+  for (let i = 0; i <= al; i++) {
+    d[i] = [i];
+  }
+  for (let j = 0; j <= bl; j++) {
+    d[0][j] = j;
+  }
+  for (let i = 1; i <= al; i++) {
+    for (let j = 1; j <= bl; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      let best = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        best = Math.min(best, d[i - 2][j - 2] + 1);
+      }
+      d[i][j] = best;
+    }
+  }
+  return d[al][bl];
+}
+
+export function isNearMiss(typed, answer) {
+  const a = normalizeTyped(typed);
+  const b = normalizeTyped(answer);
+  if (a === '' || a === b) return false;
+  return osaDistance(a, b) === 1;
+}
+
+export function gradeTyped(typed, answer, { isRetry = false } = {}) {
+  const a = normalizeTyped(typed);
+  const b = normalizeTyped(answer);
+  if (a === b) return 'correct';
+  if (isRetry) return 'wrong';
+  if (isNearMiss(typed, answer)) return 'near-miss';
+  return 'wrong';
+}

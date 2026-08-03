@@ -66,8 +66,14 @@ this phase's bytes too**; recorded as obligation W1-1).
   LF=$(tr -dc '\n' < public/quiz-core.js | wc -c)
   [ "$CR" = "$LF" ] || { echo "FAIL: quiz-core.js MIXED endings, CR=$CR LF=$LF"; exit 1; }
   [ "$CR" -ge 99 ] || { echo "FAIL: quiz-core.js shrank, CR=$CR (<99)"; exit 1; }
-  node --test tests/ 2>&1 | grep -E '^# (tests|pass|fail)'
+  node --test 2>&1 | grep -E '^# (tests|pass|fail)'
   ```
+  **AMENDED 2026-08-03, intervention I-1 (see journal).** This line originally read
+  `node --test tests/`, which on Node v22 fails with `MODULE_NOT_FOUND` — directory-argument test
+  discovery was removed after v20. It can NEVER pass, on any tree, for any step. Contract **GC-1**
+  of the first-build run already recorded this and `package.json`'s own script is the bare form.
+  The executor of step 1.1 hit it and STOPPED to ask instead of quietly substituting a command,
+  which is the escalation rule doing precisely its job.
   PASS requires: the new file green; CR count exactly 99; whole suite `fail 0` and
   `tests` ≥ 433 + the new count.
 - **Required assertions, each executed** (added at the plan-review gate — this step was the only
@@ -113,8 +119,14 @@ this phase's bytes too**; recorded as obligation W1-1).
   LF=$(tr -dc '\n' < public/quiz-core.js | wc -c)
   [ "$CR" = "$LF" ] || { echo "FAIL: quiz-core.js MIXED endings, CR=$CR LF=$LF"; exit 1; }
   [ "$CR" -ge 99 ] || { echo "FAIL: quiz-core.js shrank, CR=$CR (<99)"; exit 1; }
-  node --test tests/ 2>&1 | grep -E '^# (tests|pass|fail)'
+  node --test 2>&1 | grep -E '^# (tests|pass|fail)'
   ```
+  **AMENDED 2026-08-03, intervention I-1 (see journal).** This line originally read
+  `node --test tests/`, which on Node v22 fails with `MODULE_NOT_FOUND` — directory-argument test
+  discovery was removed after v20. It can NEVER pass, on any tree, for any step. Contract **GC-1**
+  of the first-build run already recorded this and `package.json`'s own script is the bare form.
+  The executor of step 1.1 hit it and STOPPED to ask instead of quietly substituting a command,
+  which is the escalation rule doing precisely its job.
 - **Required assertions, each executed:** membership is preserved (sorted equality against the
   input); the input array is unmutated (compare a pre-copy); with 20 ranked entries and a seeded
   `rand`, the first 4 are all drawn from the top 8; over a sweep of seeds, a rank-1 entry appears
@@ -158,8 +170,14 @@ this phase's bytes too**; recorded as obligation W1-1).
   LF=$(tr -dc '\n' < public/quiz-core.js | wc -c)
   [ "$CR" = "$LF" ] || { echo "FAIL: quiz-core.js MIXED endings, CR=$CR LF=$LF"; exit 1; }
   [ "$CR" -ge 99 ] || { echo "FAIL: quiz-core.js shrank, CR=$CR (<99)"; exit 1; }
-  node --test tests/ 2>&1 | grep -E '^# (tests|pass|fail)'
+  node --test 2>&1 | grep -E '^# (tests|pass|fail)'
   ```
+  **AMENDED 2026-08-03, intervention I-1 (see journal).** This line originally read
+  `node --test tests/`, which on Node v22 fails with `MODULE_NOT_FOUND` — directory-argument test
+  discovery was removed after v20. It can NEVER pass, on any tree, for any step. Contract **GC-1**
+  of the first-build run already recorded this and `package.json`'s own script is the bare form.
+  The executor of step 1.1 hit it and STOPPED to ask instead of quietly substituting a command,
+  which is the escalation rule doing precisely its job.
   **The `OBSERVED_DRAWS` parse is not decoration.** Field guide 18: a sweep that inspects nothing
   reports "0 violations", which is byte-identical to success. The count is now MECHANICALLY
   required, not requested in prose — the plan reviewer's finding was that a worker could simply
@@ -200,8 +218,14 @@ this phase's bytes too**; recorded as obligation W1-1).
   LF=$(tr -dc '\n' < public/quiz-core.js | wc -c)
   [ "$CR" = "$LF" ] || { echo "FAIL: quiz-core.js MIXED endings, CR=$CR LF=$LF"; exit 1; }
   [ "$CR" -ge 99 ] || { echo "FAIL: quiz-core.js shrank, CR=$CR (<99)"; exit 1; }
-  node --test tests/ 2>&1 | grep -E '^# (tests|pass|fail)'
+  node --test 2>&1 | grep -E '^# (tests|pass|fail)'
   ```
+  **AMENDED 2026-08-03, intervention I-1 (see journal).** This line originally read
+  `node --test tests/`, which on Node v22 fails with `MODULE_NOT_FOUND` — directory-argument test
+  discovery was removed after v20. It can NEVER pass, on any tree, for any step. Contract **GC-1**
+  of the first-build run already recorded this and `package.json`'s own script is the bare form.
+  The executor of step 1.1 hit it and STOPPED to ask instead of quietly substituting a command,
+  which is the escalation rule doing precisely its job.
 - **Required assertions, each executed:** with all four available, positions 0..3 yield the four
   kinds **each exactly once** (this is design criterion 1, asserted directly); positions 4..7
   repeat that; every single-kind-unavailable case falls through to the next in order; the
@@ -217,8 +241,9 @@ this phase's bytes too**; recorded as obligation W1-1).
 
 Each is a command with a pass/fail outcome. All are re-run by the ORCHESTRATOR at the gate.
 
-1. `node --test tests/ 2>&1 | grep -E '^# (pass|fail)'` ⇒ `fail 0`, and `pass` ≥ 433 + the four
-   new files' test counts, with the exact ledger recorded in `phase-state.md`.
+1. `node --test 2>&1 | grep -E '^# (pass|fail)'` ⇒ `fail 0`, and `pass` = 433 + the four new
+   files' test counts, with the exact ledger recorded in `phase-state.md`. **Bare `node --test`,
+   never `node --test tests/`** — see intervention I-1. Measured pristine baseline: 433/433/0.
 2. `tr -dc '\r' < public/quiz-core.js | wc -c` **equals** `tr -dc '\n' < public/quiz-core.js | wc -c`
    and is `>= 99`. **NOT a fixed count.** The file is 99 lines with CR=99 and LF=99 today, so every
    append raises both; a pin on `99` would have failed all four steps. The property is "no LF-only
