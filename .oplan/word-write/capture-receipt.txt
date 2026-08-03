@@ -1,0 +1,43 @@
+# Capture receipt — word-write run (R5), 2026-08-03
+
+COUNTS AND HASHES ONLY. No word of hers appears in this file (D27 / R-F3-5 / the 2026-08-03
+privacy incident: .oplan IS PUBLISHED).
+
+path (outside the repo): /c/Users/dkreinov/english-app-backups/profile-20260803-161943.json
+bytes:  30763
+sha256: 9486b185a2e5d927db403727a09de7c7cadf737f7256d3eaefc2bc9d5fa5d18b
+authority: R-CAPTURE (owner, 2026-08-02, standing pre-authorisation), frozen subshell form
+           from .oplan/word-quiz/plan.md:1573-1586. HTTP 200, APP_CODE proved not leaked.
+
+MEASURED (this is the whole reason the capture was taken):
+  word keys total 46  =  known 16 · candidate 12 · learning 18
+  Hebrew translation (entry.he) present: 46/46  -- ALL of them
+  audio clip reachable (direct or via resolveLemma): 46/46  -- ALL of them
+  quiz bank item present: 29/46  (known 16/16 · candidate 9/12 · learning 4/18)
+  known with strikes>0: 2 · known never quizzed: 2
+  known lemma length min 3 / max 6 / avg 4.4 · all pure [a-z] · 0 with punctuation
+  he strings: 0 contain non-Hebrew characters · 1 of 16 is multi-word
+  story chapters 11 · checkLog entries 18
+  skills.writing: state=unknown, score=null   <-- R5 is literally this skill
+
+TWO MEASUREMENT BUGS OF MINE, recorded because both produced a confident wrong number:
+  1. /api/profile returns {ok,data}; my first pass read profile.words at the TOP level and
+     reported '0 known words' on a 30763-byte file. A zero that large should have stopped me.
+  2. public/audio/words/index.json is an ARRAY, not an object. Object.keys() gave me indices,
+     so I reported 'known with audio clip: 0/16' when the true answer is 16/16.
+  Both were caught by asking what shape the artifact actually has, not what shape I assumed.
+
+---
+SECOND CAPTURE, 2026-08-03, at the plan-review gate. Same frozen subshell form, HTTP 200,
+APP_CODE proved not leaked, file DELETED immediately after measurement (verified absent).
+Taken because the plan reviewer found that WK-2's design rested on an UNMEASURED assumption:
+I had measured that all 46 words have a Hebrew value, never that those values are DISTINCT.
+
+MEASURED:
+  distinct he values: 46 / 46  -- zero collisions
+  he values shared by more than one word: 0
+  surviving distractor candidates per word (after the WK-2 same-he exclusion): min 45, max 45
+  words for which he-pick is UNBUILDABLE (fewer than 3 survivors): 0 / 46
+
+CONSEQUENCE: WK-2 costs nothing today. It is insurance against the collision her vocabulary
+will eventually contain (two English words, one Hebrew word), not a live restriction.
