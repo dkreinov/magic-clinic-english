@@ -241,3 +241,42 @@
         past a leak a prior audit had already named in writing.
     30  AN APPROVAL THAT IS NOT BOUND TO BYTES IS NOT AN APPROVAL. Digest the batch, name the digest
         in the approval record, and make the promoter recompute it before it copies anything.
+
+31  A FROZEN VALIDATION CAN ITSELF BE THE BUG -- AND A READ-ONLY REVIEWER CANNOT SEE IT.
+    Three of my own frozen gates were defective in ONE phase, all written before any executor ran:
+    (a) a line-ending pin `CR == 99` on a file that HAS 99 lines and 99 CRs -- every appending
+        step raises both, so it would have failed all four steps. The property is CR == LF.
+    (b) `node --test tests/` -- the DIRECTORY form fails MODULE_NOT_FOUND on Node v22 (dropped
+        after v20). It could never pass, on any tree, for any step. Contract GC-1 had already
+        recorded this and package.json's own script is the bare form.
+    (c) an `OBSERVED_SEEDS=<n>` gate satisfied by a HARDCODED n while the loop broke early: the
+        honest count was 8, the printed one 500. My anti-decoration gate was itself decoration.
+    The plan reviewer caught NONE of these and could not have: it is READ-ONLY and cannot execute.
+    AN UNRUNNABLE COMMAND IS INVISIBLE TO A REVIEWER THAT CANNOT RUN IT. So: either dry-run every
+    frozen command against the real tree yourself before dispatch, or accept that step 1 is where
+    they get found. The executor's stop-rule caught (b); an auditor caught (c).
+
+32  `git diff --numstat` CANNOT TELL AN APPEND FROM A MID-FILE INSERTION.
+    "40 added, 0 deleted" is TRUE for both. A step specified as APPEND-ONLY inserted its function
+    at line 33 and the numstat check waved it through; only a byte-PREFIX comparison saw it.
+    Zero deletions proves nothing was REMOVED and says nothing about WHERE additions landed.
+    AND THE PIN WAS THE WRONG PIN ANYWAY (lesson 22 again): "appended at the end" is a SPELLING.
+    The property is "no pre-existing line is changed or removed", which is a SUBSEQUENCE check
+    (tolerates insertion, forbids deletion/modification) plus a whole-function-body comparison of
+    every pre-existing export. Written that way it passes and it means something.
+
+33  PERCENT SIGNS ARE THE NEW BACKSLASHES (extends lesson 19).
+    A worker's shell `printf` consumed the `%` in `n % 4` as a format specifier and SILENTLY
+    TRUNCATED a production file mid-append. Caught only by re-counting bytes afterwards, never by
+    reading the output. Lesson 19 said "backslashes"; the real rule is that ANY character with
+    meaning to an intermediate layer will be eaten by it. Write code with the file tools, and
+    verify the WRITTEN BYTES after every generated write -- length, endings, and that the module
+    still parses and still exports everything it did before.
+
+34  FIELD GUIDE 8 FIRED IN AN AGENT PACKET, EXACTLY AS PREDICTED -- AND THE FIX IS TO SEND NUMBERS.
+    \uXXXX escapes sent to a worker DECODED into raw Hebrew glyphs in transit (the packet is JSON).
+    The remedy that worked: send CODE POINT NUMBERS in decimal ("the three code points 1488, 1489,
+    1490") and have the worker construct the escapes itself, then verify by dumping code points
+    from the WRITTEN FILE. No glyph and no backslash ever crosses the boundary. Verify afterwards
+    with two independent counts: raw glyphs in range U+0590-U+05FF must be 0, and non-ASCII bytes
+    must be 0.

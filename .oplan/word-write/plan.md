@@ -255,9 +255,26 @@ Each is a command with a pass/fail outcome. All are re-run by the ORCHESTRATOR a
    phase 1 does not spend it).
 5. Every one of the four steps recorded a fail-first observation in `journal.md`. A step whose
    test was never seen to fail is not accepted.
-6. `git diff baea2b8 -- public/quiz-core.js` shows **only appended lines** — the existing exports
-   are byte-unchanged. Verified by extracting the first 99 lines of the new file and byte-
-   comparing them against the same range at `baea2b8`.
+6. **RE-EXPRESSED AT THE GATE (field guide 22) — the original wording named a SPELLING, not the
+   property, and it FAILED while the property held.** It read: "`git diff baea2b8 --
+   public/quiz-core.js` shows only appended lines … verified by extracting the first 99 lines and
+   byte-comparing". Measured: step 1.3 INSERTED `selectHeOptions` at line 33, in the middle of the
+   file, rather than appending at the end. The prefix comparison therefore failed at byte 1199.
+
+   **The property I actually care about is that no pre-existing line is changed or removed.**
+   The new criterion, and it PASSES: every one of the 100 original lines still exists
+   byte-identical and in the same relative order (a subsequence check — tolerates insertion,
+   forbids deletion and modification), 128 lines inserted, **0 original lines missing or
+   modified**; and all seven pre-existing exports (`newSessionId`, `knownSetFromProfile`,
+   `selectOptions`, `isUsableItem`, `pickItem`, `pickQuizWords`, `pickCandidateWords`) compare
+   IDENTICAL as whole function bodies, not merely as lines.
+
+   **WHY MY PER-STEP CHECK WAS BLIND TO THIS:** for step 1.3 I checked only
+   `git diff --numstat`, which reported `40 added / 0 deleted`. **git reports a mid-file
+   insertion and an end-of-file append identically** — both are pure additions. A numstat with
+   zero deletions proves nothing was removed; it says nothing whatsoever about WHERE the
+   additions landed. Only the byte-prefix comparison could see it, and I ran that on steps 1.1
+   and 1.4 but not 1.3.
 7. Nothing under `public/views/` or `public/quiz.js` is imported by the new tests, and no test
    opens a network connection.
 

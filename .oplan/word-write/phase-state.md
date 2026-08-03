@@ -1,4 +1,7 @@
-CURRENT: phase 1 "the engine", next step 1.1 — NOT YET DISPATCHED (awaiting owner go-ahead)
+CURRENT: PHASE 1 CLOSED 2026-08-03. All 5 steps accepted, all 7 acceptance criteria run at the
+  gate (criterion 6 RE-EXPRESSED -- see below). Next: phase 2 "the screen", to be planned by a
+  fresh planner from these files, then reviewed by me.
+  SHE SEES NOTHING YET. Phase 1 shipped no reachable behaviour and nothing is deployed.
 PLAN: .oplan/word-write/plan.md
 DESIGN: .oplan/word-write/design.md · JOURNAL: journal.md · BRIEFING: briefing.md
 FIELD GUIDE: .oplan/word-write/field-guide/index.md (carried forward from word-finish)
@@ -8,7 +11,41 @@ BASELINE: 433 reported / 428 flat / 0 fail · contrast gate PASS
   public/quiz.js       md5 69b6d71117cf776715374abc6f0abb02  CR=346 LF=346 (CRLF)
   public/sw.js CACHE magic-vet-v24 · pin at tests/shell.test.js:64
 
-ACCEPTED: none yet.
+ACCEPTED (phase 1):
+  1.1  2c7eb0e  grading a typed answer (normalizeTyped / isNearMiss / gradeTyped)
+  1.2  40bc95d  sampleRanked -- R3(a), the "same exact questions" root cause
+  1.2b 40bc95d  same commit: OBSERVED_SEEDS made honest AND given a 35-65% uniformity band
+  1.3  2232a78  selectHeOptions -- the same-Hebrew exclusion, WK-2
+  1.4  0373eaa  QUESTION_KINDS + chooseKind -- the rotation, WK-1
+
+STATE OF THE TREE AT THE PHASE-1 CLOSE:
+  suite 494 reported / 494 pass / 0 fail   (433 baseline + 27 + 8 + 11 + 15)
+  public/quiz-core.js  CR=227 == LF=227, uniform CRLF, 228 lines, 14 exports
+  public/quiz.js       md5 69b6d71117cf776715374abc6f0abb02 -- UNTOUCHED, as phase 1 required
+  public/sw.js         CACHE still magic-vet-v24 -- the bump is OWED (W1-1)
+  nothing deployed; live is still the previous run's magic-vet-v24
+
+  *** CRITERION 6 WAS RE-EXPRESSED AT THE GATE, AND THE REASON MATTERS FOR PHASE 2. ***
+  It was written as "shows only APPENDED lines ... byte-compare the first 99 lines". That FAILED
+  while the property held: step 1.3 INSERTED selectHeOptions at line 33 rather than appending.
+  The property I actually care about -- no pre-existing line changed or removed -- was then
+  measured properly and PASSES: 0 of 100 original lines missing or modified (subsequence check),
+  and all 7 pre-existing exports IDENTICAL as whole function bodies.
+  THE BLIND SPOT TO CARRY INTO PHASE 2: `git diff --numstat` reported "40 added, 0 deleted" and
+  I accepted it. GIT REPORTS A MID-FILE INSERTION AND AN END APPEND IDENTICALLY. Zero deletions
+  proves nothing was REMOVED; it says NOTHING about where additions landed. Phase 2 edits
+  public/quiz.js, which is 346 lines of working UI -- there, WHERE an edit lands is the whole
+  question, so numstat is not an acceptable boundary check.
+
+NEW EXPORTS AVAILABLE TO PHASE 2 (all pure, all rand-threaded, all tested):
+  normalizeTyped(s)
+  isNearMiss(typed, answer)                      -> bool (Damerau distance exactly 1)
+  gradeTyped(typed, answer, {isRetry})           -> 'correct' | 'near-miss' | 'wrong'
+  sampleRanked(ranked, count, rand)              -> reordered copy, same membership
+  selectHeOptions(answerLemma, words, rand, cnt) -> array of cnt lemmas incl. answer, or null
+  QUESTION_KINDS                                 -> ['cloze-pick','he-pick','he-type','listen-type']
+  chooseKind(position, avail)                    -> kind string or null; avail is
+                                                    {clozePick, hePick, heType, listenType}
 
 FROZEN CONTRACTS IN FORCE:
   WK-1  Kind rotation is a PREFERENCE, not a rule. From the sitting position, walk
@@ -98,4 +135,18 @@ INHERITED, STILL OPEN (from word-finish -- not this run's work, recorded so noth
 
 OPEN QUESTIONS: none.
 
-BLOCKED: no -- awaiting the owner's go-ahead on the plan briefing before step 1.1 is dispatched.
+BLOCKED: no. Owner gave the go-ahead for all phases ("go do all") = CONTINUOUS MODE, so there is
+  no pause at the phase boundary. Phase 2 is planned by a fresh planner, reviewed by me, then
+  executed in this session.
+
+TWO INTERVENTIONS IN PHASE 1, BOTH MINE, BOTH IN MY OWN FROZEN VALIDATIONS:
+  I-1  `node --test tests/` can NEVER pass on Node v22 (MODULE_NOT_FOUND -- directory-argument
+       discovery dropped after v20; contract GC-1 already knew, package.json already used the
+       bare form). Amended in all four steps. The step-1.1 executor STOPPED and asked instead of
+       substituting a command silently.
+  I-2  OBSERVED_SEEDS was a HARDCODED 500 while the loop broke early after EIGHT seeds -- my
+       anti-decoration gate was itself decoration. Fixed AND strengthened into a 35-65%
+       uniformity band; measured 250/500 = exactly 50.0%.
+  THE PATTERN: three defective frozen gates in one phase (these two plus the CR==99 pin), none
+  catchable by the plan reviewer, because it is READ-ONLY and cannot execute a command. For
+  phase 2 I dry-run every frozen command against the real tree BEFORE dispatch.

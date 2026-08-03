@@ -52,3 +52,54 @@ run); generating the next story in the background; the automatic top-up of missi
 correct setting and check it at phone size in a desktop browser, but whether her phone actually
 stops suggesting the answer is something only she can confirm. How we would notice: she tells you
 the phone still writes the word for her. It is stated again at the end of the run, not buried.
+
+---
+
+## 2026-08-03 — Phase 1 closed: the engine
+
+**WHAT WE SET OUT TO DO.** Write the rules for the four new question kinds as plain functions and
+test them hard, without touching anything she can see.
+
+**WHAT WE ACTUALLY DID.**
+- Taught the app to mark a typed word right or wrong, including telling a typing slip apart from
+  a wrong answer.
+- Stopped one word being question #1 in every single quiz — her loudest complaint.
+- Made it impossible for the Hebrew question to offer two words that mean the same thing.
+- Gave it the rule for which of the four kinds to ask, and what to do when a word cannot support
+  one of them.
+
+**WHAT WE FOUND OUT.** Three things, and they are the real content of this phase.
+
+1. **Her Hebrew words are all different from each other.** I checked, because the third piece of
+   work above depends on it. All 46 have a Hebrew translation and no two share one. So the rule
+   that protects her costs nothing today — it is insurance for later, when her vocabulary grows
+   into a collision.
+
+2. **My own safety checks were the least reliable part of this phase.** Three of them were broken,
+   all written by me before any work started. One demanded a file stay 99 lines long while every
+   step added lines. One used a command that cannot work on this computer at all. And one — the
+   worst — reported it had run 500 checks when it had really run **8**. That last one existed
+   specifically to stop a test from pretending it had done work, and it was doing exactly that.
+   All three are fixed, and the 500-check one is now stronger than it was meant to be: it also
+   proves the shuffle is genuinely even-handed, measured at exactly 50%.
+
+3. **Twice, a helper stopped and asked me a question instead of guessing** — once about the broken
+   command, once about the 8-versus-500 number. Both times they were right and I was wrong. That
+   is the single rule this whole way of working rests on, and it paid for itself twice in one day.
+
+**WHAT WENT WRONG.** No work had to be redone. One helper's tool silently chopped a file in half
+mid-write (a stray `%` sign confused it); it noticed by counting characters, repaired it, and I
+checked independently that nothing was lost. And my final check on the phase failed — correctly —
+because one piece of code was inserted into the middle of a file rather than added at the end. The
+thing I actually cared about (that nothing old was changed or deleted) turned out to be perfectly
+true; the check had been written to look for the wrong thing.
+
+**WHAT IT COST.** Roughly 345,000 words' worth of helper thinking. I am not quoting a dollar
+figure because the tool did not report one, and I would rather say "unknown" than invent it.
+
+**WHERE WE ARE NOW.** 494 tests pass, none fail. The file holding today's quiz screen has not been
+touched at all. **She would not notice a single difference** — nothing is on her phone yet.
+
+**WHAT HAPPENS NEXT.** Phase 2 builds the actual screens: the four question cards and the typing
+box with autocorrect switched off. That is the phase where she gets what she asked for. Nothing
+needed from you.
