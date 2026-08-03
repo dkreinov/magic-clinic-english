@@ -199,3 +199,29 @@ export function sampleRanked(ranked, count, rand = Math.random) {
   }
   return arr;
 }
+
+// STEP 1.4: question kind rotation. Four kinds cycle by position in the sitting so audio
+// (listen-type) is at most one question in four. WK-1: rotation is a PREFERENCE, not a rule --
+// chooseKind receives availability FLAGS (not a profile, manifest, or item bank) and walks
+// forward from the starting kind with WRAPAROUND, returning the first buildable kind, or null
+// if none is buildable. D7 / R-W-6: pure function, no DOM, no fetch, no network.
+export const QUESTION_KINDS = Object.freeze(['cloze-pick', 'he-pick', 'he-type', 'listen-type']);
+
+const KIND_FLAG_NAMES = Object.freeze({
+  'cloze-pick': 'clozePick',
+  'he-pick': 'hePick',
+  'he-type': 'heType',
+  'listen-type': 'listenType',
+});
+
+export function chooseKind(position, avail) {
+  const n = Number(position);
+  const start = Number.isInteger(n) && n >= 0 ? n % 4 : 0;
+  for (let i = 0; i < 4; i++) {
+    const kind = QUESTION_KINDS[(start + i) % 4];
+    const flagName = KIND_FLAG_NAMES[kind];
+    if (avail && avail[flagName]) return kind;
+  }
+  return null;
+}
+
