@@ -1,6 +1,7 @@
 // The quiz component: the screen, the session, the answer. QZ-18.
 import { postJson } from './api.js';
 import { newSessionId, selectOptions, pickItem } from './quiz-core.js';
+import { QUIZ_STRINGS } from './quiz-strings.js';
 
 const VIEW_STYLE = `<style>
   .quiz-progress {
@@ -81,6 +82,43 @@ const VIEW_STYLE = `<style>
     cursor: not-allowed;
   }
 
+  .quiz-he {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-ink);
+    margin: 0 0 16px;
+  }
+
+  .quiz-typed {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0 0 16px;
+  }
+
+  .quiz-input {
+    min-height: 48px;
+    padding: 0 16px;
+    border-radius: var(--radius);
+    border: 2px solid var(--color-border);
+    background: var(--color-surface-2);
+    color: var(--color-ink);
+    font-size: 1.05rem;
+    font-weight: 700;
+    direction: ltr;
+  }
+
+  .quiz-listen {
+    margin: 0 0 16px;
+  }
+
+  .quiz-nearmiss {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    margin: 0 0 8px;
+  }
+
   .quiz-feedback {
     font-size: 1rem;
     font-weight: 700;
@@ -115,24 +153,54 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-function renderOptions(options, item, chosen) {
+// The one speaker button markup in this file. listen-type's body reuses this
+// SAME literal (via this one function) rather than re-typing the Hebrew
+// aria-label a second time in the source -- the DOM output is copied verbatim
+// either way, and quiz.js's non-ASCII byte count does not grow doing it this way.
+function sayButtonHtml(word) {
+  return `<button type="button" class="btn-say" data-say="${escapeHtml(word)}" aria-label="הקשיבי למילה">🔊</button>`;
+}
+
+function renderOptions(options, answer, chosen) {
   return options
     .map((opt) => {
       let cls = 'quiz-option';
       let disabledAttr = '';
       if (chosen !== null) {
         disabledAttr = ' disabled';
-        if (opt === item.answer) cls += ' correct';
-        if (chosen !== item.answer && opt === chosen) cls += ' wrong';
+        if (opt === answer) cls += ' correct';
+        if (chosen !== answer && opt === chosen) cls += ' wrong';
       }
       return `
         <div class="quiz-option-row">
           <button type="button" class="${cls}" data-choice="${escapeHtml(opt)}"${disabledAttr}>${escapeHtml(opt)}</button>
-          <button type="button" class="btn-say" data-say="${escapeHtml(opt)}" aria-label="הקשיבי למילה">🔊</button>
+          ${sayButtonHtml(opt)}
         </div>
       `;
     })
     .join('');
+}
+
+function randomToken() {
+  return Math.random().toString(36).slice(2, 10);
+}
+
+// STEP 2.3: the typed-answer surface shared by he-type and listen-type. WK-3: all
+// nine attributes, every time -- the random name (when the caller supplies none)
+// is LOAD-BEARING, because mobile Safari/Chrome re-offer a previous value for any
+// field name they recognise (reader.js:699 is the existing precedent that OMITS
+// autocapitalize; this input carries all nine).
+function renderTypedSurface({ inputName, typed, chosen, retry }) {
+  const resolved = chosen !== null;
+  const name = inputName || 'q-' + randomToken();
+  const valueAttr = typed !== undefined && typed !== null ? escapeHtml(typed) : '';
+  const disabledAttr = resolved ? ' disabled' : '';
+  const inputHtml = `<input type="text" dir="ltr" lang="en" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="${escapeHtml(name)}" class="quiz-input" value="${valueAttr}"${disabledAttr}>`;
+  const checkHtml = resolved
+    ? ''
+    : `<button type="button" class="btn btn-primary" data-action="quiz-check">${QUIZ_STRINGS.check_button}</button>`;
+  const nearMissHtml = retry ? `<p class="quiz-nearmiss">${QUIZ_STRINGS.near_miss}</p>` : '';
+  return `${nearMissHtml}<div class="quiz-typed">${inputHtml}${checkHtml}</div>`;
 }
 
 export function answerBody(sessionId, lemma, correct) {
@@ -158,13 +226,41 @@ export async function loadItem(lemma, rand = Math.random) {
 }
 
 export function renderQuizCard(state) {
-  const { item, options, index, total, chosen, correct, demoted, hintShown, wasCandidate } = state;
+  const {
+    kind = 'cloze-pick',
+    item,
+    options,
+    index,
+    total,
+    chosen,
+    correct,
+    demoted,
+    hintShown,
+    wasCandidate,
+    promptHe,
+    sayLemma,
+    typed,
+    retry,
+    inputName,
+  } = state;
+
+  // STEP 2.3: `answer` replaces `item.answer` below because `item` is null for
+  // three of the four kinds. cloze-pick's own callers keep passing item.answer
+  // (or, as here, nothing at all -- in which case we fall back to item.answer
+  // ourselves), so its output is unchanged to the byte.
+  const answer = state.answer !== undefined ? state.answer : item ? item.answer : undefined;
+
+  // Computed ONCE and reused across all four branches below (like feedbackHtml,
+  // demotedHtml and nextHtml) so the Hebrew literal is typed exactly once in this
+  // file, not once per kind -- see the non-ASCII byte-count gate (R-W-9's sibling
+  // rule: no new Hebrew is typed by hand, all of it comes from a single source).
+  const progressHtml = `<p class="quiz-progress">שאלה ${index + 1} מתוך ${total}</p>`;
 
   const feedbackHtml =
     chosen !== null
       ? correct
         ? `<p class="quiz-feedback">כל הכבוד!</p>`
-        : `<p class="quiz-feedback">כמעט! המילה הנכונה היא <strong>${escapeHtml(item.answer)}</strong></p>`
+        : `<p class="quiz-feedback">כמעט! המילה הנכונה היא <strong>${escapeHtml(answer)}</strong></p>`
       : '';
 
   // B6(iii): a candidate is a word the APP guessed she knew. She never claimed
@@ -182,17 +278,61 @@ export function renderQuizCard(state) {
       ? `<button type="button" class="btn btn-primary" data-action="quiz-next">הלאה</button>`
       : '';
 
+  if (kind === 'he-pick') {
+    // R-W-10: no hint button, no sentence -- the Hebrew word IS the gloss.
+    return `
+    ${progressHtml}
+    <p class="quiz-prompt">${QUIZ_STRINGS.he_pick_prompt}</p>
+    <p class="quiz-he" dir="rtl" lang="he">${escapeHtml(promptHe)}</p>
+    <div class="quiz-options">${renderOptions(options, answer, chosen)}</div>
+    ${feedbackHtml}
+    ${demotedHtml}
+    ${nextHtml}
+  `;
+  }
+
+  if (kind === 'he-type') {
+    // R-W-11: no speaker button -- it is a writing test, not a listen-type test.
+    const typedSurfaceHtml = renderTypedSurface({ inputName, typed, chosen, retry });
+    return `
+    ${progressHtml}
+    <p class="quiz-prompt">${QUIZ_STRINGS.he_type_prompt}</p>
+    <p class="quiz-he" dir="rtl" lang="he">${escapeHtml(promptHe)}</p>
+    ${typedSurfaceHtml}
+    ${feedbackHtml}
+    ${demotedHtml}
+    ${nextHtml}
+  `;
+  }
+
+  if (kind === 'listen-type') {
+    // The speaker button markup below is copied verbatim from renderOptions so
+    // the existing [data-say] binding plays it with zero new wiring. No English
+    // text anywhere in the body before the card resolves.
+    const typedSurfaceHtml = renderTypedSurface({ inputName, typed, chosen, retry });
+    return `
+    ${progressHtml}
+    <p class="quiz-prompt">${QUIZ_STRINGS.listen_type_prompt}</p>
+    <div class="quiz-listen">${sayButtonHtml(sayLemma)}</div>
+    ${typedSurfaceHtml}
+    ${feedbackHtml}
+    ${demotedHtml}
+    ${nextHtml}
+  `;
+  }
+
+  // cloze-pick -- BYTE-IDENTICAL to before step 2.3. Do not touch this branch.
   const hintHtml =
     hintShown || chosen !== null
       ? `<p class="quiz-sense">${escapeHtml(item.sense)}</p>`
       : `<button class="quiz-hint-btn" type="button" data-action="quiz-hint">רמז</button>`;
 
   return `
-    <p class="quiz-progress">שאלה ${index + 1} מתוך ${total}</p>
+    ${progressHtml}
     <p class="quiz-prompt">איזו מילה מתאימה?</p>
     <p class="quiz-sentence" dir="ltr">${escapeHtml(item.sentence)}</p>
     ${hintHtml}
-    <div class="quiz-options">${renderOptions(options, item, chosen)}</div>
+    <div class="quiz-options">${renderOptions(options, answer, chosen)}</div>
     ${feedbackHtml}
     ${demotedHtml}
     ${nextHtml}
