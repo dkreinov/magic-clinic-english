@@ -103,3 +103,54 @@ touched at all. **She would not notice a single difference** — nothing is on h
 **WHAT HAPPENS NEXT.** Phase 2 builds the actual screens: the four question cards and the typing
 box with autocorrect switched off. That is the phase where she gets what she asked for. Nothing
 needed from you.
+
+---
+
+## 2026-08-03 — Phase 2 closed: the screen
+
+**WHAT WE SET OUT TO DO.** Build the actual screens — the four question cards, and the typing box
+with autocorrect switched off. This is the phase where she gets what she asked for.
+
+**WHAT WE ACTUALLY DID.**
+- Her five Hebrew prompts are copied into the app by a script from one locked document. Nobody
+  typed them. Rewording one now fails the tests.
+- The quiz screen learned three new kinds of question, and today's question comes out
+  **byte-for-byte identical** — proved against a snapshot taken before we started.
+- She can type an answer, gets one free second try when she is one letter off, and is scored
+  exactly once no matter how many times she taps.
+- Both quiz screens hand the engine her saved words and her sound list, so the new questions can
+  actually appear.
+- The app's cache version was bumped, which is the small change that makes her phone bother to
+  download any of this.
+
+**WHAT WE FOUND OUT.** Three things.
+
+1. **Looking at the app found a fault that 550 passing tests could not.** After she fixes her
+   typo, the card was showing *"almost! look again"* and *"well done!"* at the same time. Every
+   piece was individually correct; together they were nonsense. It is fixed, and there is now a
+   test — written first and watched to fail — so it cannot come back.
+
+2. **Checking the app cost two throwaway web addresses, not one.** The moment I looked at the
+   first one, the browser quietly memorised the old code and kept showing me the broken version
+   even after the fix. I had to move to a fresh address to see the truth. This is a known trap
+   here and it bit exactly as predicted.
+
+3. **A helper stopped and asked me a question twice more**, and was right both times: once when
+   my instructions contradicted my own safety check, and once when an old test demanded a line of
+   code stay word-for-word the same while the work required changing it. That second one was a
+   real judgement call and it was right to bring it to me rather than quietly edit a locked test.
+
+**WHAT WENT WRONG.** Nothing had to be thrown away. But **four of my own safety checks were
+broken** across this run — this phase added one that could never have failed no matter what, which
+is the worst kind: it looks like protection and is not. All four are fixed and I now run every
+check against a deliberately broken copy before trusting it.
+
+**WHAT IT COST.** Roughly 830,000 words of helper thinking across both phases. No dollar figure —
+the tool does not report one and I will not invent it.
+
+**WHERE WE ARE NOW.** 551 tests pass, none fail. I have used the app myself at phone size and seen
+all four question types, the free retry, and her typed text staying put. **It is all still only on
+this machine — nothing has been sent to her phone yet.**
+
+**WHAT HAPPENS NEXT.** Phase 3 puts it on her phone and checks that what is live is exactly what
+was tested. That is the only step left.
