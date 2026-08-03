@@ -150,3 +150,124 @@ TWO INTERVENTIONS IN PHASE 1, BOTH MINE, BOTH IN MY OWN FROZEN VALIDATIONS:
   THE PATTERN: three defective frozen gates in one phase (these two plus the CR==99 pin), none
   catchable by the plan reviewer, because it is READ-ONLY and cannot execute a command. For
   phase 2 I dry-run every frozen command against the real tree BEFORE dispatch.
+
+================================================================================
+PHASE 2 RULINGS -- every blocker the fresh planner raised, answered in writing
+before any step of phase 2 is dispatched. 2026-08-03.
+================================================================================
+
+  R-W-7  B-1, COMMIT STRUCTURE. ORCHESTRATOR. Steps 2.1-2.6 COMMIT INDIVIDUALLY, and the CACHE
+        bump is DEFERRED TO STEP 2.6, the last step of the phase.
+        The planner proposed holding 2.2-2.6 as one uncommitted block to satisfy QZ-22's "same
+        commit" literally. I rule against it: crash-only recoverability beats the letter here.
+        Five validated-but-uncommitted steps is exactly the state this machinery exists to avoid.
+        THE PROPERTY QZ-22 PROTECTS is that a DEPLOYED tree never carries changed precached bytes
+        under an unchanged CACHE name. Nothing in phase 2 deploys. W1-1 already deferred one bump
+        on precisely this reasoning, knowingly and on the record, and phase 1 shipped nothing.
+        THE REAL GATE MOVES TO PHASE 3's PRE-FLIGHT, and is now mandatory there: assert that
+        public/sw.js's CACHE differs from the LIVE deployment's CACHE, and that every precached
+        file whose bytes differ from live is covered by that bump. A deferred bump that is never
+        checked at the boundary is how F2-3 happened.
+
+  R-W-8  B-2, LINE ENDINGS OF THE NEW GENERATED FILE. ORCHESTRATOR. public/quiz-strings.js is
+        **LF**, and the extractor writes a bare newline explicitly rather than relying on the
+        platform. It is a GENERATED ARTIFACT, and every generated/scripted file in this repo is
+        LF. The CRLF files under public/ are hand-edited legacy. Pinning LF at birth also keeps
+        phase 3's md5 worktree-vs-live comparison stable, which is the thing that would otherwise
+        bite. Its gate is CR == 0 (NOT CR == LF), and that is stated in the step.
+
+  R-W-9  B-3, IS quiz-strings.js PRECACHED? YES -- AND AN EXISTING TEST ALREADY ENFORCES IT.
+        tests/music.test.js:163 is a SEAM test: "every module a PRECACHED file imports is itself
+        PRECACHED". It was written after the R8 defect where music.js was imported by two
+        precached files without being precached itself, which killed the whole reader OFFLINE --
+        414 passing tests did not see it. quiz.js is precached and will import quiz-strings.js,
+        so the moment step 2.3 lands, that test FAILS unless PRECACHE is updated.
+        CONSEQUENCE FOR THE PLAN, and it is a real ordering defect the planner's own analysis
+        surfaced without seeing: a step must leave the suite GREEN, so the PRECACHE entry for
+        /quiz-strings.js MOVES EARLIER, into step 2.3, together with its expected-array update in
+        tests/shell.test.js. Only the CACHE VERSION BUMP stays in 2.6.
+
+  R-W-10 B-4, NO HINT BUTTON on he-pick, he-type or listen-type. ORCHESTRATOR. Confirmed as the
+        planner proposed. The hint reveals item.sense, which is ENGLISH and often does not exist
+        at all (17 of her 46 words have no bank item). On a Hebrew-prompted question the Hebrew
+        word IS the gloss, so a hint would be absent, redundant, or in the wrong language.
+        cloze-pick keeps its hint button exactly as today.
+
+  R-W-11 B-5, NO SPEAKER on he-type. ORCHESTRATOR. Confirmed. he-type is a WRITING test prompted
+        by Hebrew; giving it audio makes it listen-type, and R5 item 4 is the whole reason the
+        kinds are separated. Recorded as a DELIBERATE omission, not an oversight: a future run
+        may add a speaker AFTER the answer resolves (she has written it, now hear it), which is
+        pedagogically attractive and is NOT in this run's scope.
+
+  R-W-12 B-6, THE FREE RETRY APPLIES TO BOTH TYPED KINDS. ORCHESTRATOR. Confirmed: he-type AND
+        listen-type. R-W-1 names the behaviour, not a kind, and a phone slip is a phone slip
+        whichever prompt produced it.
+
+  R-W-13 B-7, AN EMPTY SUBMISSION IS IGNORED. ORCHESTRATOR -- AND THE PLANNER WAS RIGHT TO CALL
+        THIS THE MOST DANGEROUS UNANSWERED QUESTION IN THE PHASE.
+        A check on an empty or whitespace-only box is a NO-OP: nothing is graded, nothing is
+        posted, no retry is consumed, no strike is recorded, and the card does not change.
+        WHY, and it is not politeness: gradeTyped on an empty string returns 'wrong' by design
+        (step 1.1 asserts empty is never a near-miss), so following the record literally would
+        score a MIS-TAP as a wrong answer. A wrong answer adds a strike; and per R3, strikes sort
+        FIRST and unconditionally in pickQuizWords, so one accidental tap on an empty box would
+        pin a word she actually knows to the front of every future quiz until she got it right
+        again. The cost of the literal reading is the exact defect this run exists to fix,
+        inflicted by accident. An empty box is not an answer. It is the absence of one.
+
+--------------------------------------------------------------------------------
+RECORD GAPS THE PLANNER NAMED -- all seven patched, with measured values
+--------------------------------------------------------------------------------
+
+  G-1  THE VIEW TEST FILES (the record named only a cumulative ledger, never the files):
+       tests/reader-ui.test.js (33) · tests/reader-popup.test.js (1) · tests/words-ui.test.js (15)
+       · tests/quiz-ui.test.js (9) · tests/quiz-core.test.js (8) · tests/quiz-experience.test.js (6)
+  G-2  PER-FILE BASELINE COUNTS at the 494 ledger, for the files phase 2 touches or must not break:
+       quiz-ui 9 · quiz-core 8 · quiz-experience 6 · reader-ui 33 · reader-popup 1 · words-ui 15 ·
+       shell 5 · music 18 · typed-answer 27 · quiz-sampling 8 · he-options 11 · question-kind 15
+       (full per-file table measured 2026-08-03; 56 test files, 494 tests.)
+  G-3  public/quiz.js NON-ASCII BYTE COUNT = **293**, at baea2b8 AND in the worktree now.
+       (blob 8790 bytes CR=0 · worktree 9136 bytes CR=346 -- the count is ending-independent, so
+       the "no new Hebrew was typed" gate is sound in either form.)
+  G-4  THE CONTRAST ANCHOR IN FIELD GUIDE 5 IS STALE AND IS CORRECTED THERE.
+       The code pins **58** PASS lines (tests/quiz-ui.test.js:501). The guide said 52. This is
+       the same class of error that made the guide wrong about sw.js being LF.
+  G-5  reader.js:699, THE WK-3 PRECEDENT, NOW QUOTED IN FULL:
+         <input class="reader-onboard-input" id="heroineName" type="text" dir="ltr"
+                autocomplete="off" autocorrect="off" spellcheck="false" />
+       It sets FIVE attributes. WK-3 requires NINE. The precedent OMITS lang, inputmode,
+       autocapitalize and name. WK-3's claim is confirmed by measurement, not memory.
+  G-6  THE VISUAL-GATE FIXTURE. There is no sandbox profile path on the record because phase 1
+       never ran a visual gate. RULED NOW: the gate runs against a THROWAWAY DATA_DIR created
+       fresh (mktemp -d, outside the repo), exactly as the word-finish follow-on did -- "the
+       restore-the-fixture dance was DESIGNED OUT rather than performed". Nothing of hers is
+       touched, so there is nothing to restore and no md5 to re-verify.
+  G-7  he-pick OPTION COUNT = **6**, not selectHeOptions's default of 4. ORCHESTRATOR ruling.
+       cloze-pick shows six (answer + 5 distractors) and ships that way today; two tapping cards
+       that look structurally different for no reason is a worse screen. She has 45 surviving
+       candidates against the 5 now needed, so buildability is unaffected (measured).
+       CONSEQUENCE: step 2.2 calls selectHeOptions(lemma, words, rand, 6) and MUST TEST at
+       count=6 -- step 1.3 asserted "length is exactly count" only at the default 4.
+
+--------------------------------------------------------------------------------
+MY REVIEW OF THE FRESH PLANNER'S PLAN -- what I changed, and what I kept
+--------------------------------------------------------------------------------
+KEPT, because they are better than what I would have written:
+  · The six-step decomposition, and specifically splitting quiz.js along the pure/stateful line,
+    because those two halves need DIFFERENT harnesses (2.3 needs none, 2.4 needs fakeContainer).
+  · The non-ASCII byte-count equality on quiz.js as the MECHANICAL form of "no new Hebrew was
+    typed by anyone". I had stated that rule in prose with no way to enforce it.
+  · scripts/subsequence-check.mjs, and its allowlist re-expression for step 2.4 -- which correctly
+    anticipates that 2.4 MUST edit pre-existing lines and that my phase-1 boundary check would
+    therefore have failed it. That is field guide 22 applied before the collision, not after.
+  · Making the design file itself the ORACLE in the Hebrew test (re-parse the block at test time
+    and Buffer.compare), so there is no re-typed literal anywhere that can drift.
+  · Asserting the frozen cloze-pick card by STRING EQUALITY against the baea2b8 render, rather
+    than by "contains".
+CHANGED:
+  · R-W-7 (commit structure) -- individual commits, not one held block.
+  · R-W-9 -- the PRECACHE entry moves into 2.3, because music.test.js's existing seam test would
+    otherwise make 2.3 leave the suite RED.
+  · G-7 -- he-pick shows 6 options, not 4.
+  · Scratch files move OUT of the repo (field guide 4 forbids scratch in the repo; the plan used
+    ./.old-quiz.tmp). Absolute scratch paths are frozen into each packet.

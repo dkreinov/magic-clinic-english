@@ -31,8 +31,14 @@
    only the working tree you measured is evidence (measured live, word-trophies phase 1).
 5. `npm test` = bare `node --test` + the contrast gate; every new test is a FLAT top-level
    `test()`; pin the exact cumulative ledger per step (298 at the phase-2 close = 293 flat + 5
-   subtests in dev-server.test.js). Contrast anchor = `grep -c '^PASS'` = 52 (bare `PASS` gives
-   53). `color-mix()` FABRICATES a contrast pass; a raw hex is invisible to the gate.
+   subtests in dev-server.test.js). `color-mix()` FABRICATES a contrast pass; a raw hex is
+   invisible to the gate.
+   *** CONTRAST ANCHOR CORRECTED 2026-08-03 (word-write, phase-2 planning). This line said 52.
+   THE CODE PINS 58 -- tests/quiz-ui.test.js:501, `assert.strictEqual(passLines.length, 58)`,
+   counting lines that START WITH `PASS`. It was found by a fresh planner that went and read the
+   assertion instead of trusting this guide. A STALE ANCHOR IN THIS FILE IS THE SAME DEFECT AS
+   lesson 4's wrong claim that sw.js was LF: a remembered number, written down once, believed
+   afterwards by everyone. MEASURE THE PIN IN THE TEST, never quote it from here. ***
 6. Validation chains: `set -o pipefail`; capture to variables, match with `case`; `LC_ALL=C sort`;
    `cmd | grep -q` SIGPIPEs under pipefail. Put the file-boundary check in the STEP's script.
 7. Before touching a view/style/data file, grep `tests/` for exact-shape assertions (the `CACHE`
