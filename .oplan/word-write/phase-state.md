@@ -381,3 +381,7 @@ PHASE 3 -- SHIPPED. 2026-08-03.
     I cannot drive her actual phone keyboard from this machine. All nine input attributes are
     set and were verified in a phone-width browser, but "her phone really stops suggesting the
     answer" is verifiable only by her. If it still autocompletes, that is the thing to report.
+
+  R-F6-2 UPDATE 2026-08-04: spent origins now include 3500, 3600 and 3700.
+        NEXT FREE: 3800. 3600 was burned during the audio diagnosis; 3700 was used to verify
+        the .aac MIME fix. A visual gate that finds a defect always costs at least two origins.

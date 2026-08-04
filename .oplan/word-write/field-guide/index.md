@@ -286,3 +286,22 @@
     from the WRITTEN FILE. No glyph and no backslash ever crosses the boundary. Verify afterwards
     with two independent counts: raw glyphs in range U+0590-U+05FF must be 0, and non-ASCII bytes
     must be 0.
+
+35  A VISUAL GATE THAT DOES NOT PRESS THE BUTTON HAS NOT TESTED THE BUTTON.
+    word-write's phase-2 gate checked that the speaker button RENDERED on the listen-and-type
+    card, at the right size, with the right data-say. It never CLICKED it. The owner clicked it
+    in ten seconds and heard nothing.
+    THE CAUSE WAS NOT THE FEATURE: scripts/dev-server.js's MIME_TYPES had no '.aac' entry, so
+    every one of the 2266 word clips was served as application/octet-stream, and browsers REFUSE
+    to play audio labelled that way (new Audio() -> MEDIA_ERR_SRC_NOT_SUPPORTED). The app
+    swallows that by design ("a missing clip must never break the dictionary"), so it fails
+    SILENTLY. '.mp3' had been added when the music feature shipped; '.aac' was never noticed
+    because nobody had ever pressed a speaker on a dev server.
+    CONSEQUENCE, and it is larger than the bug: EVERY local audio check this project has ever
+    run was measuring nothing. Production was always fine (audio/x-aac), so the gap could only
+    ever be found by a human pressing a button locally.
+    THE HABIT: for any control the child OPERATES -- a speaker, a submit, a next -- the gate must
+    OPERATE IT, not observe that it exists. Field guide 15(a) in the instrument rather than the
+    code: existence is not effect, and that applies to gates too.
+    AND CHECK THE MIME TYPE, not just the HTTP status: 200 with the wrong Content-Type is a
+    successful request that cannot be played. curl -D - and read the header.
