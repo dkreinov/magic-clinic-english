@@ -151,9 +151,25 @@ if (process.argv[1] && process.argv[1].endsWith("check-record-privacy.mjs")) {
   if (src && existsSync(src)) {
     try {
       const p = JSON.parse(readFileSync(src, "utf8"));
-      const w = Object.keys(p.words || {}).map((k) => k.toLowerCase()).filter((k) => /^[a-z]{2,20}$/.test(k));
+      // GET /api/profile answers {ok, data:{...}}; a file saved straight from that
+      // endpoint is therefore WRAPPED. This originally read p.words only, so against
+      // a real capture it silently found ZERO words, fell back to tripwire-only and
+      // exited 0 -- the strongest mode of the control that guards her vocabulary had
+      // never once run. Accept both shapes. (Found 2026-08-10; the same wrong
+      // assumption about this payload's shape also produced a "0 known words" reading
+      // from a 30 KB file during the word-write run. Measure the shape, never recall it.)
+      const words = (p && p.words) || (p && p.data && p.data.words) || {};
+      const w = Object.keys(words).map((k) => k.toLowerCase()).filter((k) => /^[a-z]{2,20}$/.test(k));
       if (w.length) exact = w;
     } catch { /* fall through to tripwire-only, and say so below */ }
+  }
+  // FAIL LOUD, NOT OPEN. Asking for the exact pass and silently not getting it is
+  // worse than not asking: the run reports "nothing tripped" and reads like proof.
+  if (src && !exact) {
+    console.error("RECORD PRIVACY: LEARNER_PROFILE was set to " + src +
+      " but no usable word list came out of it -- refusing to pass.");
+    console.error("  A silent fallback to tripwire-only is how a leak gets waved through.");
+    process.exit(2);
   }
 
   let found;
