@@ -385,3 +385,20 @@ PHASE 3 -- SHIPPED. 2026-08-03.
   R-F6-2 UPDATE 2026-08-04: spent origins now include 3500, 3600 and 3700.
         NEXT FREE: 3800. 3600 was burned during the audio diagnosis; 3700 was used to verify
         the .aac MIME fix. A visual gate that finds a defect always costs at least two origins.
+
+  W1-2  *** DISCHARGED 2026-08-11, BY THE ONLY INSTRUMENT THAT COULD DISCHARGE IT: HER PHONE. ***
+        The owner confirmed the keyboard offers NO suggestions in the answer box. She types the
+        word herself, which is the whole point of R5.
+        This was the run's one claim that shipped UNPROVED, stated plainly on the owner's page
+        rather than buried, because nothing on this machine can drive her keyboard. It is now
+        closed from a real device, not from an argument.
+        WHAT THIS CONFIRMS FOR ANY FUTURE INPUT (worth more than the ticket):
+        the WK-3 nine-attribute set genuinely defeats a real mobile keyboard --
+          type="text" dir="ltr" lang="en" inputmode="text"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+          name="q-<per-question random token>"
+        The RANDOM NAME is the load-bearing part and it is the piece the existing precedent at
+        reader.js:699 lacks: mobile Safari and Chrome ignore autocomplete="off" on a field name
+        they recognise and re-offer the previous value, so a name they have never seen has
+        nothing to offer. reader.js:699 sets only FIVE of the nine and omits autocapitalize
+        entirely -- if those onboarding name fields ever misbehave, this is why.

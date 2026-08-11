@@ -196,3 +196,17 @@ for her?** If it does, that is a small fix and I would want to know.
 
 Also worth asking her, since it is the whole point: does having to write the word feel better or
 worse than tapping one?
+
+---
+
+## 2026-08-11 — the last open question, answered by her phone
+
+**The one thing I could not prove is now proved.** You checked: the keyboard offers no suggestions
+in the answer box. She types the word herself, which was the entire point of what she asked for.
+
+That was the only claim this run shipped without evidence, and it was stated plainly at the time
+rather than buried — because nothing on this machine can drive her keyboard. It is closed now from
+a real phone, which is the only instrument that could close it.
+
+**The run is finished.** Everything she asked for in R5 is live and confirmed, except writing whole
+sentences, which she asked for, which is recorded, and which nobody has scheduled yet.

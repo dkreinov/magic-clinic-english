@@ -181,12 +181,14 @@ page cannot — this is the hard part and it must not be hand-waved)?
 worktree vs live. Design at `.oplan/word-write/design.md`.
 
 - **(1) typing questions — SHIPPED.** Two of the four question kinds make her write the word.
-- **(2) autocomplete off — SHIPPED, WITH A STATED RESIDUAL.** All nine attributes are set
-  (`autocomplete`, `autocorrect`, `autocapitalize`, `spellcheck`, plus a per-question random
-  `name`, which is the part that actually defeats mobile Safari — it re-offers previous values for
-  any field name it recognises). The precedent at `reader.js:699` sets only five and omits
-  `autocapitalize`. **NOT PROVED ON HER PHONE** — that is verifiable only by her, and it is the
-  one open question of this run. Ask her whether the phone still finishes the word for her.
+- **(2) autocomplete off — SHIPPED, AND CONFIRMED ON HER PHONE 2026-08-11.** All nine attributes
+  are set (`autocomplete`, `autocorrect`, `autocapitalize`, `spellcheck`, plus a per-question
+  random `name`, which is the part that actually defeats mobile Safari — it re-offers previous
+  values for any field name it recognises). The precedent at `reader.js:699` sets only five and
+  omits `autocapitalize`. **The owner verified on the real device: the keyboard offers no
+  suggestions in the answer box.** This was the run's one unproved claim (obligation W1-2) and it
+  is now closed from a real phone rather than from an argument — nothing on the build machine can
+  drive her keyboard.
 - **(3) Hebrew → English — SHIPPED, both ways she asked for.** `he-pick` (tap the English) and
   `he-type` (write it). Options are drawn from her own words and can never include a word that
   means the same Hebrew word as the answer — the `light`/`computer` defect, designed out by

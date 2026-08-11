@@ -288,3 +288,20 @@ PHASE 3 -- SHIPPED. 2026-08-03.
     code: existence is not effect, and that applies to gates too.
     AND CHECK THE MIME TYPE, not just the HTTP status: 200 with the wrong Content-Type is a
     successful request that cannot be played. curl -D - and read the header.
+
+  W1-2  *** DISCHARGED 2026-08-11, BY THE ONLY INSTRUMENT THAT COULD DISCHARGE IT: HER PHONE. ***
+        The owner confirmed the keyboard offers NO suggestions in the answer box. She types the
+        word herself, which is the whole point of R5.
+        This was the run's one claim that shipped UNPROVED, stated plainly on the owner's page
+        rather than buried, because nothing on this machine can drive her keyboard. It is now
+        closed from a real device, not from an argument.
+        WHAT THIS CONFIRMS FOR ANY FUTURE INPUT (worth more than the ticket):
+        the WK-3 nine-attribute set genuinely defeats a real mobile keyboard --
+          type="text" dir="ltr" lang="en" inputmode="text"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+          name="q-<per-question random token>"
+        The RANDOM NAME is the load-bearing part and it is the piece the existing precedent at
+        reader.js:699 lacks: mobile Safari and Chrome ignore autocomplete="off" on a field name
+        they recognise and re-offer the previous value, so a name they have never seen has
+        nothing to offer. reader.js:699 sets only FIVE of the nine and omits autocapitalize
+        entirely -- if those onboarding name fields ever misbehave, this is why.
