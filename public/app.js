@@ -3,6 +3,7 @@ import { render as renderPlacement } from "./views/placement.js";
 import { render as renderReader } from "./views/reader.js";
 import { render as renderTrophies } from "./views/trophies.js";
 import { render as renderWords } from "./views/words.js";
+import { render as renderExamWords } from "./views/exam-words.js";
 import { isMuted, setMuted, start as musicStart, prime as musicPrime } from "./music.js";
 
 // R8. Both icons are PURE ASCII inline SVG. FC-7 measures "no new Hebrew" as raw
@@ -64,6 +65,7 @@ const ROUTES = {
   "/reader": renderReader,
   "/trophies": renderTrophies,
   "/words": renderWords,
+  "/exam-words": renderExamWords,
 };
 
 const OWNER_ROUTE = "/parent";

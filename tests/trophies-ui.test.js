@@ -380,12 +380,12 @@ test('app.js routes /trophies to the trophies view, keeps /placement tab-less an
   assert.ok(!html.includes('data-route="/placement"'), '/placement must stay tab-less');
 });
 
-test('index.html carries exactly four nav tabs and the trophies tab is last, after the words tab', () => {
+test('index.html carries exactly five nav tabs and the trophies tab is last, after the words tab', () => {
   const html = readFileSync(t33IndexPath, 'utf8');
   const TITLE = '\u05d4\u05d2\u05d1\u05d9\u05e2\u05d9\u05dd \u05e9\u05dc\u05d9';
   assert.strictEqual(TITLE.length, 11, 'the extracted tab label is eleven characters');
 
-  assert.strictEqual(html.split('class="nav-tab"').length - 1, 4, 'expected exactly four nav tabs');
+  assert.strictEqual(html.split('class="nav-tab"').length - 1, 5, 'expected exactly five nav tabs');
 
   const trophiesAt = html.indexOf('data-route="/trophies"');
   const wordsAt = html.indexOf('data-route="/words"');

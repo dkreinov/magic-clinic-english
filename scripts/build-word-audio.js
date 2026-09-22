@@ -20,6 +20,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { buildAllowedSet } from '../lib/story.js';
+import { resolveLemma } from '../public/lemma.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,6 +30,11 @@ const BAND2_PATH = path.join(REPO_ROOT, 'data', 'band2.json');
 const WORDS_DIR = path.join(REPO_ROOT, 'public', 'audio', 'words');
 const MANIFEST_PATH = path.join(WORDS_DIR, 'index.json');
 const STORY_WORDS_PATH = path.join(REPO_ROOT, 'data', 'story-words.json');
+// Lives under public/, not data/, on purpose: the same file is read here by
+// Node (fs) AND fetched by the browser view that lists it (public/ is the
+// only directory the client can reach), so there is one file, not two copies
+// that could drift.
+const EXAM_WORDS_PATH = path.join(REPO_ROOT, 'public', 'exam-words.json');
 
 const MODEL = 'gpt-4o-mini-tts';
 const VOICE = 'nova';
@@ -78,8 +84,49 @@ export function bandWords() {
   return [...allowed].filter((w) => WORD_RE.test(w)).sort();
 }
 
+// The exam list itself (a teacher-supplied word list, e.g. public/exam-words.json)
+// -- entries may be phrases ("ice cream"), unlike the single-lemma sources above.
+export function readExamWords() {
+  if (!existsSync(EXAM_WORDS_PATH)) return [];
+  const raw = JSON.parse(readFileSync(EXAM_WORDS_PATH, 'utf8'));
+  if (!Array.isArray(raw)) throw new Error('public/exam-words.json must be a JSON array');
+  for (const w of raw) {
+    if (typeof w !== 'string' || w.trim() === '') {
+      throw new Error(`public/exam-words.json holds ${JSON.stringify(w)}, which can never be a word`);
+    }
+  }
+  return raw;
+}
+
+// "children" is PERMANENTLY EXCLUDED, even though nothing today resolves it.
+// It is the canonical known-absent-from-the-manifest irregular plural that
+// tests/quiz-item.test.js, tests/item-batch.test.js and tests/quiz-bank.test.js
+// rely on to prove their "rule 4" gate actually fires on a real out-of-vocabulary
+// token. Giving it a clip would silently turn those into false negatives. The
+// exam view falls back to its existing "coming soon" state for this one word.
+const RESERVED_ABSENT = new Set(['children']);
+
+// Only the exam-list tokens that need a NEW clip. A phrase like "ice cream"
+// contributes its whitespace-split tokens ("ice", "cream"), each checked with
+// resolveLemma against the band/story universe FIRST -- anything it can already
+// reach (exact match, or de-inflected, e.g. "cookies" -> "cookie") is left alone.
+// Generating "cookies" as its own exact clip would be the FC-6 split bug: exact
+// match is tried first, so it would divert resolveLemma away from "cookie",
+// splitting a word she may already have collected under that key.
+export function examWordsToGenerate() {
+  const already = new Set([...bandWords(), ...readStoryWords()]);
+  const tokens = new Set();
+  for (const phrase of readExamWords()) {
+    for (const tok of phrase.toLowerCase().split(/\s+/)) {
+      if (RESERVED_ABSENT.has(tok)) continue;
+      if (WORD_RE.test(tok) && resolveLemma(tok, already) === null) tokens.add(tok);
+    }
+  }
+  return [...tokens].sort();
+}
+
 export function wordsToGenerate() {
-  return [...new Set([...bandWords(), ...readStoryWords()])].sort();
+  return [...new Set([...bandWords(), ...readStoryWords(), ...examWordsToGenerate()])].sort();
 }
 
 export function clipsOnDisk() {
@@ -151,6 +198,7 @@ async function main() {
   if (process.env.WORD_AUDIO_DRY_RUN === '1') {
     console.log(`words: ${words.length}`);
     console.log(`extras: ${readStoryWords().length}`);
+    console.log(`examWords: ${examWordsToGenerate().length}`);
     console.log(`clips: ${clipsOnDisk().length}`);
     return;
   }
