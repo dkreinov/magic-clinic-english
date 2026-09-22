@@ -127,12 +127,12 @@ test('sentence shape: rules 3, 6 and 10', () => {
 });
 
 test('rule 4 names the offending token, and rule 5 bounds the word count', () => {
-  // "children" is VERIFIED absent from the manifest -- irregular plurals are
+  // "men" is VERIFIED absent from the manifest -- irregular plurals are
   // exactly the trap rule 4 exists to catch.
-  const res = validateItem(feel({ sentence: 'I ___ the children with my hand.' }), ctx);
+  const res = validateItem(feel({ sentence: 'I ___ the men with my hand.' }), ctx);
   assert.ok(broke(res, 4), why(res));
   assert.ok(
-    res.errors.some((e) => e.startsWith('rule 4:') && e.includes('children')),
+    res.errors.some((e) => e.startsWith('rule 4:') && e.includes('men')),
     `rule 4 must name the offending token, got: ${why(res)}`
   );
 
@@ -164,11 +164,11 @@ test('rule 7: exactly 8 distinct distractors, none the answer, all in the manife
   assert.ok(broke(isAnswer, 7), why(isAnswer));
 
   const absent = validateItem(
-    feel({ distractors: ['children', 'sing', 'open', 'carry', 'paint', 'climb', 'wash', 'count'] }),
+    feel({ distractors: ['men', 'sing', 'open', 'carry', 'paint', 'climb', 'wash', 'count'] }),
     ctx
   );
   assert.ok(broke(absent, 7), why(absent));
-  assert.ok(absent.errors.some((e) => e.includes('children')), why(absent));
+  assert.ok(absent.errors.some((e) => e.includes('men')), why(absent));
 });
 
 test('rule 8: pos is a SET unioned across both bands, and empty means exempt', () => {
@@ -370,10 +370,10 @@ test('rule 4 hardened: the characters tokenize DISCARDS can no longer pass', () 
   assert.ok(broke(padded, 4), `rule-5 padding must now trip rule 4, got: ${why(padded)}`);
 
   // The pre-existing token check is UNCHANGED, and so is its bare-list format:
-  // downstream workers parse "rule 4: children" and must keep being able to.
-  const token = validateItem(feel({ sentence: 'I ___ the children with my hand.' }), ctx);
+  // downstream workers parse "rule 4: men" and must keep being able to.
+  const token = validateItem(feel({ sentence: 'I ___ the men with my hand.' }), ctx);
   assert.ok(
-    token.errors.includes('rule 4: children'),
+    token.errors.includes('rule 4: men'),
     `the bare rule-4 token format must survive verbatim, got: ${why(token)}`
   );
   assert.ok(

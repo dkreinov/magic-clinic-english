@@ -103,14 +103,6 @@ export function readExamWords() {
   return words;
 }
 
-// "children" is PERMANENTLY EXCLUDED, even though nothing today resolves it.
-// It is the canonical known-absent-from-the-manifest irregular plural that
-// tests/quiz-item.test.js, tests/item-batch.test.js and tests/quiz-bank.test.js
-// rely on to prove their "rule 4" gate actually fires on a real out-of-vocabulary
-// token. Giving it a clip would silently turn those into false negatives. The
-// exam view falls back to its existing "coming soon" state for this one word.
-const RESERVED_ABSENT = new Set(['children']);
-
 // Only the exam-list tokens that need a NEW clip. A phrase like "ice cream"
 // contributes its whitespace-split tokens ("ice", "cream"), each checked with
 // resolveLemma against the band/story universe FIRST -- anything it can already
@@ -118,12 +110,18 @@ const RESERVED_ABSENT = new Set(['children']);
 // Generating "cookies" as its own exact clip would be the FC-6 split bug: exact
 // match is tried first, so it would divert resolveLemma away from "cookie",
 // splitting a word she may already have collected under that key.
+//
+// tests/quiz-item.test.js, tests/item-batch.test.js and tests/quiz-bank.test.js
+// need ONE word that is permanently, verifiably absent from the manifest, to
+// prove their "rule 4" gate actually fires on a real out-of-vocabulary token.
+// That word is "men" (an irregular plural, chosen because it can never collide
+// with a real exam/curriculum word) -- it is deliberately never generated, by
+// never being in any source this function reads, not by a special-case here.
 export function examWordsToGenerate() {
   const already = new Set([...bandWords(), ...readStoryWords()]);
   const tokens = new Set();
   for (const phrase of readExamWords()) {
     for (const tok of phrase.toLowerCase().split(/\s+/)) {
-      if (RESERVED_ABSENT.has(tok)) continue;
       if (WORD_RE.test(tok) && resolveLemma(tok, already) === null) tokens.add(tok);
     }
   }

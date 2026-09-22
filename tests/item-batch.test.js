@@ -278,15 +278,15 @@ test('--stage walks every batch-*/ directory, not just the first', () => {
 });
 
 test('--stage fails on a staged file that breaks the contract, and names it', () => {
-  // "children" is verified absent from the manifest, so this trips rule 4.
-  const broken = { ...KIND, sentence: 'The ___ girl gave the children some warm milk.' };
+  // "men" is verified absent from the manifest, so this trips rule 4.
+  const broken = { ...KIND, sentence: 'The ___ girl gave the men some warm milk.' };
   const result = withFiles(stage({ 'batch-2/kind.json': [broken] }), (dir) => runBatch('--stage', dir));
   assert.equal(result.status, 1, `expected exit 1, got ${result.status}: ${out(result)}`);
   assert.ok(
     result.stdout.includes('batch-2/kind.json[0] rule 4:'),
     `a problem must name its batch, file, item and rule, got: ${result.stdout}`
   );
-  assert.ok(result.stdout.includes('children'), `rule 4 must name the offending token, got: ${result.stdout}`);
+  assert.ok(result.stdout.includes('men'), `rule 4 must name the offending token, got: ${result.stdout}`);
   assert.ok(result.stdout.includes('BATCH FAILED: '), `missing the FAILED line, got: ${result.stdout}`);
   // The counts still print. A gate that fails without saying what it observed
   // leaves the next reader with nothing to act on.

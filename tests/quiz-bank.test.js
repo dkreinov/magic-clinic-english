@@ -82,8 +82,8 @@ test('a legal fixture bank passes the gate and is counted', () => {
 });
 
 test('a broken item fails the gate and the output names the rule and the token', () => {
-  // "children" is verified absent from the manifest, so this trips rule 4.
-  const broken = { ...FEEL_TOUCH, sentence: 'I ___ the children with my hand.' };
+  // "men" is verified absent from the manifest, so this trips rule 4.
+  const broken = { ...FEEL_TOUCH, sentence: 'I ___ the men with my hand.' };
   const result = withBank({ ...GOOD_BANK, 'feel.json': [broken] }, (dir) => run('--dir', dir));
   assert.equal(result.status, 1, `expected exit 1, got ${result.status}: ${result.stdout}`);
   assert.ok(
@@ -91,7 +91,7 @@ test('a broken item fails the gate and the output names the rule and the token',
     `a problem must name its file, item and rule, got: ${result.stdout}`
   );
   assert.ok(
-    result.stdout.includes('children'),
+    result.stdout.includes('men'),
     `rule 4 must name the offending token, got: ${result.stdout}`
   );
   assert.ok(result.stdout.includes('QUIZ BANK FAILED: '), `missing the FAILED line, got: ${result.stdout}`);

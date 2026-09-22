@@ -241,13 +241,13 @@ const manifestPath = path.join(clipsDir, 'index.json');
 test('every word in the audio manifest has a clip on disk, and every clip is in the manifest', () => {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
   assert.ok(Array.isArray(manifest), 'the audio manifest must be a JSON array');
-  assert.strictEqual(manifest.length, 2269, 'the manifest must list exactly 2269 words');
+  assert.strictEqual(manifest.length, 2270, 'the manifest must list exactly 2270 words');
 
   const files = readdirSync(clipsDir);
-  assert.strictEqual(files.length, 2270, 'public/audio/words holds 2269 clips plus index.json');
+  assert.strictEqual(files.length, 2271, 'public/audio/words holds 2270 clips plus index.json');
 
   const clips = new Set(files.filter((f) => f.endsWith('.aac')).map((f) => f.slice(0, -4)));
-  assert.strictEqual(clips.size, 2269, 'there must be exactly 2269 .aac clips on disk');
+  assert.strictEqual(clips.size, 2270, 'there must be exactly 2270 .aac clips on disk');
 
   // Name the offenders. This is the invariant phase 2 is about to stress, so a
   // failure has to say WHICH word broke it, not merely that something did.
@@ -334,7 +334,7 @@ test('resolveLemma only ever returns a word that has a clip, so a speaker button
     );
   }
 
-  assert.ok(inputs.length > 2269, `the sweep must drive more than 2269 inputs, drove ${inputs.length}`);
+  assert.ok(inputs.length > 2270, `the sweep must drive more than 2270 inputs, drove ${inputs.length}`);
   assert.ok(nulls > 0, 'negative control: a sweep where nothing ever resolves to null passes vacuously');
 });
 
@@ -357,7 +357,7 @@ test('the browser and the server read the SAME word list, and the button plays t
   assert.ok(existsSync(browserFile), 'the shared manifest file must exist');
   const browserWords = JSON.parse(readFileSync(browserFile, 'utf8'));
   const serverWords = JSON.parse(readFileSync(serverFile, 'utf8'));
-  assert.strictEqual(browserWords.length, 2269, 'the shared list is 2269 words long');
+  assert.strictEqual(browserWords.length, 2270, 'the shared list is 2270 words long');
   assert.deepStrictEqual(
     serverWords,
     browserWords,

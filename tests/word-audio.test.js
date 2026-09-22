@@ -52,11 +52,9 @@ test('the generator derives its word list from the band data and a data file, ne
 test('the generator also derives an exam-words source, still never hardcoded', () => {
   const src = readFileSync(scriptPath, 'utf8');
   assert.ok(src.includes('exam-words.json'), 'the exam words must come from a data file');
-  for (const w of ['sofa', 'afternoon', 'fireman']) {
+  for (const w of ['sofa', 'afternoon', 'fireman', 'children']) {
     assert.ok(!src.includes(`'${w}'`), `the exam word '${w}' is hardcoded in the generator`);
   }
-  // 'children' IS a deliberate literal -- RESERVED_ABSENT, not a generation target.
-  assert.ok(src.includes('RESERVED_ABSENT'), 'children must be excluded by a named, commented constant');
 });
 
 test('the generator is resumable and retries', () => {
@@ -78,24 +76,21 @@ test('dry run reports the derived word count without a network call', () => {
   // first: 18122 surface forms swept, 10 gains, 0 regressions, 0 key splits, and
   // migrateWordKeys leaves her keys and taps identical. `sparkling` still resolves to
   // itself, because resolveLemma tries an exact match before de-inflecting.
-  assert.ok(out.includes('words: 2269'), `words line wrong: ${out}`);
+  assert.ok(out.includes('words: 2270'), `words line wrong: ${out}`);
   assert.ok(out.includes('extras: 12'), `extras line wrong: ${out}`);
-  assert.ok(out.includes('examWords: 3'), `examWords line wrong: ${out}`);
-  assert.ok(out.includes('clips: 2269'), `clips line wrong: ${out}`);
+  assert.ok(out.includes('examWords: 4'), `examWords line wrong: ${out}`);
+  assert.ok(out.includes('clips: 2270'), `clips line wrong: ${out}`);
 });
 
 // Grade-6 exam words (public/exam-words.json), Oct 2025. "ice cream" is a phrase,
 // not a lemma file -- it must contribute its tokens, not itself. "cookies" must
 // NOT appear: resolveLemma already reaches it via "cookie" (see FC-6 above), so
 // examWordsToGenerate() must leave it alone rather than giving it a splitting
-// exact clip. "children" must ALSO never appear: it is the reserved
-// known-absent-from-the-manifest fixture the quiz-item/item-batch/quiz-bank
-// suites depend on (see RESERVED_ABSENT in the script).
-test('examWordsToGenerate() is exactly the exam words with no existing clip, minus the reserved fixture', () => {
-  assert.deepStrictEqual(examWordsToGenerate(), ['afternoon', 'fireman', 'sofa']);
+// exact clip.
+test('examWordsToGenerate() is exactly the exam words with no existing clip', () => {
+  assert.deepStrictEqual(examWordsToGenerate(), ['afternoon', 'children', 'fireman', 'sofa']);
   const examTokens = new Set(examWordsToGenerate());
   assert.ok(!examTokens.has('cookies'), 'cookies already resolves to "cookie" and must not get its own clip');
-  assert.ok(!examTokens.has('children'), 'children is the reserved known-absent fixture and must never get a clip');
   assert.ok(!examTokens.has('ice cream'), '"ice cream" is a phrase, not a lemma -- it must split into tokens');
 });
 
