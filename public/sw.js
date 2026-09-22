@@ -1,4 +1,4 @@
-const CACHE = "magic-vet-v27";
+const CACHE = "magic-vet-v28";
 // The background music is stored ONCE and must OUTLIVE every version bump, so it
 // is deliberately NOT part of CACHE and is spared by the activate sweep below.
 // Precaching it instead would spend 4 MB on EVERY deploy, for a feature that is
@@ -22,6 +22,7 @@ const PRECACHE = [
   "/views/words.js",
   "/views/trophies.js",
   "/views/exam-words.js",
+  "/match-game.js",
   "/exam-words.json",
   "/manifest.webmanifest",
   "/icons/icon.svg"

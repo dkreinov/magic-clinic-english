@@ -103,9 +103,20 @@ test('renderCards: know button only on learning/candidate, badge only when a pro
   assert.ok(withoutProfile.includes('BAKED'), 'falls back entirely to the pre-baked translations');
 });
 
-test('renderCards escapes he and word text', () => {
+test('renderCards shows the example sentence, sourced from exam-words.json only, never the profile', () => {
   const allowed = new Set();
-  const html = renderCards([{ word: 'x', he: '<script>&' }], allowed, null);
+  const withSentence = renderCards([{ word: 'sofa', he: 'x', sentence: 'I sit on the sofa.' }], allowed, null);
+  assert.ok(withSentence.includes('exam-card-sentence'));
+  assert.ok(withSentence.includes('I sit on the sofa.'));
+
+  const noSentence = renderCards([{ word: 'sofa', he: 'x' }], allowed, null);
+  assert.ok(!noSentence.includes('exam-card-sentence'), 'no sentence paragraph when the entry has none');
+});
+
+test('renderCards escapes he, word and sentence text', () => {
+  const allowed = new Set();
+  const html = renderCards([{ word: 'x', he: '<script>&', sentence: '<b>bad</b>' }], allowed, null);
   assert.ok(!html.includes('<script>'), 'he must be escaped, not rendered raw');
+  assert.ok(!html.includes('<b>bad</b>'), 'sentence must be escaped, not rendered raw');
   assert.ok(html.includes('&lt;script&gt;'));
 });

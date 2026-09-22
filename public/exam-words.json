@@ -1,206 +1,257 @@
 [
   {
     "word": "sell",
-    "he": "למכור"
+    "he": "למכור",
+    "sentence": "I sell cookies at the school fair."
   },
   {
     "word": "lemonade",
-    "he": "לימונדה"
+    "he": "לימונדה",
+    "sentence": "I drink cold lemonade on hot days."
   },
   {
     "word": "children",
-    "he": "ילדים"
+    "he": "ילדים",
+    "sentence": "The children play in the park."
   },
   {
     "word": "play",
-    "he": "לשחק"
+    "he": "לשחק",
+    "sentence": "I play soccer with my friends."
   },
   {
     "word": "morning",
-    "he": "בוקר"
+    "he": "בוקר",
+    "sentence": "I eat breakfast every morning."
   },
   {
     "word": "park",
-    "he": "פארק"
+    "he": "פארק",
+    "sentence": "We play soccer in the park."
   },
   {
     "word": "eighty",
-    "he": "שמונים"
+    "he": "שמונים",
+    "sentence": "There are eighty stars in the sky."
   },
   {
     "word": "ninety",
-    "he": "תשעים"
+    "he": "תשעים",
+    "sentence": "My grandma is ninety years old."
   },
   {
     "word": "horse",
-    "he": "סוס"
+    "he": "סוס",
+    "sentence": "I see a horse on the farm."
   },
   {
     "word": "fly",
-    "he": "לעוף"
+    "he": "לעוף",
+    "sentence": "Birds fly in the sky every day."
   },
   {
     "word": "doctor",
-    "he": "רופא"
+    "he": "רופא",
+    "sentence": "The doctor helps sick people feel better."
   },
   {
     "word": "hospital",
-    "he": "ביתחולים"
+    "he": "ביתחולים",
+    "sentence": "My sister went to the hospital yesterday."
   },
   {
     "word": "hungry",
-    "he": "רעב"
+    "he": "רעב",
+    "sentence": "I feel hungry after school today."
   },
   {
     "word": "night",
-    "he": "לילה"
+    "he": "לילה",
+    "sentence": "I read a book at night."
   },
   {
     "word": "bathroom",
-    "he": "אמבטיה"
+    "he": "אמבטיה",
+    "sentence": "I clean the bathroom every Saturday."
   },
   {
     "word": "cookies",
-    "he": "עוגיות"
+    "he": "עוגיות",
+    "sentence": "I baked cookies for my friends."
   },
   {
     "word": "sleep",
-    "he": "שינה"
+    "he": "שינה",
+    "sentence": "I sleep eight hours every night."
   },
   {
     "word": "kind",
-    "he": "טוב"
+    "he": "טוב",
+    "sentence": "She is kind to her little brother."
   },
   {
     "word": "king",
-    "he": "מלך"
+    "he": "מלך",
+    "sentence": "The king wears a shiny crown."
   },
   {
     "word": "restaurant",
-    "he": "מסעדה"
+    "he": "מסעדה",
+    "sentence": "We eat dinner at the restaurant."
   },
   {
     "word": "clinic",
-    "he": "מרפאה"
+    "he": "מרפאה",
+    "sentence": "I go to the clinic when I am sick."
   },
   {
     "word": "vet",
-    "he": "וטרינר"
+    "he": "וטרינר",
+    "sentence": "The vet helps sick animals feel better."
   },
   {
     "word": "tea",
-    "he": "תה"
+    "he": "תה",
+    "sentence": "I like to drink hot tea."
   },
   {
     "word": "tomato",
-    "he": "עגבנייה"
+    "he": "עגבנייה",
+    "sentence": "I eat a red tomato every day."
   },
   {
     "word": "candy",
-    "he": "סוכריה"
+    "he": "סוכריה",
+    "sentence": "I like to eat candy after school."
   },
   {
     "word": "chicken",
-    "he": "עוף"
+    "he": "עוף",
+    "sentence": "I eat chicken for dinner today."
   },
   {
     "word": "sofa",
-    "he": "ספה"
+    "he": "ספה",
+    "sentence": "I sit on the sofa to read."
   },
   {
     "word": "nineteen",
-    "he": "תשעה-עשר"
+    "he": "תשעה-עשר",
+    "sentence": "She has nineteen pencils in her box."
   },
   {
     "word": "twenty",
-    "he": "עשרים"
+    "he": "עשרים",
+    "sentence": "I have twenty pencils in my box."
   },
   {
     "word": "summer",
-    "he": "קיץ"
+    "he": "קיץ",
+    "sentence": "We go to the beach every summer."
   },
   {
     "word": "evening",
-    "he": "ערב"
+    "he": "ערב",
+    "sentence": "We eat dinner together every evening."
   },
   {
     "word": "afternoon",
-    "he": "אחר הצהריים"
+    "he": "אחר הצהריים",
+    "sentence": "We play soccer every afternoon after school."
   },
   {
     "word": "fireman",
-    "he": "כבאי"
+    "he": "כבאי",
+    "sentence": "The fireman helps put out fires."
   },
   {
     "word": "famous",
-    "he": "מפורסם"
+    "he": "מפורסם",
+    "sentence": "The famous singer sings very well."
   },
   {
     "word": "teacher",
-    "he": "מורה"
+    "he": "מורה",
+    "sentence": "The teacher helps us learn new things."
   },
   {
     "word": "wednesday",
-    "he": "רביעי"
+    "he": "רביעי",
+    "sentence": "I have soccer practice on Wednesday."
   },
   {
     "word": "want",
-    "he": "רוצה"
+    "he": "רוצה",
+    "sentence": "I want a new toy today."
   },
   {
     "word": "leg",
-    "he": "רגל"
+    "he": "רגל",
+    "sentence": "I hurt my leg when I fell."
   },
   {
     "word": "look",
-    "he": "להסתכל"
+    "he": "להסתכל",
+    "sentence": "Look at the big, blue sky."
   },
   {
     "word": "need",
-    "he": "צריך"
+    "he": "צריך",
+    "sentence": "I need a pencil to write."
   },
   {
     "word": "rest",
-    "he": "מנוחה"
+    "he": "מנוחה",
+    "sentence": "I rest after I finish my homework."
   },
   {
     "word": "dinner",
-    "he": "ארוחת ערב"
+    "he": "ארוחת ערב",
+    "sentence": "We eat dinner together every night."
   },
   {
     "word": "ice cream",
-    "he": "גלידה"
+    "he": "גלידה",
+    "sentence": "I eat ice cream on hot days."
   },
   {
     "word": "together",
-    "he": "ביחד"
+    "he": "ביחד",
+    "sentence": "We play games together after school."
   },
   {
     "word": "garden",
-    "he": "גן"
+    "he": "גן",
+    "sentence": "I water the flowers in my garden."
   },
   {
     "word": "kitchen",
-    "he": "מטבח"
+    "he": "מטבח",
+    "sentence": "I help my mom clean the kitchen."
   },
   {
     "word": "fun",
-    "he": "כיף"
+    "he": "כיף",
+    "sentence": "We have fun at the park."
   },
   {
     "word": "who",
-    "he": "מי"
+    "he": "מי",
+    "sentence": "Who is your best friend at school?"
   },
   {
     "word": "name",
-    "he": "שם"
+    "he": "שם",
+    "sentence": "My name is Anna."
   },
   {
     "word": "true",
-    "he": "אמת"
+    "he": "אמת",
+    "sentence": "The story in the book is true."
   },
   {
     "word": "false",
-    "he": "שקר"
+    "he": "שקר",
+    "sentence": "The answer is false, not true."
   }
 ]

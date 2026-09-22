@@ -5,6 +5,7 @@ import { playOverMusic } from "../music.js";
 import { saySlot, markKnownBody, renderQuizLauncher } from "./words.js";
 import { startQuiz } from "../quiz.js";
 import { knownSetFromProfile } from "../quiz-core.js";
+import { startMatchGame } from "../match-game.js";
 
 const VIEW_STYLE = `
   .exam-count {
@@ -45,6 +46,12 @@ const VIEW_STYLE = `
   .exam-card-he {
     color: var(--color-muted);
     font-size: 0.95rem;
+  }
+
+  .exam-card-sentence {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin: 0;
   }
 
   .exam-card-actions {
@@ -184,11 +191,21 @@ export function renderCards(examWords, allowedWords, profile) {
           : "";
       const badgeHtml = profileEntry ? statusBadge(profileEntry.status) : "";
 
+      // A pure display fact about the WORD, not about her -- always sourced
+      // from exam-words.json itself, never routed through the profile the way
+      // "he" is (that detour exists only because he also has to feed the
+      // quiz's he-pick/he-type kinds; a sentence feeds nothing but the eye).
+      const sentenceHtml =
+        typeof entry.sentence === "string" && entry.sentence.trim() !== ""
+          ? `<p class="exam-card-sentence" dir="ltr">${escapeHtml(entry.sentence)}</p>`
+          : "";
+
       return `
         <div class="exam-card">
           <div class="exam-card-text">
             <span class="exam-card-lemma" dir="ltr">${escapeHtml(entry.word)}</span>
             <span class="exam-card-he">${heHtml}</span>
+            ${sentenceHtml}
           </div>
           <div class="exam-card-actions">
             ${sayHtml}
@@ -248,12 +265,20 @@ export async function render(container, ctx) {
       ? new Set(Object.keys(profile.words).filter((k) => profile.words[k] && profile.words[k].status === "candidate"))
       : new Set();
 
-    const launcherHtml = profile ? renderQuizLauncher(examLemmas.length) : "";
+    const quizLauncherHtml = profile ? renderQuizLauncher(examLemmas.length) : "";
+    // The matching game needs no profile at all (no score is ever posted --
+    // same "no consequence, no grading" call the word-sentences design made
+    // for its own ungraded activity), so it stays offered even if the
+    // profile fetch above failed.
+    const matchLauncherHtml =
+      examWords.length >= 2
+        ? `<div class="exam-match-launch"><button class="btn" type="button" data-action="start-match">משחק זיכרון</button></div>`
+        : "";
 
     container.innerHTML = `
       ${styleTag()}
       ${header()}
-      <p class="exam-count">${examWords.length} מילים למבחן — לחצי על הרמקול כדי לשמוע כל מילה</p>${launcherHtml}
+      <p class="exam-count">${examWords.length} מילים למבחן — לחצי על הרמקול כדי לשמוע כל מילה</p>${quizLauncherHtml}${matchLauncherHtml}
       <div class="exam-grid">${renderCards(examWords, allowedWords, profile)}</div>
     `;
 
@@ -304,6 +329,13 @@ export async function render(container, ctx) {
             draw();
           },
         });
+      });
+    }
+
+    const matchBtn = container.querySelector('[data-action="start-match"]');
+    if (matchBtn) {
+      matchBtn.addEventListener("click", () => {
+        startMatchGame(container, { examWords, count: 6, onExit: draw });
       });
     }
   }
