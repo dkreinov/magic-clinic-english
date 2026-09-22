@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { defaultProfile, validateProfile, applyWordTap, markWordKnown, migrateWordKeys } from '../lib/profile.js';
+import { defaultProfile, validateProfile, applyWordTap, markWordKnown, collectBandWords, migrateWordKeys } from '../lib/profile.js';
 
 test('applyWordTap: new tap normalizes lemma and creates entry', () => {
   const profile = defaultProfile();
@@ -60,6 +60,35 @@ test('markWordKnown: on already-tapped lemma flips status, preserves taps and so
   assert.equal(entry.taps, 2);
   assert.equal(entry.source, 'tap');
   assert.equal(entry.lastSeen, knownNow);
+});
+
+test('collectBandWords: new lemmas become learning-status entries with source "band"', () => {
+  const profile = defaultProfile();
+  const now = '2026-01-01T00:00:00.000Z';
+  collectBandWords(profile, { words: [{ lemma: 'Sofa', he: 'ספה' }, { lemma: 'fireman', he: null }], now });
+
+  assert.equal(profile.words.sofa.status, 'learning');
+  assert.equal(profile.words.sofa.source, 'band');
+  assert.equal(profile.words.sofa.he, 'ספה');
+  assert.equal(profile.words.sofa.taps, 0);
+  assert.equal(profile.words.sofa.firstSeen, now);
+  assert.equal(profile.words.fireman.he, null);
+});
+
+test('collectBandWords: an existing entry, of any status, is left completely untouched', () => {
+  const profile = defaultProfile();
+  markWordKnown(profile, { lemma: 'cookie', source: 'placement', he: 'עוגיה', now: '2026-01-01T00:00:00.000Z' });
+  const before = JSON.stringify(profile.words.cookie);
+
+  collectBandWords(profile, { words: [{ lemma: 'cookie', he: 'DIFFERENT' }], now: '2026-02-01T00:00:00.000Z' });
+
+  assert.equal(JSON.stringify(profile.words.cookie), before, 'a real word must never be downgraded or overwritten by a batch import');
+});
+
+test('collectBandWords: a blank or malformed lemma is skipped, not thrown', () => {
+  const profile = defaultProfile();
+  collectBandWords(profile, { words: [{ lemma: '  ' }, { lemma: 'ok', he: 'בסדר' }] });
+  assert.deepEqual(Object.keys(profile.words), ['ok']);
 });
 
 test('markWordKnown: missing source and invalid source both throw', () => {

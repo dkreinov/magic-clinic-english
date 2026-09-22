@@ -61,11 +61,11 @@ test('sw.js has the expected cache name and precache list resolving to real file
   // read back out of sw.js, so a bump applied to only one of the two files fails loudly
   // rather than leaving her browser serving yesterday's code from a cache with no reason
   // to refetch -- which is exactly what F2-3 caught happening on a dev origin.
-  const EXPECTED_CACHE = 'magic-vet-v26';
+  const EXPECTED_CACHE = 'magic-vet-v27';
   const cacheMatch = sw.match(/const CACHE = "([^"]+)";/);
   assert.ok(cacheMatch, 'expected to find the CACHE constant in sw.js');
   assert.strictEqual(cacheMatch[1], EXPECTED_CACHE, 'sw.js CACHE and this pin must agree');
-  assert.ok(!sw.includes('magic-vet-v25'), 'the old cache name must be gone, not merely joined');
+  assert.ok(!sw.includes('magic-vet-v26'), 'the old cache name must be gone, not merely joined');
 
   const match = sw.match(/PRECACHE\s*=\s*(\[[\s\S]*?\])/);
   assert.ok(match, 'expected to find PRECACHE array literal in sw.js');

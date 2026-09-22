@@ -1,6 +1,6 @@
 import { sendJson, readJsonBody } from '../lib/http.js';
 import { loadProfile, saveProfile } from '../lib/store.js';
-import { defaultProfile, applyWordTap, markWordKnown, setLearner, logCheck, migrateWordKeys, applyQuizAnswer, awardTrophies } from '../lib/profile.js';
+import { defaultProfile, applyWordTap, markWordKnown, collectBandWords, setLearner, logCheck, migrateWordKeys, applyQuizAnswer, awardTrophies } from '../lib/profile.js';
 import { isAuthorized, rejectUnauthorized } from '../lib/auth.js';
 import { resolveLemma } from '../public/lemma.js';
 import wordManifest from '../public/audio/words/index.json' with { type: 'json' };
@@ -81,6 +81,25 @@ export default async function handler(req, res) {
       sendJson(res, 400, { ok: false, error: err.message });
       return;
     }
+  } else if (body.action === 'collect-band-words') {
+    if (!Array.isArray(body.words) || body.words.length === 0) {
+      sendJson(res, 400, { ok: false, error: 'words required' });
+      return;
+    }
+    const words = [];
+    for (const w of body.words) {
+      if (!w || typeof w.lemma !== 'string' || w.lemma.trim() === '') {
+        sendJson(res, 400, { ok: false, error: 'invalid word entry' });
+        return;
+      }
+      // Same normalization word-tap and mark-known already apply: resolve to
+      // the lemma the audio manifest actually has a clip for, so a batch word
+      // that is already a surface form in her dictionary ("cookies") lands on
+      // the SAME key ("cookie") instead of sitting beside it unmerged.
+      const lemma = resolveLemma(w.lemma, ALLOWED_WORDS) || w.lemma.trim().toLowerCase();
+      words.push({ lemma, he: typeof w.he === 'string' ? w.he : null });
+    }
+    collectBandWords(p, { words });
   } else if (body.action === 'set-learner') {
     if (body.heroineName === undefined && body.petName === undefined) {
       sendJson(res, 400, { ok: false, error: 'name required' });

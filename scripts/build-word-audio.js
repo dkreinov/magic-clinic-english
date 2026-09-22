@@ -86,16 +86,21 @@ export function bandWords() {
 
 // The exam list itself (a teacher-supplied word list, e.g. public/exam-words.json)
 // -- entries may be phrases ("ice cream"), unlike the single-lemma sources above.
+// Each entry is `{word, he}`; audio generation only ever needs `word`, so this
+// keeps returning plain strings -- the Hebrew translation is a concern of
+// scripts/translate-exam-words.mjs and public/views/exam-words.js, not this one.
 export function readExamWords() {
   if (!existsSync(EXAM_WORDS_PATH)) return [];
   const raw = JSON.parse(readFileSync(EXAM_WORDS_PATH, 'utf8'));
   if (!Array.isArray(raw)) throw new Error('public/exam-words.json must be a JSON array');
-  for (const w of raw) {
-    if (typeof w !== 'string' || w.trim() === '') {
-      throw new Error(`public/exam-words.json holds ${JSON.stringify(w)}, which can never be a word`);
+  const words = [];
+  for (const entry of raw) {
+    if (!entry || typeof entry !== 'object' || typeof entry.word !== 'string' || entry.word.trim() === '') {
+      throw new Error(`public/exam-words.json holds ${JSON.stringify(entry)}, which can never be a word`);
     }
+    words.push(entry.word);
   }
-  return raw;
+  return words;
 }
 
 // "children" is PERMANENTLY EXCLUDED, even though nothing today resolves it.

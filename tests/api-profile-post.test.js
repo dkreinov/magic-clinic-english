@@ -145,6 +145,53 @@ test('mark-known POST without source returns 400', async () => {
   }));
 });
 
+test('collect-band-words POST adds new words as learning, resolved to their manifest lemma', async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
+    const req = createPostReq({
+      action: 'collect-band-words',
+      words: [{ lemma: 'fireman', he: 'כבאי' }, { lemma: 'cookies', he: 'עוגיות' }],
+    });
+    const res = createMockRes();
+    await profileHandler(req, res);
+    assert.strictEqual(res.statusCode, 200);
+    const parsed = JSON.parse(res.body);
+    assertEnvelope(parsed);
+    assert.strictEqual(parsed.ok, true);
+    assert.strictEqual(parsed.data.words.fireman.status, 'learning');
+    assert.strictEqual(parsed.data.words.fireman.source, 'band');
+    // "cookies" resolves to the manifest lemma "cookie", same as word-tap/mark-known do.
+    assert.strictEqual(parsed.data.words.cookie.status, 'learning');
+    assert.strictEqual(parsed.data.words.cookie.he, 'עוגיות');
+    assert.strictEqual(parsed.data.words.cookies, undefined);
+  }));
+});
+
+test('collect-band-words POST never downgrades a word she already knows', async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
+    const known = createPostReq({ action: 'mark-known', lemma: 'cookie', source: 'placement', he: 'עוגיה' });
+    await profileHandler(known, createMockRes());
+
+    const req = createPostReq({ action: 'collect-band-words', words: [{ lemma: 'cookies', he: 'DIFFERENT' }] });
+    const res = createMockRes();
+    await profileHandler(req, res);
+    const parsed = JSON.parse(res.body);
+    assert.strictEqual(parsed.data.words.cookie.status, 'known', 'a batch import must never demote a known word');
+    assert.strictEqual(parsed.data.words.cookie.he, 'עוגיה', 'a batch import must never overwrite an existing translation');
+  }));
+});
+
+test('collect-band-words POST with an empty words array returns 400', async () => {
+  await withOpenGate(() => withTempDataDir(async () => {
+    const req = createPostReq({ action: 'collect-band-words', words: [] });
+    const res = createMockRes();
+    await profileHandler(req, res);
+    assert.strictEqual(res.statusCode, 400);
+    const parsed = JSON.parse(res.body);
+    assertEnvelope(parsed);
+    assert.strictEqual(parsed.ok, false);
+  }));
+});
+
 test('unknown action POST returns 400', async () => {
   await withOpenGate(() => withTempDataDir(async () => {
     const req = createPostReq({ action: 'nope' });

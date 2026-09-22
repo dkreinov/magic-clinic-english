@@ -1,53 +1,206 @@
 [
-  "sell",
-  "lemonade",
-  "children",
-  "play",
-  "morning",
-  "park",
-  "eighty",
-  "ninety",
-  "horse",
-  "fly",
-  "doctor",
-  "hospital",
-  "hungry",
-  "night",
-  "bathroom",
-  "cookies",
-  "sleep",
-  "kind",
-  "king",
-  "restaurant",
-  "clinic",
-  "vet",
-  "tea",
-  "tomato",
-  "candy",
-  "chicken",
-  "sofa",
-  "nineteen",
-  "twenty",
-  "summer",
-  "evening",
-  "afternoon",
-  "fireman",
-  "famous",
-  "teacher",
-  "wednesday",
-  "want",
-  "leg",
-  "look",
-  "need",
-  "rest",
-  "dinner",
-  "ice cream",
-  "together",
-  "garden",
-  "kitchen",
-  "fun",
-  "who",
-  "name",
-  "true",
-  "false"
+  {
+    "word": "sell",
+    "he": "למכור"
+  },
+  {
+    "word": "lemonade",
+    "he": "לימונדה"
+  },
+  {
+    "word": "children",
+    "he": "ילדים"
+  },
+  {
+    "word": "play",
+    "he": "לשחק"
+  },
+  {
+    "word": "morning",
+    "he": "בוקר"
+  },
+  {
+    "word": "park",
+    "he": "פארק"
+  },
+  {
+    "word": "eighty",
+    "he": "שמונים"
+  },
+  {
+    "word": "ninety",
+    "he": "תשעים"
+  },
+  {
+    "word": "horse",
+    "he": "סוס"
+  },
+  {
+    "word": "fly",
+    "he": "לעוף"
+  },
+  {
+    "word": "doctor",
+    "he": "רופא"
+  },
+  {
+    "word": "hospital",
+    "he": "ביתחולים"
+  },
+  {
+    "word": "hungry",
+    "he": "רעב"
+  },
+  {
+    "word": "night",
+    "he": "לילה"
+  },
+  {
+    "word": "bathroom",
+    "he": "אמבטיה"
+  },
+  {
+    "word": "cookies",
+    "he": "עוגיות"
+  },
+  {
+    "word": "sleep",
+    "he": "שינה"
+  },
+  {
+    "word": "kind",
+    "he": "טוב"
+  },
+  {
+    "word": "king",
+    "he": "מלך"
+  },
+  {
+    "word": "restaurant",
+    "he": "מסעדה"
+  },
+  {
+    "word": "clinic",
+    "he": "מרפאה"
+  },
+  {
+    "word": "vet",
+    "he": "וטרינר"
+  },
+  {
+    "word": "tea",
+    "he": "תה"
+  },
+  {
+    "word": "tomato",
+    "he": "עגבנייה"
+  },
+  {
+    "word": "candy",
+    "he": "סוכריה"
+  },
+  {
+    "word": "chicken",
+    "he": "עוף"
+  },
+  {
+    "word": "sofa",
+    "he": "ספה"
+  },
+  {
+    "word": "nineteen",
+    "he": "תשעה-עשר"
+  },
+  {
+    "word": "twenty",
+    "he": "עשרים"
+  },
+  {
+    "word": "summer",
+    "he": "קיץ"
+  },
+  {
+    "word": "evening",
+    "he": "ערב"
+  },
+  {
+    "word": "afternoon",
+    "he": "אחר הצהריים"
+  },
+  {
+    "word": "fireman",
+    "he": "כבאי"
+  },
+  {
+    "word": "famous",
+    "he": "מפורסם"
+  },
+  {
+    "word": "teacher",
+    "he": "מורה"
+  },
+  {
+    "word": "wednesday",
+    "he": "רביעי"
+  },
+  {
+    "word": "want",
+    "he": "רוצה"
+  },
+  {
+    "word": "leg",
+    "he": "רגל"
+  },
+  {
+    "word": "look",
+    "he": "להסתכל"
+  },
+  {
+    "word": "need",
+    "he": "צריך"
+  },
+  {
+    "word": "rest",
+    "he": "מנוחה"
+  },
+  {
+    "word": "dinner",
+    "he": "ארוחת ערב"
+  },
+  {
+    "word": "ice cream",
+    "he": "גלידה"
+  },
+  {
+    "word": "together",
+    "he": "ביחד"
+  },
+  {
+    "word": "garden",
+    "he": "גן"
+  },
+  {
+    "word": "kitchen",
+    "he": "מטבח"
+  },
+  {
+    "word": "fun",
+    "he": "כיף"
+  },
+  {
+    "word": "who",
+    "he": "מי"
+  },
+  {
+    "word": "name",
+    "he": "שם"
+  },
+  {
+    "word": "true",
+    "he": "אמת"
+  },
+  {
+    "word": "false",
+    "he": "שקר"
+  }
 ]
